@@ -1,0 +1,60 @@
+[data-theme="dark"] {
+  /* Background */
+  --dark-bg-page: #0F141F;
+  --dark-bg-elevated: #1A2030;
+  --dark-bg-overlay: rgba(15, 23, 42, 0.45);
+
+  /* Card */
+  --dark-card-l1: #1A2030;
+  --dark-card-l2: #232B3D;
+  --dark-card-l3: #2A344D;
+
+  /* Text */
+  --dark-text-primary: #E8ECF1;
+  --dark-text-secondary: #94A3B8;
+  --dark-text-tertiary: #64748B;
+  --dark-text-disabled: #475569;
+
+  /* Accent */
+  --dark-accent-primary: #5B8DEF;
+  --dark-accent-primary-hover: #7AA6F5;
+  --dark-accent-primary-active: #4A7BD4;
+  --dark-accent-secondary: #22C55E;
+  --dark-accent-gold: #F5A623;
+
+  /* Border */
+  --dark-border-default: rgba(255, 255, 255, 0.08);
+  --dark-border-hover: rgba(255, 255, 255, 0.15);
+  --dark-border-active: rgba(91, 141, 239, 0.5);
+
+  /* Status - passive */
+  --dark-status-success: #6BC98F;
+  --dark-status-error: #E57D7D;
+  --dark-status-warning: #F0C674;
+  --dark-status-info: #7AA6F5;
+
+  /* Status - active (high saturation for connection lines) */
+  --dark-status-success-active: #22C55E;
+  --dark-status-error-active: #EF4444;
+  --dark-status-warning-active: #F59E0B;
+  --dark-status-info-active: #3B82F6;
+
+  /* Connection */
+  --dark-conn-line-default: #64748B;
+  --dark-conn-line-valid: #22C55E;
+  --dark-conn-line-invalid: #EF4444;
+  --dark-conn-spotlight: rgba(15, 23, 42, 0.45);
+  --dark-conn-dim: saturate(0.3) brightness(0.6);
+
+  /* Tree */
+  --dark-tree-hover-bg: rgba(255, 255, 255, 0.04);
+  --dark-tree-selected-bg: rgba(59, 130, 246, 0.12);
+  --dark-tree-guide-line: rgba(255, 255, 255, 0.06);
+  --dark-tree-guide-line-hover: rgba(255, 255, 255, 0.15);
+
+  /* Focus / Input / Backdrop */
+  --dark-focus-ring: rgba(91, 141, 239, 0.6);
+  --dark-backdrop: rgba(0, 0, 0, 0.6);
+  --dark-input-bg: #232B3D;
+  --dark-input-bg-hover: #2A344D;
+}
