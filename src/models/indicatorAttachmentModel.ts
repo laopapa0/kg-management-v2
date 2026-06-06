@@ -45,3 +45,138 @@ export function createIndicatorAttachment(
     ruleIds: indicator.ruleIds ?? [],
   } as IndicatorAttachment;
 }
+
+/* ─────────────────────────────────────────────────────────────────────────── */
+/* ─── TagNode + Rule + RuleParameter 模型 ─── */
+/* ─────────────────────────────────────────────────────────────────────────── */
+
+/** 标签节点 */
+export interface TagNode {
+  id: string;
+  name: string;
+  parentId?: string;
+  color?: string;
+  children?: TagNode[];
+}
+
+export const tagNodeSchema: z.ZodType<TagNode> = z.lazy(() =>
+  z.object({
+    id: z.string(),
+    name: z.string(),
+    parentId: z.string().optional(),
+    color: z.string().optional(),
+    children: z.array(tagNodeSchema).optional(),
+  }),
+);
+
+/** 规则类型枚举 */
+export const RuleTypeEnum = z.enum(['threshold', 'fluctuation', 'topn']);
+export type RuleType = z.infer<typeof RuleTypeEnum>;
+
+/** 规则参数实例（联合主键：ruleId + indicatorId） */
+export interface RuleParameter {
+  ruleId: string;
+  indicatorId: string;
+  upperLimit?: number;
+  lowerLimit?: number;
+  unit?: string;
+  level?: 'P1' | 'P2' | 'P3' | 'P4';
+  isInherited?: boolean;
+  overriddenFields?: string[];
+}
+
+export const ruleParameterSchema: z.ZodType<RuleParameter> = z.object({
+  ruleId: z.string(),
+  indicatorId: z.string(),
+  upperLimit: z.number().optional(),
+  lowerLimit: z.number().optional(),
+  unit: z.string().optional(),
+  level: z.enum(['P1', 'P2', 'P3', 'P4']).optional(),
+  isInherited: z.boolean().optional(),
+  overriddenFields: z.array(z.string()).optional(),
+});
+
+/** 规则节点 */
+export interface Rule {
+  id: string;
+  name: string;
+  type: RuleType;
+  parentId?: string;
+  parameters?: RuleParameter[];
+  children?: Rule[];
+}
+
+export const ruleSchema: z.ZodType<Rule> = z.lazy(() =>
+  z.object({
+    id: z.string(),
+    name: z.string(),
+    type: RuleTypeEnum,
+    parentId: z.string().optional(),
+    parameters: z.array(ruleParameterSchema).optional(),
+    children: z.array(ruleSchema).optional(),
+  }),
+);
+
+/* ─────────────────────────────────────────────────────────────────────────── */
+/* ─── 平表 → 嵌套树 工具函数 ─── */
+/* ─────────────────────────────────────────────────────────────────────────── */
+
+/**
+ * 将 TagNode 平表数组转换为嵌套树
+ *
+ * 找不到 parentId 的节点会被提升为根节点（防御性处理，避免数据丢失）。
+ */
+export function buildTagTree(flat: TagNode[]): TagNode[] {
+  if (flat.length === 0) return [];
+
+  const nodeMap = new Map<string, TagNode>();
+  const roots: TagNode[] = [];
+
+  // 第一遍：创建节点副本并建立 id -> node 映射
+  for (const node of flat) {
+    const copy: TagNode = { ...node, children: undefined };
+    nodeMap.set(copy.id, copy);
+  }
+
+  // 第二遍：挂载到父节点或作为根节点
+  for (const node of nodeMap.values()) {
+    if (node.parentId && nodeMap.has(node.parentId)) {
+      const parent = nodeMap.get(node.parentId)!;
+      parent.children = parent.children ?? [];
+      parent.children.push(node);
+    } else {
+      roots.push(node);
+    }
+  }
+
+  return roots;
+}
+
+/**
+ * 将 Rule 平表数组转换为嵌套树
+ *
+ * 找不到 parentId 的节点会被提升为根节点。
+ */
+export function buildRuleTree(flat: Rule[]): Rule[] {
+  if (flat.length === 0) return [];
+
+  const nodeMap = new Map<string, Rule>();
+  const roots: Rule[] = [];
+
+  for (const node of flat) {
+    const copy: Rule = { ...node, children: undefined };
+    nodeMap.set(copy.id, copy);
+  }
+
+  for (const node of nodeMap.values()) {
+    if (node.parentId && nodeMap.has(node.parentId)) {
+      const parent = nodeMap.get(node.parentId)!;
+      parent.children = parent.children ?? [];
+      parent.children.push(node);
+    } else {
+      roots.push(node);
+    }
+  }
+
+  return roots;
+}

@@ -3,6 +3,15 @@ import {
   indicatorAttachmentSchema,
   type IndicatorAttachment,
   createIndicatorAttachment,
+  type TagNode,
+  type Rule,
+  type RuleParameter,
+  buildTagTree,
+  buildRuleTree,
+  tagNodeSchema,
+  ruleSchema,
+  ruleParameterSchema,
+  RuleType,
 } from './indicatorAttachmentModel';
 import type { Indicator } from './indicatorModel';
 
@@ -219,5 +228,199 @@ describe('indicatorAttachmentModel', () => {
       expect(result.data.ruleIds).toEqual([]);
       expect(result.data.treeParentId).toBeUndefined();
     }
+  });
+});
+
+describe('TagNode + Rule + RuleParameter models', () => {
+  // ─── TagNode 字段定义 ───
+  it('TagNode 包含 id / name / parentId? / color? / children? 字段', () => {
+    const node: TagNode = {
+      id: 'TAG-1',
+      name: '利润',
+      parentId: 'TAG-ROOT',
+      color: '#3B82F6',
+    };
+
+    expect(node.id).toBe('TAG-1');
+    expect(node.name).toBe('利润');
+    expect(node.parentId).toBe('TAG-ROOT');
+    expect(node.color).toBe('#3B82F6');
+    expect(node.children).toBeUndefined();
+  });
+
+  it('tagNodeSchema 验证合法 TagNode', () => {
+    const result = tagNodeSchema.safeParse({
+      id: 'TAG-1',
+      name: '利润',
+      parentId: 'TAG-ROOT',
+      color: '#3B82F6',
+    });
+
+    expect(result.success).toBe(true);
+  });
+
+  // ─── Rule 字段定义 ───
+  it('Rule 包含 id / name / type / parentId? / parameters? / children? 字段', () => {
+    const rule: Rule = {
+      id: 'RULE-1',
+      name: '营收波动检测',
+      type: 'fluctuation',
+      parentId: 'RULE-ROOT',
+    };
+
+    expect(rule.id).toBe('RULE-1');
+    expect(rule.name).toBe('营收波动检测');
+    expect(rule.type).toBe('fluctuation');
+    expect(rule.parentId).toBe('RULE-ROOT');
+  });
+
+  it('Rule type 只允许 threshold / fluctuation / topn', () => {
+    expect(() => {
+      const _invalid: Rule = {
+        id: 'RULE-X',
+        name: '非法规则',
+        type: 'unknown' as RuleType,
+      };
+      void _invalid;
+    }).not.toThrow();
+
+    const valid = ruleSchema.safeParse({
+      id: 'RULE-1',
+      name: '营收波动检测',
+      type: 'fluctuation',
+    });
+    expect(valid.success).toBe(true);
+
+    const invalid = ruleSchema.safeParse({
+      id: 'RULE-1',
+      name: '营收波动检测',
+      type: 'unknown',
+    });
+    expect(invalid.success).toBe(false);
+  });
+
+  // ─── RuleParameter 字段定义 ───
+  it('RuleParameter 包含所有参数字段', () => {
+    const param: RuleParameter = {
+      ruleId: 'RULE-1',
+      indicatorId: 'IND-1',
+      upperLimit: 120,
+      lowerLimit: 80,
+      unit: '百分比',
+      level: 'P2',
+      isInherited: false,
+      overriddenFields: ['upperLimit', 'lowerLimit'],
+    };
+
+    expect(param.ruleId).toBe('RULE-1');
+    expect(param.indicatorId).toBe('IND-1');
+    expect(param.upperLimit).toBe(120);
+    expect(param.lowerLimit).toBe(80);
+    expect(param.unit).toBe('百分比');
+    expect(param.level).toBe('P2');
+    expect(param.isInherited).toBe(false);
+    expect(param.overriddenFields).toEqual(['upperLimit', 'lowerLimit']);
+  });
+
+  it('ruleParameterSchema 验证合法 RuleParameter', () => {
+    const result = ruleParameterSchema.safeParse({
+      ruleId: 'RULE-1',
+      indicatorId: 'IND-1',
+      upperLimit: 120,
+      lowerLimit: 80,
+      unit: '百分比',
+      level: 'P2',
+      isInherited: false,
+      overriddenFields: ['upperLimit'],
+    });
+
+    expect(result.success).toBe(true);
+  });
+
+  // ─── buildTagTree 平表转嵌套树 ───
+  it('buildTagTree 将平表数组转换为嵌套树', () => {
+    const flat: TagNode[] = [
+      { id: 'T1', name: '财务' },
+      { id: 'T2', name: '利润', parentId: 'T1' },
+      { id: 'T3', name: '成本', parentId: 'T1' },
+      { id: 'T4', name: '净利润', parentId: 'T2' },
+    ];
+
+    const tree = buildTagTree(flat);
+
+    expect(tree).toHaveLength(1);
+    expect(tree[0].id).toBe('T1');
+    expect(tree[0].children).toHaveLength(2);
+    expect(tree[0].children?.map((c) => c.id).sort()).toEqual(['T2', 'T3']);
+
+    const profit = tree[0].children?.find((c) => c.id === 'T2');
+    expect(profit?.children).toHaveLength(1);
+    expect(profit?.children?.[0].id).toBe('T4');
+  });
+
+  it('buildTagTree 空数组返回空数组', () => {
+    expect(buildTagTree([])).toEqual([]);
+  });
+
+  it('buildTagTree 对找不到 parentId 的节点作为根节点处理', () => {
+    const flat: TagNode[] = [
+      { id: 'T1', name: '根' },
+      { id: 'T2', name: '孤儿', parentId: 'NOT-EXIST' },
+    ];
+
+    const tree = buildTagTree(flat);
+
+    expect(tree).toHaveLength(2);
+    expect(tree.map((n) => n.id).sort()).toEqual(['T1', 'T2']);
+  });
+
+  // ─── buildRuleTree 平表转嵌套树 ───
+  it('buildRuleTree 将平表数组转换为嵌套树', () => {
+    const flat: Rule[] = [
+      { id: 'R1', name: '基础设施监控', type: 'threshold' },
+      { id: 'R2', name: '营收波动检测', type: 'fluctuation', parentId: 'R1' },
+      { id: 'R3', name: 'TopN 分析', type: 'topn', parentId: 'R1' },
+    ];
+
+    const tree = buildRuleTree(flat);
+
+    expect(tree).toHaveLength(1);
+    expect(tree[0].id).toBe('R1');
+    expect(tree[0].children).toHaveLength(2);
+    expect(tree[0].children?.map((c) => c.id).sort()).toEqual(['R2', 'R3']);
+  });
+
+  it('buildRuleTree 空数组返回空数组', () => {
+    expect(buildRuleTree([])).toEqual([]);
+  });
+
+  it('buildRuleTree 保留 parameters 字段', () => {
+    const flat: Rule[] = [
+      {
+        id: 'R1',
+        name: '规则',
+        type: 'threshold',
+        parameters: [
+          { ruleId: 'R1', indicatorId: 'IND-1', upperLimit: 100 },
+        ],
+      },
+    ];
+
+    const tree = buildRuleTree(flat);
+
+    expect(tree[0].parameters).toHaveLength(1);
+    expect(tree[0].parameters?.[0].upperLimit).toBe(100);
+  });
+
+  it('buildRuleTree 对找不到 parentId 的节点作为根节点处理', () => {
+    const flat: Rule[] = [
+      { id: 'R1', name: '根规则', type: 'threshold' },
+      { id: 'R2', name: '孤儿规则', type: 'topn', parentId: 'NOT-EXIST' },
+    ];
+
+    const tree = buildRuleTree(flat);
+
+    expect(tree).toHaveLength(2);
+    expect(tree.map((n) => n.id).sort()).toEqual(['R1', 'R2']);
   });
 });
