@@ -12,6 +12,7 @@ import {
   Home,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { DepartmentSwitcher } from './department/DepartmentSwitcher';
 
 /* ─── 面包屑映射 ─── */
 const routeNameMap: Record<string, string> = {
@@ -117,6 +118,9 @@ export default function Header({ sidebarCollapsed }: HeaderProps) {
 
       {/* 右侧操作区 */}
       <div className="flex items-center gap-3">
+        {/* 部门切换器 */}
+        <DepartmentSwitcher />
+
         {/* 搜索框 */}
         <form onSubmit={handleSearch} className="relative">
           <Search size={15} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[#9ba4b3]" />

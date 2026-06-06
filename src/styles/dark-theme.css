@@ -57,4 +57,33 @@
   --dark-backdrop: rgba(0, 0, 0, 0.6);
   --dark-input-bg: #232B3D;
   --dark-input-bg-hover: #2A344D;
+
+  /* shadcn/ui semantic overrides */
+  --background: 222 47% 9%;
+  --foreground: 210 20% 93%;
+  --card: 222 30% 15%;
+  --card-foreground: 210 20% 93%;
+  --popover: 222 30% 15%;
+  --popover-foreground: 210 20% 93%;
+  --primary: 217 91% 65%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 220 20% 18%;
+  --secondary-foreground: 210 20% 93%;
+  --muted: 220 20% 18%;
+  --muted-foreground: 215 16% 62%;
+  --accent: 222 30% 23%;
+  --accent-foreground: 210 20% 96%;
+  --destructive: 0 62% 50%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 220 13% 20%;
+  --input: 220 13% 20%;
+  --ring: 217 91% 65%;
+  --sidebar-background: 220 20% 12%;
+  --sidebar-foreground: 215 16% 70%;
+  --sidebar-primary: 217 91% 65%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 220 20% 18%;
+  --sidebar-accent-foreground: 210 20% 93%;
+  --sidebar-border: 220 13% 20%;
+  --sidebar-ring: 217 91% 65%;
 }
