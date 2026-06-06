@@ -5,3 +5,19 @@ dist/
 .vscode/
 .idea/
 *.local
+
+# Secrets
+.env
+.env.*
+*.pem
+*.key
+*.p12
+*.pfx
+secrets/
+config/secrets.*
+credentials.json
+
+# Credentials
+aws.credentials
+*.tfvars
+.terraform/
