@@ -41,9 +41,9 @@ describe('TagSetPanel', () => {
       expect(within(groupEl).getByText(name)).toBeInTheDocument()
     }
 
-    const row = within(groupEl).getByTestId('tag-list-row')
-    expect(row).toHaveClass('flex')
-    expect(row).toHaveClass('flex-wrap')
+    const cloud = within(groupEl).getByTestId('tag-cloud-container')
+    expect(cloud).toHaveClass('flex')
+    expect(cloud).toHaveClass('flex-wrap')
   })
 
   it('shows selected state for tags referenced by any indicator', () => {

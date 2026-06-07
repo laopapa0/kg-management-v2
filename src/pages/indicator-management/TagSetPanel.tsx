@@ -6,52 +6,11 @@ import { useAttachmentStore } from '@/stores/attachmentStore'
 import type { TagNode } from '@/models/indicatorAttachmentModel'
 import { buildTagTree } from '@/models/indicatorAttachmentModel'
 import { walkNodes } from '@/utils/attachmentTree'
+import TagCloud from '@/components/tag/TagCloud'
 
 interface TagTreeNode extends TreeNode {
   name: string
   color?: string
-}
-
-function collectTagIds(nodes: TagNode[]): Set<string> {
-  const set = new Set<string>()
-  for (const node of nodes) {
-    set.add(node.id)
-    if (node.children) {
-      for (const id of collectTagIds(node.children)) {
-        set.add(id)
-      }
-    }
-  }
-  return set
-}
-
-interface TagPillProps {
-  tag: TagNode
-  selected: boolean
-}
-
-function TagPill({ tag, selected }: TagPillProps) {
-  const baseColor = tag.color ?? '#64748B'
-  return (
-    <span
-      data-testid={`tag-pill-${tag.id}`}
-      data-selected={selected ? 'true' : 'false'}
-      data-tag-id={tag.id}
-      className={[
-        'inline-flex h-7 items-center whitespace-nowrap rounded-md px-2.5 text-xs font-medium transition-colors duration-150',
-        'border',
-        selected
-          ? 'bg-[#111B26] text-[#4DA6FF] border-[#15417E]'
-          : 'bg-dark-card-l2 text-dark-text-primary hover:bg-dark-tree-hover-bg',
-      ].join(' ')}
-      style={{
-        borderColor: selected ? '#15417E' : baseColor,
-        boxShadow: selected ? '0 0 8px rgba(77, 166, 255, 0.25)' : undefined,
-      }}
-    >
-      {tag.name}
-    </span>
-  )
 }
 
 interface TagGroupProps {
@@ -60,20 +19,16 @@ interface TagGroupProps {
 }
 
 function TagGroup({ node, selectedTagIds }: TagGroupProps) {
-  if (!node.children || node.children.length === 0) {
-    return <TagPill tag={node} selected={selectedTagIds.has(node.id)} />
-  }
+  const childTags = node.children && node.children.length > 0 ? node.children : [node]
 
   return (
     <div data-testid={`tag-group-${node.id}`} className="mb-2">
-      <div className="mb-1.5 text-xs font-semibold tracking-wide text-dark-text-secondary">
-        {node.name}
-      </div>
-      <div data-testid="tag-list-row" className="flex flex-wrap gap-2">
-        {node.children.map((child) => (
-          <TagGroup key={child.id} node={child} selectedTagIds={selectedTagIds} />
-        ))}
-      </div>
+      {node.children && node.children.length > 0 && (
+        <div className="mb-1.5 text-xs font-semibold tracking-wide text-dark-text-secondary">
+          {node.name}
+        </div>
+      )}
+      <TagCloud tags={childTags} selectedTagIds={selectedTagIds} />
     </div>
   )
 }
