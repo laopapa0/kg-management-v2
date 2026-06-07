@@ -110,4 +110,14 @@ describe('TagSetPanel', () => {
       expect(screen.getByText(nextTags.find((t) => !t.parentId)!.name)).toBeInTheDocument()
     })
   })
+
+  it('renders EmptyState when tagNodes is empty', () => {
+    initializeAttachmentStore()
+    useAttachmentStore.setState({ tagNodes: [] })
+
+    render(<TagSetPanel />)
+
+    expect(screen.getByTestId('empty-state-wrapper')).toBeInTheDocument()
+    expect(screen.getByText('暂无标签')).toBeInTheDocument()
+  })
 })

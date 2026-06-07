@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import { Toaster } from '@/components/ui/sonner';
 import Sidebar from './Sidebar';
 import Header from './Header';
 
@@ -34,6 +35,8 @@ export default function Layout({ children }: LayoutProps) {
           {children}
         </div>
       </motion.main>
+
+      <Toaster />
     </div>
   );
 }

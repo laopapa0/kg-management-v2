@@ -47,6 +47,47 @@ export function createIndicatorAttachment(
   return indicatorAttachmentSchema.parse(base) as unknown as IndicatorAttachment;
 }
 
+let idCounter = 0;
+
+function generateIndicatorId(): string {
+  idCounter += 1;
+  return `ind-generated-${Date.now()}-${idCounter}`;
+}
+
+/**
+ * 创建最小 IndicatorAttachment，用于指标树快速添加虚拟分组节点
+ *
+ * 本期先统一作为虚拟分组节点（只存 name/parentId），后续再区分类型。
+ */
+export function createMinimalIndicatorAttachment(
+  name: string,
+  options: { parentId?: string; department?: string } = {},
+): IndicatorAttachment {
+  const id = generateIndicatorId();
+  return createIndicatorAttachment({
+    id,
+    name,
+    code: `GROUP-${id.slice(-8).toUpperCase()}`,
+    indicatorCode: '',
+    indicatorDisplayName: name,
+    indicatorShowName: name,
+    indicatorType: '虚拟分组',
+    level1: '',
+    level2: '',
+    granularity: '',
+    frequency: '',
+    unit: '',
+    isBigScreen: false,
+    department: options.department ?? '',
+    businessCaliber: '',
+    techCaliber: '',
+    tags: [],
+    treeParentId: options.parentId,
+    tagIds: [],
+    ruleIds: [],
+  });
+}
+
 /* ─────────────────────────────────────────────────────────────────────────── */
 /* ─── TagNode + Rule + RuleParameter 模型 ─── */
 /* ─────────────────────────────────────────────────────────────────────────── */

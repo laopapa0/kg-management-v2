@@ -21,3 +21,4 @@ credentials.json
 aws.credentials
 *.tfvars
 .terraform/
+.handoff/

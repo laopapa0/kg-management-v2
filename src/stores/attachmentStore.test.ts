@@ -252,4 +252,133 @@ describe('attachmentStore', () => {
       expect(undoEvent.defaultPrevented).toBe(true)
     })
   })
+
+  describe('indicator CRUD', () => {
+    it('adds a new indicator tree node', () => {
+      initializeAttachmentStore()
+      const state = useAttachmentStore.getState()
+      const originalLength = state.indicators.length
+
+      state.addIndicator('新分组节点')
+
+      const next = useAttachmentStore.getState()
+      expect(next.indicators.length).toBe(originalLength + 1)
+      expect(next.indicators.some((i) => i.name === '新分组节点')).toBe(true)
+    })
+
+    it('pushes history when adding an indicator', () => {
+      initializeAttachmentStore()
+      const state = useAttachmentStore.getState()
+
+      expect(state.canUndo).toBe(false)
+      state.addIndicator('新分组节点')
+
+      expect(useAttachmentStore.getState().canUndo).toBe(true)
+    })
+
+    it('adds an indicator with parentId when provided', () => {
+      initializeAttachmentStore()
+      const state = useAttachmentStore.getState()
+      const parent = state.indicators[0]
+
+      state.addIndicator('子节点', parent.id)
+
+      const child = useAttachmentStore.getState().indicators.find((i) => i.name === '子节点')
+      expect(child).toBeDefined()
+      expect(child!.treeParentId).toBe(parent.id)
+    })
+
+    it('persists added indicator to storage', () => {
+      initializeAttachmentStore()
+      const state = useAttachmentStore.getState()
+
+      state.addIndicator('持久化节点')
+
+      const stored = getIndicators(state.currentDepartmentId!)
+      expect(stored.some((i) => i.name === '持久化节点')).toBe(true)
+    })
+
+    it('renames an existing indicator', () => {
+      initializeAttachmentStore()
+      const state = useAttachmentStore.getState()
+      const target = state.indicators[0]
+
+      state.renameIndicator(target.id, '重命名后')
+
+      const renamed = useAttachmentStore.getState().indicators.find((i) => i.id === target.id)
+      expect(renamed?.name).toBe('重命名后')
+    })
+
+    it('pushes history when renaming an indicator', () => {
+      initializeAttachmentStore()
+      const state = useAttachmentStore.getState()
+      const target = state.indicators[0]
+
+      expect(state.canUndo).toBe(false)
+      state.renameIndicator(target.id, '重命名后')
+
+      expect(useAttachmentStore.getState().canUndo).toBe(true)
+    })
+
+    it('does not rename when target id is not found', () => {
+      initializeAttachmentStore()
+      const state = useAttachmentStore.getState()
+      const originalLength = state.indicators.length
+
+      state.renameIndicator('non-existent', '新名称')
+
+      expect(useAttachmentStore.getState().indicators.length).toBe(originalLength)
+      expect(useAttachmentStore.getState().canUndo).toBe(false)
+    })
+
+    it('deletes an indicator by id', () => {
+      initializeAttachmentStore()
+      const state = useAttachmentStore.getState()
+      const target = state.indicators[0]
+      const originalLength = state.indicators.length
+
+      state.deleteIndicator(target.id)
+
+      expect(useAttachmentStore.getState().indicators.length).toBe(originalLength - 1)
+      expect(useAttachmentStore.getState().indicators.some((i) => i.id === target.id)).toBe(false)
+    })
+
+    it('pushes history when deleting an indicator', () => {
+      initializeAttachmentStore()
+      const state = useAttachmentStore.getState()
+      const target = state.indicators[0]
+
+      expect(state.canUndo).toBe(false)
+      state.deleteIndicator(target.id)
+
+      expect(useAttachmentStore.getState().canUndo).toBe(true)
+    })
+
+    it('does not delete when target id is not found', () => {
+      initializeAttachmentStore()
+      const state = useAttachmentStore.getState()
+      const originalLength = state.indicators.length
+
+      state.deleteIndicator('non-existent')
+
+      expect(useAttachmentStore.getState().indicators.length).toBe(originalLength)
+      expect(useAttachmentStore.getState().canUndo).toBe(false)
+    })
+
+    it('clears treeParentId of children when deleting a parent node', () => {
+      initializeAttachmentStore()
+      const state = useAttachmentStore.getState()
+      const parent = state.indicators[0]
+      const child = state.indicators[1]
+
+      state.setIndicators(
+        state.indicators.map((i) => (i.id === child.id ? { ...i, treeParentId: parent.id } : i)),
+      )
+
+      state.deleteIndicator(parent.id)
+
+      const updatedChild = useAttachmentStore.getState().indicators.find((i) => i.id === child.id)
+      expect(updatedChild?.treeParentId).toBeUndefined()
+    })
+  })
 })

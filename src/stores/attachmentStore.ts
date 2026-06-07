@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import type { IndicatorAttachment, TagNode, Rule, RuleParameter } from '@/models/indicatorAttachmentModel'
+import { createMinimalIndicatorAttachment } from '@/models/indicatorAttachmentModel'
 import type { Department, AttachmentUiState } from '@/utils/attachmentStorage'
 import {
   getDepartments,
@@ -60,22 +61,18 @@ export interface AttachmentState {
   redo: () => void
   handleKeyDown: (event: KeyboardEvent) => void
   init: () => void
+  addIndicator: (name: string, parentId?: string) => IndicatorAttachment
+  renameIndicator: (id: string, name: string) => void
+  deleteIndicator: (id: string) => void
 }
 
 function createSnapshot(state: Pick<AttachmentState, 'indicators' | 'tagNodes' | 'rules' | 'ruleParameters'>): DataSnapshot {
+  // 按 spec 使用浅拷贝快照：数组本身复制，元素引用保持共享
   return {
-    indicators: clone(state.indicators),
-    tagNodes: clone(state.tagNodes),
-    rules: clone(state.rules),
-    ruleParameters: clone(state.ruleParameters),
-  }
-}
-
-function clone<T>(value: T): T {
-  try {
-    return structuredClone(value)
-  } catch {
-    return JSON.parse(JSON.stringify(value)) as T
+    indicators: [...state.indicators],
+    tagNodes: [...state.tagNodes],
+    rules: [...state.rules],
+    ruleParameters: [...state.ruleParameters],
   }
 }
 
@@ -134,6 +131,9 @@ const initialState: Omit<
   | 'redo'
   | 'handleKeyDown'
   | 'init'
+  | 'addIndicator'
+  | 'renameIndicator'
+  | 'deleteIndicator'
 > = {
   departments: [],
   currentDepartmentId: null,
@@ -275,6 +275,47 @@ export const useAttachmentStore = create<AttachmentState>((set, get) => ({
       } else {
         get().undo()
       }
+    }
+  },
+
+  addIndicator: (name, parentId) => {
+    get().pushHistory()
+    const deptId = get().currentDepartmentId
+    const newIndicator = createMinimalIndicatorAttachment(name, {
+      parentId,
+      department: get().departments.find((d) => d.id === deptId)?.name,
+    })
+    const next = [...get().indicators, newIndicator]
+    set({ indicators: next, redoStack: [], canRedo: false })
+    if (deptId) {
+      saveIndicators(deptId, next)
+    }
+    return newIndicator
+  },
+
+  renameIndicator: (id, name) => {
+    const exists = get().indicators.find((i) => i.id === id)
+    if (!exists) return
+    get().pushHistory()
+    const next = get().indicators.map((i) => (i.id === id ? { ...i, name } : i))
+    set({ indicators: next, redoStack: [], canRedo: false })
+    const deptId = get().currentDepartmentId
+    if (deptId) {
+      saveIndicators(deptId, next)
+    }
+  },
+
+  deleteIndicator: (id) => {
+    const exists = get().indicators.find((i) => i.id === id)
+    if (!exists) return
+    get().pushHistory()
+    const next = get()
+      .indicators.filter((i) => i.id !== id)
+      .map((i) => (i.treeParentId === id ? { ...i, treeParentId: undefined } : i))
+    set({ indicators: next, redoStack: [], canRedo: false })
+    const deptId = get().currentDepartmentId
+    if (deptId) {
+      saveIndicators(deptId, next)
     }
   },
 }))

@@ -44,15 +44,6 @@ describe('IndicatorGrid', () => {
     expect(grid).toHaveClass('grid')
   })
 
-  it('has auto-fill minmax column sizing', () => {
-    const { container } = render(<IndicatorGrid indicators={mockIndicators} />)
-
-    const grid = container.firstChild as HTMLElement
-    expect(grid).toHaveStyle({
-      gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
-    })
-  })
-
   it('has responsive breakpoints', () => {
     const { container } = render(<IndicatorGrid indicators={mockIndicators} />)
 
@@ -62,9 +53,10 @@ describe('IndicatorGrid', () => {
     expect(grid).toHaveClass('min-[1440px]:grid-cols-4')
   })
 
-  it('renders an empty placeholder when no indicators are provided', () => {
+  it('renders EmptyState when no indicators are provided', () => {
     render(<IndicatorGrid indicators={[]} />)
 
-    expect(screen.getByTestId('indicator-grid-empty')).toBeInTheDocument()
+    expect(screen.getByTestId('empty-state-wrapper')).toBeInTheDocument()
+    expect(screen.getByText('暂无指标')).toBeInTheDocument()
   })
 })

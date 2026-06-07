@@ -96,13 +96,13 @@ describe('IndicatorAttachmentPage', () => {
     expect(cards.length).toBeGreaterThanOrEqual(2)
   })
 
-  it('uses the auto-fill CSS Grid for pending indicators', () => {
+  it('uses responsive CSS Grid breakpoints for pending indicators', () => {
     render(<IndicatorAttachmentPage />)
 
     const grid = screen.getByTestId('indicator-grid')
-    expect(grid).toHaveStyle({
-      gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
-    })
+    expect(grid).toHaveClass('md:grid-cols-2')
+    expect(grid).toHaveClass('lg:grid-cols-3')
+    expect(grid).toHaveClass('min-[1440px]:grid-cols-4')
   })
 
   it('filters pending indicators by attachment state', () => {

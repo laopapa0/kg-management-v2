@@ -1,21 +1,15 @@
 import { useMemo } from 'react'
+import { Scale } from 'lucide-react'
 import TreeView, { type TreeNode } from '@/components/tree/TreeView'
+import EmptyState from '@/components/empty-state/EmptyState'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { useAttachmentStore } from '@/stores/attachmentStore'
 import type { Rule } from '@/models/indicatorAttachmentModel'
 import { buildRuleTree } from '@/models/indicatorAttachmentModel'
+import { walkRules } from '@/utils/attachmentTree'
 
 interface RuleTreeNode extends TreeNode {
   rule: Rule
-}
-
-function walkRules(nodes: Rule[], callback: (node: Rule) => void): void {
-  for (const node of nodes) {
-    callback(node)
-    if (node.children) {
-      walkRules(node.children, callback)
-    }
-  }
 }
 
 export default function RulePanel() {
@@ -71,6 +65,18 @@ export default function RulePanel() {
       })),
     [tree],
   )
+
+  if (tree.length === 0) {
+    return (
+      <div className="flex-1 overflow-y-auto px-2 pb-2" data-testid="rule-panel">
+        <EmptyState
+          icon={<Scale className="size-6" />}
+          title="暂无规则"
+          description="系统管理员尚未配置规则"
+        />
+      </div>
+    )
+  }
 
   return (
     <div className="flex-1 overflow-y-auto px-2 pb-2" data-testid="rule-panel">

@@ -1,8 +1,11 @@
 import { useMemo } from 'react'
+import { Tags } from 'lucide-react'
 import TreeView, { type TreeNode } from '@/components/tree/TreeView'
+import EmptyState from '@/components/empty-state/EmptyState'
 import { useAttachmentStore } from '@/stores/attachmentStore'
 import type { TagNode } from '@/models/indicatorAttachmentModel'
 import { buildTagTree } from '@/models/indicatorAttachmentModel'
+import { walkNodes } from '@/utils/attachmentTree'
 
 interface TagTreeNode extends TreeNode {
   name: string
@@ -20,15 +23,6 @@ function collectTagIds(nodes: TagNode[]): Set<string> {
     }
   }
   return set
-}
-
-function walkNodes(nodes: TagNode[], callback: (node: TagNode) => void): void {
-  for (const node of nodes) {
-    callback(node)
-    if (node.children) {
-      walkNodes(node.children, callback)
-    }
-  }
 }
 
 interface TagPillProps {
@@ -117,6 +111,18 @@ export default function TagSetPanel() {
       })),
     [tree],
   )
+
+  if (tree.length === 0) {
+    return (
+      <div className="flex-1 overflow-y-auto px-3 pb-2" data-testid="tag-set-panel">
+        <EmptyState
+          icon={<Tags className="size-6" />}
+          title="暂无标签"
+          description="当前部门下还没有配置标签集"
+        />
+      </div>
+    )
+  }
 
   return (
     <div className="flex-1 overflow-y-auto px-3 pb-2" data-testid="tag-set-panel">

@@ -1,9 +1,9 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { useShallow } from 'zustand/react/shallow'
 import { Group, Panel, Separator } from 'react-resizable-panels'
 import PanelHeader from '@/components/panel/PanelHeader'
 import IndicatorGrid from '@/components/indicator/IndicatorGrid'
-import IndicatorTreePanel from './IndicatorTreePanel'
+import IndicatorTreePanel, { type IndicatorTreePanelRef } from './IndicatorTreePanel'
 import TagSetPanel from './TagSetPanel'
 import RulePanel from './RulePanel'
 import { initializeAttachmentStore, selectPendingIndicators, useAttachmentStore } from '@/stores/attachmentStore'
@@ -13,6 +13,8 @@ const PANEL_MIN_WIDTH_CENTER = 400
 const PANEL_MIN_WIDTH_RIGHT = 240
 
 export default function IndicatorAttachmentPage() {
+  const treePanelRef = useRef<IndicatorTreePanelRef>(null)
+
   useEffect(() => {
     initializeAttachmentStore()
   }, [])
@@ -47,11 +49,10 @@ export default function IndicatorAttachmentPage() {
             <PanelHeader
               title="指标树"
               onAdd={() => {
-                // eslint-disable-next-line no-console
-                console.log('add indicator tree node')
+                treePanelRef.current?.openAddDialog()
               }}
             />
-            <IndicatorTreePanel />
+            <IndicatorTreePanel ref={treePanelRef} />
           </div>
         </Panel>
 
@@ -71,8 +72,7 @@ export default function IndicatorAttachmentPage() {
             <PanelHeader
               title="待选指标"
               onAdd={() => {
-                // eslint-disable-next-line no-console
-                console.log('add pending indicator')
+                // TODO: #20 指标添加节点
               }}
             />
             <IndicatorGrid indicators={pendingIndicators} />
@@ -97,8 +97,7 @@ export default function IndicatorAttachmentPage() {
                 <PanelHeader
                   title="标签集"
                   onAdd={() => {
-                    // eslint-disable-next-line no-console
-                    console.log('add tag')
+                    // TODO: #25 标签集添加节点
                   }}
                 />
                 <TagSetPanel />

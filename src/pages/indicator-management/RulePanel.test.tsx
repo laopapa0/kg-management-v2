@@ -111,4 +111,14 @@ describe('RulePanel', () => {
     const row = screen.getByTestId(`rule-row-${ruleWithoutParams!.id}`)
     expect(within(row).getByText('待配置')).toBeInTheDocument()
   })
+
+  it('renders EmptyState when rules is empty', () => {
+    initializeAttachmentStore()
+    useAttachmentStore.setState({ rules: [] })
+
+    render(<RulePanel />)
+
+    expect(screen.getByTestId('empty-state-wrapper')).toBeInTheDocument()
+    expect(screen.getByText('暂无规则')).toBeInTheDocument()
+  })
 })
