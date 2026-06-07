@@ -49,11 +49,11 @@ describe('IndicatorAttachmentPage', () => {
     expect(headers).toHaveLength(4)
   })
 
-  it('renders an empty state placeholder in each panel', () => {
+  it('renders empty state placeholders in the tree/tag/rule panels', () => {
     render(<IndicatorAttachmentPage />)
 
     const emptyStates = screen.getAllByTestId('empty-state-wrapper')
-    expect(emptyStates).toHaveLength(4)
+    expect(emptyStates).toHaveLength(3)
   })
 
   it('renders four add buttons that fade in on header hover', () => {
@@ -64,6 +64,22 @@ describe('IndicatorAttachmentPage', () => {
     addButtons.forEach((button) => {
       expect(button).toHaveClass('opacity-0')
       expect(button).toHaveClass('group-hover:opacity-100')
+    })
+  })
+
+  it('renders indicator cards in the pending indicators panel', () => {
+    render(<IndicatorAttachmentPage />)
+
+    const cards = screen.getAllByTestId('indicator-card')
+    expect(cards.length).toBeGreaterThanOrEqual(2)
+  })
+
+  it('uses the auto-fill CSS Grid for pending indicators', () => {
+    render(<IndicatorAttachmentPage />)
+
+    const grid = screen.getByTestId('indicator-grid')
+    expect(grid).toHaveStyle({
+      gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
     })
   })
 })
