@@ -307,5 +307,140 @@ describe('IndicatorAttachmentPage', () => {
 
       expect(document.body).not.toHaveStyle('cursor: crosshair')
     })
+
+    it('shakes status bar on invalid Space key', async () => {
+      render(<IndicatorAttachmentPage />)
+
+      const cards = screen.getAllByTestId('indicator-card')
+      act(() => {
+        fireEvent.click(cards[0])
+      })
+
+      act(() => {
+        fireEvent.keyDown(document, { key: ' ' })
+      })
+
+      const statusBar = screen.getByTestId('connection-status-bar')
+      expect(statusBar).toHaveClass('animate-shake-connection')
+    })
+
+    it('shows misfire hint after 3 invalid Space presses', async () => {
+      render(<IndicatorAttachmentPage />)
+
+      const cards = screen.getAllByTestId('indicator-card')
+      act(() => {
+        fireEvent.click(cards[0])
+      })
+
+      // 3 invalid Space presses
+      for (let i = 0; i < 3; i++) {
+        act(() => {
+          fireEvent.keyDown(document, { key: ' ' })
+        })
+      }
+
+      expect(screen.getByTestId('misfire-hint')).toBeInTheDocument()
+      expect(screen.getByText(/请将连线拖拽到目标指标后按空格确认/i)).toBeInTheDocument()
+    })
+
+    it('auto-dismisses misfire hint after 3s and resets counter', async () => {
+      vi.useFakeTimers()
+
+      render(<IndicatorAttachmentPage />)
+
+      const cards = screen.getAllByTestId('indicator-card')
+      act(() => {
+        fireEvent.click(cards[0])
+      })
+
+      for (let i = 0; i < 3; i++) {
+        act(() => {
+          fireEvent.keyDown(document, { key: ' ' })
+        })
+      }
+
+      expect(screen.getByTestId('misfire-hint')).toBeInTheDocument()
+
+      act(() => {
+        vi.advanceTimersByTime(3000)
+      })
+
+      expect(screen.queryByTestId('misfire-hint')).not.toBeInTheDocument()
+
+      vi.useRealTimers()
+    })
+  })
+
+  describe('focus zone hint', () => {
+    it('shows hint when an indicator card is focused', () => {
+      render(<IndicatorAttachmentPage />)
+
+      const cards = screen.getAllByTestId('indicator-card')
+      act(() => {
+        cards[0].focus()
+      })
+
+      const hint = screen.getByTestId('focus-zone-hint')
+      expect(hint).toBeInTheDocument()
+      expect(hint.textContent).toMatch(/space/i)
+    })
+
+    it('shows tag zone hint when a tag pill is focused', () => {
+      render(<IndicatorAttachmentPage />)
+
+      const tagPill = document.querySelector('button[data-testid^="tag-pill-"]') as HTMLElement
+      expect(tagPill).toBeTruthy()
+      act(() => {
+        tagPill.focus()
+      })
+
+      const hint = screen.getByTestId('focus-zone-hint')
+      expect(hint).toBeInTheDocument()
+      expect(hint.textContent).toMatch(/标签/)
+    })
+
+    it('does not show hint when no focusable element is focused', () => {
+      render(<IndicatorAttachmentPage />)
+
+      // Ensure nothing is focused
+      act(() => {
+        document.body.focus()
+      })
+
+      expect(screen.queryByTestId('focus-zone-hint')).not.toBeInTheDocument()
+    })
+
+    it('hides hint when focus moves outside any zone', () => {
+      render(<IndicatorAttachmentPage />)
+
+      const cards = screen.getAllByTestId('indicator-card')
+      act(() => {
+        cards[0].focus()
+      })
+      expect(screen.getByTestId('focus-zone-hint')).toBeInTheDocument()
+
+      // Create an element outside any data-focus-zone and focus it
+      const outsideBtn = document.createElement('button')
+      outsideBtn.id = 'outside-zone-btn'
+      document.body.appendChild(outsideBtn)
+      act(() => {
+        outsideBtn.focus()
+      })
+      expect(screen.queryByTestId('focus-zone-hint')).not.toBeInTheDocument()
+      document.body.removeChild(outsideBtn)
+    })
+
+    it('does not show zone hint in connection mode (status bar already shows hint)', async () => {
+      render(<IndicatorAttachmentPage />)
+
+      const cards = screen.getAllByTestId('indicator-card')
+      act(() => {
+        fireEvent.click(cards[0])
+      })
+
+      // In connection mode, the status bar is shown but focus-zone-hint should not be
+      expect(screen.getByTestId('connection-status-bar')).toBeInTheDocument()
+      expect(screen.queryByTestId('focus-zone-hint')).not.toBeInTheDocument()
+    })
   })
 })

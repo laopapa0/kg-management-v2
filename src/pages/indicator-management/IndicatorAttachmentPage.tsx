@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState, useMemo } from 'react'
 import { useShallow } from 'zustand/react/shallow'
 import { Group, Panel, Separator } from 'react-resizable-panels'
 import PanelHeader from '@/components/panel/PanelHeader'
@@ -9,15 +9,33 @@ import RulePanel from './RulePanel'
 import SourceAnchorMarker from '@/components/connection/SourceAnchorMarker'
 import { Switch } from '@/components/ui/switch'
 import { useConnectionMode } from '@/hooks/useConnectionMode'
+import { useFocusZone } from '@/hooks/useFocusZone'
 import { initializeAttachmentStore, selectPendingIndicators, useAttachmentStore } from '@/stores/attachmentStore'
 
 const PANEL_MIN_WIDTH_LEFT = 240
 const PANEL_MIN_WIDTH_CENTER = 400
 const PANEL_MIN_WIDTH_RIGHT = 240
 
+function getFocusZoneHint(zone: ReturnType<typeof useFocusZone>): string | null {
+  switch (zone) {
+    case 'indicator':
+      return '按 Space 进入连线模式'
+    case 'tag':
+      return '按 Space 切换标签选中'
+    case 'tree':
+      return '按 Space 选中节点'
+    case 'rule':
+      return '按 Space 关联规则'
+    default:
+      return null
+  }
+}
+
 export default function IndicatorAttachmentPage() {
   const treePanelRef = useRef<IndicatorTreePanelRef>(null)
-  const { state, start, toggleContinuous } = useConnectionMode()
+  const { state, start, toggleContinuous, resetMisfireCount } = useConnectionMode()
+  const focusZone = useFocusZone()
+  const focusZoneHint = useMemo(() => getFocusZoneHint(focusZone), [focusZone])
 
   useEffect(() => {
     initializeAttachmentStore()
@@ -43,6 +61,52 @@ export default function IndicatorAttachmentPage() {
     }
   }, [state.isConnecting])
 
+  // Shake status bar on misfire
+  const [shakeKey, setShakeKey] = useState(0)
+  const prevMisfireRef = useRef(0)
+  useEffect(() => {
+    if (state.misfireCount > prevMisfireRef.current) {
+      setShakeKey((k) => k + 1)
+    }
+    prevMisfireRef.current = state.misfireCount
+  }, [state.misfireCount])
+
+  // Misfire hint: show after 3 misfires, auto-dismiss after 3s
+  const [showHint, setShowHint] = useState(false)
+  const dismissTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => {
+    if (state.misfireCount >= 3 && !showHint) {
+      setShowHint(true)
+    }
+    if (!state.isConnecting && showHint) {
+      setShowHint(false)
+    }
+  }, [state.misfireCount, state.isConnecting, showHint])
+
+  useEffect(() => {
+    if (showHint && dismissTimerRef.current === null) {
+      dismissTimerRef.current = setTimeout(() => {
+        setShowHint(false)
+        resetMisfireCount()
+        dismissTimerRef.current = null
+      }, 3000)
+    }
+    if (!showHint && dismissTimerRef.current !== null) {
+      clearTimeout(dismissTimerRef.current)
+      dismissTimerRef.current = null
+    }
+  }, [showHint, resetMisfireCount])
+
+  // Cleanup timer on unmount only
+  useEffect(() => {
+    return () => {
+      if (dismissTimerRef.current) {
+        clearTimeout(dismissTimerRef.current)
+      }
+    }
+  }, [])
+
   const pendingIndicators = useAttachmentStore(useShallow(selectPendingIndicators))
 
   const indicatorsWithClick = pendingIndicators.map((ind) => ({
@@ -58,11 +122,22 @@ export default function IndicatorAttachmentPage() {
       {/* Connection mode status bar */}
       {state.isConnecting && (
         <div
+          key={`status-bar-${shakeKey}`}
           data-testid="connection-status-bar"
-          className="absolute left-0 right-0 top-0 z-40 flex items-center justify-center gap-2 bg-dark-accent-primary/90 px-4 py-1.5 text-xs font-medium text-white backdrop-blur-sm"
+          className={`absolute left-0 right-0 top-0 z-40 flex items-center justify-center gap-2 bg-dark-accent-primary/90 px-4 py-1.5 text-xs font-medium text-white backdrop-blur-sm ${shakeKey > 0 ? 'animate-shake-connection' : ''}`}
         >
           <span>连线模式</span>
           <span className="text-white/70">— 按 Space 确认，ESC 取消</span>
+        </div>
+      )}
+
+      {/* Misfire hint */}
+      {showHint && (
+        <div
+          data-testid="misfire-hint"
+          className="absolute bottom-4 left-1/2 z-50 -translate-x-1/2 rounded-full bg-dark-border/80 px-4 py-2 text-xs text-dark-text-secondary backdrop-blur-sm"
+        >
+          请将连线拖拽到目标指标后按空格确认
         </div>
       )}
 
@@ -76,6 +151,7 @@ export default function IndicatorAttachmentPage() {
         >
           <div
             data-testid="panel-indicator-tree"
+            data-focus-zone="tree"
             className="flex h-full flex-col rounded-lg border border-dark-border bg-dark-card-l1"
           >
             <PanelHeader
@@ -99,6 +175,7 @@ export default function IndicatorAttachmentPage() {
         >
           <div
             data-testid="panel-pending-indicators"
+            data-focus-zone="indicator"
             className="flex h-full flex-col rounded-lg border border-dark-border bg-dark-elevated"
           >
             <div className="flex items-center justify-between px-3 py-2">
@@ -134,6 +211,7 @@ export default function IndicatorAttachmentPage() {
             <Panel id="tag-set" defaultSize={50} minSize={10} className="min-h-0">
               <div
                 data-testid="panel-tag-set"
+                data-focus-zone="tag"
                 className="flex h-full flex-col rounded-lg border border-dark-border bg-dark-card-l1"
               >
                 <PanelHeader
@@ -151,6 +229,7 @@ export default function IndicatorAttachmentPage() {
             <Panel id="rules" defaultSize={50} minSize={10} className="min-h-0">
               <div
                 data-testid="panel-rules"
+                data-focus-zone="rule"
                 className="flex h-full flex-col rounded-lg border border-dark-border bg-dark-card-l1"
               >
                 <PanelHeader title="规则" />
@@ -160,6 +239,16 @@ export default function IndicatorAttachmentPage() {
           </Group>
         </Panel>
       </Group>
+
+      {/* Focus zone hint (only shown in non-connecting mode) */}
+      {!state.isConnecting && focusZoneHint && (
+        <div
+          data-testid="focus-zone-hint"
+          className="absolute bottom-4 right-4 z-50 rounded-md bg-dark-card-l2/90 px-3 py-1.5 text-xs text-dark-text-secondary backdrop-blur-sm border border-dark-border"
+        >
+          {focusZoneHint}
+        </div>
+      )}
 
       {/* Source anchor marker when source scrolls out of viewport */}
       {state.isConnecting && state.sourceId && (
