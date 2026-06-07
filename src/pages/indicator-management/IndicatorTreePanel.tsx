@@ -11,6 +11,8 @@ import DeleteTreeNodeSpecialDialog from '@/components/dialog/DeleteTreeNodeSpeci
 import { useAttachmentStore } from '@/stores/attachmentStore'
 import type { IndicatorAttachment } from '@/models/indicatorAttachmentModel'
 import { buildIndicatorTree, type IndicatorTreeNode } from '@/utils/attachmentTree'
+import { applyDragOperation } from '@/components/tree/treeDragHelpers'
+import type { DropPosition } from '@/components/tree/treeDragUtils'
 
 export interface IndicatorTreePanelRef {
   openAddDialog: () => void
@@ -27,6 +29,7 @@ const IndicatorTreePanel = forwardRef<IndicatorTreePanelRef>(function IndicatorT
   const renameIndicator = useAttachmentStore((state) => state.renameIndicator)
   const deleteIndicator = useAttachmentStore((state) => state.deleteIndicator)
   const deleteIndicatorTree = useAttachmentStore((state) => state.deleteIndicatorTree)
+  const setIndicators = useAttachmentStore((state) => state.setIndicators)
   const undo = useAttachmentStore((state) => state.undo)
   const tree = useMemo(() => buildIndicatorTree(indicators), [indicators])
 
@@ -139,6 +142,21 @@ const IndicatorTreePanel = forwardRef<IndicatorTreePanelRef>(function IndicatorT
     setDeletingNodeId(null)
   }
 
+  const handleDragNode = ({
+    draggedId,
+    targetId,
+    position,
+  }: {
+    draggedId: string
+    targetId: string
+    position: DropPosition
+  }) => {
+    const next = applyDragOperation(indicators, draggedId, targetId, position)
+    if (next !== indicators) {
+      setIndicators(next)
+    }
+  }
+
   if (tree.length === 0) {
     return (
       <div className="flex-1 overflow-y-auto px-2 pb-2" data-testid="indicator-tree-panel">
@@ -160,6 +178,7 @@ const IndicatorTreePanel = forwardRef<IndicatorTreePanelRef>(function IndicatorT
           onSelect={setSelectedId}
           onEditNode={setEditingId}
           onDeleteNode={handleDeleteNode}
+          onDragNode={handleDragNode}
           renderNode={(node, { isSelected, isHovered }) => {
             const isEditing = editingId === node.id
             const isHighlighted = highlightedId === node.id

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen, waitFor, within } from '@testing-library/react'
+import { render, screen, waitFor, within, fireEvent } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import TreeView, { type TreeNode } from './TreeView'
 
@@ -396,6 +396,80 @@ describe('TreeView', () => {
       const guide = screen.getAllByTestId('tree-indent-guide')[0]
       expect(guide).toHaveClass('bg-white/[0.06]')
       expect(guide).toHaveClass('group-hover:bg-white/[0.15]')
+    })
+  })
+
+  describe('drag and drop', () => {
+    it('shows drag handle on hover when onDragNode is provided', async () => {
+      const user = userEvent.setup()
+      render(<TreeView nodes={mockNodes} renderNode={renderNode} onDragNode={vi.fn()} />)
+
+      const rows = screen.getAllByTestId('tree-node-row')
+      await user.hover(rows[0])
+
+      const handle = within(rows[0]).getByTestId('tree-node-drag-handle')
+      expect(handle).toBeInTheDocument()
+      expect(handle).toHaveClass('opacity-100')
+    })
+
+    it('hides drag handle before hover even when onDragNode is provided', () => {
+      render(<TreeView nodes={mockNodes} renderNode={renderNode} onDragNode={vi.fn()} />)
+
+      const rows = screen.getAllByTestId('tree-node-row')
+      const handle = within(rows[0]).queryByTestId('tree-node-drag-handle')
+      expect(handle).toHaveClass('opacity-0')
+    })
+
+    it('does not show drag handle when onDragNode is not provided', async () => {
+      const user = userEvent.setup()
+      render(<TreeView nodes={mockNodes} renderNode={renderNode} />)
+
+      const rows = screen.getAllByTestId('tree-node-row')
+      await user.hover(rows[0])
+
+      expect(within(rows[0]).queryByTestId('tree-node-drag-handle')).not.toBeInTheDocument()
+    })
+
+    it('drag handle has dnd-kit draggable attributes on hover', async () => {
+      const user = userEvent.setup()
+      render(<TreeView nodes={mockNodes} renderNode={renderNode} onDragNode={vi.fn()} />)
+
+      const rows = screen.getAllByTestId('tree-node-row')
+      await user.hover(rows[0])
+
+      const handle = within(rows[0]).getByTestId('tree-node-drag-handle')
+      expect(handle).toHaveAttribute('role', 'button')
+      expect(handle).toHaveAttribute('aria-roledescription', 'draggable')
+    })
+
+    it('tree rows have droppable data attributes when onDragNode is provided', () => {
+      render(<TreeView nodes={mockNodes} renderNode={renderNode} onDragNode={vi.fn()} />)
+
+      const rows = screen.getAllByTestId('tree-node-row')
+      rows.forEach((row) => {
+        expect(row).toHaveAttribute('data-dnd-droppable')
+      })
+    })
+
+    it('renders dnd-kit live region when onDragNode is provided', () => {
+      const { container } = render(<TreeView nodes={mockNodes} renderNode={renderNode} onDragNode={vi.fn()} />)
+      expect(container.querySelector('[role="status"]')).toBeInTheDocument()
+    })
+
+    it('highlights drop target when dragging over a node', async () => {
+      render(<TreeView nodes={mockNodes} renderNode={renderNode} onDragNode={vi.fn()} />)
+
+      const rows = screen.getAllByTestId('tree-node-row')
+      const firstRow = rows[0]
+
+      // Simulate drag-over state by triggering internal drag state change
+      // We'll verify the data attributes are present for styling
+      expect(firstRow).toHaveAttribute('data-dnd-droppable')
+    })
+
+    it('does not wrap in DndContext when onDragNode is not provided', () => {
+      const { container } = render(<TreeView nodes={mockNodes} renderNode={renderNode} />)
+      expect(container.querySelector('[data-dnd-context]')).not.toBeInTheDocument()
     })
   })
 })

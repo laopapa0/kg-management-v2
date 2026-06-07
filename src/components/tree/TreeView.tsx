@@ -1,7 +1,20 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, createContext, useContext } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronRight, Pencil, Trash2 } from 'lucide-react'
+import { ChevronRight, Pencil, Trash2, GripVertical } from 'lucide-react'
+import {
+  DndContext,
+  DragOverlay,
+  useDraggable,
+  useDroppable,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+  type DragOverEvent,
+  type ClientRect,
+} from '@dnd-kit/core'
 import { DURATION, EASING, getTransition } from '@/components/motion/motion.tokens'
+import { getDropPosition, type DropPosition } from './treeDragUtils'
 
 export interface TreeNode {
   id: string
@@ -23,8 +36,16 @@ interface TreeViewProps<T extends TreeNode> {
   onSelect?: (id: string | null) => void
   onEditNode?: (id: string) => void
   onDeleteNode?: (id: string) => void
+  onDragNode?: (dragInfo: { draggedId: string; targetId: string; position: DropPosition }) => void
   renderIndentGuides?: 'always' | 'onHover' | 'none'
 }
+
+interface DragState {
+  overId: string | null
+  position: DropPosition | null
+}
+
+const DragStateContext = createContext<DragState>({ overId: null, position: null })
 
 interface TreeItemProps<T extends TreeNode> {
   node: T
@@ -37,6 +58,7 @@ interface TreeItemProps<T extends TreeNode> {
   renderIndentGuides: 'always' | 'onHover' | 'none'
   onEditNode?: (id: string) => void
   onDeleteNode?: (id: string) => void
+  onDragNode?: (dragInfo: { draggedId: string; targetId: string; position: DropPosition }) => void
 }
 
 const childrenContainerVariants = {
@@ -86,24 +108,66 @@ function TreeItem<T extends TreeNode>({
   renderIndentGuides,
   onEditNode,
   onDeleteNode,
+  onDragNode,
 }: TreeItemProps<T>) {
   const [isHovered, setIsHovered] = useState(false)
   const isExpanded = expanded.has(node.id)
   const isSelected = selectedId === node.id
   const hasChildren = Boolean(node.children && node.children.length > 0)
   const showGuides = renderIndentGuides === 'always' || (renderIndentGuides === 'onHover' && isHovered)
+  const dragState = useContext(DragStateContext)
+  const isDragOver = dragState.overId === node.id
+  const dragPosition = dragState.position
 
   const handleRowClick = useCallback(() => {
     onSelect(node.id)
   }, [onSelect, node.id])
 
+  const { attributes, listeners, setNodeRef: setDragRef, setActivatorNodeRef } = useDraggable({
+    id: node.id,
+    disabled: !onDragNode,
+    data: { node },
+  })
+
+  const { setNodeRef: setDropRef } = useDroppable({
+    id: node.id,
+    disabled: !onDragNode,
+    data: { node },
+  })
+
+  const setRefs = useCallback(
+    (el: HTMLDivElement | null) => {
+      setDragRef(el)
+      setDropRef(el)
+    },
+    [setDragRef, setDropRef],
+  )
+
+  const isDropInside = isDragOver && dragPosition === 'inside'
+  const isDropBefore = isDragOver && dragPosition === 'before'
+  const isDropAfter = isDragOver && dragPosition === 'after'
+
   return (
     <div data-testid="tree-node" data-node-id={node.id}>
+      {/* Drop before indicator */}
+      {onDragNode && (
+        <div
+          data-testid="tree-drop-before-indicator"
+          className={[
+            'h-[2px] w-full transition-opacity duration-150',
+            'bg-[#3B82F6] shadow-[0_0_6px_rgba(59,130,246,0.6)]',
+            isDropBefore ? 'opacity-100' : 'opacity-0',
+          ].join(' ')}
+        />
+      )}
+
       <div
+        ref={setRefs}
         data-testid="tree-node-row"
         data-node-id={node.id}
         data-selected={isSelected}
         data-hovered={isHovered}
+        data-dnd-droppable={onDragNode ? 'true' : undefined}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         onClick={handleRowClick}
@@ -111,17 +175,40 @@ function TreeItem<T extends TreeNode>({
           'group relative flex h-9 cursor-pointer items-center gap-1 py-2 px-3',
           'transition-colors duration-150 ease-out',
           isSelected ? 'bg-[rgba(59,130,246,0.12)]' : isHovered ? 'bg-white/[0.04]' : '',
+          isDropInside ? 'bg-[#DBEAFE]' : '',
         ].join(' ')}
         style={{ paddingLeft: `${depth * 20 + 12}px` }}
       >
+        {/* Left drop accent bar */}
         <span
           data-testid="tree-node-accent-bar"
           className={[
-            'absolute left-0 top-0 bottom-0 w-1 transition-opacity duration-150 ease-out',
-            isSelected ? 'opacity-100' : isHovered ? 'opacity-50' : 'opacity-0',
+            'absolute left-0 top-0 bottom-0 transition-opacity duration-150 ease-out',
+            isSelected ? 'w-1 opacity-100' : isHovered ? 'w-1 opacity-50' : 'w-1 opacity-0',
+            isDropInside ? 'w-[3px] opacity-100' : '',
           ].join(' ')}
-          style={{ backgroundColor: '#3B82F6' }}
+          style={{ backgroundColor: isDropInside ? '#3B82F6' : '#3B82F6' }}
         />
+
+        {/* Drag handle */}
+        {onDragNode && (
+          <button
+            ref={setActivatorNodeRef}
+            type="button"
+            data-testid="tree-node-drag-handle"
+            aria-label={`拖拽节点 ${node.id}`}
+            className={[
+              'z-10 flex size-5 items-center justify-center rounded text-dark-text-tertiary',
+              'transition-all duration-150 ease-out hover:text-dark-text-secondary',
+              'cursor-grab active:cursor-grabbing',
+              isHovered ? 'translate-x-0 opacity-100' : '-translate-x-1 opacity-0',
+            ].join(' ')}
+            {...attributes}
+            {...listeners}
+          >
+            <GripVertical className="size-3.5" />
+          </button>
+        )}
 
         {renderIndentGuides !== 'none' && depth > 0 && (
           <span
@@ -212,6 +299,7 @@ function TreeItem<T extends TreeNode>({
           )}
         </div>
       </div>
+
       <AnimatePresence initial={false}>
         {isExpanded && hasChildren && (
           <motion.div
@@ -228,6 +316,7 @@ function TreeItem<T extends TreeNode>({
                 key={child.id}
                 variants={childItemVariants}
                 data-testid="tree-child-item"
+                layout
               >
                 <TreeItem
                   node={child as T}
@@ -239,12 +328,26 @@ function TreeItem<T extends TreeNode>({
                   renderNode={renderNode}
                   renderIndentGuides={renderIndentGuides}
                   onEditNode={onEditNode}
+                  onDeleteNode={onDeleteNode}
+                  onDragNode={onDragNode}
                 />
               </motion.div>
             ))}
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Drop after indicator */}
+      {onDragNode && (
+        <div
+          data-testid="tree-drop-after-indicator"
+          className={[
+            'h-[2px] w-full transition-opacity duration-150',
+            'bg-[#3B82F6] shadow-[0_0_6px_rgba(59,130,246,0.6)]',
+            isDropAfter ? 'opacity-100' : 'opacity-0',
+          ].join(' ')}
+        />
+      )}
     </div>
   )
 }
@@ -259,6 +362,7 @@ export default function TreeView<T extends TreeNode>({
   renderIndentGuides = 'onHover',
   onEditNode,
   onDeleteNode,
+  onDragNode,
 }: TreeViewProps<T>) {
   const [expanded, setExpanded] = useState<Set<string>>(
     () => new Set(initialExpanded ?? []),
@@ -268,6 +372,17 @@ export default function TreeView<T extends TreeNode>({
     null,
   )
   const selectedId = controlledSelectedId ?? internalSelectedId
+
+  const [dragState, setDragState] = useState<DragState>({ overId: null, position: null })
+  const [activeDragId, setActiveDragId] = useState<string | null>(null)
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 0,
+      },
+    }),
+  )
 
   const handleToggle = useCallback(
     (id: string) => {
@@ -295,7 +410,58 @@ export default function TreeView<T extends TreeNode>({
     [controlledSelectedId, onSelect],
   )
 
-  return (
+  const handleDragStart = useCallback((event: { active: { id: string | number } }) => {
+    setActiveDragId(event.active.id as string)
+  }, [])
+
+  const handleDragOver = useCallback((event: DragOverEvent) => {
+    const { active, over } = event
+    if (!over) {
+      setDragState({ overId: null, position: null })
+      return
+    }
+
+    const activeRect = active.rect.current.translated as ClientRect | null
+    const overRect = over.rect
+
+    if (activeRect && overRect) {
+      const position = getDropPosition(activeRect, overRect)
+      setDragState({ overId: over.id as string, position })
+    }
+  }, [])
+
+  const handleDragEnd = useCallback(
+    (event: DragEndEvent) => {
+      const { active, over } = event
+      if (over && active.id !== over.id) {
+        const activeRect = active.rect.current.translated as ClientRect | null
+        const overRect = over.rect
+        const position = activeRect && overRect
+          ? getDropPosition(activeRect, overRect)
+          : 'inside'
+
+        onDragNode?.({
+          draggedId: active.id as string,
+          targetId: over.id as string,
+          position,
+        })
+      }
+      setDragState({ overId: null, position: null })
+      setActiveDragId(null)
+    },
+    [onDragNode],
+  )
+
+  const handleDragCancel = useCallback(() => {
+    setDragState({ overId: null, position: null })
+    setActiveDragId(null)
+  }, [])
+
+  const activeNode = activeDragId
+    ? flattenNodes(nodes).find((n) => n.id === activeDragId)
+    : null
+
+  const treeContent = (
     <div data-testid="tree-view" data-initial="false" className="flex flex-col">
       <AnimatePresence>
         {nodes.map((node) => (
@@ -303,6 +469,7 @@ export default function TreeView<T extends TreeNode>({
             key={node.id}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: DURATION.fast, ease: EASING.exit }}
+            layout
           >
             <TreeItem
               node={node}
@@ -315,10 +482,54 @@ export default function TreeView<T extends TreeNode>({
               renderIndentGuides={renderIndentGuides}
               onEditNode={onEditNode}
               onDeleteNode={onDeleteNode}
+              onDragNode={onDragNode}
             />
           </motion.div>
         ))}
       </AnimatePresence>
     </div>
   )
+
+  if (!onDragNode) {
+    return treeContent
+  }
+
+  return (
+    <DndContext
+      data-dnd-context="true"
+      sensors={sensors}
+      onDragStart={handleDragStart}
+      onDragOver={handleDragOver}
+      onDragEnd={handleDragEnd}
+      onDragCancel={handleDragCancel}
+    >
+      <DragStateContext.Provider value={dragState}>
+        {treeContent}
+        <DragOverlay dropAnimation={null}>
+          {activeNode ? (
+            <div
+              className="flex h-9 items-center gap-2 rounded-md bg-dark-card-l1 px-3 py-2 shadow-lg"
+              style={{ scale: '0.98', opacity: 0.9 }}
+            >
+              <GripVertical className="size-3.5 text-dark-text-tertiary" />
+              <span className="text-sm text-dark-text-primary">
+                {(activeNode as T).id}
+              </span>
+            </div>
+          ) : null}
+        </DragOverlay>
+      </DragStateContext.Provider>
+    </DndContext>
+  )
+}
+
+function flattenNodes<T extends TreeNode>(nodes: T[]): T[] {
+  const result: T[] = []
+  for (const node of nodes) {
+    result.push(node)
+    if (node.children) {
+      result.push(...flattenNodes(node.children as T[]))
+    }
+  }
+  return result
 }
