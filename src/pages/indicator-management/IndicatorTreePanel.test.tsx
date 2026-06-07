@@ -309,4 +309,63 @@ describe('IndicatorTreePanel', () => {
       }),
     )
   })
+
+  it('shows special dialog when deleting node with attached indicators', async () => {
+    initializeAttachmentStore()
+    const state = useAttachmentStore.getState()
+    const parent = state.indicators[0]
+    const child = state.indicators[1]
+
+    // Mark child as attached (has tagIds)
+    state.setIndicators(
+      state.indicators.map((i) => (i.id === child.id ? { ...i, tagIds: ['tag-1'] } : i)),
+    )
+
+    render(<IndicatorTreePanel />)
+    const user = userEvent.setup()
+
+    const rows = screen.getAllByTestId('tree-node-row')
+    const parentRow = rows.find((r) => r.getAttribute('data-node-id') === parent.id)
+    if (!parentRow) throw new Error('parent row not found')
+
+    await user.hover(parentRow)
+    await user.click(within(parentRow).getByTestId('tree-node-delete-button'))
+
+    expect(screen.getByTestId('delete-special-dialog')).toBeInTheDocument()
+    expect(screen.getByTestId('delete-special-dialog-description')).toBeInTheDocument()
+  })
+
+  it('clears treeParentId of children when special dialog confirmed', async () => {
+    initializeAttachmentStore()
+    const state = useAttachmentStore.getState()
+    const parent = state.indicators[0]
+    const child = state.indicators[1]
+
+    state.setIndicators(
+      state.indicators.map((i) =>
+        i.id === child.id ? { ...i, tagIds: ['tag-1'] } : i,
+      ),
+    )
+
+    render(<IndicatorTreePanel />)
+    const user = userEvent.setup()
+
+    const rows = screen.getAllByTestId('tree-node-row')
+    const parentRow = rows.find((r) => r.getAttribute('data-node-id') === parent.id)
+    if (!parentRow) throw new Error('parent row not found')
+
+    await user.hover(parentRow)
+    await user.click(within(parentRow).getByTestId('tree-node-delete-button'))
+
+    await user.click(screen.getByTestId('delete-special-confirm-button'))
+
+    await waitFor(() => {
+      expect(screen.queryByText(parent.name)).not.toBeInTheDocument()
+    })
+
+    // Child should still exist but with treeParentId cleared
+    const updatedChild = useAttachmentStore.getState().indicators.find((i) => i.id === child.id)
+    expect(updatedChild).toBeDefined()
+    expect(updatedChild?.treeParentId).toBeUndefined()
+  })
 })

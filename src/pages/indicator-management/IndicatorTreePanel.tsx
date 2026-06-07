@@ -7,6 +7,7 @@ import TreeNodeInlineEdit from '@/components/tree/TreeNodeInlineEdit'
 import EmptyState from '@/components/empty-state/EmptyState'
 import AddTreeNodeDialog from '@/components/dialog/AddTreeNodeDialog'
 import DeleteTreeNodeWarningDialog from '@/components/dialog/DeleteTreeNodeWarningDialog'
+import DeleteTreeNodeSpecialDialog from '@/components/dialog/DeleteTreeNodeSpecialDialog'
 import { useAttachmentStore } from '@/stores/attachmentStore'
 import type { IndicatorAttachment } from '@/models/indicatorAttachmentModel'
 import { buildIndicatorTree, type IndicatorTreeNode } from '@/utils/attachmentTree'
@@ -33,6 +34,7 @@ const IndicatorTreePanel = forwardRef<IndicatorTreePanelRef>(function IndicatorT
   const [editingId, setEditingId] = useState<string | null>(null)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [warningDialogOpen, setWarningDialogOpen] = useState(false)
+  const [specialDialogOpen, setSpecialDialogOpen] = useState(false)
   const [deletingNodeId, setDeletingNodeId] = useState<string | null>(null)
   const [highlightedId, setHighlightedId] = useState<string | null>(null)
 
@@ -64,8 +66,18 @@ const IndicatorTreePanel = forwardRef<IndicatorTreePanelRef>(function IndicatorT
     const indicator = indicators.find((i) => i.id === id)
     if (!indicator) return
 
-    const hasChildren = indicators.some((i) => i.treeParentId === id)
-    if (hasChildren) {
+    const children = indicators.filter((i) => i.treeParentId === id)
+    const hasAttachedIndicators = children.some(
+      (c) => c.tagIds.length > 0 || c.ruleIds.length > 0,
+    )
+
+    if (hasAttachedIndicators) {
+      setDeletingNodeId(id)
+      setSpecialDialogOpen(true)
+      return
+    }
+
+    if (children.length > 0) {
       setDeletingNodeId(id)
       setWarningDialogOpen(true)
       return
@@ -99,6 +111,25 @@ const IndicatorTreePanel = forwardRef<IndicatorTreePanelRef>(function IndicatorT
 
     toast('节点已删除', {
       description: `「${indicator.name}」及其子节点已被删除`,
+      duration: 5000,
+      action: {
+        label: '撤销',
+        onClick: () => undo(),
+      },
+    })
+    setDeletingNodeId(null)
+  }
+
+  const handleSpecialConfirm = () => {
+    if (!deletingNodeId) return
+    const indicator = indicators.find((i) => i.id === deletingNodeId)
+    if (!indicator) return
+
+    const children = indicators.filter((i) => i.treeParentId === deletingNodeId)
+    deleteIndicator(deletingNodeId)
+
+    toast('节点已删除', {
+      description: `「${indicator.name}」已删除，${children.length} 个指标回到「待挂靠」区域`,
       duration: 5000,
       action: {
         label: '撤销',
@@ -187,6 +218,19 @@ const IndicatorTreePanel = forwardRef<IndicatorTreePanelRef>(function IndicatorT
         nodeName={indicators.find((i) => i.id === deletingNodeId)?.name ?? ''}
         childCount={indicators.filter((i) => i.treeParentId === deletingNodeId).length}
         onConfirm={handleWarningConfirm}
+      />
+      <DeleteTreeNodeSpecialDialog
+        open={specialDialogOpen}
+        onOpenChange={setSpecialDialogOpen}
+        nodeName={indicators.find((i) => i.id === deletingNodeId)?.name ?? ''}
+        attachedCount={
+          indicators.filter(
+            (i) =>
+              i.treeParentId === deletingNodeId &&
+              (i.tagIds.length > 0 || i.ruleIds.length > 0),
+          ).length
+        }
+        onConfirm={handleSpecialConfirm}
       />
     </>
   )
