@@ -32,6 +32,7 @@ interface TreeViewProps<T extends TreeNode> {
   nodes: T[]
   renderNode: (node: T, context: RenderNodeContext) => React.ReactNode
   initialExpanded?: string[]
+  expanded?: Set<string>
   onExpandedChange?: (expanded: Set<string>) => void
   selectedId?: string | null
   onSelect?: (id: string | null) => void
@@ -39,6 +40,7 @@ interface TreeViewProps<T extends TreeNode> {
   onDeleteNode?: (id: string) => void
   onDragNode?: (dragInfo: { draggedId: string; targetId: string; position: DropPosition }) => void
   renderIndentGuides?: 'always' | 'onHover' | 'none'
+  renderChildren?: (node: T) => React.ReactNode
 }
 
 interface DragState {
@@ -60,6 +62,7 @@ interface TreeItemProps<T extends TreeNode> {
   onEditNode?: (id: string) => void
   onDeleteNode?: (id: string) => void
   onDragNode?: (dragInfo: { draggedId: string; targetId: string; position: DropPosition }) => void
+  renderChildren?: (node: T) => React.ReactNode
 }
 
 const childrenContainerVariants = {
@@ -110,6 +113,7 @@ function TreeItem<T extends TreeNode>({
   onEditNode,
   onDeleteNode,
   onDragNode,
+  renderChildren,
 }: TreeItemProps<T>) {
   const [isHovered, setIsHovered] = useState(false)
   const isExpanded = expanded.has(node.id)
@@ -312,28 +316,32 @@ function TreeItem<T extends TreeNode>({
             exit="exit"
             style={{ overflow: 'hidden' }}
           >
-            {node.children!.map((child) => (
-              <motion.div
-                key={child.id}
-                variants={childItemVariants}
-                data-testid="tree-child-item"
-                layout
-              >
-                <TreeItem
-                  node={child as T}
-                  depth={depth + 1}
-                  expanded={expanded}
-                  onToggle={onToggle}
-                  selectedId={selectedId}
-                  onSelect={onSelect}
-                  renderNode={renderNode}
-                  renderIndentGuides={renderIndentGuides}
-                  onEditNode={onEditNode}
-                  onDeleteNode={onDeleteNode}
-                  onDragNode={onDragNode}
-                />
-              </motion.div>
-            ))}
+            {renderChildren ? (
+              renderChildren(node)
+            ) : (
+              node.children!.map((child) => (
+                <motion.div
+                  key={child.id}
+                  variants={childItemVariants}
+                  data-testid="tree-child-item"
+                  layout
+                >
+                  <TreeItem
+                    node={child as T}
+                    depth={depth + 1}
+                    expanded={expanded}
+                    onToggle={onToggle}
+                    selectedId={selectedId}
+                    onSelect={onSelect}
+                    renderNode={renderNode}
+                    renderIndentGuides={renderIndentGuides}
+                    onEditNode={onEditNode}
+                    onDeleteNode={onDeleteNode}
+                    onDragNode={onDragNode}
+                  />
+                </motion.div>
+              ))
+            )}
           </motion.div>
         )}
       </AnimatePresence>
@@ -358,6 +366,7 @@ export default function TreeView<T extends TreeNode>({
   nodes,
   renderNode,
   initialExpanded,
+  expanded: controlledExpanded,
   onExpandedChange,
   selectedId: controlledSelectedId,
   onSelect,
@@ -365,10 +374,12 @@ export default function TreeView<T extends TreeNode>({
   onEditNode,
   onDeleteNode,
   onDragNode,
+  renderChildren,
 }: TreeViewProps<T>) {
-  const [expanded, setExpanded] = useState<Set<string>>(
+  const [internalExpanded, setInternalExpanded] = useState<Set<string>>(
     () => new Set(initialExpanded ?? []),
   )
+  const expanded = controlledExpanded ?? internalExpanded
 
   const [internalSelectedId, setInternalSelectedId] = useState<string | null>(
     null,
@@ -388,7 +399,17 @@ export default function TreeView<T extends TreeNode>({
 
   const handleToggle = useCallback(
     (id: string) => {
-      setExpanded((prev) => {
+      if (controlledExpanded) {
+        const next = new Set(controlledExpanded)
+        if (next.has(id)) {
+          next.delete(id)
+        } else {
+          next.add(id)
+        }
+        onExpandedChange?.(next)
+        return
+      }
+      setInternalExpanded((prev) => {
         const next = new Set(prev)
         if (next.has(id)) {
           next.delete(id)
@@ -399,7 +420,7 @@ export default function TreeView<T extends TreeNode>({
         return next
       })
     },
-    [onExpandedChange],
+    [controlledExpanded, onExpandedChange],
   )
 
   const handleSelect = useCallback(
@@ -485,6 +506,7 @@ export default function TreeView<T extends TreeNode>({
               onEditNode={onEditNode}
               onDeleteNode={onDeleteNode}
               onDragNode={onDragNode}
+              renderChildren={renderChildren}
             />
           </motion.div>
         ))}

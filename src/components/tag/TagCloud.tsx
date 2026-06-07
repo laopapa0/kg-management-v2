@@ -8,6 +8,8 @@ export interface TagCloudProps {
   partialTagIds?: Set<string>
   maxRows?: number
   onToggle?: (id: string) => void
+  dimmedTagIds?: Set<string>
+  searchTerm?: string
 }
 
 const TAG_HEIGHT = 28
@@ -20,6 +22,8 @@ export default function TagCloud({
   partialTagIds = new Set(),
   maxRows = 3,
   onToggle,
+  dimmedTagIds = new Set(),
+  searchTerm = '',
 }: TagCloudProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const [expanded, setExpanded] = useState(false)
@@ -68,6 +72,8 @@ export default function TagCloud({
             selected={selectedTagIds.has(tag.id)}
             partial={partialTagIds.has(tag.id)}
             onClick={() => onToggle?.(tag.id)}
+            dimmed={dimmedTagIds.has(tag.id)}
+            searchTerm={searchTerm}
           />
         ))}
       </div>

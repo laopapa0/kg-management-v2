@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { render, screen, within, act, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { __resetAttachmentStorageCache } from '@/utils/attachmentStorage'
@@ -11,6 +11,11 @@ describe('TagSetPanel', () => {
     localStorage.clear()
     __resetAttachmentStorageCache()
     useAttachmentStore.setState(useAttachmentStore.getInitialState())
+    global.ResizeObserver = class {
+      observe = vi.fn()
+      unobserve = vi.fn()
+      disconnect = vi.fn()
+    } as unknown as typeof ResizeObserver
   })
 
   it('renders tag groups from store tagNodes', () => {
@@ -210,6 +215,128 @@ describe('TagSetPanel', () => {
       for (const child of groupWithChildren.children!) {
         expect(screen.getByTestId(`tag-pill-${child.id}`)).toHaveAttribute('data-selected', 'false')
       }
+    })
+  })
+
+  describe('search and filtering', () => {
+    it('renders search input, selected count, and clear button', () => {
+      initializeAttachmentStore()
+      render(<TagSetPanel />)
+
+      expect(screen.getByTestId('tree-search-input')).toBeInTheDocument()
+      expect(screen.getByTestId('tag-selected-count')).toBeInTheDocument()
+      expect(screen.getByTestId('tag-clear-button')).toBeInTheDocument()
+    })
+
+    it('shows selected count from indicator tagIds', () => {
+      initializeAttachmentStore()
+      const state = useAttachmentStore.getState()
+      const firstLeaf = state.tagNodes.find((t) => t.parentId)
+      expect(firstLeaf).toBeDefined()
+
+      act(() => {
+        state.setIndicators(
+          state.indicators.map((i, idx) => (idx === 0 ? { ...i, tagIds: [firstLeaf!.id] } : i)),
+        )
+      })
+
+      render(<TagSetPanel />)
+      expect(screen.getByTestId('tag-selected-count')).toHaveTextContent('1')
+    })
+
+    it('clears all selections when clear button clicked', async () => {
+      const user = userEvent.setup()
+      initializeAttachmentStore()
+      render(<TagSetPanel />)
+
+      const state = useAttachmentStore.getState()
+      const firstLeaf = state.tagNodes.find((t) => t.parentId)!
+
+      await user.click(screen.getByTestId(`tag-pill-${firstLeaf.id}`))
+      expect(screen.getByTestId(`tag-pill-${firstLeaf.id}`)).toHaveAttribute('data-selected', 'true')
+
+      await user.click(screen.getByTestId('tag-clear-button'))
+      expect(screen.getByTestId(`tag-pill-${firstLeaf.id}`)).toHaveAttribute('data-selected', 'false')
+    })
+
+    it('debounces search input by 150ms', async () => {
+      vi.useFakeTimers({ shouldAdvanceTime: true })
+      const user = userEvent.setup()
+      initializeAttachmentStore()
+      render(<TagSetPanel />)
+
+      const input = screen.getByTestId('tree-search-input')
+      await user.type(input, '月度', { delay: null })
+
+      expect(screen.queryByTestId('tag-pill-highlight')).not.toBeInTheDocument()
+
+      act(() => vi.advanceTimersByTime(150))
+
+      expect(screen.getByTestId('tag-pill-highlight')).toHaveTextContent('月度')
+
+      vi.useRealTimers()
+    })
+
+    it('auto expands parent of matched child and dims unmatched tags', async () => {
+      const user = userEvent.setup()
+      initializeAttachmentStore()
+      render(<TagSetPanel />)
+
+      const coreRootId = 'tag-finance-core'
+      const childId = 'tag-finance-core-monthly'
+
+      // 先收起核心指标组
+      const toggle = screen.getByLabelText(`收起节点 ${coreRootId}`)
+      await user.click(toggle)
+      await waitFor(() => {
+        expect(screen.queryByTestId(`tag-pill-${childId}`)).not.toBeInTheDocument()
+      })
+
+      // 搜索“月度”
+      const input = screen.getByTestId('tree-search-input')
+      await user.type(input, '月度')
+      await waitFor(() => {
+        expect(screen.getByTestId(`tag-pill-${childId}`)).toBeInTheDocument()
+      })
+
+      // 未匹配节点应暗淡
+      const costPill = screen.getByTestId('tag-pill-tag-finance-cost')
+      expect(costPill).toHaveAttribute('data-dimmed', 'true')
+    })
+
+    it('shows match count badge on parent', async () => {
+      vi.useFakeTimers({ shouldAdvanceTime: true })
+      const user = userEvent.setup()
+      initializeAttachmentStore()
+      render(<TagSetPanel />)
+
+      const input = screen.getByTestId('tree-search-input')
+      await user.type(input, '月度', { delay: null })
+      act(() => vi.advanceTimersByTime(150))
+
+      const badge = screen.getByTestId('tag-match-count-tag-finance-core')
+      expect(badge).toHaveTextContent('1')
+
+      vi.useRealTimers()
+    })
+
+    it('highlights matched text in tag pills', async () => {
+      vi.useFakeTimers({ shouldAdvanceTime: true })
+      const user = userEvent.setup()
+      initializeAttachmentStore()
+      render(<TagSetPanel />)
+
+      const input = screen.getByTestId('tree-search-input')
+      await user.type(input, '月度', { delay: null })
+      act(() => vi.advanceTimersByTime(150))
+
+      const highlight = screen.getByTestId('tag-pill-highlight')
+      expect(highlight).toHaveTextContent('月度')
+      expect(highlight).toHaveClass('bg-[#B8860B]/20')
+      expect(highlight).toHaveClass('text-[#FFD700]')
+      expect(highlight).toHaveClass('font-bold')
+
+      vi.useRealTimers()
     })
   })
 })

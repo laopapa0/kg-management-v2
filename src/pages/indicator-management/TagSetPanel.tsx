@@ -1,4 +1,4 @@
-import { useMemo, useState, useCallback } from 'react'
+import { useMemo, useState, useCallback, useEffect } from 'react'
 import { Tags } from 'lucide-react'
 import TreeView, { type TreeNode } from '@/components/tree/TreeView'
 import EmptyState from '@/components/empty-state/EmptyState'
@@ -8,44 +8,61 @@ import { buildTagTree } from '@/models/indicatorAttachmentModel'
 import { walkNodes } from '@/utils/attachmentTree'
 import TagCloud from '@/components/tag/TagCloud'
 import TagPill from '@/components/tag/TagPill'
-import { toggle, computeState } from '@/components/tree/CascadingStateEngine'
+import TreeSearchInput from '@/components/search/TreeSearchInput'
+import { toggle, computeState, clear } from '@/components/tree/CascadingStateEngine'
 
 interface TagTreeNode extends TreeNode {
   name: string
   color?: string
 }
 
-interface TagGroupProps {
-  node: TagNode
-  selectedTagIds: Set<string>
-  partialTagIds: Set<string>
-  onToggle: (id: string) => void
+interface SearchResult {
+  matchedIds: Set<string>
+  ancestorIds: Set<string>
+  matchCounts: Map<string, number>
 }
 
-function TagGroup({ node, selectedTagIds, partialTagIds, onToggle }: TagGroupProps) {
-  const hasChildren = node.children && node.children.length > 0
-  const childTags = hasChildren ? node.children! : [node]
+function computeSearchResult(tree: TagNode[], term: string): SearchResult {
+  if (!term) {
+    return {
+      matchedIds: new Set<string>(),
+      ancestorIds: new Set<string>(),
+      matchCounts: new Map<string, number>(),
+    }
+  }
+  const lower = term.toLowerCase()
+  const matchedIds = new Set<string>()
+  const matchCounts = new Map<string, number>()
 
-  return (
-    <div data-testid={`tag-group-${node.id}`} className="mb-2">
-      {hasChildren && (
-        <div className="mb-1.5">
-          <TagPill
-            tag={node}
-            selected={selectedTagIds.has(node.id)}
-            partial={partialTagIds.has(node.id)}
-            onClick={() => onToggle(node.id)}
-          />
-        </div>
-      )}
-      <TagCloud
-        tags={childTags}
-        selectedTagIds={selectedTagIds}
-        partialTagIds={partialTagIds}
-        onToggle={onToggle}
-      />
-    </div>
-  )
+  function dfs(node: TagNode): number {
+    let count = 0
+    if (node.name.toLowerCase().includes(lower)) {
+      matchedIds.add(node.id)
+      count++
+    }
+    for (const child of node.children ?? []) {
+      count += dfs(child)
+    }
+    if (count > 0) {
+      matchCounts.set(node.id, count)
+    }
+    return count
+  }
+
+  for (const root of tree) dfs(root)
+
+  const ancestorIds = new Set<string>()
+  function markAncestors(node: TagNode) {
+    for (const child of node.children ?? []) {
+      if (matchedIds.has(child.id) || ancestorIds.has(child.id)) {
+        ancestorIds.add(node.id)
+      }
+      markAncestors(child)
+    }
+  }
+  for (const root of tree) markAncestors(root)
+
+  return { matchedIds, ancestorIds, matchCounts }
 }
 
 export default function TagSetPanel() {
@@ -65,6 +82,42 @@ export default function TagSetPanel() {
   }, [indicators])
 
   const [selection, setSelection] = useState(() => computeState(tagNodes, initialSelectedIds))
+  const [searchTerm, setSearchTerm] = useState('')
+  const [debouncedTerm, setDebouncedTerm] = useState('')
+
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedTerm(searchTerm), 150)
+    return () => clearTimeout(timer)
+  }, [searchTerm])
+
+  const [userExpanded, setUserExpanded] = useState<Set<string>>(() => {
+    const initial = new Set<string>()
+    for (const node of tree) {
+      if (node.children && node.children.length > 0) initial.add(node.id)
+    }
+    return initial
+  })
+
+  const { matchedIds, ancestorIds, matchCounts, dimmedTagIds } = useMemo(() => {
+    const result = computeSearchResult(tree, debouncedTerm)
+    const dimmed = new Set<string>()
+    if (debouncedTerm) {
+      walkNodes(tree, (node) => {
+        if (!result.matchedIds.has(node.id) && !result.ancestorIds.has(node.id)) {
+          dimmed.add(node.id)
+        }
+      })
+    }
+    return { ...result, dimmedTagIds: dimmed }
+  }, [debouncedTerm, tree])
+
+  const expanded = useMemo(() => {
+    const next = new Set(userExpanded)
+    if (debouncedTerm) {
+      for (const id of ancestorIds) next.add(id)
+    }
+    return next
+  }, [userExpanded, ancestorIds, debouncedTerm])
 
   const handleToggle = useCallback(
     (id: string) => {
@@ -72,6 +125,10 @@ export default function TagSetPanel() {
     },
     [tagNodes],
   )
+
+  const handleClear = useCallback(() => {
+    setSelection(clear())
+  }, [])
 
   const nodeMap = useMemo(() => {
     const map = new Map<string, TagNode>()
@@ -87,6 +144,10 @@ export default function TagSetPanel() {
         id: node.id,
         name: node.name,
         color: node.color,
+        children:
+          node.children && node.children.length > 0
+            ? node.children.map((child) => ({ id: child.id }))
+            : undefined,
       })),
     [tree],
   )
@@ -105,18 +166,76 @@ export default function TagSetPanel() {
 
   return (
     <div className="flex-1 overflow-y-auto px-3 pb-2" data-testid="tag-set-panel">
+      <div className="sticky top-0 z-10 space-y-2 bg-dark-card-l1 pb-2 pt-1">
+        <div className="flex items-center justify-between">
+          <span className="text-sm text-dark-text-secondary">
+            已选{' '}
+            <span
+              data-testid="tag-selected-count"
+              className="font-semibold text-dark-text-primary"
+            >
+              {selection.selected.size}
+            </span>{' '}
+            个
+          </span>
+          <button
+            type="button"
+            data-testid="tag-clear-button"
+            onClick={handleClear}
+            className="text-xs text-dark-text-secondary transition-colors hover:text-dark-accent-primary"
+          >
+            清空
+          </button>
+        </div>
+        <TreeSearchInput value={searchTerm} onChange={setSearchTerm} />
+      </div>
       <TreeView
         nodes={rootNodes}
+        expanded={expanded}
+        onExpandedChange={setUserExpanded}
         renderNode={(node) => {
           const fullNode = nodeMap.get(node.id)
           if (!fullNode) return null
+          const matchCount = matchCounts.get(fullNode.id)
+          const isDimmed = debouncedTerm
+            ? !matchedIds.has(fullNode.id) && !ancestorIds.has(fullNode.id)
+            : false
           return (
-            <TagGroup
-              node={fullNode}
-              selectedTagIds={selection.selected}
-              partialTagIds={selection.partial}
-              onToggle={handleToggle}
-            />
+            <div className="flex items-center gap-2">
+              <TagPill
+                tag={fullNode}
+                selected={selection.selected.has(fullNode.id)}
+                partial={selection.partial.has(fullNode.id)}
+                onClick={() => handleToggle(fullNode.id)}
+                searchTerm={debouncedTerm}
+                dimmed={isDimmed}
+              />
+              {debouncedTerm && matchCount ? (
+                <span
+                  data-testid={`tag-match-count-${fullNode.id}`}
+                  className="inline-flex items-center rounded-full border border-[#15417E] bg-[#111B26] px-2 py-0.5 text-xs font-medium text-[#4DA6FF]"
+                >
+                  {matchCount}
+                </span>
+              ) : null}
+            </div>
+          )
+        }}
+        renderChildren={(node) => {
+          const fullNode = nodeMap.get(node.id)
+          if (!fullNode) return null
+          const childTags = fullNode.children?.length ? fullNode.children : []
+          return (
+            <div data-testid={`tag-group-${node.id}`} className="pb-2 pl-6">
+              <TagCloud
+                tags={childTags}
+                selectedTagIds={selection.selected}
+                partialTagIds={selection.partial}
+                onToggle={handleToggle}
+                dimmedTagIds={dimmedTagIds}
+                searchTerm={debouncedTerm}
+              />
+            </div>
           )
         }}
       />
