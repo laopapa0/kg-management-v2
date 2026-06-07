@@ -11,6 +11,30 @@ import DeleteTreeNodeSpecialDialog from '@/components/dialog/DeleteTreeNodeSpeci
 import { useAttachmentStore } from '@/stores/attachmentStore'
 import type { IndicatorAttachment } from '@/models/indicatorAttachmentModel'
 import { buildIndicatorTree, type IndicatorTreeNode } from '@/utils/attachmentTree'
+
+/** 递归检查某个节点下是否有已挂靠（有 tagIds/ruleIds）的真实指标 */
+function hasAttachedDescendantIndicators(indicators: IndicatorAttachment[], parentId: string): boolean {
+  const children = indicators.filter((i) => i.treeParentId === parentId)
+  return children.some((child) => {
+    if (child.indicatorType !== '虚拟分组' && (child.tagIds.length > 0 || child.ruleIds.length > 0)) {
+      return true
+    }
+    return hasAttachedDescendantIndicators(indicators, child.id)
+  })
+}
+
+/** 递归获取某个节点下的所有后代真实指标（排除虚拟分组节点） */
+function getDescendantRealIndicators(indicators: IndicatorAttachment[], parentId: string): IndicatorAttachment[] {
+  const result: IndicatorAttachment[] = []
+  const children = indicators.filter((i) => i.treeParentId === parentId)
+  for (const child of children) {
+    if (child.indicatorType !== '虚拟分组') {
+      result.push(child)
+    }
+    result.push(...getDescendantRealIndicators(indicators, child.id))
+  }
+  return result
+}
 import { applyDragOperation } from '@/components/tree/treeDragHelpers'
 import type { DropPosition } from '@/components/tree/treeDragUtils'
 
@@ -32,6 +56,10 @@ const IndicatorTreePanel = forwardRef<IndicatorTreePanelRef>(function IndicatorT
   const setIndicators = useAttachmentStore((state) => state.setIndicators)
   const undo = useAttachmentStore((state) => state.undo)
   const tree = useMemo(() => buildIndicatorTree(indicators), [indicators])
+  // Expand all nodes that have children (L1 + L2) so the full tree is initially visible
+  const initialExpandedIds = useMemo(() => {
+    return indicators.filter((i) => indicators.some((c) => c.treeParentId === i.id)).map((i) => i.id)
+  }, [indicators])
 
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -70,9 +98,7 @@ const IndicatorTreePanel = forwardRef<IndicatorTreePanelRef>(function IndicatorT
     if (!indicator) return
 
     const children = indicators.filter((i) => i.treeParentId === id)
-    const hasAttachedIndicators = children.some(
-      (c) => c.tagIds.length > 0 || c.ruleIds.length > 0,
-    )
+    const hasAttachedIndicators = hasAttachedDescendantIndicators(indicators, id)
 
     if (hasAttachedIndicators) {
       setDeletingNodeId(id)
@@ -128,11 +154,11 @@ const IndicatorTreePanel = forwardRef<IndicatorTreePanelRef>(function IndicatorT
     const indicator = indicators.find((i) => i.id === deletingNodeId)
     if (!indicator) return
 
-    const children = indicators.filter((i) => i.treeParentId === deletingNodeId)
+    const realIndicators = getDescendantRealIndicators(indicators, deletingNodeId)
     deleteIndicator(deletingNodeId)
 
     toast('节点已删除', {
-      description: `「${indicator.name}」已删除，${children.length} 个指标回到「待挂靠」区域`,
+      description: `「${indicator.name}」已删除，${realIndicators.length} 个指标回到「待挂靠」区域`,
       duration: 5000,
       action: {
         label: '撤销',
@@ -221,7 +247,7 @@ const IndicatorTreePanel = forwardRef<IndicatorTreePanelRef>(function IndicatorT
               </motion.div>
             )
           }}
-          initialExpanded={tree.map((n) => n.id)}
+          initialExpanded={initialExpandedIds}
         />
       </div>
 
@@ -243,11 +269,11 @@ const IndicatorTreePanel = forwardRef<IndicatorTreePanelRef>(function IndicatorT
         onOpenChange={setSpecialDialogOpen}
         nodeName={indicators.find((i) => i.id === deletingNodeId)?.name ?? ''}
         attachedCount={
-          indicators.filter(
-            (i) =>
-              i.treeParentId === deletingNodeId &&
-              (i.tagIds.length > 0 || i.ruleIds.length > 0),
-          ).length
+          deletingNodeId
+            ? getDescendantRealIndicators(indicators, deletingNodeId).filter(
+                (i) => i.tagIds.length > 0 || i.ruleIds.length > 0,
+              ).length
+            : 0
         }
         onConfirm={handleSpecialConfirm}
       />

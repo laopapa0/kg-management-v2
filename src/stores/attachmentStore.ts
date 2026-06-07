@@ -366,6 +366,7 @@ export function initializeAttachmentStore(): void {
 export function selectPendingIndicators(state: AttachmentState): IndicatorAttachment[] {
   return state.indicators.filter(
     (indicator) =>
+      indicator.indicatorType !== '虚拟分组' &&
       !indicator.treeParentId &&
       indicator.tagIds.length === 0 &&
       indicator.ruleIds.length === 0,

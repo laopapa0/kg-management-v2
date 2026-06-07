@@ -2,7 +2,8 @@ import { describe, it, expect, beforeEach } from 'vitest'
 import { render, screen, within, waitFor, act } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { __resetAttachmentStorageCache } from '@/utils/attachmentStorage'
-import { useAttachmentStore } from '@/stores/attachmentStore'
+import { useAttachmentStore, initializeAttachmentStore, selectPendingIndicators } from '@/stores/attachmentStore'
+import { createIndicatorAttachment } from '@/models/indicatorAttachmentModel'
 import IndicatorAttachmentPage from './IndicatorAttachmentPage'
 
 describe('IndicatorAttachmentPage', () => {
@@ -10,6 +11,56 @@ describe('IndicatorAttachmentPage', () => {
     localStorage.clear()
     __resetAttachmentStorageCache()
     useAttachmentStore.setState(useAttachmentStore.getInitialState())
+    initializeAttachmentStore()
+
+    // Inject real pending indicators so tests have observable data after the
+    // selectPendingIndicators fix excludes virtual grouping nodes.
+    const state = useAttachmentStore.getState()
+    const pendingReal1 = createIndicatorAttachment({
+      id: 'pending-real-1',
+      name: '待选真实指标1',
+      code: 'PENDING-001',
+      indicatorCode: 'PENDING-001',
+      indicatorDisplayName: '待选真实指标1',
+      indicatorShowName: '待选真实指标1',
+      indicatorType: '基础指标',
+      level1: '经营',
+      level2: '收入',
+      granularity: '全局',
+      frequency: '月',
+      unit: '元',
+      isBigScreen: false,
+      department: state.departments[0]?.name ?? '',
+      businessCaliber: '',
+      techCaliber: '',
+      tags: [],
+      treeParentId: undefined,
+      tagIds: [],
+      ruleIds: [],
+    })
+    const pendingReal2 = createIndicatorAttachment({
+      id: 'pending-real-2',
+      name: '待选真实指标2',
+      code: 'PENDING-002',
+      indicatorCode: 'PENDING-002',
+      indicatorDisplayName: '待选真实指标2',
+      indicatorShowName: '待选真实指标2',
+      indicatorType: '基础指标',
+      level1: '经营',
+      level2: '利润',
+      granularity: '全局',
+      frequency: '月',
+      unit: '元',
+      isBigScreen: false,
+      department: state.departments[0]?.name ?? '',
+      businessCaliber: '',
+      techCaliber: '',
+      tags: [],
+      treeParentId: undefined,
+      tagIds: [],
+      ruleIds: [],
+    })
+    state.setIndicators([...state.indicators, pendingReal1, pendingReal2])
   })
 
   it('renders four panels with correct titles', () => {
@@ -75,7 +126,7 @@ describe('IndicatorAttachmentPage', () => {
     const treePanel = screen.getByTestId('panel-indicator-tree')
     expect(within(treePanel).getByTestId('tree-view')).toBeInTheDocument()
     const indicators = useAttachmentStore.getState().indicators
-    expect(within(treePanel).getByText(indicators[0].name)).toBeInTheDocument()
+    expect(within(treePanel).getByTestId(`indicator-tree-node-content-${indicators[0].id}`)).toBeInTheDocument()
   })
 
   it('renders TreeView in the rules panel from store data', () => {
@@ -109,9 +160,7 @@ describe('IndicatorAttachmentPage', () => {
     render(<IndicatorAttachmentPage />)
 
     const state = useAttachmentStore.getState()
-    const pendingCount = state.indicators.filter(
-      (i) => !i.treeParentId && i.tagIds.length === 0 && i.ruleIds.length === 0,
-    ).length
+    const pendingCount = selectPendingIndicators(state).length
 
     const cards = screen.getAllByTestId('indicator-card')
     expect(cards.length).toBe(pendingCount)
@@ -122,7 +171,7 @@ describe('IndicatorAttachmentPage', () => {
 
     const state = useAttachmentStore.getState()
     const target = state.indicators.find(
-      (i) => i.id !== state.indicators[0].id && !i.treeParentId && i.tagIds.length === 0 && i.ruleIds.length === 0,
+      (i) => i.indicatorType !== '虚拟分组' && !i.treeParentId && i.tagIds.length === 0 && i.ruleIds.length === 0,
     )!
     const pendingPanel = screen.getByTestId('panel-pending-indicators')
 
@@ -182,7 +231,7 @@ describe('IndicatorAttachmentPage', () => {
     })
 
     const toggle = screen.getByLabelText(`收起节点 ${root.id}`)
-    expect(screen.getByText(state.indicators[1].name)).toBeInTheDocument()
+    expect(within(screen.getByTestId('panel-indicator-tree')).getByTestId(`indicator-tree-node-content-${state.indicators[1].id}`)).toBeInTheDocument()
 
     await user.click(toggle)
 

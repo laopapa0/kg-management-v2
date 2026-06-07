@@ -8,7 +8,8 @@ import {
   getUiState,
   __resetAttachmentStorageCache,
 } from '@/utils/attachmentStorage'
-import { useAttachmentStore, initializeAttachmentStore } from './attachmentStore'
+import { useAttachmentStore, initializeAttachmentStore, selectPendingIndicators } from './attachmentStore'
+import { createMinimalIndicatorAttachment } from '@/models/indicatorAttachmentModel'
 
 const mockStorage = {
   departments: [
@@ -68,10 +69,10 @@ describe('attachmentStore', () => {
     initializeAttachmentStore()
 
     const state = useAttachmentStore.getState()
-    state.setCurrentDepartmentId('dept-market')
+    state.setCurrentDepartmentId('dept-市场部')
 
     const next = useAttachmentStore.getState()
-    expect(next.currentDepartmentId).toBe('dept-market')
+    expect(next.currentDepartmentId).toBe('dept-市场部')
     expect(next.indicators.length).toBeGreaterThanOrEqual(1)
     expect(next.tagNodes.length).toBeGreaterThanOrEqual(1)
   })
@@ -453,6 +454,51 @@ describe('attachmentStore', () => {
       expect(restored.some((i) => i.id === parent.id)).toBe(true)
       expect(restored.some((i) => i.id === child.id)).toBe(true)
       expect(restored.find((i) => i.id === child.id)?.treeParentId).toBe(parent.id)
+    })
+  })
+
+  describe('selectPendingIndicators', () => {
+    it('excludes virtual grouping nodes even without treeParentId and attachments', () => {
+      initializeAttachmentStore()
+      const state = useAttachmentStore.getState()
+
+      // createMinimalIndicatorAttachment creates a virtual grouping node
+      // with indicatorType === '虚拟分组', treeParentId undefined, tagIds [], ruleIds []
+      const virtualNode = createMinimalIndicatorAttachment('虚拟分组测试')
+
+      state.setIndicators([...state.indicators, virtualNode])
+
+      const pending = selectPendingIndicators(useAttachmentStore.getState())
+      expect(pending.some((i) => i.id === virtualNode.id)).toBe(false)
+    })
+
+    it('includes real indicators that have no treeParentId and no attachments', () => {
+      initializeAttachmentStore()
+      const state = useAttachmentStore.getState()
+
+      // Find a real indicator (not virtual grouping) with no parent and no attachments
+      const realIndicator = state.indicators.find(
+        (i) =>
+          i.indicatorType !== '虚拟分组' &&
+          !i.treeParentId &&
+          i.tagIds.length === 0 &&
+          i.ruleIds.length === 0,
+      )
+
+      // If no such indicator exists in mock data, create one manually
+      if (!realIndicator) {
+        const manualIndicator = {
+          ...createMinimalIndicatorAttachment('真实指标'),
+          indicatorType: '真实指标',
+          code: 'REAL-001',
+        }
+        state.setIndicators([...state.indicators, manualIndicator])
+        const pending = selectPendingIndicators(useAttachmentStore.getState())
+        expect(pending.some((i) => i.id === manualIndicator.id)).toBe(true)
+      } else {
+        const pending = selectPendingIndicators(state)
+        expect(pending.some((i) => i.id === realIndicator.id)).toBe(true)
+      }
     })
   })
 })
