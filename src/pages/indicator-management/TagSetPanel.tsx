@@ -68,6 +68,7 @@ function computeSearchResult(tree: TagNode[], term: string): SearchResult {
 export default function TagSetPanel() {
   const tagNodes = useAttachmentStore((state) => state.tagNodes)
   const indicators = useAttachmentStore((state) => state.indicators)
+  const setTagNodes = useAttachmentStore((state) => state.setTagNodes)
 
   const tree = useMemo(() => buildTagTree(tagNodes), [tagNodes])
 
@@ -129,6 +130,15 @@ export default function TagSetPanel() {
   const handleClear = useCallback(() => {
     setSelection(clear())
   }, [])
+
+  const handleColorChange = useCallback(
+    (tagId: string, color: string) => {
+      setTagNodes(
+        tagNodes.map((node) => (node.id === tagId ? { ...node, color } : node)),
+      )
+    },
+    [tagNodes, setTagNodes],
+  )
 
   const nodeMap = useMemo(() => {
     const map = new Map<string, TagNode>()
@@ -209,6 +219,8 @@ export default function TagSetPanel() {
                 onClick={() => handleToggle(fullNode.id)}
                 searchTerm={debouncedTerm}
                 dimmed={isDimmed}
+                editable
+                onColorChange={(color) => handleColorChange(fullNode.id, color)}
               />
               {debouncedTerm && matchCount ? (
                 <span
@@ -234,6 +246,8 @@ export default function TagSetPanel() {
                 onToggle={handleToggle}
                 dimmedTagIds={dimmedTagIds}
                 searchTerm={debouncedTerm}
+                editable
+                onColorChange={handleColorChange}
               />
             </div>
           )

@@ -10,6 +10,8 @@ export interface TagCloudProps {
   onToggle?: (id: string) => void
   dimmedTagIds?: Set<string>
   searchTerm?: string
+  editable?: boolean
+  onColorChange?: (tagId: string, color: string) => void
 }
 
 const TAG_HEIGHT = 28
@@ -24,6 +26,8 @@ export default function TagCloud({
   onToggle,
   dimmedTagIds = new Set(),
   searchTerm = '',
+  editable = false,
+  onColorChange,
 }: TagCloudProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const [expanded, setExpanded] = useState(false)
@@ -74,6 +78,8 @@ export default function TagCloud({
             onClick={() => onToggle?.(tag.id)}
             dimmed={dimmedTagIds.has(tag.id)}
             searchTerm={searchTerm}
+            editable={editable}
+            onColorChange={(color) => onColorChange?.(tag.id, color)}
           />
         ))}
       </div>

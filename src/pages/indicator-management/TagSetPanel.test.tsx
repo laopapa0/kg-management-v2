@@ -339,4 +339,77 @@ describe('TagSetPanel', () => {
       vi.useRealTimers()
     })
   })
+
+  describe('tag color editing', () => {
+    it('renders color picker trigger for each tag', () => {
+      initializeAttachmentStore()
+      render(<TagSetPanel />)
+
+      const state = useAttachmentStore.getState()
+      const firstLeaf = state.tagNodes.find((t) => t.parentId)!
+      expect(screen.getByTestId(`tag-pill-color-trigger-${firstLeaf.id}`)).toBeInTheDocument()
+    })
+
+    it('changes tag color via preset and persists to store', async () => {
+      const user = userEvent.setup()
+      initializeAttachmentStore()
+      render(<TagSetPanel />)
+
+      const state = useAttachmentStore.getState()
+      const firstLeaf = state.tagNodes.find((t) => t.parentId)!
+
+      await user.click(screen.getByTestId(`tag-pill-color-trigger-${firstLeaf.id}`))
+      await user.click(screen.getByTestId('tag-color-preset-#EB2F96'))
+
+      await waitFor(() => {
+        expect(useAttachmentStore.getState().tagNodes.find((n) => n.id === firstLeaf.id)?.color).toBe('#EB2F96')
+      })
+    })
+
+    it('changes tag color via hex input and persists to store', async () => {
+      const user = userEvent.setup()
+      initializeAttachmentStore()
+      render(<TagSetPanel />)
+
+      const state = useAttachmentStore.getState()
+      const firstLeaf = state.tagNodes.find((t) => t.parentId)!
+
+      await user.click(screen.getByTestId(`tag-pill-color-trigger-${firstLeaf.id}`))
+
+      const input = screen.getByTestId('tag-color-hex-input')
+      await user.clear(input)
+      await user.type(input, 'FF5733')
+      await user.click(screen.getByTestId('tag-color-hex-apply'))
+
+      await waitFor(() => {
+        expect(useAttachmentStore.getState().tagNodes.find((n) => n.id === firstLeaf.id)?.color).toBe('#FF5733')
+      })
+    })
+
+    it('applies 10% tag color background on unselected tag', () => {
+      initializeAttachmentStore()
+      const state = useAttachmentStore.getState()
+      const coloredRoot = state.tagNodes.find((t) => t.color && !t.parentId)!
+
+      render(<TagSetPanel />)
+
+      const pill = screen.getByTestId(`tag-pill-${coloredRoot.id}`)
+      expect(pill).toHaveStyle({ backgroundColor: `${coloredRoot.color}1A` })
+    })
+
+    it('uses unified highlight background on selected tag regardless of color', async () => {
+      const user = userEvent.setup()
+      initializeAttachmentStore()
+      render(<TagSetPanel />)
+
+      const state = useAttachmentStore.getState()
+      const coloredRoot = state.tagNodes.find((t) => t.color && !t.parentId)!
+
+      await user.click(screen.getByTestId(`tag-pill-${coloredRoot.id}`))
+
+      const pill = screen.getByTestId(`tag-pill-${coloredRoot.id}`)
+      expect(pill).toHaveClass('bg-[#111B26]')
+      expect(pill).not.toHaveStyle({ backgroundColor: `${coloredRoot.color}1A` })
+    })
+  })
 })
