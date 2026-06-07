@@ -108,6 +108,54 @@ export default function IndicatorAttachmentPage() {
     }
   }, [])
 
+  // Global Space dispatcher in non-connecting mode (capture phase)
+  useEffect(() => {
+    if (state.isConnecting) return
+
+    const handler = (e: KeyboardEvent) => {
+      if (e.key !== ' ') return
+      const target = e.target as HTMLElement
+      if (
+        target.tagName === 'INPUT' ||
+        target.tagName === 'TEXTAREA' ||
+        target.isContentEditable
+      ) {
+        return
+      }
+
+      // Find the closest data-focus-zone ancestor
+      let el: Element | null = target
+      let zone: string | null = null
+      while (el) {
+        const z = el.getAttribute('data-focus-zone')
+        if (z === 'indicator' || z === 'tag' || z === 'tree' || z === 'rule') {
+          zone = z
+          break
+        }
+        el = el.parentElement
+      }
+
+      if (zone === 'indicator') {
+        const card = target.closest('[data-indicator-id]') as HTMLElement | null
+        if (card) {
+          e.preventDefault()
+          e.stopPropagation()
+          start(card.dataset.indicatorId!, 'tree')
+        }
+      } else if (zone === 'tag') {
+        const pill = target.closest('button[data-tag-id]') as HTMLButtonElement | null
+        if (pill) {
+          e.preventDefault()
+          e.stopPropagation()
+          pill.click()
+        }
+      }
+    }
+
+    window.addEventListener('keydown', handler, true)
+    return () => window.removeEventListener('keydown', handler, true)
+  }, [state.isConnecting, start])
+
   const pendingIndicators = useAttachmentStore(useShallow(selectPendingIndicators))
 
   const indicatorsWithClick = pendingIndicators.map((ind) => ({

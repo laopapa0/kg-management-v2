@@ -6,7 +6,7 @@ interface SourceAnchorMarkerProps {
 }
 
 export default function SourceAnchorMarker({ sourceId, onClick }: SourceAnchorMarkerProps) {
-  const [isVisible, setIsVisible] = useState(true)
+  const [isVisible, setIsVisible] = useState(false)
   const [sourceName, setSourceName] = useState('')
 
   useEffect(() => {

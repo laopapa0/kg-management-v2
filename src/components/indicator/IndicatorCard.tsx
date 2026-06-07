@@ -13,6 +13,7 @@ export interface IndicatorCardProps {
 }
 
 export default function IndicatorCard({
+  id,
   name,
   code,
   level1,
@@ -28,15 +29,10 @@ export default function IndicatorCard({
   return (
     <div
       data-testid="indicator-card"
+      data-indicator-id={id}
       onClick={onClick}
       role="button"
       tabIndex={0}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault()
-          onClick?.()
-        }
-      }}
       className={[
         'relative flex min-h-[120px] flex-col gap-3 rounded-lg border p-4',
         'bg-dark-card-l1 text-dark-text-primary',

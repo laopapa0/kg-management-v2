@@ -1,3 +1,6 @@
+import { useState, useCallback, useEffect, useRef } from 'react'
+import { useAttachmentStore } from '@/stores/attachmentStore'
+
 export interface ConnectionState {
   isConnecting: boolean
   sourceId: string | null
@@ -7,9 +10,6 @@ export interface ConnectionState {
   isContinuous: boolean
   misfireCount: number
 }
-
-import { useState, useCallback, useEffect, useRef } from 'react'
-import { useAttachmentStore } from '@/stores/attachmentStore'
 
 function collectAllIds<T extends { id: string; children?: T[] }>(nodes: T[]): string[] {
   const result: string[] = []
