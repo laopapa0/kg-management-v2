@@ -1,11 +1,12 @@
 import { useEffect } from 'react'
 import { useShallow } from 'zustand/react/shallow'
 import { Group, Panel, Separator } from 'react-resizable-panels'
-import { Tags, Scale } from 'lucide-react'
+import { Scale } from 'lucide-react'
 import PanelHeader from '@/components/panel/PanelHeader'
 import EmptyState from '@/components/empty-state/EmptyState'
 import IndicatorGrid from '@/components/indicator/IndicatorGrid'
 import IndicatorTreePanel from './IndicatorTreePanel'
+import TagSetPanel from './TagSetPanel'
 import { initializeAttachmentStore, selectPendingIndicators, useAttachmentStore } from '@/stores/attachmentStore'
 
 const PANEL_MIN_WIDTH_LEFT = 240
@@ -101,11 +102,7 @@ export default function IndicatorAttachmentPage() {
                     console.log('add tag')
                   }}
                 />
-                <EmptyState
-                  icon={<Tags className="size-6" />}
-                  title="暂无标签"
-                  description="点击右上角 + 添加标签"
-                />
+                <TagSetPanel />
               </div>
             </Panel>
 

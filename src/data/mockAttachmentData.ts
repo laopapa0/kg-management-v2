@@ -72,18 +72,15 @@ export function generateMockTagNodes(departmentId: string): TagNode[] {
     { id: `tag-${deptSuffix}-revenue`, name: '收入类', color: '#06B6D4' },
   ]
 
-  roots[0].children = [
+  const children: TagNode[] = [
     { id: `tag-${deptSuffix}-core-monthly`, name: '月度核心', parentId: roots[0].id },
     { id: `tag-${deptSuffix}-core-quarterly`, name: '季度核心', parentId: roots[0].id },
-  ]
-
-  roots[2].children = [
     { id: `tag-${deptSuffix}-risk-high`, name: '高风险', parentId: roots[2].id },
     { id: `tag-${deptSuffix}-risk-medium`, name: '中风险', parentId: roots[2].id },
     { id: `tag-${deptSuffix}-risk-low`, name: '低风险', parentId: roots[2].id },
   ]
 
-  return roots
+  return [...roots, ...children]
 }
 
 export function generateMockRules(): Rule[] {

@@ -58,11 +58,22 @@ describe('IndicatorAttachmentPage', () => {
     expect(headers).toHaveLength(4)
   })
 
-  it('renders empty state placeholders in the tag/rule panels only', () => {
+  it('renders empty state placeholder in the rule panel only', () => {
     render(<IndicatorAttachmentPage />)
 
     const emptyStates = screen.getAllByTestId('empty-state-wrapper')
-    expect(emptyStates).toHaveLength(2)
+    expect(emptyStates).toHaveLength(1)
+  })
+
+  it('renders TreeView in the tag set panel from store data', () => {
+    render(<IndicatorAttachmentPage />)
+
+    const tagPanel = screen.getByTestId('panel-tag-set')
+    expect(within(tagPanel).getByTestId('tree-view')).toBeInTheDocument()
+    const tagNodes = useAttachmentStore.getState().tagNodes
+    const firstRoot = tagNodes.find((t) => !t.parentId)
+    expect(firstRoot).toBeDefined()
+    expect(within(tagPanel).getByText(firstRoot!.name)).toBeInTheDocument()
   })
 
   it('renders TreeView in the indicator tree panel from store data', () => {
