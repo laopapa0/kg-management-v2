@@ -8,11 +8,20 @@ export interface TreeNode {
   children?: TreeNode[]
 }
 
+export interface RenderNodeContext {
+  isSelected: boolean
+  isHovered: boolean
+  depth: number
+}
+
 interface TreeViewProps<T extends TreeNode> {
   nodes: T[]
-  renderNode: (node: T) => React.ReactNode
+  renderNode: (node: T, context: RenderNodeContext) => React.ReactNode
   initialExpanded?: string[]
   onExpandedChange?: (expanded: Set<string>) => void
+  selectedId?: string | null
+  onSelect?: (id: string | null) => void
+  renderIndentGuides?: 'always' | 'onHover' | 'none'
 }
 
 interface TreeItemProps<T extends TreeNode> {
@@ -20,7 +29,10 @@ interface TreeItemProps<T extends TreeNode> {
   depth: number
   expanded: Set<string>
   onToggle: (id: string) => void
-  renderNode: (node: T) => React.ReactNode
+  selectedId: string | null
+  onSelect: (id: string) => void
+  renderNode: (node: T, context: RenderNodeContext) => React.ReactNode
+  renderIndentGuides: 'always' | 'onHover' | 'none'
 }
 
 const childrenContainerVariants = {
@@ -62,27 +74,78 @@ function TreeItem<T extends TreeNode>({
   depth,
   expanded,
   onToggle,
+  selectedId,
+  onSelect,
   renderNode,
+  renderIndentGuides,
 }: TreeItemProps<T>) {
+  const [isHovered, setIsHovered] = useState(false)
   const isExpanded = expanded.has(node.id)
+  const isSelected = selectedId === node.id
   const hasChildren = Boolean(node.children && node.children.length > 0)
+  const showGuides = renderIndentGuides === 'always' || (renderIndentGuides === 'onHover' && isHovered)
+
+  const handleRowClick = useCallback(() => {
+    onSelect(node.id)
+  }, [onSelect, node.id])
 
   return (
     <div data-testid="tree-node" data-node-id={node.id}>
       <div
-        data-testid="tree-node-content"
+        data-testid="tree-node-row"
         data-node-id={node.id}
-        className="flex items-center gap-1 py-1"
-        style={{ paddingLeft: `${depth * 20}px` }}
+        data-selected={isSelected}
+        data-hovered={isHovered}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        onClick={handleRowClick}
+        className={[
+          'group relative flex h-9 cursor-pointer items-center gap-1 py-2 px-3',
+          'transition-colors duration-150 ease-out',
+          isSelected ? 'bg-[rgba(59,130,246,0.12)]' : isHovered ? 'bg-white/[0.04]' : '',
+        ].join(' ')}
+        style={{ paddingLeft: `${depth * 20 + 12}px` }}
       >
+        <span
+          data-testid="tree-node-accent-bar"
+          className={[
+            'absolute left-0 top-0 bottom-0 w-1 transition-opacity duration-150 ease-out',
+            isSelected ? 'opacity-100' : isHovered ? 'opacity-50' : 'opacity-0',
+          ].join(' ')}
+          style={{ backgroundColor: '#3B82F6' }}
+        />
+
+        {renderIndentGuides !== 'none' && depth > 0 && (
+          <span
+            className="pointer-events-none absolute inset-y-0 left-0 flex"
+            style={{ width: `${depth * 20}px` }}
+          >
+            {Array.from({ length: depth }).map((_, i) => (
+              <span
+                key={i}
+                data-testid="tree-indent-guide"
+                className={[
+                  'absolute top-0 bottom-0 w-px transition-opacity duration-150',
+                  'bg-white/[0.06] group-hover:bg-white/[0.15]',
+                  showGuides ? 'opacity-100' : 'opacity-0',
+                ].join(' ')}
+                style={{ left: `${(i + 1) * 20 - 10}px` }}
+              />
+            ))}
+          </span>
+        )}
+
         {hasChildren ? (
           <button
             type="button"
             data-testid="tree-node-toggle"
             aria-expanded={isExpanded}
             aria-label={isExpanded ? `收起节点 ${node.id}` : `展开节点 ${node.id}`}
-            onClick={() => onToggle(node.id)}
-            className="flex size-5 items-center justify-center rounded text-dark-text-secondary transition-colors hover:bg-dark-tree-hover-bg hover:text-dark-accent-primary"
+            onClick={(e) => {
+              e.stopPropagation()
+              onToggle(node.id)
+            }}
+            className="z-10 flex size-5 items-center justify-center rounded text-dark-text-secondary transition-colors hover:bg-dark-tree-hover-bg hover:text-dark-accent-primary"
           >
             <ChevronRight
               className="size-4 transition-transform ease-out"
@@ -95,11 +158,13 @@ function TreeItem<T extends TreeNode>({
         ) : (
           <span
             data-testid="tree-node-leaf-placeholder"
-            className="inline-block size-5"
+            className="z-10 inline-block size-5"
             aria-hidden="true"
           />
         )}
-        <div className="flex-1 min-w-0">{renderNode(node)}</div>
+        <div className="z-10 flex-1 min-w-0">
+          {renderNode(node, { isSelected, isHovered, depth })}
+        </div>
       </div>
       <AnimatePresence initial={false}>
         {isExpanded && hasChildren && (
@@ -123,7 +188,10 @@ function TreeItem<T extends TreeNode>({
                   depth={depth + 1}
                   expanded={expanded}
                   onToggle={onToggle}
+                  selectedId={selectedId}
+                  onSelect={onSelect}
                   renderNode={renderNode}
+                  renderIndentGuides={renderIndentGuides}
                 />
               </motion.div>
             ))}
@@ -139,10 +207,17 @@ export default function TreeView<T extends TreeNode>({
   renderNode,
   initialExpanded,
   onExpandedChange,
+  selectedId: controlledSelectedId,
+  onSelect,
+  renderIndentGuides = 'onHover',
 }: TreeViewProps<T>) {
   const [expanded, setExpanded] = useState<Set<string>>(
     () => new Set(initialExpanded ?? []),
   )
+  const [internalSelectedId, setInternalSelectedId] = useState<string | null>(
+    null,
+  )
+  const selectedId = controlledSelectedId ?? internalSelectedId
 
   const handleToggle = useCallback(
     (id: string) => {
@@ -160,6 +235,16 @@ export default function TreeView<T extends TreeNode>({
     [onExpandedChange],
   )
 
+  const handleSelect = useCallback(
+    (id: string) => {
+      if (controlledSelectedId === undefined) {
+        setInternalSelectedId((prev) => (prev === id ? null : id))
+      }
+      onSelect?.(id)
+    },
+    [controlledSelectedId, onSelect],
+  )
+
   return (
     <div data-testid="tree-view" data-initial="false" className="flex flex-col">
       {nodes.map((node) => (
@@ -169,7 +254,10 @@ export default function TreeView<T extends TreeNode>({
           depth={0}
           expanded={expanded}
           onToggle={handleToggle}
+          selectedId={selectedId}
+          onSelect={handleSelect}
           renderNode={renderNode}
+          renderIndentGuides={renderIndentGuides}
         />
       ))}
     </div>
