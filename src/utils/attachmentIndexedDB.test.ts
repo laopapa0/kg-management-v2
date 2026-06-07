@@ -210,4 +210,22 @@ describe('attachmentIndexedDB', () => {
 
     global.indexedDB = originalIndexedDB;
   });
+
+  it('openDB 初始化异常时整体降级到内存实现', async () => {
+    const originalOpen = global.indexedDB.open;
+    global.indexedDB.open = () => {
+      throw new Error('Privacy mode blocked');
+    };
+
+    const fallbackDb = createAttachmentDB();
+
+    const departments = await fallbackDb.getDepartments();
+    expect(departments.length).toBeGreaterThan(0);
+    expect(departments.some((d) => d.name === '财务部')).toBe(true);
+
+    await fallbackDb.setDepartments([{ id: 'dept-privacy', name: '隐私部' }]);
+    expect(await fallbackDb.getDepartments()).toEqual([{ id: 'dept-privacy', name: '隐私部' }]);
+
+    global.indexedDB.open = originalOpen;
+  });
 });

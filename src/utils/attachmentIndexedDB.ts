@@ -329,22 +329,37 @@ export interface CreateAttachmentDBOptions {
 export function createAttachmentDB(options: CreateAttachmentDBOptions = {}): AttachmentDB {
   const dbName = options.dbName ?? DEFAULT_DB_NAME;
 
-  try {
-    if (typeof indexedDB === 'undefined') {
-      return createMemoryAttachmentDB();
+  let memoryFallback: AttachmentDB | null = null;
+  let dbPromise: Promise<DB | null> | null = null;
+  let hasFailed = false;
+
+  function getMemoryFallback(): AttachmentDB {
+    if (!memoryFallback) {
+      memoryFallback = createMemoryAttachmentDB();
     }
-  } catch {
-    return createMemoryAttachmentDB();
+    return memoryFallback;
   }
 
-  let dbPromise: Promise<DB> | null = null;
+  async function initDB(): Promise<DB | null> {
+    if (hasFailed) return null;
+    try {
+      if (typeof indexedDB === 'undefined') {
+        hasFailed = true;
+        return null;
+      }
+      const db = await openAttachmentDB(dbName);
+      await seedMockData(db);
+      return db;
+    } catch {
+      hasFailed = true;
+      return null;
+    }
+  }
 
-  function getDB(): Promise<DB> {
+  async function getDB(): Promise<DB | null> {
+    if (hasFailed) return null;
     if (!dbPromise) {
-      dbPromise = openAttachmentDB(dbName).then(async (db) => {
-        await seedMockData(db);
-        return db;
-      });
+      dbPromise = initDB();
     }
     return dbPromise;
   }
@@ -357,16 +372,27 @@ export function createAttachmentDB(options: CreateAttachmentDBOptions = {}): Att
 
   return {
     async getDepartments() {
+      if (hasFailed) return getMemoryFallback().getDepartments();
+      const db = await getDB();
+      if (!db) return getMemoryFallback().getDepartments();
       try {
-        const db = await getDB();
-        return db.getAll('departments');
+        return await db.getAll('departments');
       } catch {
-        return createMemoryAttachmentDB().getDepartments();
+        hasFailed = true;
+        return getMemoryFallback().getDepartments();
       }
     },
     async setDepartments(data) {
+      if (hasFailed) {
+        await getMemoryFallback().setDepartments(data);
+        return;
+      }
+      const db = await getDB();
+      if (!db) {
+        await getMemoryFallback().setDepartments(data);
+        return;
+      }
       try {
-        const db = await getDB();
         const tx = db.transaction('departments', 'readwrite');
         await tx.store.clear();
         for (const item of data) {
@@ -374,23 +400,35 @@ export function createAttachmentDB(options: CreateAttachmentDBOptions = {}): Att
         }
         await tx.done;
       } catch {
-        // 降级到内存无法在这个接口直接反馈，后续读取会走内存
+        hasFailed = true;
+        await getMemoryFallback().setDepartments(data);
       }
     },
     async getIndicators(departmentId) {
+      if (hasFailed) return getMemoryFallback().getIndicators(departmentId);
+      const db = await getDB();
+      if (!db) return getMemoryFallback().getIndicators(departmentId);
       try {
-        const db = await getDB();
         const tx = db.transaction('indicators', 'readonly');
         const index = tx.store.index('byDepartmentId');
         const stored = await index.getAll(departmentId);
         return stored.map(stripDepartmentId);
       } catch {
-        return createMemoryAttachmentDB().getIndicators(departmentId);
+        hasFailed = true;
+        return getMemoryFallback().getIndicators(departmentId);
       }
     },
     async setIndicators(departmentId, data) {
+      if (hasFailed) {
+        await getMemoryFallback().setIndicators(departmentId, data);
+        return;
+      }
+      const db = await getDB();
+      if (!db) {
+        await getMemoryFallback().setIndicators(departmentId, data);
+        return;
+      }
       try {
-        const db = await getDB();
         const tx = db.transaction('indicators', 'readwrite');
         const index = tx.store.index('byDepartmentId');
         const keys = await index.getAllKeys(departmentId);
@@ -403,37 +441,61 @@ export function createAttachmentDB(options: CreateAttachmentDBOptions = {}): Att
         }
         await tx.done;
       } catch {
-        // silent fallback
+        hasFailed = true;
+        await getMemoryFallback().setIndicators(departmentId, data);
       }
     },
     async getTagNodes(departmentId) {
+      if (hasFailed) return getMemoryFallback().getTagNodes(departmentId);
+      const db = await getDB();
+      if (!db) return getMemoryFallback().getTagNodes(departmentId);
       try {
-        const db = await getDB();
         const wrapped = await db.get('tagNodes', departmentId);
         return wrapped?.nodes ?? [];
       } catch {
-        return createMemoryAttachmentDB().getTagNodes(departmentId);
+        hasFailed = true;
+        return getMemoryFallback().getTagNodes(departmentId);
       }
     },
     async setTagNodes(departmentId, data) {
+      if (hasFailed) {
+        await getMemoryFallback().setTagNodes(departmentId, data);
+        return;
+      }
+      const db = await getDB();
+      if (!db) {
+        await getMemoryFallback().setTagNodes(departmentId, data);
+        return;
+      }
       try {
-        const db = await getDB();
         await db.put('tagNodes', { departmentId, nodes: data });
       } catch {
-        // silent fallback
+        hasFailed = true;
+        await getMemoryFallback().setTagNodes(departmentId, data);
       }
     },
     async getRules() {
+      if (hasFailed) return getMemoryFallback().getRules();
+      const db = await getDB();
+      if (!db) return getMemoryFallback().getRules();
       try {
-        const db = await getDB();
-        return db.getAll('rules');
+        return await db.getAll('rules');
       } catch {
-        return createMemoryAttachmentDB().getRules();
+        hasFailed = true;
+        return getMemoryFallback().getRules();
       }
     },
     async setRules(data) {
+      if (hasFailed) {
+        await getMemoryFallback().setRules(data);
+        return;
+      }
+      const db = await getDB();
+      if (!db) {
+        await getMemoryFallback().setRules(data);
+        return;
+      }
       try {
-        const db = await getDB();
         const tx = db.transaction('rules', 'readwrite');
         await tx.store.clear();
         for (const item of data) {
@@ -441,7 +503,8 @@ export function createAttachmentDB(options: CreateAttachmentDBOptions = {}): Att
         }
         await tx.done;
       } catch {
-        // silent fallback
+        hasFailed = true;
+        await getMemoryFallback().setRules(data);
       }
     },
   };

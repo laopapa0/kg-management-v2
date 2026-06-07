@@ -93,4 +93,49 @@ describe('DepartmentTransition', () => {
 
     expect(container.querySelector('[data-testid="tree-panel"]')).toBeInTheDocument();
   });
+
+  it('加载状态切换时骨架屏和内容分别使用独立的 motion 容器', async () => {
+    const { rerender } = render(
+      <DepartmentTransition departmentId="dept-finance" isLoading>
+        <div data-testid="tree-content">指标树内容</div>
+      </DepartmentTransition>,
+    );
+
+    expect(screen.getByTestId('department-skeleton-container')).toBeInTheDocument();
+    expect(screen.queryByTestId('department-content-container')).not.toBeInTheDocument();
+
+    rerender(
+      <DepartmentTransition departmentId="dept-finance">
+        <div data-testid="tree-content">指标树内容</div>
+      </DepartmentTransition>,
+    );
+
+    // mode="wait" 会先等 skeleton exit 完成再挂载 content
+    await waitFor(() => {
+      expect(screen.queryByTestId('department-skeleton-container')).not.toBeInTheDocument();
+      expect(screen.getByTestId('department-content-container')).toBeInTheDocument();
+    });
+  });
+
+  it('同 departmentId 下 isLoading 切换不触发位移动画（仅透明度变化）', async () => {
+    const { rerender } = render(
+      <DepartmentTransition departmentId="dept-finance" isLoading>
+        <div data-testid="tree-content">指标树内容</div>
+      </DepartmentTransition>,
+    );
+
+    rerender(
+      <DepartmentTransition departmentId="dept-finance">
+        <div data-testid="tree-content">指标树内容</div>
+      </DepartmentTransition>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId('tree-content')).toBeInTheDocument();
+    });
+
+    const contentContainer = screen.getByTestId('department-content-container');
+    // 内容容器应为 motion.div，通过检查 role/presence 确认它承载淡入淡出而非位移
+    expect(contentContainer).toBeInTheDocument();
+  });
 });

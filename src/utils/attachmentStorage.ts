@@ -32,8 +32,20 @@ export interface AttachmentUiState {
   selectedIndicatorIds?: string[];
 }
 
+/** 单个 key 的历史记录项 */
+interface HistoryEntry<T> {
+  timestamp: number;
+  value: T;
+}
+
+/** 每个 key 最多保留的 undo 深度 */
+const MAX_UNDO_DEPTH = 20;
+
 // ─── 内存降级缓存 ───
 const memoryCache = new Map<string, unknown>();
+
+/** key → 历史栈 */
+const undoHistory = new Map<string, HistoryEntry<unknown>[]>();
 
 /**
  * 重置内存缓存（主要用于测试隔离）
@@ -41,6 +53,15 @@ const memoryCache = new Map<string, unknown>();
  */
 export function __resetAttachmentStorageCache(): void {
   memoryCache.clear();
+  undoHistory.clear();
+}
+
+function clone<T>(value: T): T {
+  try {
+    return structuredClone(value);
+  } catch {
+    return JSON.parse(JSON.stringify(value)) as T;
+  }
 }
 
 function readFromStorage<T>(key: string, defaultValue: T): T {
@@ -76,6 +97,43 @@ function writeToStorage<T>(key: string, data: T): StorageResult {
   }
 }
 
+function pushHistory<T>(key: string, value: T): void {
+  const stack = undoHistory.get(key) ?? [];
+  stack.push({ timestamp: Date.now(), value: clone(value) });
+  if (stack.length > MAX_UNDO_DEPTH) {
+    stack.shift();
+  }
+  undoHistory.set(key, stack);
+}
+
+/**
+ * 判断指定 key 是否存在可撤销的历史记录
+ */
+export function canUndo(key: string): boolean {
+  const stack = undoHistory.get(key);
+  return Array.isArray(stack) && stack.length > 0;
+}
+
+/**
+ * 撤销最近一次对指定 key 的写入操作
+ * @returns 撤销后的值；若无可撤销记录则返回 defaultValue
+ */
+export function undo<T>(key: string, defaultValue: T): T {
+  const stack = undoHistory.get(key);
+  if (!stack || stack.length === 0) {
+    return defaultValue;
+  }
+  const entry = stack.pop();
+  if (stack.length === 0) {
+    undoHistory.delete(key);
+  }
+  if (!entry) {
+    return defaultValue;
+  }
+  writeToStorage(key, entry.value as T);
+  return entry.value as T;
+}
+
 // ─── Departments ───
 
 export function getDepartments(): Department[] {
@@ -83,6 +141,7 @@ export function getDepartments(): Department[] {
 }
 
 export function saveDepartments(data: Department[]): StorageResult {
+  pushHistory(KEYS.departments, getDepartments());
   return writeToStorage(KEYS.departments, data);
 }
 
@@ -93,7 +152,9 @@ export function getIndicators(departmentId: string): IndicatorAttachment[] {
 }
 
 export function saveIndicators(departmentId: string, data: IndicatorAttachment[]): StorageResult {
-  return writeToStorage(KEYS.indicators(departmentId), data);
+  const key = KEYS.indicators(departmentId);
+  pushHistory(key, getIndicators(departmentId));
+  return writeToStorage(key, data);
 }
 
 // ─── TagNodes（按部门隔离）───
@@ -103,7 +164,9 @@ export function getTagNodes(departmentId: string): TagNode[] {
 }
 
 export function saveTagNodes(departmentId: string, data: TagNode[]): StorageResult {
-  return writeToStorage(KEYS.tagNodes(departmentId), data);
+  const key = KEYS.tagNodes(departmentId);
+  pushHistory(key, getTagNodes(departmentId));
+  return writeToStorage(key, data);
 }
 
 // ─── Rules（全局）───
@@ -113,6 +176,7 @@ export function getRules(): Rule[] {
 }
 
 export function saveRules(data: Rule[]): StorageResult {
+  pushHistory(KEYS.rules, getRules());
   return writeToStorage(KEYS.rules, data);
 }
 
@@ -123,6 +187,7 @@ export function getRuleParameters(): RuleParameter[] {
 }
 
 export function saveRuleParameters(data: RuleParameter[]): StorageResult {
+  pushHistory(KEYS.ruleParameters, getRuleParameters());
   return writeToStorage(KEYS.ruleParameters, data);
 }
 
@@ -133,5 +198,6 @@ export function getUiState(): AttachmentUiState {
 }
 
 export function saveUiState(data: AttachmentUiState): StorageResult {
+  pushHistory(KEYS.uiState, getUiState());
   return writeToStorage(KEYS.uiState, data);
 }

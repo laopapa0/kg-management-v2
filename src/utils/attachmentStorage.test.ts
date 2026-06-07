@@ -15,6 +15,8 @@ import {
   saveUiState,
   KEY_PREFIX,
   __resetAttachmentStorageCache,
+  canUndo,
+  undo,
   type Department,
   type AttachmentUiState,
 } from './attachmentStorage';
@@ -297,5 +299,100 @@ describe('attachmentStorage', () => {
     // 恢复后 localStorage 中仍然是 departmentsA，未被破坏
     const persisted = JSON.parse(localStorage.getItem('kgv2-attachment-departments')!);
     expect(persisted).toEqual(departmentsA);
+  });
+
+  // ─── Undo 操作支持 ───
+  describe('undo', () => {
+    it('首次保存后 canUndo 返回 true', () => {
+      expect(canUndo('kgv2-attachment-departments')).toBe(false);
+      saveDepartments([{ id: 'dept-1', name: '财务部' }]);
+      expect(canUndo('kgv2-attachment-departments')).toBe(true);
+    });
+
+    it('undo 可恢复到上一次保存的值', () => {
+      const departmentsA: Department[] = [{ id: 'dept-a', name: 'A部' }];
+      const departmentsB: Department[] = [{ id: 'dept-b', name: 'B部' }];
+
+      saveDepartments(departmentsA);
+      saveDepartments(departmentsB);
+      expect(getDepartments()).toEqual(departmentsB);
+
+      const restored = undo<Department[]>('kgv2-attachment-departments', []);
+      expect(restored).toEqual(departmentsA);
+      expect(getDepartments()).toEqual(departmentsA);
+      // 还有一次 save [] → [a] 的历史可撤销
+      expect(canUndo('kgv2-attachment-departments')).toBe(true);
+
+      // 再次 undo 回到初始空数组
+      const emptyRestored = undo<Department[]>('kgv2-attachment-departments', []);
+      expect(emptyRestored).toEqual([]);
+      expect(canUndo('kgv2-attachment-departments')).toBe(false);
+    });
+
+    it('undo 无可撤销记录时返回 defaultValue', () => {
+      const fallback: Department[] = [{ id: 'fallback', name: '默认' }];
+      expect(canUndo('kgv2-attachment-departments')).toBe(false);
+      expect(undo<Department[]>('kgv2-attachment-departments', fallback)).toEqual(fallback);
+    });
+
+    it('多次 undo 按 LIFO 顺序恢复历史', () => {
+      const a: Department[] = [{ id: 'a', name: 'A' }];
+      const b: Department[] = [{ id: 'b', name: 'B' }];
+      const c: Department[] = [{ id: 'c', name: 'C' }];
+
+      saveDepartments(a);
+      saveDepartments(b);
+      saveDepartments(c);
+
+      expect(undo<Department[]>('kgv2-attachment-departments', [])).toEqual(b);
+      expect(undo<Department[]>('kgv2-attachment-departments', [])).toEqual(a);
+      expect(undo<Department[]>('kgv2-attachment-departments', [])).toEqual([]);
+      expect(canUndo('kgv2-attachment-departments')).toBe(false);
+    });
+
+    it('undo 支持 indicators 按 departmentId 隔离', () => {
+      const financeIndicator: IndicatorAttachment = {
+        id: 'IND-F',
+        name: '财务指标',
+        code: 'FIN-001',
+        indicatorCode: 'FIN-001',
+        indicatorDisplayName: '财务指标',
+        indicatorShowName: '财务',
+        indicatorType: '基础指标',
+        level1: '经营',
+        level2: '收入',
+        granularity: '全局',
+        frequency: '月',
+        unit: '元',
+        isBigScreen: false,
+        department: '财务部',
+        businessCaliber: '',
+        techCaliber: '',
+        tags: [],
+        tagIds: [],
+        ruleIds: [],
+      };
+
+      saveIndicators('dept-finance', [financeIndicator]);
+      saveIndicators('dept-finance', []);
+      expect(getIndicators('dept-finance')).toEqual([]);
+
+      const restored = undo<IndicatorAttachment[]>('kgv2-attachment-indicators-dept-finance', []);
+      expect(restored).toEqual([financeIndicator]);
+      expect(getIndicators('dept-finance')).toEqual([financeIndicator]);
+    });
+
+    it('save 操作会限制 undo 栈最大深度', () => {
+      for (let i = 0; i < 25; i += 1) {
+        saveDepartments([{ id: `dept-${i}`, name: `部-${i}` }]);
+      }
+
+      // 最大深度 20，最旧的 5 条应被丢弃
+      for (let i = 0; i < 5; i += 1) {
+        undo<Department[]>('kgv2-attachment-departments', []);
+      }
+      // 第 5 次 undo 应该回到 dept-19，而不是 dept-4
+      expect(getDepartments()).toEqual([{ id: 'dept-19', name: '部-19' }]);
+    });
   });
 });

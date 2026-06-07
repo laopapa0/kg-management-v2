@@ -39,11 +39,12 @@ export const indicatorAttachmentSchema = z
 export function createIndicatorAttachment(
   indicator: Omit<Indicator, 'tags'> & Partial<AttachmentFields> & Pick<Indicator, 'tags'>,
 ): IndicatorAttachment {
-  return {
+  const base = {
     ...indicator,
     tagIds: indicator.tagIds ?? [],
     ruleIds: indicator.ruleIds ?? [],
-  } as IndicatorAttachment;
+  };
+  return indicatorAttachmentSchema.parse(base) as unknown as IndicatorAttachment;
 }
 
 /* ─────────────────────────────────────────────────────────────────────────── */

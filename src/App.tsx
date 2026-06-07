@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import Layout from './components/Layout'
 import DashboardPage from './pages/dashboard/DashboardPage'
@@ -23,6 +24,10 @@ import PlatformPropertyPage from './pages/platform/PlatformPropertyPage'
 import PlatformGraphPage from './pages/platform/PlatformGraphPage'
 
 export default function App() {
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', 'dark')
+  }, [])
+
   return (
     <Layout>
       <Routes>

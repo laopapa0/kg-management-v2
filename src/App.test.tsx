@@ -4,6 +4,15 @@ import { MemoryRouter } from 'react-router-dom'
 import App from './App'
 
 describe('App routing', () => {
+  it('默认在 html 元素上设置 data-theme="dark"', () => {
+    render(
+      <MemoryRouter initialEntries={['/']}>
+        <App />
+      </MemoryRouter>
+    )
+
+    expect(document.documentElement.getAttribute('data-theme')).toBe('dark')
+  })
   it('renders IndicatorManagementPage at /indicator-management', () => {
     render(
       <MemoryRouter initialEntries={['/indicator-management']}>

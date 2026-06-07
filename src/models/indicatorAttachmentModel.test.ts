@@ -229,6 +229,32 @@ describe('indicatorAttachmentModel', () => {
       expect(result.data.treeParentId).toBeUndefined();
     }
   });
+
+  it('createIndicatorAttachment 使用 indicatorAttachmentSchema 做运行时校验并拒绝非法 tagIds 类型', () => {
+    expect(() =>
+      createIndicatorAttachment({
+        id: 'IND-BAD',
+        name: '测试',
+        code: 'BAD-001',
+        indicatorCode: 'BAD-001',
+        indicatorDisplayName: '测试',
+        indicatorShowName: '测试',
+        indicatorType: '基础指标',
+        level1: '经营',
+        level2: '收入',
+        granularity: '全局',
+        frequency: '月',
+        unit: '元',
+        isBigScreen: false,
+        department: '财务部',
+        businessCaliber: '',
+        techCaliber: '',
+        tags: [],
+        // @ts-expect-error 故意传入非法类型验证 schema
+        tagIds: 'not-an-array',
+      }),
+    ).toThrow();
+  });
 });
 
 describe('TagNode + Rule + RuleParameter models', () => {
