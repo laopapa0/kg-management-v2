@@ -122,6 +122,14 @@ export interface RuleParameter {
   level?: 'P1' | 'P2' | 'P3' | 'P4';
   isInherited?: boolean;
   overriddenFields?: string[];
+  /** 波动检测算法，例如 '3σ' */
+  algorithm?: string;
+  /** 时间窗口，例如 '5min' */
+  window?: string;
+  /** TOPN 数量 */
+  n?: number;
+  /** TOPN 维度，例如 'QPS' */
+  dimension?: string;
 }
 
 export const ruleParameterSchema: z.ZodType<RuleParameter> = z.object({
@@ -133,6 +141,10 @@ export const ruleParameterSchema: z.ZodType<RuleParameter> = z.object({
   level: z.enum(['P1', 'P2', 'P3', 'P4']).optional(),
   isInherited: z.boolean().optional(),
   overriddenFields: z.array(z.string()).optional(),
+  algorithm: z.string().optional(),
+  window: z.string().optional(),
+  n: z.number().optional(),
+  dimension: z.string().optional(),
 });
 
 /** 规则节点 */

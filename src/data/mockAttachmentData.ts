@@ -104,10 +104,10 @@ export function generateMockRuleParameters(): RuleParameter[] {
   return [
     { ruleId: 'rule-threshold-revenue-p1', indicatorId: 'ind-dept-finance-1', upperLimit: 120, lowerLimit: 80, unit: '百分比', level: 'P1' },
     { ruleId: 'rule-threshold-revenue-p2', indicatorId: 'ind-dept-finance-1', upperLimit: 110, lowerLimit: 90, unit: '百分比', level: 'P2' },
-    { ruleId: 'rule-fluctuation-cost', indicatorId: 'ind-dept-finance-3', upperLimit: 15, unit: '百分比', level: 'P2' },
-    { ruleId: 'rule-topn-arpu', indicatorId: 'ind-dept-market-14', upperLimit: 10, unit: '个', level: 'P3' },
+    { ruleId: 'rule-fluctuation-cost', indicatorId: 'ind-dept-finance-3', upperLimit: 15, unit: '百分比', level: 'P2', algorithm: '3σ', window: '5min' },
+    { ruleId: 'rule-topn-arpu', indicatorId: 'ind-dept-market-14', upperLimit: 10, unit: '个', level: 'P3', n: 10, dimension: 'QPS' },
     { ruleId: 'rule-threshold-satisfaction', indicatorId: 'ind-dept-network-8', lowerLimit: 85, unit: '分', level: 'P1' },
-    { ruleId: 'rule-fluctuation-churn', indicatorId: 'ind-dept-market-17', upperLimit: 5, unit: '百分比', level: 'P2' },
+    { ruleId: 'rule-fluctuation-churn', indicatorId: 'ind-dept-market-17', upperLimit: 5, unit: '百分比', level: 'P2', algorithm: '环比', window: '1d' },
   ]
 }
 

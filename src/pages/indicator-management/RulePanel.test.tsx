@@ -72,29 +72,31 @@ describe('RulePanel', () => {
     })
   })
 
-  it('shows tooltip with attached indicator names on hover', async () => {
+  it('shows summary tooltip with parameter details on hover', async () => {
     const user = userEvent.setup()
     initializeAttachmentStore()
 
     const state = useAttachmentStore.getState()
-    const firstRule = state.rules[0]
-    const targetIndicator = state.indicators[0]
+    const ruleWithParams = state.rules.find((r) =>
+      state.ruleParameters.some((p) => p.ruleId === r.id),
+    )
+    expect(ruleWithParams).toBeDefined()
 
-    act(() => {
-      state.setIndicators(
-        state.indicators.map((i) =>
-          i.id === targetIndicator.id ? { ...i, ruleIds: [firstRule.id] } : i,
-        ),
-      )
-    })
+    const params = state.ruleParameters.filter((p) => p.ruleId === ruleWithParams!.id)
 
     render(<RulePanel />)
 
-    const row = screen.getByTestId(`rule-row-${firstRule.id}`)
-    await user.hover(row)
+    const summary = screen.getByTestId(`rule-summary-${ruleWithParams!.id}`)
+    await user.hover(summary)
 
     await waitFor(() => {
-      expect(screen.getByRole('tooltip')).toHaveTextContent(targetIndicator.name)
+      const tooltip = screen.getByRole('tooltip')
+      expect(tooltip).toHaveTextContent(`类型: ${ruleWithParams!.type}`)
+      for (const param of params) {
+        if (param.level) {
+          expect(tooltip).toHaveTextContent(`级别: ${param.level}`)
+        }
+      }
     })
   })
 

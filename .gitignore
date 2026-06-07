@@ -22,3 +22,4 @@ aws.credentials
 *.tfvars
 .terraform/
 .handoff/
+.deepseek/

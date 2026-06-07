@@ -2,9 +2,9 @@ import { useMemo } from 'react'
 import { Scale } from 'lucide-react'
 import TreeView, { type TreeNode } from '@/components/tree/TreeView'
 import EmptyState from '@/components/empty-state/EmptyState'
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import RuleSummaryBadge from '@/components/rule/RuleSummaryBadge'
 import { useAttachmentStore } from '@/stores/attachmentStore'
-import type { Rule } from '@/models/indicatorAttachmentModel'
+import type { Rule, RuleParameter } from '@/models/indicatorAttachmentModel'
 import { buildRuleTree } from '@/models/indicatorAttachmentModel'
 import { walkRules } from '@/utils/attachmentTree'
 
@@ -29,24 +29,14 @@ export default function RulePanel() {
     return map
   }, [indicators])
 
-  const attachedNamesByRule = useMemo(() => {
-    const map = new Map<string, string[]>()
-    for (const indicator of indicators) {
-      for (const ruleId of indicator.ruleIds) {
-        const list = map.get(ruleId) ?? []
-        list.push(indicator.name)
-        map.set(ruleId, list)
-      }
+  const parametersByRule = useMemo(() => {
+    const map = new Map<string, RuleParameter[]>()
+    for (const param of ruleParameters) {
+      const list = map.get(param.ruleId) ?? []
+      list.push(param)
+      map.set(param.ruleId, list)
     }
     return map
-  }, [indicators])
-
-  const configuredRuleIds = useMemo(() => {
-    const set = new Set<string>()
-    for (const param of ruleParameters) {
-      set.add(param.ruleId)
-    }
-    return set
   }, [ruleParameters])
 
   const nodeMap = useMemo(() => {
@@ -87,44 +77,31 @@ export default function RulePanel() {
           if (!fullRule) return null
 
           const count = attachedCountByRule.get(fullRule.id) ?? 0
-          const names = attachedNamesByRule.get(fullRule.id) ?? []
-          const isConfigured = configuredRuleIds.has(fullRule.id)
-          const tooltipText = names.length > 0 ? names.join('、') : '暂无指标挂靠'
+          const params = parametersByRule.get(fullRule.id) ?? []
 
           return (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <div
-                  data-testid={`rule-row-${fullRule.id}`}
-                  className="flex items-center justify-between gap-2"
+            <div
+              data-testid={`rule-row-${fullRule.id}`}
+              className="flex items-center justify-between gap-2"
+            >
+              <span className="truncate text-sm text-dark-text-primary">
+                {fullRule.name}
+              </span>
+              <div className="flex shrink-0 items-center gap-1.5">
+                <RuleSummaryBadge rule={fullRule} parameters={params} />
+                <span
+                  data-testid={`rule-count-${fullRule.id}`}
+                  className={[
+                    'inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-[10px] font-semibold',
+                    count > 0
+                      ? 'bg-[#3B82F6]/15 text-[#4DA6FF]'
+                      : 'bg-dark-card-l2 text-dark-text-tertiary',
+                  ].join(' ')}
                 >
-                  <span className="truncate text-sm text-dark-text-primary">
-                    {fullRule.name}
-                  </span>
-                  <div className="flex shrink-0 items-center gap-1.5">
-                    {!isConfigured && (
-                      <span className="text-xs italic text-dark-text-tertiary">
-                        待配置
-                      </span>
-                    )}
-                    <span
-                      data-testid={`rule-count-${fullRule.id}`}
-                      className={[
-                        'inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-[10px] font-semibold',
-                        count > 0
-                          ? 'bg-[#3B82F6]/15 text-[#4DA6FF]'
-                          : 'bg-dark-card-l2 text-dark-text-tertiary',
-                      ].join(' ')}
-                    >
-                      {count}
-                    </span>
-                  </div>
-                </div>
-              </TooltipTrigger>
-              <TooltipContent side="right" sideOffset={8}>
-                <div className="max-w-xs">{tooltipText}</div>
-              </TooltipContent>
-            </Tooltip>
+                  {count}
+                </span>
+              </div>
+            </div>
           )
         }}
       />
