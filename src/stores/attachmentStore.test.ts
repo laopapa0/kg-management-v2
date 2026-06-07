@@ -1,0 +1,140 @@
+import { describe, it, expect, beforeEach, vi } from 'vitest'
+import {
+  getDepartments,
+  getIndicators,
+  getTagNodes,
+  getRules,
+  getRuleParameters,
+  getUiState,
+  __resetAttachmentStorageCache,
+} from '@/utils/attachmentStorage'
+import { useAttachmentStore, initializeAttachmentStore } from './attachmentStore'
+
+const mockStorage = {
+  departments: [
+    { id: 'dept-finance', name: '财务部' },
+    { id: 'dept-market', name: '市场部' },
+  ],
+}
+
+describe('attachmentStore', () => {
+  beforeEach(() => {
+    localStorage.clear()
+    __resetAttachmentStorageCache()
+    useAttachmentStore.setState(useAttachmentStore.getInitialState())
+  })
+
+  it('initializes with empty data before init() is called', () => {
+    const state = useAttachmentStore.getState()
+
+    expect(state.departments).toEqual([])
+    expect(state.currentDepartmentId).toBeNull()
+    expect(state.indicators).toEqual([])
+    expect(state.tagNodes).toEqual([])
+    expect(state.rules).toEqual([])
+    expect(state.ruleParameters).toEqual([])
+    expect(state.connectionMode).toBe(false)
+    expect(state.uiState).toEqual({})
+  })
+
+  it('loads data from attachmentStorage during init()', () => {
+    localStorage.setItem('kgv2-attachment-departments', JSON.stringify(mockStorage.departments))
+    localStorage.setItem(
+      'kgv2-attachment-indicators-dept-finance',
+      JSON.stringify([{ id: 'ind-001', name: '测试指标' }]),
+    )
+
+    initializeAttachmentStore()
+
+    const state = useAttachmentStore.getState()
+    expect(state.departments).toEqual(mockStorage.departments)
+    expect(state.currentDepartmentId).toBe('dept-finance')
+    expect(state.indicators.length).toBeGreaterThanOrEqual(1)
+  })
+
+  it('injects mock data when storage is empty', () => {
+    initializeAttachmentStore()
+
+    const state = useAttachmentStore.getState()
+    expect(state.departments.length).toBeGreaterThanOrEqual(2)
+    expect(state.indicators.length).toBeGreaterThanOrEqual(20)
+    expect(state.tagNodes.length).toBeGreaterThanOrEqual(5)
+    expect(state.rules.length).toBeGreaterThanOrEqual(3)
+  })
+
+  it('switches current department and loads its data', () => {
+    initializeAttachmentStore()
+
+    const state = useAttachmentStore.getState()
+    state.setCurrentDepartmentId('dept-market')
+
+    const next = useAttachmentStore.getState()
+    expect(next.currentDepartmentId).toBe('dept-market')
+    expect(next.indicators.length).toBeGreaterThanOrEqual(1)
+    expect(next.tagNodes.length).toBeGreaterThanOrEqual(1)
+  })
+
+  it('persists indicators to storage when they change', () => {
+    initializeAttachmentStore()
+
+    const state = useAttachmentStore.getState()
+    const original = state.indicators
+    state.setIndicators([...original, { id: 'ind-new', name: '新增指标' } as typeof original[number]])
+
+    const stored = getIndicators(state.currentDepartmentId!)
+    expect(stored.some((i) => i.id === 'ind-new')).toBe(true)
+  })
+
+  it('persists tag nodes to storage when they change', () => {
+    initializeAttachmentStore()
+
+    const state = useAttachmentStore.getState()
+    state.setTagNodes([{ id: 'tag-new', name: '新标签' }])
+
+    const stored = getTagNodes(state.currentDepartmentId!)
+    expect(stored.some((t) => t.id === 'tag-new')).toBe(true)
+  })
+
+  it('persists rules and rule parameters to storage when they change', () => {
+    initializeAttachmentStore()
+
+    const state = useAttachmentStore.getState()
+    state.setRules([{ id: 'rule-new', name: '新规则', type: 'threshold' }])
+    state.setRuleParameters([{ ruleId: 'rule-new', indicatorId: 'ind-001' }])
+
+    expect(getRules().some((r) => r.id === 'rule-new')).toBe(true)
+    expect(getRuleParameters().some((p) => p.ruleId === 'rule-new')).toBe(true)
+  })
+
+  it('persists ui state to storage when it changes', () => {
+    initializeAttachmentStore()
+
+    const state = useAttachmentStore.getState()
+    state.setUiState({ selectedIndicatorIds: ['ind-001'] })
+
+    expect(getUiState().selectedIndicatorIds).toContain('ind-001')
+  })
+
+  it('toggles connection mode', () => {
+    initializeAttachmentStore()
+
+    useAttachmentStore.getState().setConnectionMode(true)
+    expect(useAttachmentStore.getState().connectionMode).toBe(true)
+
+    useAttachmentStore.getState().setConnectionMode(false)
+    expect(useAttachmentStore.getState().connectionMode).toBe(false)
+  })
+
+  it('does not auto-inject mock data if storage already has departments', () => {
+    localStorage.setItem('kgv2-attachment-departments', JSON.stringify(mockStorage.departments))
+    localStorage.setItem('kgv2-attachment-indicators-dept-finance', JSON.stringify([]))
+    localStorage.setItem('kgv2-attachment-tagnodes-dept-finance', JSON.stringify([]))
+
+    initializeAttachmentStore()
+
+    const state = useAttachmentStore.getState()
+    expect(state.departments).toEqual(mockStorage.departments)
+    expect(state.indicators).toEqual([])
+    expect(state.tagNodes).toEqual([])
+  })
+})
