@@ -13,14 +13,18 @@ describe('App routing', () => {
 
     expect(document.documentElement.getAttribute('data-theme')).toBe('dark')
   })
-  it('renders IndicatorManagementPage at /indicator-management', () => {
+
+  it('renders IndicatorAttachmentPage at /indicator-management', () => {
     render(
       <MemoryRouter initialEntries={['/indicator-management']}>
         <App />
       </MemoryRouter>
     )
 
-    expect(screen.getByText(/indicator management/i)).toBeInTheDocument()
+    expect(screen.getByText('指标树')).toBeInTheDocument()
+    expect(screen.getByText('待选指标')).toBeInTheDocument()
+    expect(screen.getByText('标签集')).toBeInTheDocument()
+    expect(screen.getByText('规则')).toBeInTheDocument()
   })
 
   it('still renders IndicatorCreatePage at /indicator/create', () => {
