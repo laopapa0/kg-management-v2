@@ -1,4 +1,7 @@
 import { Group, Panel, Separator } from 'react-resizable-panels'
+import { GitBranch, LayoutGrid, Tags, Scale } from 'lucide-react'
+import PanelHeader from '@/components/panel/PanelHeader'
+import EmptyState from '@/components/empty-state/EmptyState'
 
 const PANEL_MIN_WIDTH_LEFT = 240
 const PANEL_MIN_WIDTH_CENTER = 400
@@ -20,9 +23,20 @@ export default function IndicatorAttachmentPage() {
         >
           <div
             data-testid="panel-indicator-tree"
-            className="flex h-full flex-col rounded-lg border border-dark-border bg-dark-card-l1 p-3"
+            className="flex h-full flex-col rounded-lg border border-dark-border bg-dark-card-l1"
           >
-            <h2 className="text-h3 font-semibold">指标树</h2>
+            <PanelHeader
+              title="指标树"
+              onAdd={() => {
+                // eslint-disable-next-line no-console
+                console.log('add indicator tree node')
+              }}
+            />
+            <EmptyState
+              icon={<GitBranch className="size-6" />}
+              title="暂无指标树节点"
+              description="点击右上角 + 添加根节点"
+            />
           </div>
         </Panel>
 
@@ -37,9 +51,20 @@ export default function IndicatorAttachmentPage() {
         >
           <div
             data-testid="panel-pending-indicators"
-            className="flex h-full flex-col rounded-lg border border-dark-border bg-dark-elevated p-3"
+            className="flex h-full flex-col rounded-lg border border-dark-border bg-dark-elevated"
           >
-            <h2 className="text-h3 font-semibold">待选指标</h2>
+            <PanelHeader
+              title="待选指标"
+              onAdd={() => {
+                // eslint-disable-next-line no-console
+                console.log('add pending indicator')
+              }}
+            />
+            <EmptyState
+              icon={<LayoutGrid className="size-6" />}
+              title="暂无待选指标"
+              description="当前没有需要挂靠的指标"
+            />
           </div>
         </Panel>
 
@@ -56,9 +81,20 @@ export default function IndicatorAttachmentPage() {
             <Panel id="tag-set" defaultSize={50} minSize={10} className="min-h-0">
               <div
                 data-testid="panel-tag-set"
-                className="flex h-full flex-col rounded-lg border border-dark-border bg-dark-card-l1 p-3"
+                className="flex h-full flex-col rounded-lg border border-dark-border bg-dark-card-l1"
               >
-                <h2 className="text-h3 font-semibold">标签集</h2>
+                <PanelHeader
+                  title="标签集"
+                  onAdd={() => {
+                    // eslint-disable-next-line no-console
+                    console.log('add tag')
+                  }}
+                />
+                <EmptyState
+                  icon={<Tags className="size-6" />}
+                  title="暂无标签"
+                  description="点击右上角 + 添加标签"
+                />
               </div>
             </Panel>
 
@@ -67,9 +103,14 @@ export default function IndicatorAttachmentPage() {
             <Panel id="rules" defaultSize={50} minSize={10} className="min-h-0">
               <div
                 data-testid="panel-rules"
-                className="flex h-full flex-col rounded-lg border border-dark-border bg-dark-card-l1 p-3"
+                className="flex h-full flex-col rounded-lg border border-dark-border bg-dark-card-l1"
               >
-                <h2 className="text-h3 font-semibold">规则</h2>
+                <PanelHeader title="规则" />
+                <EmptyState
+                  icon={<Scale className="size-6" />}
+                  title="暂无规则"
+                  description="规则由系统管理员维护"
+                />
               </div>
             </Panel>
           </Group>

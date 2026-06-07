@@ -41,4 +41,29 @@ describe('IndicatorAttachmentPage', () => {
     expect(screen.getByTestId('panel-tag-set').closest('[data-panel]')).toBeInTheDocument()
     expect(screen.getByTestId('panel-rules').closest('[data-panel]')).toBeInTheDocument()
   })
+
+  it('renders a panel header for each of the four panels', () => {
+    render(<IndicatorAttachmentPage />)
+
+    const headers = screen.getAllByTestId('panel-header')
+    expect(headers).toHaveLength(4)
+  })
+
+  it('renders an empty state placeholder in each panel', () => {
+    render(<IndicatorAttachmentPage />)
+
+    const emptyStates = screen.getAllByTestId('empty-state-wrapper')
+    expect(emptyStates).toHaveLength(4)
+  })
+
+  it('renders four add buttons that fade in on header hover', () => {
+    render(<IndicatorAttachmentPage />)
+
+    const addButtons = screen.getAllByTestId('panel-header-add-button')
+    expect(addButtons).toHaveLength(4)
+    addButtons.forEach((button) => {
+      expect(button).toHaveClass('opacity-0')
+      expect(button).toHaveClass('group-hover:opacity-100')
+    })
+  })
 })
