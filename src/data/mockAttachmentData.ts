@@ -84,37 +84,20 @@ export function generateMockTagNodes(departmentId: string): TagNode[] {
 }
 
 export function generateMockRules(): Rule[] {
-  return [
-    {
-      id: 'rule-threshold-revenue',
-      name: '营收阈值告警',
-      type: 'threshold',
-      children: [
-        { id: 'rule-threshold-revenue-p1', name: 'P1 级营收阈值', type: 'threshold', parentId: 'rule-threshold-revenue' },
-        { id: 'rule-threshold-revenue-p2', name: 'P2 级营收阈值', type: 'threshold', parentId: 'rule-threshold-revenue' },
-      ],
-    },
-    {
-      id: 'rule-fluctuation-cost',
-      name: '成本波动监控',
-      type: 'fluctuation',
-    },
-    {
-      id: 'rule-topn-arpu',
-      name: 'ARPU TOP-N',
-      type: 'topn',
-    },
-    {
-      id: 'rule-threshold-satisfaction',
-      name: '满意度阈值',
-      type: 'threshold',
-    },
-    {
-      id: 'rule-fluctuation-churn',
-      name: '离网率波动',
-      type: 'fluctuation',
-    },
+  const roots: Rule[] = [
+    { id: 'rule-threshold-revenue', name: '营收阈值告警', type: 'threshold' },
+    { id: 'rule-fluctuation-cost', name: '成本波动监控', type: 'fluctuation' },
+    { id: 'rule-topn-arpu', name: 'ARPU TOP-N', type: 'topn' },
+    { id: 'rule-threshold-satisfaction', name: '满意度阈值', type: 'threshold' },
+    { id: 'rule-fluctuation-churn', name: '离网率波动', type: 'fluctuation' },
   ]
+
+  const children: Rule[] = [
+    { id: 'rule-threshold-revenue-p1', name: 'P1 级营收阈值', type: 'threshold', parentId: roots[0].id },
+    { id: 'rule-threshold-revenue-p2', name: 'P2 级营收阈值', type: 'threshold', parentId: roots[0].id },
+  ]
+
+  return [...roots, ...children]
 }
 
 export function generateMockRuleParameters(): RuleParameter[] {

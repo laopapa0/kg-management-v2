@@ -58,13 +58,6 @@ describe('IndicatorAttachmentPage', () => {
     expect(headers).toHaveLength(4)
   })
 
-  it('renders empty state placeholder in the rule panel only', () => {
-    render(<IndicatorAttachmentPage />)
-
-    const emptyStates = screen.getAllByTestId('empty-state-wrapper')
-    expect(emptyStates).toHaveLength(1)
-  })
-
   it('renders TreeView in the tag set panel from store data', () => {
     render(<IndicatorAttachmentPage />)
 
@@ -83,6 +76,17 @@ describe('IndicatorAttachmentPage', () => {
     expect(within(treePanel).getByTestId('tree-view')).toBeInTheDocument()
     const indicators = useAttachmentStore.getState().indicators
     expect(within(treePanel).getByText(indicators[0].name)).toBeInTheDocument()
+  })
+
+  it('renders TreeView in the rules panel from store data', () => {
+    render(<IndicatorAttachmentPage />)
+
+    const rulesPanel = screen.getByTestId('panel-rules')
+    expect(within(rulesPanel).getByTestId('tree-view')).toBeInTheDocument()
+    const rules = useAttachmentStore.getState().rules
+    const firstRoot = rules.find((r) => !r.parentId)
+    expect(firstRoot).toBeDefined()
+    expect(within(rulesPanel).getByText(firstRoot!.name)).toBeInTheDocument()
   })
 
   it('renders indicator cards in the pending indicators panel from store data', () => {

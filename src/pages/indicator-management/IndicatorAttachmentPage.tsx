@@ -1,12 +1,11 @@
 import { useEffect } from 'react'
 import { useShallow } from 'zustand/react/shallow'
 import { Group, Panel, Separator } from 'react-resizable-panels'
-import { Scale } from 'lucide-react'
 import PanelHeader from '@/components/panel/PanelHeader'
-import EmptyState from '@/components/empty-state/EmptyState'
 import IndicatorGrid from '@/components/indicator/IndicatorGrid'
 import IndicatorTreePanel from './IndicatorTreePanel'
 import TagSetPanel from './TagSetPanel'
+import RulePanel from './RulePanel'
 import { initializeAttachmentStore, selectPendingIndicators, useAttachmentStore } from '@/stores/attachmentStore'
 
 const PANEL_MIN_WIDTH_LEFT = 240
@@ -114,11 +113,7 @@ export default function IndicatorAttachmentPage() {
                 className="flex h-full flex-col rounded-lg border border-dark-border bg-dark-card-l1"
               >
                 <PanelHeader title="规则" />
-                <EmptyState
-                  icon={<Scale className="size-6" />}
-                  title="暂无规则"
-                  description="规则由系统管理员维护"
-                />
+                <RulePanel />
               </div>
             </Panel>
           </Group>
