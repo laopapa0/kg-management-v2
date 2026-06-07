@@ -35,6 +35,8 @@ describe('attachmentStore', () => {
     expect(state.ruleParameters).toEqual([])
     expect(state.connectionMode).toBe(false)
     expect(state.uiState).toEqual({})
+    expect(state.canUndo).toBe(false)
+    expect(state.canRedo).toBe(false)
   })
 
   it('loads data from attachmentStorage during init()', () => {
@@ -136,5 +138,118 @@ describe('attachmentStore', () => {
     expect(state.departments).toEqual(mockStorage.departments)
     expect(state.indicators).toEqual([])
     expect(state.tagNodes).toEqual([])
+  })
+
+  describe('undo/redo', () => {
+    it('tracks canUndo after a data mutation', () => {
+      initializeAttachmentStore()
+      const state = useAttachmentStore.getState()
+
+      expect(state.canUndo).toBe(false)
+      state.setIndicators([...state.indicators, { id: 'ind-x', name: 'X' } as typeof state.indicators[number]])
+
+      expect(useAttachmentStore.getState().canUndo).toBe(true)
+    })
+
+    it('undo restores previous indicators', () => {
+      initializeAttachmentStore()
+      const state = useAttachmentStore.getState()
+      const originalLength = state.indicators.length
+
+      state.setIndicators([...state.indicators, { id: 'ind-undo-test', name: 'Undo Test' } as typeof state.indicators[number]])
+      expect(useAttachmentStore.getState().indicators.length).toBe(originalLength + 1)
+
+      useAttachmentStore.getState().undo()
+      expect(useAttachmentStore.getState().indicators.length).toBe(originalLength)
+      expect(useAttachmentStore.getState().indicators.some((i) => i.id === 'ind-undo-test')).toBe(false)
+    })
+
+    it('redo restores undone state', () => {
+      initializeAttachmentStore()
+      const state = useAttachmentStore.getState()
+      const originalLength = state.indicators.length
+
+      state.setIndicators([...state.indicators, { id: 'ind-redo-test', name: 'Redo Test' } as typeof state.indicators[number]])
+      useAttachmentStore.getState().undo()
+      expect(useAttachmentStore.getState().canRedo).toBe(true)
+
+      useAttachmentStore.getState().redo()
+      expect(useAttachmentStore.getState().indicators.length).toBe(originalLength + 1)
+      expect(useAttachmentStore.getState().indicators.some((i) => i.id === 'ind-redo-test')).toBe(true)
+    })
+
+    it('clears redoStack when a new mutation happens after undo', () => {
+      initializeAttachmentStore()
+      const state = useAttachmentStore.getState()
+
+      state.setIndicators([...state.indicators, { id: 'ind-a', name: 'A' } as typeof state.indicators[number]])
+      useAttachmentStore.getState().undo()
+      expect(useAttachmentStore.getState().canRedo).toBe(true)
+
+      useAttachmentStore.getState().setIndicators([...useAttachmentStore.getState().indicators, { id: 'ind-b', name: 'B' } as typeof state.indicators[number]])
+      expect(useAttachmentStore.getState().canRedo).toBe(false)
+    })
+
+    it('undo works for tagNodes, rules and ruleParameters', () => {
+      initializeAttachmentStore()
+      const state = useAttachmentStore.getState()
+
+      state.setRules([{ id: 'rule-undo', name: 'Rule Undo', type: 'threshold' }])
+      expect(useAttachmentStore.getState().rules.some((r) => r.id === 'rule-undo')).toBe(true)
+
+      useAttachmentStore.getState().undo()
+      expect(useAttachmentStore.getState().rules.some((r) => r.id === 'rule-undo')).toBe(false)
+    })
+
+    it('does not throw when undo is called on empty stack', () => {
+      initializeAttachmentStore()
+      expect(() => useAttachmentStore.getState().undo()).not.toThrow()
+    })
+
+    it('does not throw when redo is called on empty stack', () => {
+      initializeAttachmentStore()
+      expect(() => useAttachmentStore.getState().redo()).not.toThrow()
+    })
+
+    it('caps undo stack size', () => {
+      initializeAttachmentStore()
+      const state = useAttachmentStore.getState()
+
+      for (let i = 0; i < 52; i++) {
+        state.setIndicators([...useAttachmentStore.getState().indicators, { id: `ind-${i}`, name: `${i}` } as typeof state.indicators[number]])
+      }
+
+      expect(useAttachmentStore.getState().undoStack.length).toBeLessThanOrEqual(50)
+    })
+
+    it('handleKeyDown triggers undo on Ctrl+Z', () => {
+      initializeAttachmentStore()
+      const state = useAttachmentStore.getState()
+      state.setIndicators([...state.indicators, { id: 'ind-key', name: 'Key' } as typeof state.indicators[number]])
+
+      const event = new KeyboardEvent('keydown', { key: 'z', ctrlKey: true, bubbles: true })
+      useAttachmentStore.getState().handleKeyDown(event)
+
+      expect(useAttachmentStore.getState().indicators.some((i) => i.id === 'ind-key')).toBe(false)
+    })
+
+    it('handleKeyDown triggers redo on Ctrl+Shift+Z', () => {
+      initializeAttachmentStore()
+      const state = useAttachmentStore.getState()
+      state.setIndicators([...state.indicators, { id: 'ind-key', name: 'Key' } as typeof state.indicators[number]])
+      useAttachmentStore.getState().undo()
+
+      const event = new KeyboardEvent('keydown', { key: 'z', ctrlKey: true, shiftKey: true, bubbles: true })
+      useAttachmentStore.getState().handleKeyDown(event)
+
+      expect(useAttachmentStore.getState().indicators.some((i) => i.id === 'ind-key')).toBe(true)
+    })
+
+    it('handleKeyDown prevents default for undo/redo shortcuts', () => {
+      initializeAttachmentStore()
+      const undoEvent = new KeyboardEvent('keydown', { key: 'z', ctrlKey: true, bubbles: true, cancelable: true })
+      useAttachmentStore.getState().handleKeyDown(undoEvent)
+      expect(undoEvent.defaultPrevented).toBe(true)
+    })
   })
 })
