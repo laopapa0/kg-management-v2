@@ -4,9 +4,11 @@ export interface ConnectionState {
   validTargetIds: Set<string>
   hoverTargetId: string | null
   targetType: 'tree' | 'tag' | 'rule' | null
+  isContinuous: boolean
+  misfireCount: number
 }
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import { useAttachmentStore } from '@/stores/attachmentStore'
 
 function collectAllIds<T extends { id: string; children?: T[] }>(nodes: T[]): string[] {
@@ -39,24 +41,33 @@ export function useConnectionMode() {
     validTargetIds: new Set(),
     hoverTargetId: null,
     targetType: null,
+    isContinuous: false,
+    misfireCount: 0,
   })
 
   const computeValidTargetIds = useCallback(
     (targetType: 'tree' | 'tag' | 'rule', sourceId: string): Set<string> => {
+      const source = indicators.find((i) => i.id === sourceId)
       const result = new Set<string>()
       if (targetType === 'tree') {
         for (const indicator of indicators) {
-          if (indicator.indicatorType === '虚拟分组' && indicator.id !== sourceId) {
+          if (
+            indicator.indicatorType === '虚拟分组' &&
+            indicator.id !== sourceId &&
+            indicator.id !== source?.treeParentId
+          ) {
             result.add(indicator.id)
           }
         }
       } else if (targetType === 'tag') {
+        const attachedTagIds = new Set(source?.tagIds ?? [])
         for (const id of flattenTagNodes(tagNodes)) {
-          if (id !== sourceId) result.add(id)
+          if (id !== sourceId && !attachedTagIds.has(id)) result.add(id)
         }
       } else if (targetType === 'rule') {
+        const attachedRuleIds = new Set(source?.ruleIds ?? [])
         for (const id of flattenRules(rules)) {
-          if (id !== sourceId) result.add(id)
+          if (id !== sourceId && !attachedRuleIds.has(id)) result.add(id)
         }
       }
       return result
@@ -76,44 +87,100 @@ export function useConnectionMode() {
         targetType,
         validTargetIds: computeValidTargetIds(targetType, sourceId),
         hoverTargetId: null,
+        isContinuous: state.isContinuous,
+        misfireCount: 0,
       })
     },
-    [computeValidTargetIds, indicators],
+    [computeValidTargetIds, indicators, state.isContinuous],
   )
 
   const cancel = useCallback(() => {
+    const sourceIdToFocus = state.sourceId
     setState({
       isConnecting: false,
       sourceId: null,
       validTargetIds: new Set(),
       hoverTargetId: null,
       targetType: null,
+      isContinuous: state.isContinuous,
+      misfireCount: 0,
     })
-  }, [])
+    // 焦点返还源指标元素，若不在 DOM 中则 fallback 到 body
+    if (sourceIdToFocus) {
+      const el = document.getElementById(sourceIdToFocus)
+      if (el && typeof el.focus === 'function') {
+        el.focus()
+      } else {
+        document.body.focus()
+      }
+    }
+  }, [state.sourceId, state.isContinuous])
 
   const confirm = useCallback((): boolean => {
-    if (!state.hoverTargetId) return false
-    if (!state.validTargetIds.has(state.hoverTargetId)) return false
+    const isValid =
+      state.hoverTargetId !== null &&
+      state.validTargetIds.has(state.hoverTargetId) &&
+      !(state.targetType === 'tree' &&
+        indicators.find((i) => i.id === state.hoverTargetId)?.indicatorType !== '虚拟分组')
 
-    // 额外校验：tree 类型时目标必须是虚拟分组节点
-    if (state.targetType === 'tree') {
-      const target = indicators.find((i) => i.id === state.hoverTargetId)
-      if (!target || target.indicatorType !== '虚拟分组') return false
+    if (!isValid) {
+      setState((prev) => ({ ...prev, misfireCount: prev.misfireCount + 1 }))
+      return false
     }
 
-    setState({
-      isConnecting: false,
-      sourceId: null,
-      validTargetIds: new Set(),
-      hoverTargetId: null,
-      targetType: null,
-    })
+    if (state.isContinuous) {
+      setState((prev) => ({ ...prev, hoverTargetId: null, misfireCount: 0 }))
+    } else {
+      setState({
+        isConnecting: false,
+        sourceId: null,
+        validTargetIds: new Set(),
+        hoverTargetId: null,
+        targetType: null,
+        isContinuous: state.isContinuous,
+        misfireCount: 0,
+      })
+    }
     return true
-  }, [state.hoverTargetId, state.validTargetIds, state.targetType, indicators])
+  }, [state.hoverTargetId, state.validTargetIds, state.targetType, state.isContinuous, indicators])
 
   const setHoverTarget = useCallback((id: string | null) => {
     setState((prev) => ({ ...prev, hoverTargetId: id }))
   }, [])
 
-  return { state, start, cancel, confirm, setHoverTarget }
+  const toggleContinuous = useCallback(() => {
+    setState((prev) => ({ ...prev, isContinuous: !prev.isContinuous }))
+  }, [])
+
+  // Keyboard event handling (Space / ESC)
+  const confirmRef = useRef(confirm)
+  confirmRef.current = confirm
+  const cancelRef = useRef(cancel)
+  cancelRef.current = cancel
+
+  useEffect(() => {
+    if (!state.isConnecting) return
+    const handler = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement
+      if (
+        target.tagName === 'INPUT' ||
+        target.tagName === 'TEXTAREA' ||
+        target.isContentEditable
+      ) {
+        return
+      }
+      if (e.key === ' ') {
+        e.preventDefault()
+        confirmRef.current()
+      }
+      if (e.key === 'Escape') {
+        e.preventDefault()
+        cancelRef.current()
+      }
+    }
+    document.addEventListener('keydown', handler)
+    return () => document.removeEventListener('keydown', handler)
+  }, [state.isConnecting])
+
+  return { state, start, cancel, confirm, setHoverTarget, toggleContinuous }
 }
