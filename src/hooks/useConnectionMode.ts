@@ -75,6 +75,10 @@ export function useConnectionMode() {
     [indicators, tagNodes, rules],
   )
 
+  // Use ref to avoid including state.isContinuous in useCallback deps
+  const isContinuousRef = useRef(state.isContinuous)
+  isContinuousRef.current = state.isContinuous
+
   const start = useCallback(
     (sourceId: string, targetType: 'tree' | 'tag' | 'rule') => {
       // sourceId 必须是真实指标，不能是虚拟分组节点
@@ -87,11 +91,11 @@ export function useConnectionMode() {
         targetType,
         validTargetIds: computeValidTargetIds(targetType, sourceId),
         hoverTargetId: null,
-        isContinuous: state.isContinuous,
+        isContinuous: isContinuousRef.current,
         misfireCount: 0,
       })
     },
-    [computeValidTargetIds, indicators, state.isContinuous],
+    [computeValidTargetIds, indicators],
   )
 
   const cancel = useCallback(() => {
@@ -102,7 +106,7 @@ export function useConnectionMode() {
       validTargetIds: new Set(),
       hoverTargetId: null,
       targetType: null,
-      isContinuous: state.isContinuous,
+      isContinuous: isContinuousRef.current,
       misfireCount: 0,
     })
     // 焦点返还源指标元素，若不在 DOM 中则 fallback 到 body
@@ -114,7 +118,7 @@ export function useConnectionMode() {
         document.body.focus()
       }
     }
-  }, [state.sourceId, state.isContinuous])
+  }, [state.sourceId])
 
   const confirm = useCallback((): boolean => {
     const isValid =
@@ -128,7 +132,7 @@ export function useConnectionMode() {
       return false
     }
 
-    if (state.isContinuous) {
+    if (isContinuousRef.current) {
       setState((prev) => ({ ...prev, hoverTargetId: null, misfireCount: 0 }))
     } else {
       setState({
@@ -137,12 +141,12 @@ export function useConnectionMode() {
         validTargetIds: new Set(),
         hoverTargetId: null,
         targetType: null,
-        isContinuous: state.isContinuous,
+        isContinuous: isContinuousRef.current,
         misfireCount: 0,
       })
     }
     return true
-  }, [state.hoverTargetId, state.validTargetIds, state.targetType, state.isContinuous, indicators])
+  }, [state.hoverTargetId, state.validTargetIds, state.targetType, indicators])
 
   const setHoverTarget = useCallback((id: string | null) => {
     setState((prev) => ({ ...prev, hoverTargetId: id }))

@@ -62,12 +62,15 @@ export default function IndicatorAttachmentPage() {
     }
   }, [state.isConnecting])
 
-  // Shake status bar on misfire
-  const [shakeKey, setShakeKey] = useState(0)
+  // Shake status bar on misfire (DOM class toggle, avoids remount)
+  const statusBarRef = useRef<HTMLDivElement>(null)
   const prevMisfireRef = useRef(0)
   useEffect(() => {
-    if (state.misfireCount > prevMisfireRef.current) {
-      setShakeKey((k) => k + 1)
+    if (state.misfireCount > prevMisfireRef.current && statusBarRef.current) {
+      statusBarRef.current.classList.remove('animate-shake-connection')
+      // force reflow to restart animation
+      void statusBarRef.current.offsetWidth
+      statusBarRef.current.classList.add('animate-shake-connection')
     }
     prevMisfireRef.current = state.misfireCount
   }, [state.misfireCount])
@@ -171,9 +174,9 @@ export default function IndicatorAttachmentPage() {
       {/* Connection mode status bar */}
       {state.isConnecting && (
         <div
-          key={`status-bar-${shakeKey}`}
+          ref={statusBarRef}
           data-testid="connection-status-bar"
-          className={`absolute left-0 right-0 top-0 z-40 flex items-center justify-center gap-2 bg-dark-accent-primary/90 px-4 py-1.5 text-xs font-medium text-white backdrop-blur-sm ${shakeKey > 0 ? 'animate-shake-connection' : ''}`}
+          className="absolute left-0 right-0 top-0 z-40 flex items-center justify-center gap-2 bg-dark-accent-primary/90 px-4 py-1.5 text-xs font-medium text-white backdrop-blur-sm"
         >
           <span>连线模式</span>
           <span className="text-white/70">— 按 Space 确认，ESC 取消</span>

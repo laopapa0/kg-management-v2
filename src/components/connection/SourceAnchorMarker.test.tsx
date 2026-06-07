@@ -49,6 +49,61 @@ describe('SourceAnchorMarker', () => {
     document.body.removeChild(sourceEl)
   })
 
+  it('positions anchor on top edge when source scrolled above viewport', async () => {
+    const sourceEl = document.createElement('div')
+    sourceEl.id = 'test-source-top'
+    vi.spyOn(sourceEl, 'getBoundingClientRect').mockReturnValue({
+      top: -100, left: 200, right: 250, bottom: -70,
+      width: 50, height: 30, x: 200, y: -100, toJSON: () => {},
+    } as DOMRect)
+    document.body.appendChild(sourceEl)
+
+    render(<SourceAnchorMarker sourceId="test-source-top" onClick={vi.fn()} />)
+
+    await act(async () => {
+      observerCallback?.(
+        [{ isIntersecting: false, target: sourceEl } as IntersectionObserverEntry],
+        {} as IntersectionObserver,
+      )
+    })
+
+    const anchor = screen.getByTestId('source-anchor-marker')
+    expect(anchor).toHaveAttribute('data-edge', 'top')
+
+    document.body.removeChild(sourceEl)
+  })
+
+  it('positions anchor on right edge when source scrolled right of viewport', async () => {
+    const originalWidth = window.innerWidth
+    const originalHeight = window.innerHeight
+    vi.stubGlobal('innerWidth', 1024)
+    vi.stubGlobal('innerHeight', 768)
+
+    const sourceEl = document.createElement('div')
+    sourceEl.id = 'test-source-right'
+    vi.spyOn(sourceEl, 'getBoundingClientRect').mockReturnValue({
+      top: 200, left: 1100, right: 1150, bottom: 230,
+      width: 50, height: 30, x: 1100, y: 200, toJSON: () => {},
+    } as DOMRect)
+    document.body.appendChild(sourceEl)
+
+    render(<SourceAnchorMarker sourceId="test-source-right" onClick={vi.fn()} />)
+
+    await act(async () => {
+      observerCallback?.(
+        [{ isIntersecting: false, target: sourceEl } as IntersectionObserverEntry],
+        {} as IntersectionObserver,
+      )
+    })
+
+    const anchor = screen.getByTestId('source-anchor-marker')
+    expect(anchor).toHaveAttribute('data-edge', 'right')
+
+    document.body.removeChild(sourceEl)
+    vi.stubGlobal('innerWidth', originalWidth)
+    vi.stubGlobal('innerHeight', originalHeight)
+  })
+
   it('does not render anchor when source element is visible', async () => {
     const sourceEl = document.createElement('div')
     sourceEl.id = 'test-source-visible'
