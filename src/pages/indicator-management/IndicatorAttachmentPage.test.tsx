@@ -443,4 +443,49 @@ describe('IndicatorAttachmentPage', () => {
       expect(screen.queryByTestId('focus-zone-hint')).not.toBeInTheDocument()
     })
   })
+
+  describe('connection layer integration', () => {
+    it('renders SVG connection layer when a card is clicked', async () => {
+      render(<IndicatorAttachmentPage />)
+
+      const cards = screen.getAllByTestId('indicator-card')
+      act(() => {
+        fireEvent.click(cards[0])
+      })
+
+      expect(screen.getByTestId('connection-layer')).toBeInTheDocument()
+    })
+
+    it('does not render connection layer when not in connection mode', () => {
+      render(<IndicatorAttachmentPage />)
+
+      expect(screen.queryByTestId('connection-layer')).not.toBeInTheDocument()
+    })
+
+    it('renders connection line path with ant-line animation', async () => {
+      render(<IndicatorAttachmentPage />)
+
+      const cards = screen.getAllByTestId('indicator-card')
+      act(() => {
+        fireEvent.click(cards[0])
+      })
+
+      const path = screen.getByTestId('connection-line-path')
+      expect(path).toHaveAttribute('stroke', '#64748B')
+      expect(path).toHaveAttribute('stroke-dasharray', '6 4')
+      expect(path).toHaveClass('animate-ant-line')
+    })
+
+    it('renders arrow marker in connection layer', async () => {
+      render(<IndicatorAttachmentPage />)
+
+      const cards = screen.getAllByTestId('indicator-card')
+      act(() => {
+        fireEvent.click(cards[0])
+      })
+
+      const marker = document.getElementById('conn-arrow')
+      expect(marker).toBeInTheDocument()
+    })
+  })
 })

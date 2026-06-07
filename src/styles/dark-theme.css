@@ -114,3 +114,14 @@
 .animate-misfire-hint {
   animation: misfire-hint-fade 3000ms linear forwards;
 }
+
+/* Ant-line dash animation for connection line */
+@keyframes ant-line {
+  to {
+    stroke-dashoffset: -10;
+  }
+}
+
+.animate-ant-line {
+  animation: ant-line 0.5s linear infinite;
+}

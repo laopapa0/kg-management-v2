@@ -7,6 +7,7 @@ import IndicatorTreePanel, { type IndicatorTreePanelRef } from './IndicatorTreeP
 import TagSetPanel from './TagSetPanel'
 import RulePanel from './RulePanel'
 import SourceAnchorMarker from '@/components/connection/SourceAnchorMarker'
+import ConnectionLayer from '@/components/connection/ConnectionLayer'
 import { Switch } from '@/components/ui/switch'
 import { useConnectionMode } from '@/hooks/useConnectionMode'
 import { useFocusZone } from '@/hooks/useFocusZone'
@@ -248,6 +249,11 @@ export default function IndicatorAttachmentPage() {
         >
           {focusZoneHint}
         </div>
+      )}
+
+      {/* SVG connection layer */}
+      {state.isConnecting && state.sourceId && (
+        <ConnectionLayer sourceId={state.sourceId} />
       )}
 
       {/* Source anchor marker when source scrolls out of viewport */}
