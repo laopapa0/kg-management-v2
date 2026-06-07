@@ -5,14 +5,22 @@ import TagPill from './TagPill'
 export interface TagCloudProps {
   tags: TagNode[]
   selectedTagIds: Set<string>
+  partialTagIds?: Set<string>
   maxRows?: number
+  onToggle?: (id: string) => void
 }
 
 const TAG_HEIGHT = 28
 const GAP = 8
 const TRANSITION_DURATION_MS = 250
 
-export default function TagCloud({ tags, selectedTagIds, maxRows = 3 }: TagCloudProps) {
+export default function TagCloud({
+  tags,
+  selectedTagIds,
+  partialTagIds = new Set(),
+  maxRows = 3,
+  onToggle,
+}: TagCloudProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const [expanded, setExpanded] = useState(false)
   const [needsCollapse, setNeedsCollapse] = useState(false)
@@ -54,7 +62,13 @@ export default function TagCloud({ tags, selectedTagIds, maxRows = 3 }: TagCloud
         }}
       >
         {tags.map((tag) => (
-          <TagPill key={tag.id} tag={tag} selected={selectedTagIds.has(tag.id)} />
+          <TagPill
+            key={tag.id}
+            tag={tag}
+            selected={selectedTagIds.has(tag.id)}
+            partial={partialTagIds.has(tag.id)}
+            onClick={() => onToggle?.(tag.id)}
+          />
         ))}
       </div>
       {needsCollapse && (

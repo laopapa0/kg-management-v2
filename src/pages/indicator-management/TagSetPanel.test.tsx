@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { render, screen, within, act, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { __resetAttachmentStorageCache } from '@/utils/attachmentStorage'
 import { useAttachmentStore, initializeAttachmentStore } from '@/stores/attachmentStore'
 import TagSetPanel from './TagSetPanel'
@@ -119,5 +120,96 @@ describe('TagSetPanel', () => {
 
     expect(screen.getByTestId('empty-state-wrapper')).toBeInTheDocument()
     expect(screen.getByText('暂无标签')).toBeInTheDocument()
+  })
+
+  describe('cascading selection', () => {
+    it('selects a child tag when clicked', async () => {
+      const user = userEvent.setup()
+      initializeAttachmentStore()
+      render(<TagSetPanel />)
+
+      const state = useAttachmentStore.getState()
+      const firstLeaf = state.tagNodes.find((t) => t.parentId)
+      expect(firstLeaf).toBeDefined()
+
+      const pill = screen.getByTestId(`tag-pill-${firstLeaf!.id}`)
+      expect(pill).toHaveAttribute('data-selected', 'false')
+
+      await user.click(pill)
+      expect(pill).toHaveAttribute('data-selected', 'true')
+    })
+
+    it('marks parent as partial when a child is selected', async () => {
+      const user = userEvent.setup()
+      initializeAttachmentStore()
+      render(<TagSetPanel />)
+
+      const state = useAttachmentStore.getState()
+      const tagTree = buildTagTree(state.tagNodes)
+      const groupWithChildren = tagTree.find((t) => t.children && t.children.length > 0)!
+      const firstChild = groupWithChildren.children![0]
+
+      const childPill = screen.getByTestId(`tag-pill-${firstChild.id}`)
+      await user.click(childPill)
+
+      const parentPill = screen.getByTestId(`tag-pill-${groupWithChildren.id}`)
+      expect(parentPill).toHaveAttribute('data-partial', 'true')
+      expect(parentPill).toHaveAttribute('data-selected', 'false')
+    })
+
+    it('marks parent as selected when all children are selected', async () => {
+      const user = userEvent.setup()
+      initializeAttachmentStore()
+      render(<TagSetPanel />)
+
+      const state = useAttachmentStore.getState()
+      const tagTree = buildTagTree(state.tagNodes)
+      const groupWithChildren = tagTree.find((t) => t.children && t.children.length > 0)!
+
+      for (const child of groupWithChildren.children!) {
+        await user.click(screen.getByTestId(`tag-pill-${child.id}`))
+      }
+
+      const parentPill = screen.getByTestId(`tag-pill-${groupWithChildren.id}`)
+      expect(parentPill).toHaveAttribute('data-selected', 'true')
+      expect(parentPill).toHaveAttribute('data-partial', 'false')
+    })
+
+    it('selects all descendants when parent is selected', async () => {
+      const user = userEvent.setup()
+      initializeAttachmentStore()
+      render(<TagSetPanel />)
+
+      const state = useAttachmentStore.getState()
+      const tagTree = buildTagTree(state.tagNodes)
+      const groupWithChildren = tagTree.find((t) => t.children && t.children.length > 0)!
+
+      const parentPill = screen.getByTestId(`tag-pill-${groupWithChildren.id}`)
+      await user.click(parentPill)
+
+      expect(parentPill).toHaveAttribute('data-selected', 'true')
+      for (const child of groupWithChildren.children!) {
+        expect(screen.getByTestId(`tag-pill-${child.id}`)).toHaveAttribute('data-selected', 'true')
+      }
+    })
+
+    it('unselects all descendants when parent is toggled off', async () => {
+      const user = userEvent.setup()
+      initializeAttachmentStore()
+      render(<TagSetPanel />)
+
+      const state = useAttachmentStore.getState()
+      const tagTree = buildTagTree(state.tagNodes)
+      const groupWithChildren = tagTree.find((t) => t.children && t.children.length > 0)!
+
+      const parentPill = screen.getByTestId(`tag-pill-${groupWithChildren.id}`)
+      await user.click(parentPill)
+      await user.click(parentPill)
+
+      expect(parentPill).toHaveAttribute('data-selected', 'false')
+      for (const child of groupWithChildren.children!) {
+        expect(screen.getByTestId(`tag-pill-${child.id}`)).toHaveAttribute('data-selected', 'false')
+      }
+    })
   })
 })

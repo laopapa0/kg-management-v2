@@ -45,7 +45,7 @@ describe('TagCloud', () => {
   })
 
   it('renders all tags when there are few tags', () => {
-    mockContainerScrollHeight(28) // 1 row, no collapse needed
+    mockContainerScrollHeight(28)
     const tags = createTags(3)
     render(<TagCloud tags={tags} selectedTagIds={new Set()} />)
 
@@ -56,7 +56,7 @@ describe('TagCloud', () => {
   })
 
   it('shows expand button when tags exceed max rows', () => {
-    mockContainerScrollHeight(200) // ~6 rows, 3 rows over maxRows=3
+    mockContainerScrollHeight(200)
     const tags = createTags(20)
     render(<TagCloud tags={tags} selectedTagIds={new Set()} />)
 
@@ -137,5 +137,34 @@ describe('TagCloud', () => {
 
     const container = screen.getByTestId('tag-cloud-container')
     expect(container).toHaveStyle({ maxHeight: '200px' })
+  })
+
+  it('calls onToggle when a tag pill is clicked', async () => {
+    const user = userEvent.setup()
+    mockContainerScrollHeight(28)
+    const tags = createTags(3)
+    const onToggle = vi.fn()
+    render(<TagCloud tags={tags} selectedTagIds={new Set()} onToggle={onToggle} />)
+
+    const pill = screen.getByTestId('tag-pill-tag-1')
+    await user.click(pill)
+    expect(onToggle).toHaveBeenCalledWith('tag-1')
+  })
+
+  it('renders selected and partial states on tag pills', () => {
+    mockContainerScrollHeight(28)
+    const tags = createTags(3)
+    render(
+      <TagCloud
+        tags={tags}
+        selectedTagIds={new Set(['tag-0'])}
+        partialTagIds={new Set(['tag-1'])}
+      />,
+    )
+
+    expect(screen.getByTestId('tag-pill-tag-0')).toHaveAttribute('data-selected', 'true')
+    expect(screen.getByTestId('tag-pill-tag-1')).toHaveAttribute('data-partial', 'true')
+    expect(screen.getByTestId('tag-pill-tag-2')).toHaveAttribute('data-selected', 'false')
+    expect(screen.getByTestId('tag-pill-tag-2')).toHaveAttribute('data-partial', 'false')
   })
 })
