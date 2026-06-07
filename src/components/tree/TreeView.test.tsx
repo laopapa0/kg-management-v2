@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import TreeView, { type TreeNode } from './TreeView'
 
@@ -184,6 +184,17 @@ describe('TreeView', () => {
       expect(bar).toHaveClass('opacity-100')
     })
 
+    it('applies font-medium to the selected node content container', async () => {
+      const user = userEvent.setup()
+      render(<TreeView nodes={mockNodes} renderNode={renderNode} />)
+
+      const firstNode = screen.getAllByTestId('tree-node-row')[0]
+      await user.click(firstNode)
+
+      const contentContainer = firstNode.querySelector('.flex-1.min-w-0') as HTMLElement
+      expect(contentContainer).toHaveClass('font-medium')
+    })
+
     it('only allows one selected node at a time', async () => {
       const user = userEvent.setup()
       render(<TreeView nodes={mockNodes} renderNode={renderNode} />)
@@ -247,6 +258,96 @@ describe('TreeView', () => {
         expect.objectContaining({ id: 'root-2' }),
         expect.objectContaining({ isSelected: false, isHovered: true, depth: 0 }),
       )
+    })
+
+    it('does not show edit button by default', () => {
+      render(<TreeView nodes={mockNodes} renderNode={renderNode} />)
+      expect(screen.queryByTestId('tree-node-edit-button')).not.toBeInTheDocument()
+    })
+
+    it('shows edit button on hover when onEditNode is provided', async () => {
+      const user = userEvent.setup()
+      const onEditNode = vi.fn()
+      render(<TreeView nodes={mockNodes} renderNode={renderNode} onEditNode={onEditNode} />)
+
+      const rows = screen.getAllByTestId('tree-node-row')
+      await user.hover(rows[0])
+
+      const editButton = within(rows[0]).getByTestId('tree-node-edit-button')
+      expect(editButton).toBeInTheDocument()
+      expect(editButton).toHaveClass('opacity-100')
+    })
+
+    it('hides edit button on mouse leave', async () => {
+      const user = userEvent.setup()
+      const onEditNode = vi.fn()
+      render(<TreeView nodes={mockNodes} renderNode={renderNode} onEditNode={onEditNode} />)
+
+      const rows = screen.getAllByTestId('tree-node-row')
+      await user.hover(rows[0])
+      await user.unhover(rows[0])
+
+      const editButton = within(rows[0]).getByTestId('tree-node-edit-button')
+      expect(editButton).toHaveClass('opacity-0')
+    })
+
+    it('calls onEditNode when edit button is clicked', async () => {
+      const user = userEvent.setup()
+      const onEditNode = vi.fn()
+      render(<TreeView nodes={mockNodes} renderNode={renderNode} onEditNode={onEditNode} />)
+
+      const rows = screen.getAllByTestId('tree-node-row')
+      await user.hover(rows[0])
+
+      const editButton = within(rows[0]).getByTestId('tree-node-edit-button')
+      await user.click(editButton)
+
+      expect(onEditNode).toHaveBeenCalledWith('root-1')
+    })
+
+    it('does not show delete button by default', () => {
+      render(<TreeView nodes={mockNodes} renderNode={renderNode} />)
+      expect(screen.queryByTestId('tree-node-delete-button')).not.toBeInTheDocument()
+    })
+
+    it('shows delete button on hover when onDeleteNode is provided', async () => {
+      const user = userEvent.setup()
+      const onDeleteNode = vi.fn()
+      render(<TreeView nodes={mockNodes} renderNode={renderNode} onDeleteNode={onDeleteNode} />)
+
+      const rows = screen.getAllByTestId('tree-node-row')
+      await user.hover(rows[0])
+
+      const deleteButton = within(rows[0]).getByTestId('tree-node-delete-button')
+      expect(deleteButton).toBeInTheDocument()
+      expect(deleteButton).toHaveClass('opacity-100')
+    })
+
+    it('hides delete button on mouse leave', async () => {
+      const user = userEvent.setup()
+      const onDeleteNode = vi.fn()
+      render(<TreeView nodes={mockNodes} renderNode={renderNode} onDeleteNode={onDeleteNode} />)
+
+      const rows = screen.getAllByTestId('tree-node-row')
+      await user.hover(rows[0])
+      await user.unhover(rows[0])
+
+      const deleteButton = within(rows[0]).getByTestId('tree-node-delete-button')
+      expect(deleteButton).toHaveClass('opacity-0')
+    })
+
+    it('calls onDeleteNode when delete button is clicked', async () => {
+      const user = userEvent.setup()
+      const onDeleteNode = vi.fn()
+      render(<TreeView nodes={mockNodes} renderNode={renderNode} onDeleteNode={onDeleteNode} />)
+
+      const rows = screen.getAllByTestId('tree-node-row')
+      await user.hover(rows[0])
+
+      const deleteButton = within(rows[0]).getByTestId('tree-node-delete-button')
+      await user.click(deleteButton)
+
+      expect(onDeleteNode).toHaveBeenCalledWith('root-1')
     })
   })
 

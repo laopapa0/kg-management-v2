@@ -1,70 +1,152 @@
-import { useMemo } from 'react'
+import { forwardRef, useImperativeHandle, useMemo, useState } from 'react'
+import { motion } from 'framer-motion'
+import { TreePine } from 'lucide-react'
+import { toast } from 'sonner'
 import TreeView, { type TreeNode } from '@/components/tree/TreeView'
+import TreeNodeInlineEdit from '@/components/tree/TreeNodeInlineEdit'
+import EmptyState from '@/components/empty-state/EmptyState'
+import AddTreeNodeDialog from '@/components/dialog/AddTreeNodeDialog'
 import { useAttachmentStore } from '@/stores/attachmentStore'
 import type { IndicatorAttachment } from '@/models/indicatorAttachmentModel'
+import { buildIndicatorTree, type IndicatorTreeNode } from '@/utils/attachmentTree'
 
-interface IndicatorTreeNode extends TreeNode {
-  indicator: IndicatorAttachment
-  children?: IndicatorTreeNode[]
+export interface IndicatorTreePanelRef {
+  openAddDialog: () => void
 }
 
-export function buildIndicatorTree(flat: IndicatorAttachment[]): IndicatorTreeNode[] {
-  const nodeMap = new Map<string, IndicatorTreeNode>()
-  const roots: IndicatorTreeNode[] = []
+interface RenderTreeNode extends TreeNode {
+  indicator: IndicatorAttachment
+  children?: RenderTreeNode[]
+}
 
-  for (const indicator of flat) {
-    nodeMap.set(indicator.id, {
-      id: indicator.id,
-      indicator,
-      children: undefined,
-    })
-  }
+const IndicatorTreePanel = forwardRef<IndicatorTreePanelRef>(function IndicatorTreePanel(_props, ref) {
+  const indicators = useAttachmentStore((state) => state.indicators)
+  const addIndicator = useAttachmentStore((state) => state.addIndicator)
+  const renameIndicator = useAttachmentStore((state) => state.renameIndicator)
+  const deleteIndicator = useAttachmentStore((state) => state.deleteIndicator)
+  const undo = useAttachmentStore((state) => state.undo)
+  const tree = useMemo(() => buildIndicatorTree(indicators), [indicators])
 
-  for (const node of nodeMap.values()) {
-    const parentId = node.indicator.treeParentId
-    if (parentId && nodeMap.has(parentId)) {
-      const parent = nodeMap.get(parentId)!
-      parent.children = parent.children ?? []
-      parent.children.push(node)
-    } else {
-      roots.push(node)
+  const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [dialogOpen, setDialogOpen] = useState(false)
+  const [highlightedId, setHighlightedId] = useState<string | null>(null)
+
+  const existingNames = useMemo(() => indicators.map((i) => i.name), [indicators])
+
+  useImperativeHandle(ref, () => ({
+    openAddDialog: () => setDialogOpen(true),
+  }))
+
+  const handleAddConfirm = (name: string, parentId?: string) => {
+    const newIndicator = addIndicator(name, parentId)
+    if (newIndicator) {
+      setHighlightedId(newIndicator.id)
+      setTimeout(() => setHighlightedId((current) => (current === newIndicator.id ? null : current)), 500)
+      setSelectedId(newIndicator.id)
     }
   }
 
-  return roots
-}
+  const handleEditSave = (id: string, name: string) => {
+    renameIndicator(id, name)
+    setEditingId(null)
+  }
 
-export default function IndicatorTreePanel() {
-  const indicators = useAttachmentStore((state) => state.indicators)
-  const tree = useMemo(() => buildIndicatorTree(indicators), [indicators])
+  const handleEditCancel = () => {
+    setEditingId(null)
+  }
+
+  const handleDeleteNode = (id: string) => {
+    const indicator = indicators.find((i) => i.id === id)
+    if (!indicator) return
+
+    deleteIndicator(id)
+
+    toast('节点已删除', {
+      description: `「${indicator.name}」已被删除`,
+      duration: 5000,
+      action: {
+        label: '撤销',
+        onClick: () => undo(),
+      },
+    })
+  }
+
+  if (tree.length === 0) {
+    return (
+      <div className="flex-1 overflow-y-auto px-2 pb-2" data-testid="indicator-tree-panel">
+        <EmptyState
+          icon={<TreePine className="size-6" />}
+          title="暂无指标树节点"
+          description="当前部门下还没有构建指标树"
+        />
+      </div>
+    )
+  }
 
   return (
-    <div className="flex-1 overflow-y-auto px-2 pb-2" data-testid="indicator-tree-panel">
-      <TreeView
-        nodes={tree}
-        renderNode={(node, { isSelected, isHovered }) => (
-          <div className="flex flex-col justify-center">
-            <span
-              className={[
-                'text-body leading-tight',
-                isSelected ? 'font-medium text-dark-text-primary' : 'text-dark-text-primary',
-                isHovered && !isSelected ? 'text-dark-text-primary' : '',
-              ].join(' ')}
-            >
-              {node.indicator.name}
-            </span>
-            <span
-              className={[
-                'text-caption font-mono leading-tight',
-                isSelected ? 'text-dark-text-secondary' : 'text-dark-text-tertiary',
-              ].join(' ')}
-            >
-              {node.indicator.code}
-            </span>
-          </div>
-        )}
-        initialExpanded={tree.map((n) => n.id)}
+    <>
+      <div className="flex-1 overflow-y-auto px-2 pb-2" data-testid="indicator-tree-panel">
+        <TreeView
+          nodes={tree as RenderTreeNode[]}
+          selectedId={selectedId}
+          onSelect={setSelectedId}
+          onEditNode={setEditingId}
+          onDeleteNode={handleDeleteNode}
+          renderNode={(node, { isSelected, isHovered }) => {
+            const isEditing = editingId === node.id
+            const isHighlighted = highlightedId === node.id
+
+            return (
+              <motion.div
+                data-testid={`indicator-tree-node-content-${node.id}`}
+                className="flex flex-col justify-center"
+                animate={isHighlighted ? { backgroundColor: ['rgba(219, 234, 254, 0)', 'rgba(219, 234, 254, 1)', 'rgba(219, 234, 254, 0)'] } : {}}
+                transition={{ duration: 0.5, ease: 'easeOut' }}
+              >
+                {isEditing ? (
+                  <TreeNodeInlineEdit
+                    initialName={node.indicator.name}
+                    existingNames={existingNames}
+                    onSave={(name) => handleEditSave(node.id, name)}
+                    onCancel={handleEditCancel}
+                  />
+                ) : (
+                  <>
+                    <span
+                      className={[
+                        'text-body leading-tight',
+                        isSelected ? 'font-medium text-dark-text-primary' : 'text-dark-text-primary',
+                        isHovered && !isSelected ? 'text-dark-text-primary' : '',
+                      ].join(' ')}
+                    >
+                      {node.indicator.name}
+                    </span>
+                    <span
+                      className={[
+                        'text-caption font-mono leading-tight',
+                        isSelected ? 'text-dark-text-secondary' : 'text-dark-text-tertiary',
+                      ].join(' ')}
+                    >
+                      {node.indicator.code}
+                    </span>
+                  </>
+                )}
+              </motion.div>
+            )
+          }}
+          initialExpanded={tree.map((n) => n.id)}
+        />
+      </div>
+
+      <AddTreeNodeDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        selectedNodeId={selectedId}
+        onConfirm={handleAddConfirm}
       />
-    </div>
+    </>
   )
-}
+})
+
+export default IndicatorTreePanel

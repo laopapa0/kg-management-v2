@@ -1,7 +1,7 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronRight } from 'lucide-react'
-import { EASING, getTransition } from '@/components/motion/motion.tokens'
+import { ChevronRight, Pencil, Trash2 } from 'lucide-react'
+import { DURATION, EASING, getTransition } from '@/components/motion/motion.tokens'
 
 export interface TreeNode {
   id: string
@@ -21,6 +21,8 @@ interface TreeViewProps<T extends TreeNode> {
   onExpandedChange?: (expanded: Set<string>) => void
   selectedId?: string | null
   onSelect?: (id: string | null) => void
+  onEditNode?: (id: string) => void
+  onDeleteNode?: (id: string) => void
   renderIndentGuides?: 'always' | 'onHover' | 'none'
 }
 
@@ -33,6 +35,8 @@ interface TreeItemProps<T extends TreeNode> {
   onSelect: (id: string) => void
   renderNode: (node: T, context: RenderNodeContext) => React.ReactNode
   renderIndentGuides: 'always' | 'onHover' | 'none'
+  onEditNode?: (id: string) => void
+  onDeleteNode?: (id: string) => void
 }
 
 const childrenContainerVariants = {
@@ -42,7 +46,7 @@ const childrenContainerVariants = {
     opacity: 1,
     transition: {
       height: getTransition('expand'),
-      opacity: { duration: 0.15, ease: EASING.enter },
+      opacity: { duration: DURATION.fast, ease: EASING.enter },
       staggerChildren: 0.03,
     },
   },
@@ -51,7 +55,7 @@ const childrenContainerVariants = {
     opacity: 0,
     transition: {
       height: getTransition('collapse'),
-      opacity: { duration: 0.15, ease: EASING.exit },
+      opacity: { duration: DURATION.fast, ease: EASING.exit },
     },
   },
 }
@@ -61,11 +65,11 @@ const childItemVariants = {
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.15, ease: EASING.enter },
+    transition: { duration: DURATION.fast, ease: EASING.enter },
   },
   exit: {
     opacity: 0,
-    transition: { duration: 0.15, ease: EASING.exit },
+    transition: { duration: DURATION.fast, ease: EASING.exit },
   },
 }
 
@@ -78,6 +82,8 @@ function TreeItem<T extends TreeNode>({
   onSelect,
   renderNode,
   renderIndentGuides,
+  onEditNode,
+  onDeleteNode,
 }: TreeItemProps<T>) {
   const [isHovered, setIsHovered] = useState(false)
   const isExpanded = expanded.has(node.id)
@@ -151,7 +157,7 @@ function TreeItem<T extends TreeNode>({
               className="size-4 transition-transform ease-out"
               style={{
                 transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)',
-                transitionDuration: '200ms',
+                transitionDuration: `${DURATION.normal * 1000}ms`,
               }}
             />
           </button>
@@ -162,8 +168,46 @@ function TreeItem<T extends TreeNode>({
             aria-hidden="true"
           />
         )}
-        <div className="z-10 flex-1 min-w-0">
+        <div className={['z-10 flex-1 min-w-0', isSelected ? 'font-medium' : ''].join(' ')}>
           {renderNode(node, { isSelected, isHovered, depth })}
+        </div>
+        <div className="z-10 flex items-center gap-0.5">
+          {onEditNode && (
+            <button
+              type="button"
+              data-testid="tree-node-edit-button"
+              aria-label={`编辑节点 ${node.id}`}
+              onClick={(e) => {
+                e.stopPropagation()
+                onEditNode(node.id)
+              }}
+              className={[
+                'flex size-6 items-center justify-center rounded text-dark-text-secondary',
+                'transition-all duration-150 ease-out hover:bg-dark-tree-hover-bg hover:text-dark-accent-primary',
+                isHovered ? 'translate-x-0 opacity-100' : '-translate-x-1 opacity-0',
+              ].join(' ')}
+            >
+              <Pencil className="size-3.5" />
+            </button>
+          )}
+          {onDeleteNode && (
+            <button
+              type="button"
+              data-testid="tree-node-delete-button"
+              aria-label={`删除节点 ${node.id}`}
+              onClick={(e) => {
+                e.stopPropagation()
+                onDeleteNode(node.id)
+              }}
+              className={[
+                'flex size-6 items-center justify-center rounded text-dark-text-secondary',
+                'transition-all duration-150 ease-out hover:bg-red-500/10 hover:text-red-400',
+                isHovered ? 'translate-x-0 opacity-100' : '-translate-x-1 opacity-0',
+              ].join(' ')}
+            >
+              <Trash2 className="size-3.5" />
+            </button>
+          )}
         </div>
       </div>
       <AnimatePresence initial={false}>
@@ -192,6 +236,7 @@ function TreeItem<T extends TreeNode>({
                   onSelect={onSelect}
                   renderNode={renderNode}
                   renderIndentGuides={renderIndentGuides}
+                  onEditNode={onEditNode}
                 />
               </motion.div>
             ))}
@@ -210,16 +255,12 @@ export default function TreeView<T extends TreeNode>({
   selectedId: controlledSelectedId,
   onSelect,
   renderIndentGuides = 'onHover',
+  onEditNode,
+  onDeleteNode,
 }: TreeViewProps<T>) {
   const [expanded, setExpanded] = useState<Set<string>>(
     () => new Set(initialExpanded ?? []),
   )
-
-  useEffect(() => {
-    if (initialExpanded !== undefined) {
-      setExpanded(new Set(initialExpanded))
-    }
-  }, [initialExpanded])
 
   const [internalSelectedId, setInternalSelectedId] = useState<string | null>(
     null,
@@ -265,6 +306,8 @@ export default function TreeView<T extends TreeNode>({
           onSelect={handleSelect}
           renderNode={renderNode}
           renderIndentGuides={renderIndentGuides}
+          onEditNode={onEditNode}
+          onDeleteNode={onDeleteNode}
         />
       ))}
     </div>
