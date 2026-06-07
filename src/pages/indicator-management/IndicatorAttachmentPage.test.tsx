@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import { render, screen, within, waitFor, act } from '@testing-library/react'
+import { render, screen, within, waitFor, act, fireEvent } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { __resetAttachmentStorageCache } from '@/utils/attachmentStorage'
 import { useAttachmentStore, initializeAttachmentStore, selectPendingIndicators } from '@/stores/attachmentStore'
@@ -246,6 +246,66 @@ describe('IndicatorAttachmentPage', () => {
     addButtons.forEach((button) => {
       expect(button).toHaveClass('opacity-0')
       expect(button).toHaveClass('group-hover:opacity-100')
+    })
+  })
+
+  describe('connection mode integration', () => {
+    it('renders continuous mode toggle', () => {
+      render(<IndicatorAttachmentPage />)
+
+      expect(screen.getByText('连续挂靠')).toBeInTheDocument()
+      expect(screen.getByRole('switch')).toBeInTheDocument()
+    })
+
+    it('toggles continuous mode on click', async () => {
+      const user = userEvent.setup()
+      render(<IndicatorAttachmentPage />)
+
+      const toggle = screen.getByRole('switch')
+      expect(toggle).toHaveAttribute('data-state', 'unchecked')
+
+      await user.click(toggle)
+      expect(toggle).toHaveAttribute('data-state', 'checked')
+
+      await user.click(toggle)
+      expect(toggle).toHaveAttribute('data-state', 'unchecked')
+    })
+
+    it('shows connection status bar when a card is clicked', async () => {
+      const user = userEvent.setup()
+      render(<IndicatorAttachmentPage />)
+
+      const cards = screen.getAllByTestId('indicator-card')
+      await user.click(cards[0])
+
+      expect(screen.getByTestId('connection-status-bar')).toBeInTheDocument()
+      expect(screen.getByText(/连线模式/i)).toBeInTheDocument()
+    })
+
+    it('sets body cursor to crosshair in connection mode', async () => {
+      const user = userEvent.setup()
+      render(<IndicatorAttachmentPage />)
+
+      const cards = screen.getAllByTestId('indicator-card')
+      await user.click(cards[0])
+
+      expect(document.body).toHaveStyle('cursor: crosshair')
+    })
+
+    it('restores body cursor after cancel', async () => {
+      const user = userEvent.setup()
+      render(<IndicatorAttachmentPage />)
+
+      const cards = screen.getAllByTestId('indicator-card')
+      await user.click(cards[0])
+      expect(document.body).toHaveStyle('cursor: crosshair')
+
+      // Press ESC to cancel
+      await act(async () => {
+        fireEvent.keyDown(document, { key: 'Escape' })
+      })
+
+      expect(document.body).not.toHaveStyle('cursor: crosshair')
     })
   })
 })
