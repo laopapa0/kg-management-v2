@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { render, screen, within, act, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { __resetAttachmentStorageCache } from '@/utils/attachmentStorage'
@@ -10,6 +10,7 @@ describe('RulePanel', () => {
     localStorage.clear()
     __resetAttachmentStorageCache()
     useAttachmentStore.setState(useAttachmentStore.getInitialState())
+    vi.useRealTimers()
   })
 
   it('renders rule tree from store rules', () => {
@@ -122,5 +123,102 @@ describe('RulePanel', () => {
 
     expect(screen.getByTestId('empty-state-wrapper')).toBeInTheDocument()
     expect(screen.getByText('暂无规则')).toBeInTheDocument()
+  })
+
+  describe('search filtering', () => {
+    it('renders TreeSearchInput at the top', () => {
+      initializeAttachmentStore()
+      render(<RulePanel />)
+      expect(screen.getByTestId('rule-search-input')).toBeInTheDocument()
+    })
+
+    it('filters rules with 150ms debounce', async () => {
+      vi.useFakeTimers({ shouldAdvanceTime: true })
+      const user = userEvent.setup()
+      initializeAttachmentStore()
+
+      const state = useAttachmentStore.getState()
+      const targetRule = state.rules.find((r) => r.name.includes('阈值'))
+      expect(targetRule).toBeDefined()
+      const otherRule = state.rules.find((r) => !r.name.includes('阈值'))
+      expect(otherRule).toBeDefined()
+
+      render(<RulePanel />)
+
+      const input = screen.getByTestId('rule-search-input')
+      await user.type(input, '阈值', { delay: null })
+
+      act(() => {
+        vi.advanceTimersByTime(150)
+      })
+
+      expect(screen.getByTestId(`rule-row-${targetRule!.id}`)).not.toHaveAttribute('data-dimmed')
+      expect(screen.getByTestId(`rule-row-${otherRule!.id}`)).toHaveAttribute('data-dimmed', 'true')
+
+      vi.useRealTimers()
+    })
+
+    it('auto-expands parent nodes containing matched children', async () => {
+      vi.useFakeTimers({ shouldAdvanceTime: true })
+      const user = userEvent.setup()
+      initializeAttachmentStore()
+
+      const state = useAttachmentStore.getState()
+      const childRule = state.rules.find((r) => r.parentId)
+      expect(childRule).toBeDefined()
+
+      render(<RulePanel />)
+
+      const input = screen.getByTestId('rule-search-input')
+      await user.type(input, childRule!.name, { delay: null })
+      act(() => {
+        vi.advanceTimersByTime(150)
+      })
+
+      expect(screen.getByText(childRule!.name)).toBeInTheDocument()
+
+      vi.useRealTimers()
+    })
+
+    it('shows contextual empty state when no rules match', async () => {
+      vi.useFakeTimers({ shouldAdvanceTime: true })
+      const user = userEvent.setup()
+      initializeAttachmentStore()
+
+      render(<RulePanel />)
+
+      const input = screen.getByTestId('rule-search-input')
+      await user.type(input, '不存在的规则', { delay: null })
+      act(() => {
+        vi.advanceTimersByTime(150)
+      })
+
+      expect(screen.getByTestId('empty-state-wrapper')).toBeInTheDocument()
+      expect(screen.getByText('未找到匹配规则')).toBeInTheDocument()
+
+      vi.useRealTimers()
+    })
+
+    it('clears search when clear button is clicked', async () => {
+      vi.useFakeTimers({ shouldAdvanceTime: true })
+      const user = userEvent.setup()
+      initializeAttachmentStore()
+
+      render(<RulePanel />)
+
+      const input = screen.getByTestId('rule-search-input')
+      await user.type(input, '阈值', { delay: null })
+      act(() => {
+        vi.advanceTimersByTime(150)
+      })
+
+      expect(screen.getByDisplayValue('阈值')).toBeInTheDocument()
+
+      await user.click(screen.getByTestId('tree-search-clear'))
+
+      expect(screen.queryByDisplayValue('阈值')).not.toBeInTheDocument()
+
+      vi.useRealTimers()
+    })
   })
 })
