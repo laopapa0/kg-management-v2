@@ -487,5 +487,22 @@ describe('IndicatorAttachmentPage', () => {
       const marker = document.getElementById('conn-arrow')
       expect(marker).toBeInTheDocument()
     })
+
+    it('renders focus mode overlay when in connection mode', async () => {
+      render(<IndicatorAttachmentPage />)
+
+      const cards = screen.getAllByTestId('indicator-card')
+      act(() => {
+        fireEvent.click(cards[0])
+      })
+
+      expect(screen.getByTestId('focus-mode-overlay')).toBeInTheDocument()
+    })
+
+    it('does not render focus mode overlay when not in connection mode', () => {
+      render(<IndicatorAttachmentPage />)
+
+      expect(screen.queryByTestId('focus-mode-overlay')).not.toBeInTheDocument()
+    })
   })
 })

@@ -180,6 +180,7 @@ export default function RulePanel() {
             return (
               <div
                 data-testid={`rule-row-${fullRule.id}`}
+                data-rule-id={fullRule.id}
                 data-dimmed={isDimmed || undefined}
                 className={[
                   'flex items-center justify-between gap-2 transition-opacity duration-200',

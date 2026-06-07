@@ -8,6 +8,7 @@ import TagSetPanel from './TagSetPanel'
 import RulePanel from './RulePanel'
 import SourceAnchorMarker from '@/components/connection/SourceAnchorMarker'
 import ConnectionLayer from '@/components/connection/ConnectionLayer'
+import FocusModeOverlay from '@/components/connection/FocusModeOverlay'
 import { Switch } from '@/components/ui/switch'
 import { useConnectionMode } from '@/hooks/useConnectionMode'
 import { useFocusZone } from '@/hooks/useFocusZone'
@@ -301,6 +302,14 @@ export default function IndicatorAttachmentPage() {
           {focusZoneHint}
         </div>
       )}
+
+      {/* Spotlight focus mask */}
+      <FocusModeOverlay
+        isVisible={state.isConnecting}
+        sourceId={state.sourceId}
+        validTargetIds={state.validTargetIds}
+        targetType={state.targetType}
+      />
 
       {/* SVG connection layer */}
       {state.isConnecting && state.sourceId && (
