@@ -1,13 +1,31 @@
 import { Group, Panel, Separator } from 'react-resizable-panels'
-import { GitBranch, Tags, Scale } from 'lucide-react'
+import { Tags, Scale } from 'lucide-react'
 import PanelHeader from '@/components/panel/PanelHeader'
 import EmptyState from '@/components/empty-state/EmptyState'
 import IndicatorGrid from '@/components/indicator/IndicatorGrid'
+import TreeView, { type TreeNode } from '@/components/tree/TreeView'
 import type { IndicatorCardProps } from '@/components/indicator/IndicatorCard'
 
 const PANEL_MIN_WIDTH_LEFT = 240
 const PANEL_MIN_WIDTH_CENTER = 400
 const PANEL_MIN_WIDTH_RIGHT = 240
+
+interface IndicatorTreeNode extends TreeNode {
+  name: string
+  children?: IndicatorTreeNode[]
+}
+
+const MOCK_TREE_NODES: IndicatorTreeNode[] = [
+  {
+    id: 'tree-root-1',
+    name: '发展类指标',
+    children: [
+      { id: 'tree-child-1-1', name: '用户发展趋势' },
+      { id: 'tree-child-1-2', name: '收入增长率' },
+    ],
+  },
+  { id: 'tree-root-2', name: '服务类指标' },
+]
 
 const MOCK_PENDING_INDICATORS: IndicatorCardProps[] = [
   {
@@ -69,11 +87,15 @@ export default function IndicatorAttachmentPage() {
                 console.log('add indicator tree node')
               }}
             />
-            <EmptyState
-              icon={<GitBranch className="size-6" />}
-              title="暂无指标树节点"
-              description="点击右上角 + 添加根节点"
-            />
+            <div className="flex-1 overflow-y-auto px-2 pb-2">
+              <TreeView
+                nodes={MOCK_TREE_NODES}
+                renderNode={(node) => (
+                  <span className="text-body text-dark-text-primary">{node.name}</span>
+                )}
+                initialExpanded={['tree-root-1']}
+              />
+            </div>
           </div>
         </Panel>
 

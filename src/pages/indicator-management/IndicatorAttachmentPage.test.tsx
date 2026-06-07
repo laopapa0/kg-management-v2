@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import IndicatorAttachmentPage from './IndicatorAttachmentPage'
 
 describe('IndicatorAttachmentPage', () => {
@@ -49,11 +50,33 @@ describe('IndicatorAttachmentPage', () => {
     expect(headers).toHaveLength(4)
   })
 
-  it('renders empty state placeholders in the tree/tag/rule panels', () => {
+
+  it('renders empty state placeholders in the tag/rule panels only', () => {
     render(<IndicatorAttachmentPage />)
 
     const emptyStates = screen.getAllByTestId('empty-state-wrapper')
-    expect(emptyStates).toHaveLength(3)
+    expect(emptyStates).toHaveLength(2)
+  })
+
+  it('renders TreeView in the indicator tree panel with initial expansion', () => {
+    render(<IndicatorAttachmentPage />)
+
+    expect(screen.getByTestId('tree-view')).toBeInTheDocument()
+    expect(screen.getByText('发展类指标')).toBeInTheDocument()
+    expect(screen.getByText('用户发展趋势')).toBeInTheDocument()
+    expect(screen.getByText('收入增长率')).toBeInTheDocument()
+  })
+
+  it('allows expanding and collapsing tree nodes in the indicator tree panel', async () => {
+    const user = userEvent.setup()
+    render(<IndicatorAttachmentPage />)
+
+    const toggle = screen.getByLabelText('收起节点 tree-root-1')
+    expect(screen.getByText('用户发展')).toBeInTheDocument()
+
+    await user.click(toggle)
+
+    expect(toggle).toHaveAttribute('aria-expanded', 'false')
   })
 
   it('renders four add buttons that fade in on header hover', () => {
