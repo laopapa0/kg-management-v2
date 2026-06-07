@@ -56,6 +56,7 @@ const childrenContainerVariants = {
     transition: {
       height: getTransition('collapse'),
       opacity: { duration: DURATION.fast, ease: EASING.exit },
+      staggerChildren: 0.05,
     },
   },
 }
@@ -69,6 +70,7 @@ const childItemVariants = {
   },
   exit: {
     opacity: 0,
+    height: 0,
     transition: { duration: DURATION.fast, ease: EASING.exit },
   },
 }
@@ -295,21 +297,28 @@ export default function TreeView<T extends TreeNode>({
 
   return (
     <div data-testid="tree-view" data-initial="false" className="flex flex-col">
-      {nodes.map((node) => (
-        <TreeItem
-          key={node.id}
-          node={node}
-          depth={0}
-          expanded={expanded}
-          onToggle={handleToggle}
-          selectedId={selectedId}
-          onSelect={handleSelect}
-          renderNode={renderNode}
-          renderIndentGuides={renderIndentGuides}
-          onEditNode={onEditNode}
-          onDeleteNode={onDeleteNode}
-        />
-      ))}
+      <AnimatePresence>
+        {nodes.map((node) => (
+          <motion.div
+            key={node.id}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: DURATION.fast, ease: EASING.exit }}
+          >
+            <TreeItem
+              node={node}
+              depth={0}
+              expanded={expanded}
+              onToggle={handleToggle}
+              selectedId={selectedId}
+              onSelect={handleSelect}
+              renderNode={renderNode}
+              renderIndentGuides={renderIndentGuides}
+              onEditNode={onEditNode}
+              onDeleteNode={onDeleteNode}
+            />
+          </motion.div>
+        ))}
+      </AnimatePresence>
     </div>
   )
 }

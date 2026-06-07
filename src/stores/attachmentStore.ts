@@ -64,6 +64,7 @@ export interface AttachmentState {
   addIndicator: (name: string, parentId?: string) => IndicatorAttachment
   renameIndicator: (id: string, name: string) => void
   deleteIndicator: (id: string) => void
+  deleteIndicatorTree: (id: string) => void
 }
 
 function createSnapshot(state: Pick<AttachmentState, 'indicators' | 'tagNodes' | 'rules' | 'ruleParameters'>): DataSnapshot {
@@ -134,6 +135,7 @@ const initialState: Omit<
   | 'addIndicator'
   | 'renameIndicator'
   | 'deleteIndicator'
+  | 'deleteIndicatorTree'
 > = {
   departments: [],
   currentDepartmentId: null,
@@ -312,6 +314,33 @@ export const useAttachmentStore = create<AttachmentState>((set, get) => ({
     const next = get()
       .indicators.filter((i) => i.id !== id)
       .map((i) => (i.treeParentId === id ? { ...i, treeParentId: undefined } : i))
+    set({ indicators: next, redoStack: [], canRedo: false })
+    const deptId = get().currentDepartmentId
+    if (deptId) {
+      saveIndicators(deptId, next)
+    }
+  },
+
+  deleteIndicatorTree: (id) => {
+    const exists = get().indicators.find((i) => i.id === id)
+    if (!exists) return
+
+    // Collect all descendant IDs recursively
+    const idsToDelete = new Set<string>([id])
+    const indicators = get().indicators
+    let changed = true
+    while (changed) {
+      changed = false
+      for (const i of indicators) {
+        if (!idsToDelete.has(i.id) && i.treeParentId && idsToDelete.has(i.treeParentId)) {
+          idsToDelete.add(i.id)
+          changed = true
+        }
+      }
+    }
+
+    get().pushHistory()
+    const next = indicators.filter((i) => !idsToDelete.has(i.id))
     set({ indicators: next, redoStack: [], canRedo: false })
     const deptId = get().currentDepartmentId
     if (deptId) {

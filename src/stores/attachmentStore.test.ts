@@ -380,5 +380,79 @@ describe('attachmentStore', () => {
       const updatedChild = useAttachmentStore.getState().indicators.find((i) => i.id === child.id)
       expect(updatedChild?.treeParentId).toBeUndefined()
     })
+
+    it('deleteIndicatorTree removes parent and all descendants', () => {
+      initializeAttachmentStore()
+      const state = useAttachmentStore.getState()
+      const parent = state.indicators[0]
+      const child = state.indicators[1]
+      const grandchild = state.indicators[2]
+
+      // Clear default treeParentIds, then build tree: parent -> child -> grandchild
+      state.setIndicators(
+        state.indicators.map((i) => {
+          if (i.id === child.id) return { ...i, treeParentId: parent.id }
+          if (i.id === grandchild.id) return { ...i, treeParentId: child.id }
+          return { ...i, treeParentId: undefined }
+        }),
+      )
+      const originalLength = state.indicators.length
+
+      state.deleteIndicatorTree(parent.id)
+
+      const remaining = useAttachmentStore.getState().indicators
+      expect(remaining.length).toBe(originalLength - 3)
+      expect(remaining.some((i) => i.id === parent.id)).toBe(false)
+      expect(remaining.some((i) => i.id === child.id)).toBe(false)
+      expect(remaining.some((i) => i.id === grandchild.id)).toBe(false)
+    })
+
+    it('deleteIndicatorTree pushes history', () => {
+      initializeAttachmentStore()
+      const state = useAttachmentStore.getState()
+      const parent = state.indicators[0]
+
+      expect(state.canUndo).toBe(false)
+      state.deleteIndicatorTree(parent.id)
+
+      expect(useAttachmentStore.getState().canUndo).toBe(true)
+    })
+
+    it('does not deleteIndicatorTree when target id is not found', () => {
+      initializeAttachmentStore()
+      const state = useAttachmentStore.getState()
+      const originalLength = state.indicators.length
+
+      state.deleteIndicatorTree('non-existent')
+
+      expect(useAttachmentStore.getState().indicators.length).toBe(originalLength)
+      expect(useAttachmentStore.getState().canUndo).toBe(false)
+    })
+
+    it('undo restores entire subtree after deleteIndicatorTree', () => {
+      initializeAttachmentStore()
+      const state = useAttachmentStore.getState()
+      const parent = state.indicators[0]
+      const child = state.indicators[1]
+
+      // Clear default treeParentIds, then build simple parent -> child tree
+      state.setIndicators(
+        state.indicators.map((i) =>
+          i.id === child.id ? { ...i, treeParentId: parent.id } : { ...i, treeParentId: undefined },
+        ),
+      )
+      const originalLength = state.indicators.length
+
+      state.deleteIndicatorTree(parent.id)
+      expect(useAttachmentStore.getState().indicators.length).toBe(originalLength - 2)
+
+      state.undo()
+
+      const restored = useAttachmentStore.getState().indicators
+      expect(restored.length).toBe(originalLength)
+      expect(restored.some((i) => i.id === parent.id)).toBe(true)
+      expect(restored.some((i) => i.id === child.id)).toBe(true)
+      expect(restored.find((i) => i.id === child.id)?.treeParentId).toBe(parent.id)
+    })
   })
 })

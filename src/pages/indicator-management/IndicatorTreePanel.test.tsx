@@ -168,28 +168,32 @@ describe('IndicatorTreePanel', () => {
     expect(deleteButton).toBeInTheDocument()
   })
 
-  it('deletes a node and shows undo toast when delete button is clicked', async () => {
+  it('deletes a leaf node directly and shows undo toast', async () => {
     initializeAttachmentStore()
     const user = userEvent.setup()
     render(<IndicatorTreePanel />)
 
     const state = useAttachmentStore.getState()
-    const firstIndicator = state.indicators[0]
+    // indicators[5] has no children by default (index >= 5 => treeParentId undefined, no child refs it)
+    const leafIndicator = state.indicators[5]
 
     const rows = screen.getAllByTestId('tree-node-row')
-    await user.hover(rows[0])
+    const leafRow = rows.find((r) => r.getAttribute('data-node-id') === leafIndicator.id)
+    if (!leafRow) throw new Error('leaf row not found')
 
-    const deleteButton = within(rows[0]).getByTestId('tree-node-delete-button')
+    await user.hover(leafRow)
+
+    const deleteButton = within(leafRow).getByTestId('tree-node-delete-button')
     await user.click(deleteButton)
 
     await waitFor(() => {
-      expect(screen.queryByText(firstIndicator.name)).not.toBeInTheDocument()
+      expect(screen.queryByText(leafIndicator.name)).not.toBeInTheDocument()
     })
 
     expect(mockToast).toHaveBeenCalledWith(
       '节点已删除',
       expect.objectContaining({
-        description: `「${firstIndicator.name}」已被删除`,
+        description: `「${leafIndicator.name}」已被删除`,
         duration: 5000,
         action: expect.objectContaining({
           label: '撤销',
@@ -198,22 +202,25 @@ describe('IndicatorTreePanel', () => {
     )
   })
 
-  it('restores deleted node via toast undo action', async () => {
+  it('restores deleted leaf node via toast undo action', async () => {
     initializeAttachmentStore()
     const user = userEvent.setup()
     render(<IndicatorTreePanel />)
 
     const state = useAttachmentStore.getState()
-    const firstIndicator = state.indicators[0]
+    const leafIndicator = state.indicators[5]
 
     const rows = screen.getAllByTestId('tree-node-row')
-    await user.hover(rows[0])
+    const leafRow = rows.find((r) => r.getAttribute('data-node-id') === leafIndicator.id)
+    if (!leafRow) throw new Error('leaf row not found')
 
-    const deleteButton = within(rows[0]).getByTestId('tree-node-delete-button')
+    await user.hover(leafRow)
+
+    const deleteButton = within(leafRow).getByTestId('tree-node-delete-button')
     await user.click(deleteButton)
 
     await waitFor(() => {
-      expect(screen.queryByText(firstIndicator.name)).not.toBeInTheDocument()
+      expect(screen.queryByText(leafIndicator.name)).not.toBeInTheDocument()
     })
 
     const toastCall = mockToast.mock.calls[0]
@@ -223,7 +230,83 @@ describe('IndicatorTreePanel', () => {
     })
 
     await waitFor(() => {
-      expect(screen.getByText(firstIndicator.name)).toBeInTheDocument()
+      expect(screen.getByText(leafIndicator.name)).toBeInTheDocument()
     })
+  })
+
+  it('shows warning dialog when deleting node with children', async () => {
+    initializeAttachmentStore()
+    const user = userEvent.setup()
+    render(<IndicatorTreePanel />)
+
+    // indicators[0] is parent of indicators[1-4] by default mock data
+    const rows = screen.getAllByTestId('tree-node-row')
+    const parentRow = rows.find((r) => r.getAttribute('data-node-id') === 'ind-dept-finance-1')
+    if (!parentRow) throw new Error('parent row not found')
+
+    await user.hover(parentRow)
+    const deleteButton = within(parentRow).getByTestId('tree-node-delete-button')
+    await user.click(deleteButton)
+
+    expect(screen.getByTestId('delete-warning-dialog')).toBeInTheDocument()
+    expect(screen.getByText(/此操作将删除 4 个子节点/)).toBeInTheDocument()
+  })
+
+  it('cancels deletion when warning dialog cancel is clicked', async () => {
+    initializeAttachmentStore()
+    const user = userEvent.setup()
+    render(<IndicatorTreePanel />)
+
+    const state = useAttachmentStore.getState()
+    const parent = state.indicators[0]
+
+    const rows = screen.getAllByTestId('tree-node-row')
+    const parentRow = rows.find((r) => r.getAttribute('data-node-id') === parent.id)
+    if (!parentRow) throw new Error('parent row not found')
+
+    await user.hover(parentRow)
+    await user.click(within(parentRow).getByTestId('tree-node-delete-button'))
+
+    expect(screen.getByTestId('delete-warning-dialog')).toBeInTheDocument()
+
+    await user.click(screen.getByTestId('delete-warning-cancel-button'))
+
+    await waitFor(() => {
+      expect(screen.queryByTestId('delete-warning-dialog')).not.toBeInTheDocument()
+    })
+    expect(screen.getByText(parent.name)).toBeInTheDocument()
+  })
+
+  it('cascades delete when warning dialog is confirmed', async () => {
+    initializeAttachmentStore()
+    const user = userEvent.setup()
+    render(<IndicatorTreePanel />)
+
+    const state = useAttachmentStore.getState()
+    const parent = state.indicators[0]
+    const child = state.indicators[1]
+
+    const rows = screen.getAllByTestId('tree-node-row')
+    const parentRow = rows.find((r) => r.getAttribute('data-node-id') === parent.id)
+    if (!parentRow) throw new Error('parent row not found')
+
+    await user.hover(parentRow)
+    await user.click(within(parentRow).getByTestId('tree-node-delete-button'))
+
+    await user.click(screen.getByTestId('delete-warning-confirm-button'))
+
+    await waitFor(() => {
+      expect(screen.queryByText(parent.name)).not.toBeInTheDocument()
+    })
+    expect(screen.queryByText(child.name)).not.toBeInTheDocument()
+
+    expect(mockToast).toHaveBeenCalledWith(
+      '节点已删除',
+      expect.objectContaining({
+        description: expect.stringContaining(parent.name),
+        duration: 5000,
+        action: expect.objectContaining({ label: '撤销' }),
+      }),
+    )
   })
 })
