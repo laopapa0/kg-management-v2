@@ -633,6 +633,29 @@ describe('useConnectionMode', () => {
 
       expect(result.current.state.misfireCount).toBe(1)
     })
+
+    it('resetMisfireCount resets counter to 0', () => {
+      useAttachmentStore.setState({
+        indicators: [
+          { id: 'ind-real', name: '真实指标', indicatorType: '原子指标', tagIds: [], ruleIds: [], treeParentId: undefined } as any,
+        ],
+      })
+
+      const { result } = renderHook(() => useConnectionMode())
+
+      act(() => {
+        result.current.start('ind-real', 'tree')
+      })
+      act(() => {
+        result.current.confirm()
+      })
+      expect(result.current.state.misfireCount).toBe(1)
+
+      act(() => {
+        result.current.resetMisfireCount()
+      })
+      expect(result.current.state.misfireCount).toBe(0)
+    })
   })
 
   describe('filter already-attached targets', () => {

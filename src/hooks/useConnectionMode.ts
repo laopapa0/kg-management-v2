@@ -152,6 +152,10 @@ export function useConnectionMode() {
     setState((prev) => ({ ...prev, isContinuous: !prev.isContinuous }))
   }, [])
 
+  const resetMisfireCount = useCallback(() => {
+    setState((prev) => ({ ...prev, misfireCount: 0 }))
+  }, [])
+
   // Keyboard event handling (Space / ESC)
   const confirmRef = useRef(confirm)
   confirmRef.current = confirm
@@ -182,5 +186,5 @@ export function useConnectionMode() {
     return () => document.removeEventListener('keydown', handler)
   }, [state.isConnecting])
 
-  return { state, start, cancel, confirm, setHoverTarget, toggleContinuous }
+  return { state, start, cancel, confirm, setHoverTarget, toggleContinuous, resetMisfireCount }
 }

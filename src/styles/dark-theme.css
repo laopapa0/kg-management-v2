@@ -91,3 +91,26 @@
   --sidebar-border: 220 13% 20%;
   --sidebar-ring: 217 91% 65%;
 }
+
+/* Connection mode shake animation */
+@keyframes shake-connection {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-3px); }
+  75% { transform: translateX(3px); }
+}
+
+.animate-shake-connection {
+  animation: shake-connection 150ms ease-in-out 2;
+}
+
+/* Misfire hint fade animation */
+@keyframes misfire-hint-fade {
+  0% { opacity: 0; transform: translateY(10px); }
+  10% { opacity: 1; transform: translateY(0); }
+  90% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(10px); }
+}
+
+.animate-misfire-hint {
+  animation: misfire-hint-fade 3000ms linear forwards;
+}
