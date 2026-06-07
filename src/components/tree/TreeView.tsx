@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronRight } from 'lucide-react'
 import { EASING, getTransition } from '@/components/motion/motion.tokens'
@@ -214,6 +214,13 @@ export default function TreeView<T extends TreeNode>({
   const [expanded, setExpanded] = useState<Set<string>>(
     () => new Set(initialExpanded ?? []),
   )
+
+  useEffect(() => {
+    if (initialExpanded !== undefined) {
+      setExpanded(new Set(initialExpanded))
+    }
+  }, [initialExpanded])
+
   const [internalSelectedId, setInternalSelectedId] = useState<string | null>(
     null,
   )

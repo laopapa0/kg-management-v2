@@ -287,3 +287,13 @@ Object.defineProperty(useAttachmentStore, 'getInitialState', {
 export function initializeAttachmentStore(): void {
   useAttachmentStore.getState().init()
 }
+
+/** Derived selector: 返回未挂靠到任何树/标签/规则的指标 */
+export function selectPendingIndicators(state: AttachmentState): IndicatorAttachment[] {
+  return state.indicators.filter(
+    (indicator) =>
+      !indicator.treeParentId &&
+      indicator.tagIds.length === 0 &&
+      indicator.ruleIds.length === 0,
+  )
+}

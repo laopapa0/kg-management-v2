@@ -1,7 +1,8 @@
+import type { IndicatorAttachment } from '@/models/indicatorAttachmentModel'
 import IndicatorCard, { type IndicatorCardProps } from './IndicatorCard'
 
 export interface IndicatorGridProps {
-  indicators: IndicatorCardProps[]
+  indicators: (IndicatorCardProps | IndicatorAttachment)[]
 }
 
 export default function IndicatorGrid({ indicators }: IndicatorGridProps) {

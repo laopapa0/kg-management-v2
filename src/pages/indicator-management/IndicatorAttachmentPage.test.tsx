@@ -1,9 +1,17 @@
-import { describe, it, expect } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { describe, it, expect, beforeEach } from 'vitest'
+import { render, screen, within, waitFor, act } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { __resetAttachmentStorageCache } from '@/utils/attachmentStorage'
+import { useAttachmentStore } from '@/stores/attachmentStore'
 import IndicatorAttachmentPage from './IndicatorAttachmentPage'
 
 describe('IndicatorAttachmentPage', () => {
+  beforeEach(() => {
+    localStorage.clear()
+    __resetAttachmentStorageCache()
+    useAttachmentStore.setState(useAttachmentStore.getInitialState())
+  })
+
   it('renders four panels with correct titles', () => {
     render(<IndicatorAttachmentPage />)
 
@@ -50,7 +58,6 @@ describe('IndicatorAttachmentPage', () => {
     expect(headers).toHaveLength(4)
   })
 
-
   it('renders empty state placeholders in the tag/rule panels only', () => {
     render(<IndicatorAttachmentPage />)
 
@@ -58,21 +65,109 @@ describe('IndicatorAttachmentPage', () => {
     expect(emptyStates).toHaveLength(2)
   })
 
-  it('renders TreeView in the indicator tree panel with initial expansion', () => {
+  it('renders TreeView in the indicator tree panel from store data', () => {
     render(<IndicatorAttachmentPage />)
 
-    expect(screen.getByTestId('tree-view')).toBeInTheDocument()
-    expect(screen.getByText('发展类指标')).toBeInTheDocument()
-    expect(screen.getByText('用户发展趋势')).toBeInTheDocument()
-    expect(screen.getByText('收入增长率')).toBeInTheDocument()
+    const treePanel = screen.getByTestId('panel-indicator-tree')
+    expect(within(treePanel).getByTestId('tree-view')).toBeInTheDocument()
+    const indicators = useAttachmentStore.getState().indicators
+    expect(within(treePanel).getByText(indicators[0].name)).toBeInTheDocument()
+  })
+
+  it('renders indicator cards in the pending indicators panel from store data', () => {
+    render(<IndicatorAttachmentPage />)
+
+    const cards = screen.getAllByTestId('indicator-card')
+    expect(cards.length).toBeGreaterThanOrEqual(2)
+  })
+
+  it('uses the auto-fill CSS Grid for pending indicators', () => {
+    render(<IndicatorAttachmentPage />)
+
+    const grid = screen.getByTestId('indicator-grid')
+    expect(grid).toHaveStyle({
+      gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
+    })
+  })
+
+  it('filters pending indicators by attachment state', () => {
+    render(<IndicatorAttachmentPage />)
+
+    const state = useAttachmentStore.getState()
+    const pendingCount = state.indicators.filter(
+      (i) => !i.treeParentId && i.tagIds.length === 0 && i.ruleIds.length === 0,
+    ).length
+
+    const cards = screen.getAllByTestId('indicator-card')
+    expect(cards.length).toBe(pendingCount)
+  })
+
+  it('updates pending indicators when an indicator is attached to the tree', async () => {
+    render(<IndicatorAttachmentPage />)
+
+    const state = useAttachmentStore.getState()
+    const target = state.indicators.find(
+      (i) => i.id !== state.indicators[0].id && !i.treeParentId && i.tagIds.length === 0 && i.ruleIds.length === 0,
+    )!
+    const pendingPanel = screen.getByTestId('panel-pending-indicators')
+
+    expect(within(pendingPanel).getByText(target.name)).toBeInTheDocument()
+
+    act(() => {
+      state.setIndicators(
+        state.indicators.map((i) =>
+          i.id === target.id ? { ...i, treeParentId: state.indicators[0].id } : i,
+        ),
+      )
+    })
+
+    await waitFor(() => {
+      expect(within(pendingPanel).queryByText(target.name)).not.toBeInTheDocument()
+    })
+  })
+
+  it('returns an indicator to pending when treeParentId is cleared', async () => {
+    render(<IndicatorAttachmentPage />)
+
+    const state = useAttachmentStore.getState()
+    const pendingPanel = screen.getByTestId('panel-pending-indicators')
+    const attached = state.indicators[5]
+
+    act(() => {
+      state.setIndicators(
+        state.indicators.map((i) => (i.id === attached.id ? { ...i, treeParentId: state.indicators[0].id } : i)),
+      )
+    })
+
+    await waitFor(() => {
+      expect(within(pendingPanel).queryByText(attached.name)).not.toBeInTheDocument()
+    })
+
+    act(() => {
+      state.setIndicators(
+        state.indicators.map((i) => (i.id === attached.id ? { ...i, treeParentId: undefined } : i)),
+      )
+    })
+
+    await waitFor(() => {
+      expect(within(pendingPanel).getByText(attached.name)).toBeInTheDocument()
+    })
   })
 
   it('allows expanding and collapsing tree nodes in the indicator tree panel', async () => {
     const user = userEvent.setup()
     render(<IndicatorAttachmentPage />)
 
-    const toggle = screen.getByLabelText('收起节点 tree-root-1')
-    expect(screen.getByText('用户发展')).toBeInTheDocument()
+    const state = useAttachmentStore.getState()
+    const root = state.indicators[0]
+    act(() => {
+      state.setIndicators(
+        state.indicators.map((i, idx) => (idx > 0 && idx < 3 ? { ...i, treeParentId: root.id } : i)),
+      )
+    })
+
+    const toggle = screen.getByLabelText(`收起节点 ${root.id}`)
+    expect(screen.getByText(state.indicators[1].name)).toBeInTheDocument()
 
     await user.click(toggle)
 
@@ -87,22 +182,6 @@ describe('IndicatorAttachmentPage', () => {
     addButtons.forEach((button) => {
       expect(button).toHaveClass('opacity-0')
       expect(button).toHaveClass('group-hover:opacity-100')
-    })
-  })
-
-  it('renders indicator cards in the pending indicators panel', () => {
-    render(<IndicatorAttachmentPage />)
-
-    const cards = screen.getAllByTestId('indicator-card')
-    expect(cards.length).toBeGreaterThanOrEqual(2)
-  })
-
-  it('uses the auto-fill CSS Grid for pending indicators', () => {
-    render(<IndicatorAttachmentPage />)
-
-    const grid = screen.getByTestId('indicator-grid')
-    expect(grid).toHaveStyle({
-      gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
     })
   })
 })

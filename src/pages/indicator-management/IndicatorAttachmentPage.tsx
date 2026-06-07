@@ -1,68 +1,32 @@
+import { useEffect } from 'react'
+import { useShallow } from 'zustand/react/shallow'
 import { Group, Panel, Separator } from 'react-resizable-panels'
 import { Tags, Scale } from 'lucide-react'
 import PanelHeader from '@/components/panel/PanelHeader'
 import EmptyState from '@/components/empty-state/EmptyState'
 import IndicatorGrid from '@/components/indicator/IndicatorGrid'
-import TreeView, { type TreeNode } from '@/components/tree/TreeView'
-import type { IndicatorCardProps } from '@/components/indicator/IndicatorCard'
+import IndicatorTreePanel from './IndicatorTreePanel'
+import { initializeAttachmentStore, selectPendingIndicators, useAttachmentStore } from '@/stores/attachmentStore'
 
 const PANEL_MIN_WIDTH_LEFT = 240
 const PANEL_MIN_WIDTH_CENTER = 400
 const PANEL_MIN_WIDTH_RIGHT = 240
 
-interface IndicatorTreeNode extends TreeNode {
-  name: string
-  children?: IndicatorTreeNode[]
-}
-
-const MOCK_TREE_NODES: IndicatorTreeNode[] = [
-  {
-    id: 'tree-root-1',
-    name: '发展类指标',
-    children: [
-      { id: 'tree-child-1-1', name: '用户发展趋势' },
-      { id: 'tree-child-1-2', name: '收入增长率' },
-    ],
-  },
-  { id: 'tree-root-2', name: '服务类指标' },
-]
-
-const MOCK_PENDING_INDICATORS: IndicatorCardProps[] = [
-  {
-    id: 'ind-001',
-    name: '5G用户渗透率',
-    code: '5G_PENETRATION',
-    level1: '发展',
-    level2: '用户发展',
-    source: '市场部',
-  },
-  {
-    id: 'ind-002',
-    name: '营收完成率',
-    code: 'REVENUE_COMPLETION',
-    level1: '经营',
-    level2: '收入',
-    source: '财务部',
-  },
-  {
-    id: 'ind-003',
-    name: '客户满意度',
-    code: 'CSAT',
-    level1: '服务',
-    level2: '客户满意度',
-    source: '客服部',
-  },
-  {
-    id: 'ind-004',
-    name: '网络投诉率',
-    code: 'NET_COMPLAINT',
-    level1: '服务',
-    level2: '投诉处理',
-    source: '网络部',
-  },
-]
-
 export default function IndicatorAttachmentPage() {
+  useEffect(() => {
+    initializeAttachmentStore()
+  }, [])
+
+  useEffect(() => {
+    function handleKeyDown(event: KeyboardEvent) {
+      useAttachmentStore.getState().handleKeyDown(event)
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [])
+
+  const pendingIndicators = useAttachmentStore(useShallow(selectPendingIndicators))
+
   return (
     <div
       data-testid="indicator-attachment-page"
@@ -87,15 +51,7 @@ export default function IndicatorAttachmentPage() {
                 console.log('add indicator tree node')
               }}
             />
-            <div className="flex-1 overflow-y-auto px-2 pb-2">
-              <TreeView
-                nodes={MOCK_TREE_NODES}
-                renderNode={(node) => (
-                  <span className="text-body text-dark-text-primary">{node.name}</span>
-                )}
-                initialExpanded={['tree-root-1']}
-              />
-            </div>
+            <IndicatorTreePanel />
           </div>
         </Panel>
 
@@ -119,7 +75,7 @@ export default function IndicatorAttachmentPage() {
                 console.log('add pending indicator')
               }}
             />
-            <IndicatorGrid indicators={MOCK_PENDING_INDICATORS} />
+            <IndicatorGrid indicators={pendingIndicators} />
           </div>
         </Panel>
 
