@@ -9,11 +9,12 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
+  type DragStartEvent,
   type DragEndEvent,
   type DragOverEvent,
   type ClientRect,
 } from '@dnd-kit/core'
-import { DURATION, EASING, getTransition } from '@/components/motion/motion.tokens'
+import { DURATION, EASING, getTransition, DRAG_GHOST, DURATION_CLASS } from '@/components/motion/motion.tokens'
 import { getDropPosition, type DropPosition } from './treeDragUtils'
 
 export interface TreeNode {
@@ -154,8 +155,9 @@ function TreeItem<T extends TreeNode>({
         <div
           data-testid="tree-drop-before-indicator"
           className={[
-            'h-[2px] w-full transition-opacity duration-150',
-            'bg-[#3B82F6] shadow-[0_0_6px_rgba(59,130,246,0.6)]',
+            'h-[2px] w-full transition-opacity', DURATION_CLASS.fast,
+            'bg-dark-status-info-active',
+            'shadow-[0_0_6px_var(--dark-drop-glow)]',
             isDropBefore ? 'opacity-100' : 'opacity-0',
           ].join(' ')}
         />
@@ -173,9 +175,9 @@ function TreeItem<T extends TreeNode>({
         onClick={handleRowClick}
         className={[
           'group relative flex h-9 cursor-pointer items-center gap-1 py-2 px-3',
-          'transition-colors duration-150 ease-out',
-          isSelected ? 'bg-[rgba(59,130,246,0.12)]' : isHovered ? 'bg-white/[0.04]' : '',
-          isDropInside ? 'bg-[#DBEAFE]' : '',
+          'transition-colors', DURATION_CLASS.fast, 'ease-out',
+          isSelected ? 'bg-dark-tree-selected' : isHovered ? 'bg-white/[0.04]' : '',
+          isDropInside ? 'bg-dark-drop-highlight' : '',
         ].join(' ')}
         style={{ paddingLeft: `${depth * 20 + 12}px` }}
       >
@@ -183,11 +185,10 @@ function TreeItem<T extends TreeNode>({
         <span
           data-testid="tree-node-accent-bar"
           className={[
-            'absolute left-0 top-0 bottom-0 transition-opacity duration-150 ease-out',
+            'absolute left-0 top-0 bottom-0 transition-opacity', DURATION_CLASS.fast, 'ease-out bg-dark-status-info-active',
             isSelected ? 'w-1 opacity-100' : isHovered ? 'w-1 opacity-50' : 'w-1 opacity-0',
             isDropInside ? 'w-[3px] opacity-100' : '',
           ].join(' ')}
-          style={{ backgroundColor: isDropInside ? '#3B82F6' : '#3B82F6' }}
         />
 
         {/* Drag handle */}
@@ -199,7 +200,7 @@ function TreeItem<T extends TreeNode>({
             aria-label={`拖拽节点 ${node.id}`}
             className={[
               'z-10 flex size-5 items-center justify-center rounded text-dark-text-tertiary',
-              'transition-all duration-150 ease-out hover:text-dark-text-secondary',
+              'transition-all', DURATION_CLASS.fast, 'ease-out hover:text-dark-text-secondary',
               'cursor-grab active:cursor-grabbing',
               isHovered ? 'translate-x-0 opacity-100' : '-translate-x-1 opacity-0',
             ].join(' ')}
@@ -220,7 +221,7 @@ function TreeItem<T extends TreeNode>({
                 key={i}
                 data-testid="tree-indent-guide"
                 className={[
-                  'absolute top-0 bottom-0 w-px transition-opacity duration-150',
+                  'absolute top-0 bottom-0 w-px transition-opacity', DURATION_CLASS.fast,
                   'bg-white/[0.06] group-hover:bg-white/[0.15]',
                   showGuides ? 'opacity-100' : 'opacity-0',
                 ].join(' ')}
@@ -272,7 +273,7 @@ function TreeItem<T extends TreeNode>({
               }}
               className={[
                 'flex size-6 items-center justify-center rounded text-dark-text-secondary',
-                'transition-all duration-150 ease-out hover:bg-dark-tree-hover-bg hover:text-dark-accent-primary',
+                'transition-all', DURATION_CLASS.fast, 'ease-out hover:bg-dark-tree-hover-bg hover:text-dark-accent-primary',
                 isHovered ? 'translate-x-0 opacity-100' : '-translate-x-1 opacity-0',
               ].join(' ')}
             >
@@ -290,7 +291,7 @@ function TreeItem<T extends TreeNode>({
               }}
               className={[
                 'flex size-6 items-center justify-center rounded text-dark-text-secondary',
-                'transition-all duration-150 ease-out hover:bg-red-500/10 hover:text-red-400',
+                'transition-all', DURATION_CLASS.fast, 'ease-out hover:bg-red-500/10 hover:text-red-400',
                 isHovered ? 'translate-x-0 opacity-100' : '-translate-x-1 opacity-0',
               ].join(' ')}
             >
@@ -342,8 +343,9 @@ function TreeItem<T extends TreeNode>({
         <div
           data-testid="tree-drop-after-indicator"
           className={[
-            'h-[2px] w-full transition-opacity duration-150',
-            'bg-[#3B82F6] shadow-[0_0_6px_rgba(59,130,246,0.6)]',
+            'h-[2px] w-full transition-opacity', DURATION_CLASS.fast,
+            'bg-dark-status-info-active',
+            'shadow-[0_0_6px_var(--dark-drop-glow)]',
             isDropAfter ? 'opacity-100' : 'opacity-0',
           ].join(' ')}
         />
@@ -410,7 +412,7 @@ export default function TreeView<T extends TreeNode>({
     [controlledSelectedId, onSelect],
   )
 
-  const handleDragStart = useCallback((event: { active: { id: string | number } }) => {
+  const handleDragStart = useCallback((event: DragStartEvent) => {
     setActiveDragId(event.active.id as string)
   }, [])
 
@@ -509,7 +511,7 @@ export default function TreeView<T extends TreeNode>({
           {activeNode ? (
             <div
               className="flex h-9 items-center gap-2 rounded-md bg-dark-card-l1 px-3 py-2 shadow-lg"
-              style={{ scale: '0.98', opacity: 0.9 }}
+              style={{ scale: DRAG_GHOST.scale, opacity: DRAG_GHOST.opacity }}
             >
               <GripVertical className="size-3.5 text-dark-text-tertiary" />
               <span className="text-sm text-dark-text-primary">

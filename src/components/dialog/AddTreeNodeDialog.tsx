@@ -10,6 +10,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 
 export interface AddTreeNodeDialogProps {
   open: boolean
@@ -69,29 +70,33 @@ export default function AddTreeNodeDialog({
 
           <div className="grid gap-2">
             <Label>添加位置</Label>
-            <div className="flex gap-4">
-              <label className="flex items-center gap-2 text-sm text-dark-text-primary">
-                <input
+            <RadioGroup
+              value={asChild ? 'child' : 'root'}
+              onValueChange={(value) => setAsChild(value === 'child')}
+              className="flex gap-4"
+            >
+              <div className="flex items-center gap-2">
+                <RadioGroupItem
+                  value="root"
+                  id="node-location-root"
                   data-testid="add-node-root-radio"
-                  type="radio"
-                  name="node-location"
-                  checked={!asChild}
-                  onChange={() => setAsChild(false)}
                 />
-                作为根节点
-              </label>
-              <label className="flex items-center gap-2 text-sm text-dark-text-primary">
-                <input
+                <Label htmlFor="node-location-root" className="text-sm text-dark-text-primary cursor-pointer">
+                  作为根节点
+                </Label>
+              </div>
+              <div className="flex items-center gap-2">
+                <RadioGroupItem
+                  value="child"
+                  id="node-location-child"
                   data-testid="add-node-child-radio"
-                  type="radio"
-                  name="node-location"
-                  checked={asChild}
-                  onChange={() => setAsChild(true)}
                   disabled={!selectedNodeId}
                 />
-                作为子节点
-              </label>
-            </div>
+                <Label htmlFor="node-location-child" className="text-sm text-dark-text-primary cursor-pointer">
+                  作为子节点
+                </Label>
+              </div>
+            </RadioGroup>
           </div>
         </div>
 

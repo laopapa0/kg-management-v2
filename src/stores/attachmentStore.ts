@@ -68,7 +68,9 @@ export interface AttachmentState {
 }
 
 function createSnapshot(state: Pick<AttachmentState, 'indicators' | 'tagNodes' | 'rules' | 'ruleParameters'>): DataSnapshot {
-  // 按 spec 使用浅拷贝快照：数组本身复制，元素引用保持共享
+  // 浅拷贝快照：数组复制，元素引用共享。
+  // 当前所有 mutation 遵循 immutable pattern（生成新数组），浅拷贝已足够。
+  // 若未来引入 mutate-in-place 操作，需升级为 structuredClone。
   return {
     indicators: [...state.indicators],
     tagNodes: [...state.tagNodes],
@@ -76,6 +78,8 @@ function createSnapshot(state: Pick<AttachmentState, 'indicators' | 'tagNodes' |
     ruleParameters: [...state.ruleParameters],
   }
 }
+
+const CLEAR_REDO = { redoStack: [] as DataSnapshot[], canRedo: false } as const
 
 function hasStoredData(): boolean {
   return getDepartments().length > 0
@@ -188,7 +192,7 @@ export const useAttachmentStore = create<AttachmentState>((set, get) => ({
 
   setIndicators: (data) => {
     get().pushHistory()
-    set({ indicators: data, redoStack: [], canRedo: false })
+    set({ indicators: data, ...CLEAR_REDO })
     const deptId = get().currentDepartmentId
     if (deptId) {
       saveIndicators(deptId, data)
@@ -197,7 +201,7 @@ export const useAttachmentStore = create<AttachmentState>((set, get) => ({
 
   setTagNodes: (data) => {
     get().pushHistory()
-    set({ tagNodes: data, redoStack: [], canRedo: false })
+    set({ tagNodes: data, ...CLEAR_REDO })
     const deptId = get().currentDepartmentId
     if (deptId) {
       saveTagNodes(deptId, data)
@@ -206,13 +210,13 @@ export const useAttachmentStore = create<AttachmentState>((set, get) => ({
 
   setRules: (data) => {
     get().pushHistory()
-    set({ rules: data, redoStack: [], canRedo: false })
+    set({ rules: data, ...CLEAR_REDO })
     saveRules(data)
   },
 
   setRuleParameters: (data) => {
     get().pushHistory()
-    set({ ruleParameters: data, redoStack: [], canRedo: false })
+    set({ ruleParameters: data, ...CLEAR_REDO })
     saveRuleParameters(data)
   },
 
@@ -288,7 +292,7 @@ export const useAttachmentStore = create<AttachmentState>((set, get) => ({
       department: get().departments.find((d) => d.id === deptId)?.name,
     })
     const next = [...get().indicators, newIndicator]
-    set({ indicators: next, redoStack: [], canRedo: false })
+    set({ indicators: next, ...CLEAR_REDO })
     if (deptId) {
       saveIndicators(deptId, next)
     }
@@ -300,7 +304,7 @@ export const useAttachmentStore = create<AttachmentState>((set, get) => ({
     if (!exists) return
     get().pushHistory()
     const next = get().indicators.map((i) => (i.id === id ? { ...i, name } : i))
-    set({ indicators: next, redoStack: [], canRedo: false })
+    set({ indicators: next, ...CLEAR_REDO })
     const deptId = get().currentDepartmentId
     if (deptId) {
       saveIndicators(deptId, next)
@@ -314,7 +318,7 @@ export const useAttachmentStore = create<AttachmentState>((set, get) => ({
     const next = get()
       .indicators.filter((i) => i.id !== id)
       .map((i) => (i.treeParentId === id ? { ...i, treeParentId: undefined } : i))
-    set({ indicators: next, redoStack: [], canRedo: false })
+    set({ indicators: next, ...CLEAR_REDO })
     const deptId = get().currentDepartmentId
     if (deptId) {
       saveIndicators(deptId, next)
@@ -341,7 +345,7 @@ export const useAttachmentStore = create<AttachmentState>((set, get) => ({
 
     get().pushHistory()
     const next = indicators.filter((i) => !idsToDelete.has(i.id))
-    set({ indicators: next, redoStack: [], canRedo: false })
+    set({ indicators: next, ...CLEAR_REDO })
     const deptId = get().currentDepartmentId
     if (deptId) {
       saveIndicators(deptId, next)

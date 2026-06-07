@@ -180,7 +180,7 @@ describe('TreeView', () => {
 
       await user.click(firstNode)
 
-      expect(firstNode).toHaveClass('bg-[rgba(59,130,246,0.12)]')
+      expect(firstNode).toHaveClass('bg-dark-tree-selected')
       expect(bar).toHaveClass('opacity-100')
     })
 
@@ -203,8 +203,8 @@ describe('TreeView', () => {
       await user.click(rows[0])
       await user.click(rows[1])
 
-      expect(rows[0]).not.toHaveClass('bg-[rgba(59,130,246,0.12)]')
-      expect(rows[1]).toHaveClass('bg-[rgba(59,130,246,0.12)]')
+      expect(rows[0]).not.toHaveClass('bg-dark-tree-selected')
+      expect(rows[1]).toHaveClass('bg-dark-tree-selected')
     })
 
     it('transitions hover and selected states over 150ms', () => {
@@ -233,8 +233,8 @@ describe('TreeView', () => {
       render(<TreeView nodes={mockNodes} renderNode={renderNode} selectedId="root-2" />)
 
       const rows = screen.getAllByTestId('tree-node-row')
-      expect(rows[0]).not.toHaveClass('bg-[rgba(59,130,246,0.12)]')
-      expect(rows[1]).toHaveClass('bg-[rgba(59,130,246,0.12)]')
+      expect(rows[0]).not.toHaveClass('bg-dark-tree-selected')
+      expect(rows[1]).toHaveClass('bg-dark-tree-selected')
     })
 
     it('passes interaction context to renderNode', async () => {

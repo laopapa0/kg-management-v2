@@ -143,6 +143,10 @@ module.exports = {
             'guide-line': 'var(--dark-tree-guide-line)',
             'guide-line-hover': 'var(--dark-tree-guide-line-hover)',
           },
+          drop: {
+            highlight: 'var(--dark-drop-highlight)',
+            glow: 'var(--dark-drop-glow)',
+          },
           focus: 'var(--dark-focus-ring)',
           backdrop: 'var(--dark-backdrop)',
           input: {

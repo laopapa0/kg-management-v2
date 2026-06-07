@@ -6,6 +6,17 @@ export const DURATION = {
   slow: 0.3,
 } as const;
 
+/**
+ * Tailwind CSS duration class 与 DURATION token 的对应关系。
+ * 组件中使用 Tailwind duration class 时，应引用此映射以保持同步。
+ */
+export const DURATION_CLASS = {
+  fast: 'duration-150',
+  normal: 'duration-200',
+  medium: 'duration-250',
+  slow: 'duration-300',
+} as const;
+
 export const EASING = {
   default: [0.16, 1, 0.3, 1] as const,
   enter: [0.16, 1, 0.3, 1] as const,
@@ -18,6 +29,11 @@ export const SPRING = {
   snappy: { type: 'spring' as const, stiffness: 500, damping: 30, mass: 1 },
   gentle: { type: 'spring' as const, stiffness: 120, damping: 20, mass: 1 },
   dragRelease: { type: 'spring' as const, stiffness: 300, damping: 25, mass: 1 },
+} as const;
+
+export const DRAG_GHOST = {
+  scale: 0.98,
+  opacity: 0.9,
 } as const;
 
 export type TransitionName =

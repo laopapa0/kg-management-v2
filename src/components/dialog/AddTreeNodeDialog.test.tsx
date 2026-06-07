@@ -29,10 +29,10 @@ describe('AddTreeNodeDialog', () => {
       />,
     )
 
-    const rootRadio = screen.getByTestId('add-node-root-radio') as HTMLInputElement
-    const childRadio = screen.getByTestId('add-node-child-radio') as HTMLInputElement
-    expect(rootRadio.checked).toBe(true)
-    expect(childRadio.checked).toBe(false)
+    const rootRadio = screen.getByTestId('add-node-root-radio')
+    const childRadio = screen.getByTestId('add-node-child-radio')
+    expect(rootRadio).toHaveAttribute('data-state', 'checked')
+    expect(childRadio).toHaveAttribute('data-state', 'unchecked')
   })
 
   it('defaults to child when a node is selected', () => {
@@ -45,10 +45,10 @@ describe('AddTreeNodeDialog', () => {
       />,
     )
 
-    const rootRadio = screen.getByTestId('add-node-root-radio') as HTMLInputElement
-    const childRadio = screen.getByTestId('add-node-child-radio') as HTMLInputElement
-    expect(rootRadio.checked).toBe(false)
-    expect(childRadio.checked).toBe(true)
+    const rootRadio = screen.getByTestId('add-node-root-radio')
+    const childRadio = screen.getByTestId('add-node-child-radio')
+    expect(rootRadio).toHaveAttribute('data-state', 'unchecked')
+    expect(childRadio).toHaveAttribute('data-state', 'checked')
   })
 
   it('calls onConfirm with name and undefined parent when root is chosen', async () => {

@@ -47,11 +47,8 @@ export function createIndicatorAttachment(
   return indicatorAttachmentSchema.parse(base) as unknown as IndicatorAttachment;
 }
 
-let idCounter = 0;
-
 function generateIndicatorId(): string {
-  idCounter += 1;
-  return `ind-generated-${Date.now()}-${idCounter}`;
+  return `ind-generated-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 }
 
 /**
