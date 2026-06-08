@@ -1,10 +1,12 @@
 import { useMemo, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
+import { BookOpen } from 'lucide-react'
 import { getGeneratedReports, getReportsByPlanId } from '@/utils/generatedReportStorage'
 import { useCommentStore } from '@/stores/commentStore'
 import CommentThread from '@/components/report/CommentThread'
 import KnowledgeGraphChart from '@/components/report/KnowledgeGraphChart'
+import KnowledgeEditDialog from '@/components/knowledge/KnowledgeEditDialog'
 import type { KnowledgeGraphNode, KnowledgeGraphEdge } from '@/components/report/KnowledgeGraphChart'
 import type { GeneratedReport, GeneratedReportSection } from '@/models/generatedReportModel'
 
@@ -34,6 +36,9 @@ export default function ReportDetailPage() {
   const [compareVersionId, setCompareVersionId] = useState<string | null>(null)
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set())
   const [kgEdgesMap, setKgEdgesMap] = useState<Record<string, KnowledgeGraphEdge[]>>({})
+  const [editDialogOpen, setEditDialogOpen] = useState(false)
+  const [editSectionId, setEditSectionId] = useState<string | null>(null)
+  const [editContent, setEditContent] = useState('')
   const allComments = useCommentStore((state) => state.comments)
 
   const report = useMemo(() => {
@@ -109,6 +114,23 @@ export default function ReportDetailPage() {
       ),
     }))
     toast('关联关系已更新，建议重跑报告', {
+      action: {
+        label: '重跑',
+        onClick: () => navigate('/reports/generate'),
+      },
+    })
+  }
+
+  function openKnowledgeEdit(section: GeneratedReportSection) {
+    setEditSectionId(section.id)
+    setEditContent(section.content)
+    setEditDialogOpen(true)
+  }
+
+  function handleKnowledgeSave(content: string) {
+    // TODO: 实际业务中应更新知识库 store，关联到对应知识文件
+    // 当前仅 toast 提示，不实现复杂内部逻辑（#80 要求）
+    toast('知识已更新，建议重跑报告', {
       action: {
         label: '重跑',
         onClick: () => navigate('/reports/generate'),
@@ -230,11 +252,22 @@ export default function ReportDetailPage() {
                 <div key={section.id} data-testid={`report-section-${section.id}`} className="mb-4 rounded-md border border-dark-border bg-dark-card-l2 p-3">
                   <div className="mb-2 flex items-center justify-between">
                     <h3 className="font-medium text-dark-text-primary">{section.title}</h3>
-                    {count > 0 && (
-                      <span data-testid={`comment-badge-${section.id}`} className="rounded-full bg-dark-accent-primary/20 px-2 py-0.5 text-xs text-dark-accent-primary">
-                        {count}
-                      </span>
-                    )}
+                    <div className="flex items-center gap-2">
+                      <button
+                        data-testid={`update-knowledge-btn-${section.id}`}
+                        onClick={() => openKnowledgeEdit(section)}
+                        className="flex items-center gap-1 rounded-md px-2 py-1 text-xs text-dark-text-secondary hover:bg-dark-accent-primary/10 hover:text-dark-accent-primary"
+                        title="更新知识"
+                      >
+                        <BookOpen size={14} />
+                        更新知识
+                      </button>
+                      {count > 0 && (
+                        <span data-testid={`comment-badge-${section.id}`} className="rounded-full bg-dark-accent-primary/20 px-2 py-0.5 text-xs text-dark-accent-primary">
+                          {count}
+                        </span>
+                      )}
+                    </div>
                   </div>
                   <p className="whitespace-pre-wrap text-sm text-dark-text-secondary">{section.content}</p>
                   <button
@@ -300,6 +333,14 @@ export default function ReportDetailPage() {
           </div>
         </div>
       </div>
+
+      <KnowledgeEditDialog
+        open={editDialogOpen}
+        onOpenChange={setEditDialogOpen}
+        initialContent={editContent}
+        onSave={handleKnowledgeSave}
+        title="更新知识"
+      />
     </div>
   )
 }

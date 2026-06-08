@@ -446,4 +446,83 @@ describe('ReportDetailPage', () => {
     // For a full end-to-end we'd need to trigger echarts events,
     // which is tested in KnowledgeGraphChart.test.tsx.
   })
+
+  it('shows update knowledge button on text sections', () => {
+    const report = createGeneratedReport({
+      planId: 'plan-1',
+      planName: '核心指标日报',
+      templateId: 'tmpl-1',
+      templateName: '日报模板',
+      version: 'v0.1',
+      triggerType: 'manual',
+      filterScope: {
+        includedIndicatorIds: [],
+        excludedRuleIds: [],
+        excludedLinkRelationIds: [],
+      },
+      sections: [
+        { id: 's1', title: '概览', content: '概览内容' },
+        { id: 's2', title: '详情', content: '详情内容' },
+      ],
+    })
+    addGeneratedReport(report)
+
+    render(
+      <MemoryRouter initialEntries={[`/reports/${report.id}`]}>
+        <Routes>
+          <Route path="/reports/:reportId" element={<ReportDetailPage />} />
+        </Routes>
+      </MemoryRouter>,
+    )
+
+    expect(screen.getByTestId('update-knowledge-btn-s1')).toBeInTheDocument()
+    expect(screen.getByTestId('update-knowledge-btn-s2')).toBeInTheDocument()
+    expect(screen.getByTestId('update-knowledge-btn-s1')).toHaveTextContent('更新知识')
+  })
+
+  it('opens knowledge edit dialog and shows toast after save', () => {
+    mockToast.mockClear()
+
+    const report = createGeneratedReport({
+      planId: 'plan-1',
+      planName: '核心指标日报',
+      templateId: 'tmpl-1',
+      templateName: '日报模板',
+      version: 'v0.1',
+      triggerType: 'manual',
+      filterScope: {
+        includedIndicatorIds: [],
+        excludedRuleIds: [],
+        excludedLinkRelationIds: [],
+      },
+      sections: [{ id: 's1', title: '概览', content: '原始知识内容' }],
+    })
+    addGeneratedReport(report)
+
+    render(
+      <MemoryRouter initialEntries={[`/reports/${report.id}`]}>
+        <Routes>
+          <Route path="/reports/:reportId" element={<ReportDetailPage />} />
+        </Routes>
+      </MemoryRouter>,
+    )
+
+    // Click update knowledge button
+    fireEvent.click(screen.getByTestId('update-knowledge-btn-s1'))
+
+    // Dialog should open with initial content
+    expect(screen.getByTestId('knowledge-edit-textarea')).toBeInTheDocument()
+    const textarea = screen.getByTestId('knowledge-edit-textarea') as HTMLTextAreaElement
+    expect(textarea.value).toBe('原始知识内容')
+
+    // Edit content and save
+    fireEvent.change(textarea, { target: { value: '修改后的知识内容' } })
+    fireEvent.click(screen.getByTestId('knowledge-edit-save'))
+
+    // Toast should be triggered
+    expect(mockToast).toHaveBeenCalledWith(
+      '知识已更新，建议重跑报告',
+      expect.objectContaining({ action: expect.any(Object) }),
+    )
+  })
 })
