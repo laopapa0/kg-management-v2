@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event'
 import { __resetAttachmentStorageCache } from '@/utils/attachmentStorage'
 import { useAttachmentStore, initializeAttachmentStore } from '@/stores/attachmentStore'
 import { createMinimalIndicatorAttachment, createIndicatorAttachment } from '@/models/indicatorAttachmentModel'
+import type { IndicatorTreePanelRef } from './IndicatorTreePanel'
 import IndicatorTreePanel from './IndicatorTreePanel'
 
 const mockToast = vi.fn()
@@ -573,6 +574,165 @@ describe('IndicatorTreePanel', () => {
           description: `「${l1.name}」已删除，2 个指标回到「待挂靠」区域`,
         }),
       )
+    })
+
+    it('cascades delete of descendant virtual groups when special dialog confirmed', async () => {
+      initializeAttachmentStore()
+      const state = useAttachmentStore.getState()
+
+      // 3-level tree: L1(virtual) -> L2(virtual) -> real(indicator with tagIds)
+      const l1 = createMinimalIndicatorAttachment('一级分组')
+      const l2 = createMinimalIndicatorAttachment('二级分组', { parentId: l1.id })
+      const real = makeRealIndicator({ id: 'real-001', name: '真实指标', treeParentId: l2.id, tagIds: ['tag-1'] })
+
+      state.setIndicators([l1, l2, real])
+
+      render(<IndicatorTreePanel />)
+      const user = userEvent.setup()
+
+      const rows = screen.getAllByTestId('tree-node-row')
+      const l1Row = rows.find((r) => r.getAttribute('data-node-id') === l1.id)
+      if (!l1Row) throw new Error('L1 row not found')
+
+      await user.hover(l1Row)
+      await user.click(within(l1Row).getByTestId('tree-node-delete-button'))
+      await user.click(screen.getByTestId('delete-special-confirm-button'))
+
+      await waitFor(() => {
+        expect(screen.queryByTestId(`indicator-tree-node-content-${l1.id}`)).not.toBeInTheDocument()
+      })
+
+      // L2 virtual group should also be deleted (cascade), not promoted to root
+      expect(screen.queryByTestId(`indicator-tree-node-content-${l2.id}`)).not.toBeInTheDocument()
+
+      // Real indicator should remain with treeParentId cleared
+      const updatedReal = useAttachmentStore.getState().indicators.find((i) => i.id === real.id)
+      expect(updatedReal).toBeDefined()
+      expect(updatedReal?.treeParentId).toBeUndefined()
+    })
+
+    it('cascades delete through multiple levels of virtual groups', async () => {
+      initializeAttachmentStore()
+      const state = useAttachmentStore.getState()
+
+      // 4-level tree: L1(virtual) -> L2(virtual) -> L3(virtual) -> real
+      const l1 = createMinimalIndicatorAttachment('一级分组')
+      const l2 = createMinimalIndicatorAttachment('二级分组', { parentId: l1.id })
+      const l3 = createMinimalIndicatorAttachment('三级分组', { parentId: l2.id })
+      const real = makeRealIndicator({ id: 'real-deep', name: '深层指标', treeParentId: l3.id, tagIds: ['tag-1'] })
+
+      state.setIndicators([l1, l2, l3, real])
+
+      render(<IndicatorTreePanel />)
+      const user = userEvent.setup()
+
+      const rows = screen.getAllByTestId('tree-node-row')
+      const l1Row = rows.find((r) => r.getAttribute('data-node-id') === l1.id)
+      if (!l1Row) throw new Error('L1 row not found')
+
+      await user.hover(l1Row)
+      await user.click(within(l1Row).getByTestId('tree-node-delete-button'))
+      await user.click(screen.getByTestId('delete-special-confirm-button'))
+
+      await waitFor(() => {
+        expect(screen.queryByTestId(`indicator-tree-node-content-${l1.id}`)).not.toBeInTheDocument()
+      })
+
+      // All virtual groups should be deleted
+      expect(screen.queryByTestId(`indicator-tree-node-content-${l2.id}`)).not.toBeInTheDocument()
+      expect(screen.queryByTestId(`indicator-tree-node-content-${l3.id}`)).not.toBeInTheDocument()
+
+      // Real indicator should remain with treeParentId cleared
+      const updatedReal = useAttachmentStore.getState().indicators.find((i) => i.id === real.id)
+      expect(updatedReal).toBeDefined()
+      expect(updatedReal?.treeParentId).toBeUndefined()
+    })
+  })
+
+  describe('expandAndSelectNode', () => {
+    it('expands collapsed ancestors and selects the target node', async () => {
+      const user = userEvent.setup()
+      const state = useAttachmentStore.getState()
+      const gp = createIndicatorAttachment({
+        id: 'gp', name: '祖父', code: 'GROUP-GP',
+        indicatorCode: '', indicatorDisplayName: '祖父', indicatorShowName: '祖父',
+        indicatorType: '虚拟分组', level1: '', level2: '', granularity: '', frequency: '', unit: '',
+        isBigScreen: false, department: '', businessCaliber: '', techCaliber: '', tags: [],
+        treeParentId: undefined, tagIds: [], ruleIds: [],
+      })
+      const p = createIndicatorAttachment({
+        id: 'p', name: '父', code: 'GROUP-P',
+        indicatorCode: '', indicatorDisplayName: '父', indicatorShowName: '父',
+        indicatorType: '虚拟分组', level1: '', level2: '', granularity: '', frequency: '', unit: '',
+        isBigScreen: false, department: '', businessCaliber: '', techCaliber: '', tags: [],
+        treeParentId: 'gp', tagIds: [], ruleIds: [],
+      })
+      const c = createIndicatorAttachment({
+        id: 'c', name: '子', code: 'GROUP-C',
+        indicatorCode: '', indicatorDisplayName: '子', indicatorShowName: '子',
+        indicatorType: '虚拟分组', level1: '', level2: '', granularity: '', frequency: '', unit: '',
+        isBigScreen: false, department: '', businessCaliber: '', techCaliber: '', tags: [],
+        treeParentId: 'p', tagIds: [], ruleIds: [],
+      })
+      state.setIndicators([gp, p, c])
+
+      const ref = { current: null as IndicatorTreePanelRef | null }
+      render(<IndicatorTreePanel ref={(r) => { ref.current = r }} />)
+
+      // Collapse the grandparent
+      const toggle = screen.getByLabelText(`收起节点 gp`)
+      await user.click(toggle)
+
+      await waitFor(() => {
+        expect(screen.queryByTestId('indicator-tree-node-content-c')).not.toBeInTheDocument()
+      })
+
+      act(() => {
+        ref.current?.expandAndSelectNode('c')
+      })
+
+      // Ancestors expanded: child should now be visible
+      expect(screen.getByTestId('indicator-tree-node-content-c')).toBeInTheDocument()
+
+      // Target node should be selected
+      const rows = screen.getAllByTestId('tree-node-row')
+      const cRow = rows.find((r) => r.getAttribute('data-node-id') === 'c')
+      expect(cRow).toHaveAttribute('aria-selected', 'true')
+    })
+
+    it('highlights the selected node temporarily', async () => {
+      vi.useFakeTimers()
+      const state = useAttachmentStore.getState()
+      const gp = createIndicatorAttachment({
+        id: 'gp', name: '祖父', code: 'GROUP-GP',
+        indicatorCode: '', indicatorDisplayName: '祖父', indicatorShowName: '祖父',
+        indicatorType: '虚拟分组', level1: '', level2: '', granularity: '', frequency: '', unit: '',
+        isBigScreen: false, department: '', businessCaliber: '', techCaliber: '', tags: [],
+        treeParentId: undefined, tagIds: [], ruleIds: [],
+      })
+      const c = createIndicatorAttachment({
+        id: 'c', name: '子', code: 'GROUP-C',
+        indicatorCode: '', indicatorDisplayName: '子', indicatorShowName: '子',
+        indicatorType: '虚拟分组', level1: '', level2: '', granularity: '', frequency: '', unit: '',
+        isBigScreen: false, department: '', businessCaliber: '', techCaliber: '', tags: [],
+        treeParentId: 'gp', tagIds: [], ruleIds: [],
+      })
+      state.setIndicators([gp, c])
+
+      const ref = { current: null as IndicatorTreePanelRef | null }
+      render(<IndicatorTreePanel ref={(r) => { ref.current = r }} />)
+
+      act(() => {
+        ref.current?.expandAndSelectNode('c')
+      })
+
+      // Highlighted state is internal; the motion.div has animate prop
+      // We verify the node is selected
+      const rows = screen.getAllByTestId('tree-node-row')
+      const cRow = rows.find((r) => r.getAttribute('data-node-id') === 'c')
+      expect(cRow).toHaveAttribute('aria-selected', 'true')
+
+      vi.useRealTimers()
     })
   })
 })

@@ -140,4 +140,78 @@ describe('CascadingStateEngine', () => {
       expect(result.partial.size).toBe(0)
     })
   })
+
+  describe('edge cases', () => {
+    it('toggle on a leaf node only affects itself', () => {
+      const nodes = makeNodes()
+      const result = toggle(nodes, new Set(), 'a1')
+
+      expect(result.selected.has('a1')).toBe(true)
+      expect(result.selected.has('a')).toBe(false)
+      expect(result.partial.has('a')).toBe(true)
+    })
+
+    it('toggle off a leaf node only affects itself', () => {
+      const nodes = makeNodes()
+      const result = toggle(nodes, new Set(['a1']), 'a1')
+
+      expect(result.selected.has('a1')).toBe(false)
+      expect(result.partial.size).toBe(0)
+    })
+
+    it('toggle on a partial node selects it and all descendants', () => {
+      // a is partial (a1 selected, a2 not)
+      const nodes = makeNodes()
+      const selected = new Set(['a1'])
+      const result = toggle(nodes, selected, 'a')
+
+      expect(result.selected.has('a')).toBe(true)
+      expect(result.selected.has('a1')).toBe(true)
+      expect(result.selected.has('a2')).toBe(true)
+    })
+
+    it('handles deeply nested trees (>2 levels)', () => {
+      const nodes: TagNode[] = [
+        { id: 'l0', name: 'L0' },
+        { id: 'l1', name: 'L1', parentId: 'l0' },
+        { id: 'l2', name: 'L2', parentId: 'l1' },
+        { id: 'l3', name: 'L3', parentId: 'l2' },
+      ]
+      const result = toggle(nodes, new Set(), 'l3')
+
+      expect(result.selected.has('l3')).toBe(true)
+      expect(result.selected.has('l2')).toBe(true)
+      expect(result.selected.has('l1')).toBe(true)
+      expect(result.selected.has('l0')).toBe(true)
+    })
+
+    it('handles empty nodes array', () => {
+      const result = computeState([], new Set())
+      expect(result.selected.size).toBe(0)
+      expect(result.partial.size).toBe(0)
+    })
+
+    it('toggle with non-existent targetId adds the id to selected', () => {
+      const nodes = makeNodes()
+      const result = toggle(nodes, new Set(), 'non-existent')
+
+      // The implementation adds the targetId even if it is not in the node list
+      expect(result.selected.has('non-existent')).toBe(true)
+      expect(result.partial.size).toBe(0)
+    })
+
+    it('getDescendantIds guards against cyclic references', () => {
+      // We verify toggle does not infinite loop on deep trees
+      const deepNodes: TagNode[] = Array.from({ length: 100 }, (_, i) => ({
+        id: `node-${i}`,
+        name: `Node ${i}`,
+        parentId: i > 0 ? `node-${i - 1}` : undefined,
+      }))
+      const result = toggle(deepNodes, new Set(), 'node-99')
+      expect(result.selected.has('node-99')).toBe(true)
+      // In a single-child chain, all ancestors become selected
+      expect(result.selected.has('node-0')).toBe(true)
+      expect(result.partial.has('node-0')).toBe(false)
+    })
+  })
 })

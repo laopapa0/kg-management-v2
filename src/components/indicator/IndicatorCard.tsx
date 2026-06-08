@@ -28,6 +28,13 @@ export default function IndicatorCard({
   const isSelected = cardState === 'selected'
   const isAttached = cardState === 'attached'
 
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault()
+      onClick?.()
+    }
+  }
+
   const controls = useAnimation()
   const controlsRef = useRef(controls)
   controlsRef.current = controls
@@ -86,6 +93,7 @@ export default function IndicatorCard({
       data-testid="indicator-card"
       data-indicator-id={id}
       onClick={onClick}
+      onKeyDown={handleKeyDown}
       role="button"
       tabIndex={0}
       animate={controls}

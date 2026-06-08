@@ -79,6 +79,45 @@ describe('IndicatorCard', () => {
     expect(onClick).toHaveBeenCalledTimes(1)
   })
 
+  it('calls onClick when Enter is pressed', async () => {
+    const user = userEvent.setup()
+    const onClick = vi.fn()
+
+    render(<IndicatorCard {...baseIndicator} onClick={onClick} />)
+
+    const card = screen.getByTestId('indicator-card')
+    card.focus()
+    await user.keyboard('{Enter}')
+
+    expect(onClick).toHaveBeenCalledTimes(1)
+  })
+
+  it('calls onClick when Space is pressed', async () => {
+    const user = userEvent.setup()
+    const onClick = vi.fn()
+
+    render(<IndicatorCard {...baseIndicator} onClick={onClick} />)
+
+    const card = screen.getByTestId('indicator-card')
+    card.focus()
+    await user.keyboard(' ')
+
+    expect(onClick).toHaveBeenCalledTimes(1)
+  })
+
+  it('does not call onClick for other keys', async () => {
+    const user = userEvent.setup()
+    const onClick = vi.fn()
+
+    render(<IndicatorCard {...baseIndicator} onClick={onClick} />)
+
+    const card = screen.getByTestId('indicator-card')
+    card.focus()
+    await user.keyboard('{ArrowDown}')
+
+    expect(onClick).not.toHaveBeenCalled()
+  })
+
   describe('fly-out animation', () => {
     it('registers connection-confirmed listener on mount', () => {
       const addListenerSpy = vi.spyOn(window, 'addEventListener')

@@ -395,4 +395,92 @@ describe('attachmentStorage', () => {
       expect(getDepartments()).toEqual([{ id: 'dept-19', name: '部-19' }]);
     });
   });
+
+  // ─── clone fallback ───
+  it('structuredClone 失败时回退到 JSON.parse/stringify', () => {
+    const spy = vi.spyOn(global, 'structuredClone').mockImplementation(() => {
+      throw new Error('structuredClone failed')
+    })
+    const departments: Department[] = [{ id: 'dept-1', name: '财务部' }]
+    saveDepartments(departments)
+    expect(getDepartments()).toEqual(departments)
+    spy.mockRestore()
+  })
+
+  // ─── memory cache 优先于 localStorage ───
+  it('readFromStorage 优先返回内存缓存中的最新数据', () => {
+    const departmentsA: Department[] = [{ id: 'dept-a', name: 'A部' }]
+    const departmentsB: Department[] = [{ id: 'dept-b', name: 'B部' }]
+    saveDepartments(departmentsA)
+    // 模拟 localStorage 被外部修改为旧数据
+    localStorage.setItem('kgv2-attachment-departments', JSON.stringify(departmentsB))
+    // 内存缓存仍应返回 departmentsA
+    expect(getDepartments()).toEqual(departmentsA)
+  })
+
+  // ─── corruption fallback for all entity types ───
+  it('getTagNodes returns empty array when localStorage is corrupted', () => {
+    localStorage.setItem('kgv2-attachment-tagnodes-dept-test', 'not-json')
+    expect(getTagNodes('dept-test')).toEqual([])
+  })
+
+  it('getRules returns empty array when localStorage is corrupted', () => {
+    localStorage.setItem('kgv2-attachment-rules', 'not-json')
+    expect(getRules()).toEqual([])
+  })
+
+  it('getRuleParameters returns empty array when localStorage is corrupted', () => {
+    localStorage.setItem('kgv2-attachment-rule-params', 'not-json')
+    expect(getRuleParameters()).toEqual([])
+  })
+
+  it('getUiState returns empty object when localStorage is corrupted', () => {
+    localStorage.setItem('kgv2-attachment-ui', 'not-json')
+    expect(getUiState()).toEqual({})
+  })
+
+  // ─── write failure memory fallback for all entity types ───
+  it('saveTagNodes memory fallback on QuotaExceededError', () => {
+    const tagNodes = [{ id: 'tag-1', name: '标签1', color: '#ff0000', parentId: undefined }]
+    const setItemSpy = vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+      throw new DOMException('Quota exceeded', 'QuotaExceededError')
+    })
+    const result = saveTagNodes('dept-test', tagNodes)
+    expect(result.success).toBe(false)
+    expect(getTagNodes('dept-test')).toEqual(tagNodes)
+    setItemSpy.mockRestore()
+  })
+
+  it('saveRules memory fallback on QuotaExceededError', () => {
+    const rules = [{ id: 'rule-1', name: '规则1', description: '', parentId: undefined }]
+    const setItemSpy = vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+      throw new DOMException('Quota exceeded', 'QuotaExceededError')
+    })
+    const result = saveRules(rules)
+    expect(result.success).toBe(false)
+    expect(getRules()).toEqual(rules)
+    setItemSpy.mockRestore()
+  })
+
+  it('saveRuleParameters memory fallback on QuotaExceededError', () => {
+    const params = [{ id: 'rp-1', ruleId: 'rule-1', indicatorId: 'ind-1', thresholdMin: 0, thresholdMax: 100 }]
+    const setItemSpy = vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+      throw new DOMException('Quota exceeded', 'QuotaExceededError')
+    })
+    const result = saveRuleParameters(params)
+    expect(result.success).toBe(false)
+    expect(getRuleParameters()).toEqual(params)
+    setItemSpy.mockRestore()
+  })
+
+  it('saveUiState memory fallback on QuotaExceededError', () => {
+    const uiState: AttachmentUiState = { selectedDepartmentId: 'dept-1' }
+    const setItemSpy = vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+      throw new DOMException('Quota exceeded', 'QuotaExceededError')
+    })
+    const result = saveUiState(uiState)
+    expect(result.success).toBe(false)
+    expect(getUiState()).toEqual(uiState)
+    setItemSpy.mockRestore()
+  })
 });

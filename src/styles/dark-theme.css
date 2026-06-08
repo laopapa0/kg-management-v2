@@ -12,7 +12,7 @@
   /* Text */
   --dark-text-primary: #E8ECF1;
   --dark-text-secondary: #94A3B8;
-  --dark-text-tertiary: #64748B;
+  --dark-text-tertiary: #7A8FA8;
   --dark-text-disabled: #475569;
 
   /* Accent */
@@ -242,4 +242,44 @@
 
 .animate-error-slide-in {
   animation: error-slide-in 200ms ease-out forwards;
+}
+
+/* ─── prefers-reduced-motion 降级 ─── */
+
+@media (prefers-reduced-motion: reduce) {
+  /* 取消所有自定义动画 */
+  .animate-shake-connection,
+  .animate-misfire-hint,
+  .animate-ant-line,
+  .animate-target-bounce,
+  .animate-pulse-ring,
+  .animate-pulse-ring-stroke,
+  .animate-scale-in,
+  .animate-persistent-line-fade-in,
+  .animate-error-slide-in,
+  .animate-accordion-down,
+  .animate-accordion-up,
+  .animate-ping,
+  .animate-bounce {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+
+  /* 限制过渡为功能性属性（颜色、透明度），去除装饰性运动 */
+  .transition-all,
+  .transition {
+    transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity !important;
+    transition-duration: 100ms !important;
+  }
+
+  /* 保留颜色/透明度过渡 */
+  .transition-colors,
+  .transition-opacity {
+    transition-duration: 100ms !important;
+  }
+
+  /* 完全取消 transform 过渡（装饰性运动） */
+  .transition-transform {
+    transition-duration: 0ms !important;
+  }
 }
