@@ -8,10 +8,14 @@ import TagSetPanel from './TagSetPanel'
 import RulePanel from './RulePanel'
 import SourceAnchorMarker from '@/components/connection/SourceAnchorMarker'
 import ConnectionLayer from '@/components/connection/ConnectionLayer'
+import PersistentConnectionLayer from '@/components/connection/PersistentConnectionLayer'
+import PulseRing from '@/components/connection/PulseRing'
+import MiniToast from '@/components/connection/MiniToast'
 import FocusModeOverlay from '@/components/connection/FocusModeOverlay'
 import { Switch } from '@/components/ui/switch'
 import { useConnectionMode } from '@/hooks/useConnectionMode'
 import { useFocusZone } from '@/hooks/useFocusZone'
+import { useTargetBounce } from '@/hooks/useTargetBounce'
 import { initializeAttachmentStore, selectPendingIndicators, useAttachmentStore } from '@/stores/attachmentStore'
 
 const PANEL_MIN_WIDTH_LEFT = 240
@@ -38,6 +42,36 @@ export default function IndicatorAttachmentPage() {
   const { state, start, setHoverTarget, toggleContinuous, resetMisfireCount } = useConnectionMode()
   const focusZone = useFocusZone()
   const focusZoneHint = useMemo(() => getFocusZoneHint(focusZone), [focusZone])
+
+  // Feedback state for successful attachment
+  const [pulseTargetId, setPulseTargetId] = useState<string | null>(null)
+  const [toastTargetId, setToastTargetId] = useState<string | null>(null)
+  useTargetBounce()
+
+  // Listen for connection-confirmed to trigger feedback
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent).detail as { targetId: string }
+      setPulseTargetId(detail.targetId)
+      setToastTargetId(detail.targetId)
+    }
+    window.addEventListener('connection-confirmed', handler)
+    return () => window.removeEventListener('connection-confirmed', handler)
+  }, [])
+
+  // Auto-clear pulse after 450ms
+  useEffect(() => {
+    if (!pulseTargetId) return
+    const timer = setTimeout(() => setPulseTargetId(null), 450)
+    return () => clearTimeout(timer)
+  }, [pulseTargetId])
+
+  // Auto-clear toast after 2s
+  useEffect(() => {
+    if (!toastTargetId) return
+    const timer = setTimeout(() => setToastTargetId(null), 2000)
+    return () => clearTimeout(timer)
+  }, [toastTargetId])
 
   useEffect(() => {
     initializeAttachmentStore()
@@ -188,7 +222,24 @@ export default function IndicatorAttachmentPage() {
     return () => window.removeEventListener('keydown', handler, true)
   }, [state.isConnecting, start])
 
+  const allIndicators = useAttachmentStore(useShallow((s) => s.indicators))
   const pendingIndicators = useAttachmentStore(useShallow(selectPendingIndicators))
+
+  const persistentConnections = useMemo(() => {
+    const result: { sourceId: string; targetId: string }[] = []
+    for (const ind of allIndicators) {
+      if (ind.treeParentId) {
+        result.push({ sourceId: ind.id, targetId: ind.treeParentId })
+      }
+      for (const tagId of ind.tagIds) {
+        result.push({ sourceId: ind.id, targetId: tagId })
+      }
+      for (const ruleId of ind.ruleIds) {
+        result.push({ sourceId: ind.id, targetId: ruleId })
+      }
+    }
+    return result
+  }, [allIndicators])
 
   const indicatorsWithClick = pendingIndicators.map((ind) => ({
     ...ind,
@@ -340,7 +391,10 @@ export default function IndicatorAttachmentPage() {
         targetType={state.targetType}
       />
 
-      {/* SVG connection layer */}
+      {/* Persistent solid connection lines */}
+      <PersistentConnectionLayer connections={persistentConnections} />
+
+      {/* SVG connection layer (active dashed line during connection mode) */}
       {state.isConnecting && state.sourceId && (
         <ConnectionLayer
           sourceId={state.sourceId}
@@ -359,6 +413,10 @@ export default function IndicatorAttachmentPage() {
           }}
         />
       )}
+
+      {/* Feedback animations */}
+      {pulseTargetId && <PulseRing targetId={pulseTargetId} />}
+      {toastTargetId && <MiniToast targetId={toastTargetId} message="✓ 指标已挂靠" />}
     </div>
   )
 }

@@ -34,24 +34,19 @@ export default function ConnectionLayer({
     }
 
     const updateLine = () => {
-      const sourceEl = document.querySelector(`[data-indicator-id="${sourceId}"]`) as HTMLElement | null
-      if (!sourceEl || !pathRef.current) {
-        rafRef.current = requestAnimationFrame(updateLine)
-        return
+      if (pathRef.current) {
+        const sourceEl = document.querySelector(`[data-indicator-id="${sourceId}"]`) as HTMLElement | null
+        if (sourceEl) {
+          const start = getElementCenter(sourceEl)
+          const viewport = getViewportRect()
+          if (isInViewport(start, viewport)) {
+            const end = mouseRef.current
+            pathRef.current.setAttribute('d', createOptimizedPathD(start, end))
+          } else {
+            pathRef.current.setAttribute('d', '')
+          }
+        }
       }
-
-      const start = getElementCenter(sourceEl)
-
-      // Viewport clipping: skip rendering when source is completely off-screen
-      const viewport = getViewportRect()
-      if (!isInViewport(start, viewport)) {
-        pathRef.current?.setAttribute('d', '')
-        rafRef.current = requestAnimationFrame(updateLine)
-        return
-      }
-
-      const end = mouseRef.current
-      pathRef.current.setAttribute('d', createOptimizedPathD(start, end))
       rafRef.current = requestAnimationFrame(updateLine)
     }
 
@@ -104,6 +99,7 @@ export default function ConnectionLayer({
           <polygon points="0 0, 8 3, 0 6" fill="var(--dark-conn-line-valid)" />
         </marker>
       </defs>
+
       <ConnectionLine
         pathRef={pathRef}
         isValidHover={isValidHover}

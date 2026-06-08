@@ -126,6 +126,32 @@
   animation: ant-line 0.5s linear infinite;
 }
 
+/* Target bounce animation on successful attachment */
+@keyframes target-bounce {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+}
+
+.animate-target-bounce {
+  animation: target-bounce 200ms ease-in-out;
+}
+
+/* Pulse ring animation for connection confirmation feedback */
+@keyframes pulse-ring-scale {
+  from {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  to {
+    transform: scale(1.4);
+    opacity: 0;
+  }
+}
+
+.animate-pulse-ring {
+  animation: pulse-ring-scale 400ms ease-out forwards;
+}
+
 /* Focus mode dimming: non-target panels are desaturated and darkened */
 [data-dim-mode="true"] [data-focus-zone] {
   filter: saturate(0.3) brightness(0.6);

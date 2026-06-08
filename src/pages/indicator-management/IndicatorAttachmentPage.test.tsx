@@ -523,6 +523,116 @@ describe('IndicatorAttachmentPage', () => {
       const root = screen.getByTestId('indicator-attachment-page')
       expect(root).not.toHaveAttribute('data-dim-mode')
     })
+  })
 
+  describe('persistent connection layer', () => {
+    it('renders persistent connection layer when indicators have attachments', () => {
+      render(<IndicatorAttachmentPage />)
+
+      expect(screen.getByTestId('persistent-connection-layer')).toBeInTheDocument()
+    })
+
+    it('renders persistent connection lines for tree-parent attachments', () => {
+      render(<IndicatorAttachmentPage />)
+
+      const lines = screen.getAllByTestId('persistent-connection-line')
+      expect(lines.length).toBeGreaterThanOrEqual(1)
+    })
+  })
+
+  describe('feedback on successful attachment', () => {
+    function createFeedbackTarget(id: string) {
+      const el = document.createElement('div')
+      el.classList.add('test-cleanup')
+      el.setAttribute('data-node-id', id)
+      el.style.position = 'absolute'
+      el.style.left = '100px'
+      el.style.top = '100px'
+      el.style.width = '50px'
+      el.style.height = '50px'
+      document.body.appendChild(el)
+      return el
+    }
+
+    it('shows pulse ring when connection-confirmed event is dispatched', () => {
+      createFeedbackTarget('feedback-tree-1')
+      render(<IndicatorAttachmentPage />)
+
+      act(() => {
+        window.dispatchEvent(
+          new CustomEvent('connection-confirmed', {
+            detail: { sourceId: 'src-1', targetId: 'feedback-tree-1', targetType: 'tree' },
+          }),
+        )
+      })
+
+      expect(screen.getByTestId('pulse-ring')).toBeInTheDocument()
+    })
+
+    it('shows mini toast when connection-confirmed event is dispatched', () => {
+      createFeedbackTarget('feedback-tree-2')
+      render(<IndicatorAttachmentPage />)
+
+      act(() => {
+        window.dispatchEvent(
+          new CustomEvent('connection-confirmed', {
+            detail: { sourceId: 'src-1', targetId: 'feedback-tree-2', targetType: 'tree' },
+          }),
+        )
+      })
+
+      expect(screen.getByTestId('mini-toast')).toBeInTheDocument()
+      expect(screen.getByText('✓ 指标已挂靠')).toBeInTheDocument()
+    })
+
+    it('auto-removes pulse ring after 450ms', () => {
+      vi.useFakeTimers({ shouldAdvanceTime: true })
+      createFeedbackTarget('feedback-tree-3')
+
+      render(<IndicatorAttachmentPage />)
+
+      act(() => {
+        window.dispatchEvent(
+          new CustomEvent('connection-confirmed', {
+            detail: { sourceId: 'src-1', targetId: 'feedback-tree-3', targetType: 'tree' },
+          }),
+        )
+      })
+
+      expect(screen.getByTestId('pulse-ring')).toBeInTheDocument()
+
+      act(() => {
+        vi.advanceTimersByTime(500)
+      })
+
+      expect(screen.queryByTestId('pulse-ring')).not.toBeInTheDocument()
+
+      vi.useRealTimers()
+    })
+
+    it('auto-removes mini toast after 2 seconds', () => {
+      vi.useFakeTimers({ shouldAdvanceTime: true })
+      createFeedbackTarget('feedback-tree-4')
+
+      render(<IndicatorAttachmentPage />)
+
+      act(() => {
+        window.dispatchEvent(
+          new CustomEvent('connection-confirmed', {
+            detail: { sourceId: 'src-1', targetId: 'feedback-tree-4', targetType: 'tree' },
+          }),
+        )
+      })
+
+      expect(screen.getByTestId('mini-toast')).toBeInTheDocument()
+
+      act(() => {
+        vi.advanceTimersByTime(2100)
+      })
+
+      expect(screen.queryByTestId('mini-toast')).not.toBeInTheDocument()
+
+      vi.useRealTimers()
+    })
   })
 })
