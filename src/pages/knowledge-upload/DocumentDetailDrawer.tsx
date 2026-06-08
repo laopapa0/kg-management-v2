@@ -6,6 +6,7 @@ import {
   SheetDescription,
 } from '@/components/ui/sheet';
 import { getKnowledgeBaseById } from '@/utils/knowledgeBaseStorage';
+import CommentThread from '@/components/report/CommentThread';
 import {
   DOCUMENT_STATUS_LABEL,
   type KnowledgeDocument,
@@ -156,6 +157,9 @@ export default function DocumentDetailDrawer({
               </div>
             </div>
           )}
+        </div>
+        <div className="mt-4 border-t border-dark-border pt-4">
+          <CommentThread targetId={doc.id} targetType="knowledge" />
         </div>
       </SheetContent>
     </Sheet>
