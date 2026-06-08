@@ -399,6 +399,10 @@ export default function IndicatorAttachmentPage() {
       <PersistentConnectionLayer
         connections={persistentConnections}
         onDelete={deleteConnection}
+        requiresConfirm={(conn) => {
+          const indicator = allIndicators.find((i) => i.id === conn.sourceId)
+          return indicator?.ruleIds.includes(conn.targetId) ?? false
+        }}
       />
 
       {/* SVG connection layer (active dashed line during connection mode) */}

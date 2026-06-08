@@ -4,6 +4,8 @@ import TreeView, { type TreeNode } from '@/components/tree/TreeView'
 import EmptyState from '@/components/empty-state/EmptyState'
 import RuleSummaryBadge from '@/components/rule/RuleSummaryBadge'
 import TreeSearchInput from '@/components/search/TreeSearchInput'
+import AttachedBadge from '@/components/connection/AttachedBadge'
+import BatchDetachMenu from '@/components/connection/BatchDetachMenu'
 import { useAttachmentStore } from '@/stores/attachmentStore'
 import type { Rule, RuleParameter } from '@/models/indicatorAttachmentModel'
 import { buildRuleTree } from '@/models/indicatorAttachmentModel'
@@ -98,6 +100,18 @@ export default function RulePanel() {
     return map
   }, [indicators])
 
+  const attachedIndicatorsByRule = useMemo(() => {
+    const map = new Map<string, { id: string; name: string }[]>()
+    for (const indicator of indicators) {
+      for (const ruleId of indicator.ruleIds) {
+        const list = map.get(ruleId) ?? []
+        list.push({ id: indicator.id, name: indicator.name })
+        map.set(ruleId, list)
+      }
+    }
+    return map
+  }, [indicators])
+
   const parametersByRule = useMemo(() => {
     const map = new Map<string, RuleParameter[]>()
     for (const param of ruleParameters) {
@@ -166,45 +180,72 @@ export default function RulePanel() {
           nodes={rootNodes}
           expanded={expanded}
           onExpandedChange={setUserExpanded}
-          renderNode={(node) => {
+          renderNode={(node, { isHovered }) => {
             const fullRule = nodeMap.get(node.id)
             if (!fullRule) return null
 
             const count = attachedCountByRule.get(fullRule.id) ?? 0
             const params = parametersByRule.get(fullRule.id) ?? []
+            const attachedList = attachedIndicatorsByRule.get(fullRule.id) ?? []
             const isDimmed =
               isSearchActive &&
               !matchedIds.has(fullRule.id) &&
               !ancestorIds.has(fullRule.id)
 
             return (
-              <div
-                data-testid={`rule-row-${fullRule.id}`}
-                data-rule-id={fullRule.id}
-                data-dimmed={isDimmed || undefined}
-                className={[
-                  'flex items-center justify-between gap-2 transition-opacity duration-200',
-                  isDimmed ? 'opacity-[0.35]' : 'opacity-100',
-                ].join(' ')}
+              <BatchDetachMenu
+                onViewAttached={() => {}}
+                detachOptions={
+                  count > 0
+                    ? [
+                        {
+                          label: '移除所有规则挂靠',
+                          count,
+                          onConfirm: () => handleDetachAllFromRule(fullRule.id),
+                        },
+                      ]
+                    : []
+                }
               >
-                <span className="truncate text-sm text-dark-text-primary">
-                  {fullRule.name}
-                </span>
-                <div className="flex shrink-0 items-center gap-1.5">
-                  <RuleSummaryBadge rule={fullRule} parameters={params} />
-                  <span
-                    data-testid={`rule-count-${fullRule.id}`}
-                    className={[
-                      'inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-[10px] font-semibold',
-                      count > 0
-                        ? 'bg-[#3B82F6]/15 text-[#4DA6FF]'
-                        : 'bg-dark-card-l2 text-dark-text-tertiary',
-                    ].join(' ')}
-                  >
-                    {count}
+                <div
+                  data-testid={`rule-row-${fullRule.id}`}
+                  data-rule-id={fullRule.id}
+                  data-dimmed={isDimmed || undefined}
+                  className={[
+                    'flex items-center justify-between gap-2 transition-opacity duration-200',
+                    isDimmed ? 'opacity-[0.35]' : 'opacity-100',
+                  ].join(' ')}
+                >
+                  <span className="truncate text-sm text-dark-text-primary">
+                    {fullRule.name}
                   </span>
+                  <div className="flex shrink-0 items-center gap-1.5">
+                    <RuleSummaryBadge rule={fullRule} parameters={params} />
+                    {isHovered && count > 0 ? (
+                      <AttachedBadge
+                        count={count}
+                        indicators={attachedList}
+                        onDeleteOne={(indicatorId) =>
+                          handleDetachOneFromRule(fullRule.id, indicatorId)
+                        }
+                        onDeleteAll={() => handleDetachAllFromRule(fullRule.id)}
+                      />
+                    ) : (
+                      <span
+                        data-testid={`rule-count-${fullRule.id}`}
+                        className={[
+                          'inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-[10px] font-semibold',
+                          count > 0
+                            ? 'bg-[#3B82F6]/15 text-[#4DA6FF]'
+                            : 'bg-dark-card-l2 text-dark-text-tertiary',
+                        ].join(' ')}
+                      >
+                        {count}
+                      </span>
+                    )}
+                  </div>
                 </div>
-              </div>
+              </BatchDetachMenu>
             )
           }}
         />

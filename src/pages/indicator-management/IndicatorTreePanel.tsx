@@ -8,6 +8,8 @@ import EmptyState from '@/components/empty-state/EmptyState'
 import AddTreeNodeDialog from '@/components/dialog/AddTreeNodeDialog'
 import DeleteTreeNodeWarningDialog from '@/components/dialog/DeleteTreeNodeWarningDialog'
 import DeleteTreeNodeSpecialDialog from '@/components/dialog/DeleteTreeNodeSpecialDialog'
+import AttachedBadge from '@/components/connection/AttachedBadge'
+import BatchDetachMenu from '@/components/connection/BatchDetachMenu'
 import { useAttachmentStore } from '@/stores/attachmentStore'
 import type { IndicatorAttachment } from '@/models/indicatorAttachmentModel'
 import { buildIndicatorTree, type IndicatorTreeNode } from '@/utils/attachmentTree'
@@ -70,6 +72,18 @@ const IndicatorTreePanel = forwardRef<IndicatorTreePanelRef>(function IndicatorT
   const [highlightedId, setHighlightedId] = useState<string | null>(null)
 
   const existingNames = useMemo(() => indicators.map((i) => i.name), [indicators])
+
+  const attachedIndicatorsByTreeNode = useMemo(() => {
+    const map = new Map<string, { id: string; name: string }[]>()
+    for (const indicator of indicators) {
+      if (indicator.treeParentId) {
+        const list = map.get(indicator.treeParentId) ?? []
+        list.push({ id: indicator.id, name: indicator.name })
+        map.set(indicator.treeParentId, list)
+      }
+    }
+    return map
+  }, [indicators])
 
   useImperativeHandle(ref, () => ({
     openAddDialog: () => setDialogOpen(true),
@@ -208,43 +222,90 @@ const IndicatorTreePanel = forwardRef<IndicatorTreePanelRef>(function IndicatorT
           renderNode={(node, { isSelected, isHovered }) => {
             const isEditing = editingId === node.id
             const isHighlighted = highlightedId === node.id
+            const attachedList = attachedIndicatorsByTreeNode.get(node.id) ?? []
+            const attachedCount = attachedList.length
 
             return (
-              <motion.div
-                data-testid={`indicator-tree-node-content-${node.id}`}
-                className="flex flex-col justify-center"
-                animate={isHighlighted ? { backgroundColor: ['rgba(219, 234, 254, 0)', 'rgba(219, 234, 254, 1)', 'rgba(219, 234, 254, 0)'] } : {}}
-                transition={{ duration: 0.5, ease: 'easeOut' }}
+              <BatchDetachMenu
+                onViewAttached={() => {}}
+                detachOptions={
+                  attachedCount > 0
+                    ? [
+                        {
+                          label: '移除所有挂靠',
+                          count: attachedCount,
+                          onConfirm: () => {
+                            setIndicators(
+                              indicators.map((i) =>
+                                i.treeParentId === node.id
+                                  ? { ...i, treeParentId: undefined }
+                                  : i,
+                              ),
+                            )
+                          },
+                        },
+                      ]
+                    : []
+                }
               >
-                {isEditing ? (
-                  <TreeNodeInlineEdit
-                    initialName={node.indicator.name}
-                    existingNames={existingNames}
-                    onSave={(name) => handleEditSave(node.id, name)}
-                    onCancel={handleEditCancel}
-                  />
-                ) : (
-                  <>
-                    <span
-                      className={[
-                        'text-body leading-tight',
-                        isSelected ? 'font-medium text-dark-text-primary' : 'text-dark-text-primary',
-                        isHovered && !isSelected ? 'text-dark-text-primary' : '',
-                      ].join(' ')}
-                    >
-                      {node.indicator.name}
-                    </span>
-                    <span
-                      className={[
-                        'text-caption font-mono leading-tight',
-                        isSelected ? 'text-dark-text-secondary' : 'text-dark-text-tertiary',
-                      ].join(' ')}
-                    >
-                      {node.indicator.code}
-                    </span>
-                  </>
-                )}
-              </motion.div>
+                <motion.div
+                  data-testid={`indicator-tree-node-content-${node.id}`}
+                  className="flex flex-col justify-center"
+                  animate={isHighlighted ? { backgroundColor: ['rgba(219, 234, 254, 0)', 'rgba(219, 234, 254, 1)', 'rgba(219, 234, 254, 0)'] } : {}}
+                  transition={{ duration: 0.5, ease: 'easeOut' }}
+                >
+                  {isEditing ? (
+                    <TreeNodeInlineEdit
+                      initialName={node.indicator.name}
+                      existingNames={existingNames}
+                      onSave={(name) => handleEditSave(node.id, name)}
+                      onCancel={handleEditCancel}
+                    />
+                  ) : (
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex flex-col justify-center">
+                        <span
+                          className={[
+                            'text-body leading-tight',
+                            isSelected ? 'font-medium text-dark-text-primary' : 'text-dark-text-primary',
+                            isHovered && !isSelected ? 'text-dark-text-primary' : '',
+                          ].join(' ')}
+                        >
+                          {node.indicator.name}
+                        </span>
+                        <span
+                          className={[
+                            'text-caption font-mono leading-tight',
+                            isSelected ? 'text-dark-text-secondary' : 'text-dark-text-tertiary',
+                          ].join(' ')}
+                        >
+                          {node.indicator.code}
+                        </span>
+                      </div>
+                      {isHovered && attachedCount > 0 ? (
+                        <AttachedBadge
+                          count={attachedCount}
+                          indicators={attachedList}
+                          onDeleteOne={(indicatorId) => {
+                            setIndicators(
+                              indicators.map((i) =>
+                                i.id === indicatorId ? { ...i, treeParentId: undefined } : i,
+                              ),
+                            )
+                          }}
+                          onDeleteAll={() => {
+                            setIndicators(
+                              indicators.map((i) =>
+                                i.treeParentId === node.id ? { ...i, treeParentId: undefined } : i,
+                              ),
+                            )
+                          }}
+                        />
+                      ) : null}
+                    </div>
+                  )}
+                </motion.div>
+              </BatchDetachMenu>
             )
           }}
           initialExpanded={initialExpandedIds}

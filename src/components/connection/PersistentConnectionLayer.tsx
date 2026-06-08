@@ -3,6 +3,7 @@ import { getElementCenter } from '@/utils/connectionGeometry'
 import { createOptimizedPathD } from '@/utils/connectionRenderer'
 import type { Point } from '@/utils/connectionRenderer'
 import DeleteConnectionButton from './DeleteConnectionButton'
+import InlineConfirmButton from './InlineConfirmButton'
 
 export interface PersistentConnection {
   sourceId: string
@@ -12,15 +13,18 @@ export interface PersistentConnection {
 interface PersistentConnectionLayerProps {
   connections: PersistentConnection[]
   onDelete?: (connection: PersistentConnection) => void
+  requiresConfirm?: (connection: PersistentConnection) => boolean
 }
 
 export default function PersistentConnectionLayer({
   connections,
   onDelete,
+  requiresConfirm,
 }: PersistentConnectionLayerProps) {
   const pathMapRef = useRef(new Map<string, SVGPathElement>())
   const coordsMapRef = useRef(new Map<string, { start: Point; end: Point }>())
   const [hoveredKey, setHoveredKey] = useState<string | null>(null)
+  const [confirmingKey, setConfirmingKey] = useState<string | null>(null)
 
   useEffect(() => {
     if (connections.length === 0) return
@@ -60,18 +64,21 @@ export default function PersistentConnectionLayer({
     }
   }, [connections])
 
-  const hoveredConnection = useMemo(() => {
-    if (!hoveredKey) return null
-    const [sourceId, targetId] = hoveredKey.split('::')
-    const coords = coordsMapRef.current.get(hoveredKey)
+  const activeKey = confirmingKey ?? hoveredKey
+
+  const activeConnection = useMemo(() => {
+    if (!activeKey) return null
+    const [sourceId, targetId] = activeKey.split('::')
+    const coords = coordsMapRef.current.get(activeKey)
     if (!coords || !sourceId || !targetId) return null
     return {
       sourceId,
       targetId,
       midX: (coords.start.x + coords.end.x) / 2,
       midY: (coords.start.y + coords.end.y) / 2,
+      needsConfirm: requiresConfirm?.({ sourceId, targetId }) ?? false,
     }
-  }, [hoveredKey])
+  }, [activeKey, requiresConfirm])
 
   const handlePathEnter = (conn: PersistentConnection) => {
     setHoveredKey(`${conn.sourceId}::${conn.targetId}`)
@@ -82,8 +89,16 @@ export default function PersistentConnectionLayer({
   }
 
   const handleDelete = () => {
-    if (!hoveredConnection || !onDelete) return
-    onDelete({ sourceId: hoveredConnection.sourceId, targetId: hoveredConnection.targetId })
+    if (!activeConnection || !onDelete) return
+    onDelete({ sourceId: activeConnection.sourceId, targetId: activeConnection.targetId })
+    setConfirmingKey(null)
+    setHoveredKey(null)
+  }
+
+  const handleInlineConfirm = () => {
+    if (!activeConnection || !onDelete) return
+    onDelete({ sourceId: activeConnection.sourceId, targetId: activeConnection.targetId })
+    setConfirmingKey(null)
     setHoveredKey(null)
   }
 
@@ -98,7 +113,7 @@ export default function PersistentConnectionLayer({
       >
         {connections.map((conn) => {
           const key = `${conn.sourceId}::${conn.targetId}`
-          const isHovered = hoveredKey === key
+          const isHovered = hoveredKey === key || confirmingKey === key
           return (
             <path
               key={key}
@@ -119,13 +134,36 @@ export default function PersistentConnectionLayer({
         })}
       </svg>
 
-      {hoveredConnection && (
-        <DeleteConnectionButton
-          x={hoveredConnection.midX}
-          y={hoveredConnection.midY}
-          visible
-          onClick={handleDelete}
-        />
+      {activeConnection && (
+        <div
+          style={{
+            position: 'fixed',
+            left: activeConnection.midX - 10,
+            top: activeConnection.midY - 10,
+            zIndex: 50,
+          }}
+        >
+          {activeConnection.needsConfirm ? (
+            <InlineConfirmButton
+              onConfirm={handleInlineConfirm}
+              confirmText="确认删除？"
+              onConfirmingChange={(isConfirming) => {
+                if (isConfirming) {
+                  setConfirmingKey(activeKey)
+                } else {
+                  setConfirmingKey(null)
+                }
+              }}
+            />
+          ) : (
+            <DeleteConnectionButton
+              x={activeConnection.midX}
+              y={activeConnection.midY}
+              visible
+              onClick={handleDelete}
+            />
+          )}
+        </div>
       )}
     </>
   )

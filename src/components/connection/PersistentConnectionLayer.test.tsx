@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { render, screen, cleanup, fireEvent } from '@testing-library/react'
+import { render, screen, cleanup, fireEvent, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import PersistentConnectionLayer from './PersistentConnectionLayer'
 
 describe('PersistentConnectionLayer', () => {
@@ -314,6 +315,122 @@ describe('PersistentConnectionLayer', () => {
 
       const path = screen.getByTestId('persistent-connection-line')
       expect(path).toHaveStyle({ pointerEvents: 'stroke' })
+    })
+  })
+
+  describe('inline confirm for rule connections', () => {
+    function setupRuleConnectionElements() {
+      const sourceEl = document.createElement('div')
+      sourceEl.classList.add('test-cleanup')
+      sourceEl.setAttribute('data-indicator-id', 'src-1')
+      sourceEl.style.position = 'absolute'
+      sourceEl.style.left = '0px'
+      sourceEl.style.top = '0px'
+      sourceEl.style.width = '10px'
+      sourceEl.style.height = '10px'
+      document.body.appendChild(sourceEl)
+
+      sourceEl.getBoundingClientRect = vi.fn(() => ({
+        x: 0, y: 0, width: 10, height: 10,
+        top: 0, left: 0, right: 10, bottom: 10, toJSON: () => '',
+      }))
+
+      const targetEl = document.createElement('div')
+      targetEl.classList.add('test-cleanup')
+      targetEl.setAttribute('data-rule-id', 'rule-1')
+      targetEl.style.position = 'absolute'
+      targetEl.style.left = '100px'
+      targetEl.style.top = '100px'
+      targetEl.style.width = '10px'
+      targetEl.style.height = '10px'
+      document.body.appendChild(targetEl)
+
+      targetEl.getBoundingClientRect = vi.fn(() => ({
+        x: 100, y: 100, width: 10, height: 10,
+        top: 100, left: 100, right: 110, bottom: 110, toJSON: () => '',
+      }))
+
+      return { sourceEl, targetEl }
+    }
+
+    it('shows InlineConfirmButton for rule connections when requiresConfirm returns true', () => {
+      setupRuleConnectionElements()
+      render(
+        <PersistentConnectionLayer
+          connections={[{ sourceId: 'src-1', targetId: 'rule-1' }]}
+          requiresConfirm={() => true}
+        />,
+      )
+
+      const path = screen.getByTestId('persistent-connection-line')
+      fireEvent.mouseEnter(path)
+
+      expect(screen.getByTestId('inline-confirm-button')).toBeInTheDocument()
+      expect(screen.queryByTestId('delete-connection-button')).not.toBeInTheDocument()
+    })
+
+    it('shows regular DeleteConnectionButton for non-rule connections', () => {
+      setupRuleConnectionElements()
+      render(
+        <PersistentConnectionLayer
+          connections={[{ sourceId: 'src-1', targetId: 'rule-1' }]}
+          requiresConfirm={() => false}
+        />,
+      )
+
+      const path = screen.getByTestId('persistent-connection-line')
+      fireEvent.mouseEnter(path)
+
+      expect(screen.getByTestId('delete-connection-button')).toBeInTheDocument()
+      expect(screen.queryByTestId('inline-confirm-button')).not.toBeInTheDocument()
+    })
+
+    it('requires two clicks on InlineConfirmButton before calling onDelete', async () => {
+      const onDelete = vi.fn()
+      setupRuleConnectionElements()
+      render(
+        <PersistentConnectionLayer
+          connections={[{ sourceId: 'src-1', targetId: 'rule-1' }]}
+          onDelete={onDelete}
+          requiresConfirm={() => true}
+        />,
+      )
+
+      const path = screen.getByTestId('persistent-connection-line')
+      fireEvent.mouseEnter(path)
+
+      const button = screen.getByTestId('inline-confirm-button')
+      await userEvent.click(button) // first click → confirming
+
+      expect(button).toHaveTextContent('确认删除？')
+      expect(onDelete).not.toHaveBeenCalled()
+
+      await userEvent.click(button) // second click → confirm
+      expect(onDelete).toHaveBeenCalledTimes(1)
+      expect(onDelete).toHaveBeenCalledWith({ sourceId: 'src-1', targetId: 'rule-1' })
+    })
+
+    it('keeps delete button visible when in confirming state even if mouse leaves', async () => {
+      setupRuleConnectionElements()
+      render(
+        <PersistentConnectionLayer
+          connections={[{ sourceId: 'src-1', targetId: 'rule-1' }]}
+          requiresConfirm={() => true}
+        />,
+      )
+
+      const path = screen.getByTestId('persistent-connection-line')
+      fireEvent.mouseEnter(path)
+
+      const button = screen.getByTestId('inline-confirm-button')
+      await userEvent.click(button) // enter confirming state
+
+      fireEvent.mouseLeave(path)
+
+      // Button should still be visible because we're in confirming state
+      await waitFor(() => {
+        expect(screen.queryByTestId('inline-confirm-button')).toBeInTheDocument()
+      })
     })
   })
 })

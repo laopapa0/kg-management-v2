@@ -8,6 +8,8 @@ import { buildTagTree } from '@/models/indicatorAttachmentModel'
 import { walkNodes } from '@/utils/attachmentTree'
 import TagCloud from '@/components/tag/TagCloud'
 import TagPill from '@/components/tag/TagPill'
+import AttachedBadge from '@/components/connection/AttachedBadge'
+import BatchDetachMenu from '@/components/connection/BatchDetachMenu'
 import TreeSearchInput from '@/components/search/TreeSearchInput'
 import { toggle, computeState, clear } from '@/components/tree/CascadingStateEngine'
 
@@ -69,6 +71,7 @@ export default function TagSetPanel() {
   const tagNodes = useAttachmentStore((state) => state.tagNodes)
   const indicators = useAttachmentStore((state) => state.indicators)
   const setTagNodes = useAttachmentStore((state) => state.setTagNodes)
+  const setIndicators = useAttachmentStore((state) => state.setIndicators)
 
   const tree = useMemo(() => buildTagTree(tagNodes), [tagNodes])
 
@@ -140,6 +143,40 @@ export default function TagSetPanel() {
     [tagNodes, setTagNodes],
   )
 
+  const attachedIndicatorsByTag = useMemo(() => {
+    const map = new Map<string, { id: string; name: string }[]>()
+    for (const indicator of indicators) {
+      for (const tagId of indicator.tagIds) {
+        const list = map.get(tagId) ?? []
+        list.push({ id: indicator.id, name: indicator.name })
+        map.set(tagId, list)
+      }
+    }
+    return map
+  }, [indicators])
+
+  const handleDetachAllFromTag = useCallback(
+    (tagId: string) => {
+      setIndicators(
+        indicators.map((i) =>
+          i.tagIds.includes(tagId) ? { ...i, tagIds: i.tagIds.filter((id) => id !== tagId) } : i,
+        ),
+      )
+    },
+    [indicators, setIndicators],
+  )
+
+  const handleDetachOneFromTag = useCallback(
+    (tagId: string, indicatorId: string) => {
+      setIndicators(
+        indicators.map((i) =>
+          i.id === indicatorId ? { ...i, tagIds: i.tagIds.filter((id) => id !== tagId) } : i,
+        ),
+      )
+    },
+    [indicators, setIndicators],
+  )
+
   const nodeMap = useMemo(() => {
     const map = new Map<string, TagNode>()
     walkNodes(tree, (node) => {
@@ -203,34 +240,95 @@ export default function TagSetPanel() {
         nodes={rootNodes}
         expanded={expanded}
         onExpandedChange={setUserExpanded}
-        renderNode={(node) => {
+        renderNode={(node, { isHovered }) => {
           const fullNode = nodeMap.get(node.id)
           if (!fullNode) return null
           const matchCount = matchCounts.get(fullNode.id)
           const isDimmed = debouncedTerm
             ? !matchedIds.has(fullNode.id) && !ancestorIds.has(fullNode.id)
             : false
+
+          const childTagIds = new Set(fullNode.children?.map((c) => c.id) ?? [])
+          const attachedIds = new Set<string>()
+          for (const indicator of indicators) {
+            for (const tagId of indicator.tagIds) {
+              if (childTagIds.has(tagId)) {
+                attachedIds.add(indicator.id)
+                break
+              }
+            }
+          }
+          const attachedCount = attachedIds.size
+          const attachedList = Array.from(attachedIds)
+            .map((id) => indicators.find((i) => i.id === id))
+            .filter(Boolean)
+            .map((i) => ({ id: i!.id, name: i!.name }))
+
           return (
-            <div className="flex items-center gap-2">
-              <TagPill
-                tag={fullNode}
-                selected={selection.selected.has(fullNode.id)}
-                partial={selection.partial.has(fullNode.id)}
-                onClick={() => handleToggle(fullNode.id)}
-                searchTerm={debouncedTerm}
-                dimmed={isDimmed}
-                editable
-                onColorChange={(color) => handleColorChange(fullNode.id, color)}
-              />
-              {debouncedTerm && matchCount ? (
-                <span
-                  data-testid={`tag-match-count-${fullNode.id}`}
-                  className="inline-flex items-center rounded-full border border-[#15417E] bg-[#111B26] px-2 py-0.5 text-xs font-medium text-[#4DA6FF]"
-                >
-                  {matchCount}
-                </span>
-              ) : null}
-            </div>
+            <BatchDetachMenu
+              onViewAttached={() => {}}
+              detachOptions={
+                attachedCount > 0
+                  ? [
+                      {
+                        label: '移除所有标签集挂靠',
+                        count: attachedCount,
+                        onConfirm: () => {
+                          const ids = Array.from(attachedIds)
+                          setIndicators(
+                            indicators.map((i) =>
+                              ids.includes(i.id)
+                                ? { ...i, tagIds: i.tagIds.filter((tid) => !childTagIds.has(tid)) }
+                                : i,
+                            ),
+                          )
+                        },
+                      },
+                    ]
+                  : []
+              }
+            >
+              <div className="flex items-center gap-2">
+                <TagPill
+                  tag={fullNode}
+                  selected={selection.selected.has(fullNode.id)}
+                  partial={selection.partial.has(fullNode.id)}
+                  onClick={() => handleToggle(fullNode.id)}
+                  searchTerm={debouncedTerm}
+                  dimmed={isDimmed}
+                  editable
+                  onColorChange={(color) => handleColorChange(fullNode.id, color)}
+                />
+                {debouncedTerm && matchCount ? (
+                  <span
+                    data-testid={`tag-match-count-${fullNode.id}`}
+                    className="inline-flex items-center rounded-full border border-[#15417E] bg-[#111B26] px-2 py-0.5 text-xs font-medium text-[#4DA6FF]"
+                  >
+                    {matchCount}
+                  </span>
+                ) : null}
+                {isHovered && attachedCount > 0 ? (
+                  <AttachedBadge
+                    count={attachedCount}
+                    indicators={attachedList}
+                    onDeleteOne={(indicatorId) => {
+                      const tagId = indicators.find((i) => i.id === indicatorId)?.tagIds.find((tid) => childTagIds.has(tid))
+                      if (tagId) handleDetachOneFromTag(tagId, indicatorId)
+                    }}
+                    onDeleteAll={() => {
+                      const ids = Array.from(attachedIds)
+                      setIndicators(
+                        indicators.map((i) =>
+                          ids.includes(i.id)
+                            ? { ...i, tagIds: i.tagIds.filter((tid) => !childTagIds.has(tid)) }
+                            : i,
+                        ),
+                      )
+                    }}
+                  />
+                ) : null}
+              </div>
+            </BatchDetachMenu>
           )
         }}
         renderChildren={(node) => {
