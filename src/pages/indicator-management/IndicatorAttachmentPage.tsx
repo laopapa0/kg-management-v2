@@ -422,7 +422,7 @@ export default function IndicatorAttachmentPage() {
           className="absolute left-0 right-0 top-0 z-40 flex items-center justify-center gap-2 bg-dark-accent-primary/90 px-4 py-1.5 text-xs font-medium text-white backdrop-blur-sm"
         >
           <span>连线模式</span>
-          <span className="text-white/70">— 按 Space 确认，ESC 取消</span>
+          <span className="text-white/70">— 点击目录挂靠，右键/ESC 取消</span>
         </div>
       )}
 
@@ -432,7 +432,7 @@ export default function IndicatorAttachmentPage() {
           data-testid="misfire-hint"
           className="absolute bottom-4 left-1/2 z-50 -translate-x-1/2 rounded-full bg-dark-border/80 px-4 py-2 text-xs text-dark-text-secondary backdrop-blur-sm"
         >
-          请将连线拖拽到目标指标后按空格确认
+           点击目录节点即可挂靠，右键取消
         </div>
       )}
 
