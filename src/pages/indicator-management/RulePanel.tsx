@@ -1,5 +1,6 @@
 import { useMemo, useState, useEffect } from 'react'
-import { Scale, Search } from 'lucide-react'
+import { Scale, Search, Settings } from 'lucide-react'
+import ParameterDrawer from './ParameterDrawer'
 import TreeView, { type TreeNode } from '@/components/tree/TreeView'
 import EmptyState from '@/components/empty-state/EmptyState'
 import RuleSummaryBadge from '@/components/rule/RuleSummaryBadge'
@@ -63,6 +64,8 @@ export default function RulePanel() {
 
   const [searchTerm, setSearchTerm] = useState('')
   const [debouncedTerm, setDebouncedTerm] = useState('')
+  const [selectedRuleId, setSelectedRuleId] = useState<string | null>(null)
+  const [drawerOpen, setDrawerOpen] = useState(false)
 
   useEffect(() => {
     const timer = setTimeout(() => setDebouncedTerm(searchTerm), 150)
@@ -219,6 +222,18 @@ export default function RulePanel() {
                     {fullRule.name}
                   </span>
                   <div className="flex shrink-0 items-center gap-1.5">
+                    <button
+                      type="button"
+                      data-testid={`rule-config-btn-${fullRule.id}`}
+                      onClick={() => {
+                        setSelectedRuleId(fullRule.id)
+                        setDrawerOpen(true)
+                      }}
+                      className="rounded p-0.5 text-dark-text-tertiary transition-colors hover:bg-dark-card-l2 hover:text-dark-text-secondary"
+                      title="配置参数"
+                    >
+                      <Settings className="size-3.5" />
+                    </button>
                     <RuleSummaryBadge rule={fullRule} parameters={params} />
                     {isHovered && count > 0 ? (
                       <AttachedBadge
@@ -246,6 +261,17 @@ export default function RulePanel() {
                 </div>
               </BatchDetachMenu>
             )
+          }}
+        />
+      )}
+
+      {selectedRuleId && (
+        <ParameterDrawer
+          ruleId={selectedRuleId}
+          open={drawerOpen}
+          onOpenChange={(open) => {
+            setDrawerOpen(open)
+            if (!open) setSelectedRuleId(null)
           }}
         />
       )}

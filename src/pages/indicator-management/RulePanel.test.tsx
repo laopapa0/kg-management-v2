@@ -5,6 +5,14 @@ import { __resetAttachmentStorageCache } from '@/utils/attachmentStorage'
 import { useAttachmentStore, initializeAttachmentStore } from '@/stores/attachmentStore'
 import RulePanel from './RulePanel'
 
+// vaul uses PointerEvents which are not fully supported in JSDOM
+if (!Element.prototype.setPointerCapture) {
+  Element.prototype.setPointerCapture = vi.fn()
+}
+if (!Element.prototype.releasePointerCapture) {
+  Element.prototype.releasePointerCapture = vi.fn()
+}
+
 describe('RulePanel', () => {
   beforeEach(() => {
     localStorage.clear()
@@ -219,6 +227,61 @@ describe('RulePanel', () => {
       expect(screen.queryByDisplayValue('阈值')).not.toBeInTheDocument()
 
       vi.useRealTimers()
+    })
+  })
+
+  describe('parameter drawer', () => {
+    it('opens parameter drawer when config icon is clicked', async () => {
+      const user = userEvent.setup()
+      initializeAttachmentStore()
+
+      const state = useAttachmentStore.getState()
+      const firstRule = state.rules[0]
+
+      render(<RulePanel />)
+
+      const configBtn = screen.getByTestId(`rule-config-btn-${firstRule.id}`)
+      await user.click(configBtn)
+
+      expect(screen.getByTestId('parameter-drawer-content')).toBeInTheDocument()
+    })
+
+    it('shows correct rule name in drawer header', async () => {
+      const user = userEvent.setup()
+      initializeAttachmentStore()
+
+      const state = useAttachmentStore.getState()
+      const firstRule = state.rules[0]
+
+      render(<RulePanel />)
+
+      const configBtn = screen.getByTestId(`rule-config-btn-${firstRule.id}`)
+      await user.click(configBtn)
+
+      const header = screen.getByTestId('drawer-header')
+      expect(header).toHaveTextContent(firstRule.name)
+    })
+
+    it('closes drawer and removes it from DOM', async () => {
+      const user = userEvent.setup()
+      initializeAttachmentStore()
+
+      const state = useAttachmentStore.getState()
+      const firstRule = state.rules[0]
+
+      render(<RulePanel />)
+
+      const configBtn = screen.getByTestId(`rule-config-btn-${firstRule.id}`)
+      await user.click(configBtn)
+
+      expect(screen.getByTestId('parameter-drawer-content')).toBeInTheDocument()
+
+      const closeBtn = screen.getByTestId('drawer-close-btn')
+      await user.click(closeBtn)
+
+      await waitFor(() => {
+        expect(screen.queryByTestId('parameter-drawer-content')).not.toBeInTheDocument()
+      })
     })
   })
 })
