@@ -124,20 +124,26 @@ describe('KnowledgeUploadPage', () => {
     expect(screen.getByRole('tab', { name: /我的文档/ })).toBeInTheDocument();
   });
 
-  it('默认激活「上传新文档」Tab', () => {
+  it('does not mention NOC audit in subtitle', () => {
+    renderPage();
+    expect(screen.queryByText(/NOC 审核/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/提交审核/)).not.toBeInTheDocument();
+  });
+
+  it('default active tab is 上传新文档', () => {
     renderPage();
     const activeTab = screen.getByRole('tab', { name: /上传新文档/ });
     expect(activeTab).toHaveAttribute('data-state', 'active');
   });
 
-  it('默认业务知识库已选中', () => {
+  it('default business knowledge base is selected', () => {
     renderPage();
     const checkbox = screen.getByTestId('default-kb-checkbox');
     expect(checkbox).toBeChecked();
     expect(checkbox).toBeDisabled();
   });
 
-  it('可选择额外专业知识库', () => {
+  it('can select extra professional knowledge base', () => {
     renderPage();
     const select = screen.getByLabelText(/额外知识库/);
     expect(select).toBeInTheDocument();
@@ -187,7 +193,7 @@ describe('KnowledgeUploadPage', () => {
     });
   });
 
-  /* ─── #45 预览块 + 提交审核 ─── */
+  /* ─── #45 预览块 + 提交保存 ─── */
 
   it('clicking "预览块" generates and shows first 5 chunks', async () => {
     renderPage();
@@ -210,7 +216,7 @@ describe('KnowledgeUploadPage', () => {
     expect(mockDocumentChunker).toHaveBeenCalled();
   });
 
-  it('clicking "预览并发送审核" creates pending document', async () => {
+  it('clicking "保存到知识库" creates pending document', async () => {
     renderPage();
     uploadFile('test.pdf', 1000, 'application/pdf');
 
@@ -219,7 +225,7 @@ describe('KnowledgeUploadPage', () => {
     });
 
     fireEvent.click(
-      screen.getByRole('button', { name: /预览并发送审核/ }),
+      screen.getByRole('button', { name: /保存到知识库/ }),
     );
 
     await waitFor(() => {
@@ -232,6 +238,24 @@ describe('KnowledgeUploadPage', () => {
         }),
       );
     });
+  });
+
+  it('shows success dialog without NOC audit mention after save', async () => {
+    renderPage();
+    uploadFile('test.pdf', 1000, 'application/pdf');
+
+    await waitFor(() => {
+      expect(screen.getByText('test.pdf')).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: /保存到知识库/ }));
+
+    await waitFor(() => {
+      expect(screen.getByText(/保存成功/)).toBeInTheDocument();
+    });
+
+    expect(screen.queryByText(/NOC 审核/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/提交审核/)).not.toBeInTheDocument();
   });
 
   it('shows error when chunk count exceeds 100', async () => {
@@ -250,7 +274,7 @@ describe('KnowledgeUploadPage', () => {
     });
 
     fireEvent.click(
-      screen.getByRole('button', { name: /预览并发送审核/ }),
+      screen.getByRole('button', { name: /保存到知识库/ }),
     );
 
     await waitFor(() => {
@@ -275,7 +299,7 @@ describe('KnowledgeUploadPage', () => {
     });
 
     fireEvent.click(
-      screen.getByRole('button', { name: /预览并发送审核/ }),
+      screen.getByRole('button', { name: /保存到知识库/ }),
     );
 
     await waitFor(() => {
@@ -283,5 +307,4 @@ describe('KnowledgeUploadPage', () => {
     });
     expect(mockCreateKnowledgeDocument).not.toHaveBeenCalled();
   });
-
-});
+})

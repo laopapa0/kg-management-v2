@@ -163,7 +163,7 @@ export default function KnowledgeUploadPage() {
       <div className="mb-6">
         <h1 className="text-[20px] font-semibold text-dark-text-primary">知识上传</h1>
         <p className="text-[13px] text-dark-text-secondary mt-1">
-          上传业务文档到知识库，配置分段参数后提交 NOC 审核
+          上传业务文档到知识库，配置分段参数后保存
         </p>
       </div>
 
@@ -362,7 +362,7 @@ export default function KnowledgeUploadPage() {
                 <Button variant="outline" onClick={handlePreviewChunks}>
                   预览块
                 </Button>
-                <Button onClick={handleSubmit}>预览并发送审核</Button>
+                <Button onClick={handleSubmit}>保存到知识库</Button>
               </div>
             </div>
 
@@ -436,9 +436,9 @@ export default function KnowledgeUploadPage() {
       <Dialog open={submitSuccess} onOpenChange={() => setSubmitSuccess(false)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>提交成功</DialogTitle>
+            <DialogTitle>保存成功</DialogTitle>
             <DialogDescription>
-              文档已提交审核，NOC 审核通过后将自动嵌入知识库
+              文档已保存到知识库
             </DialogDescription>
           </DialogHeader>
           <div className="flex justify-end">
