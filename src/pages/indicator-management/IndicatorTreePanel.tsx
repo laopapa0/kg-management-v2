@@ -9,7 +9,6 @@ import AddTreeNodeDialog from '@/components/dialog/AddTreeNodeDialog'
 import DeleteTreeNodeWarningDialog from '@/components/dialog/DeleteTreeNodeWarningDialog'
 import DeleteTreeNodeSpecialDialog from '@/components/dialog/DeleteTreeNodeSpecialDialog'
 import AttachedBadge from '@/components/connection/AttachedBadge'
-import BatchDetachMenu from '@/components/connection/BatchDetachMenu'
 import { useAttachmentStore } from '@/stores/attachmentStore'
 import type { IndicatorAttachment } from '@/models/indicatorAttachmentModel'
 import { buildIndicatorTree, type IndicatorTreeNode } from '@/utils/attachmentTree'
@@ -292,27 +291,6 @@ const IndicatorTreePanel = forwardRef<IndicatorTreePanelRef>(function IndicatorT
             const attachedCount = attachedList.length
 
             return (
-              <BatchDetachMenu
-                detachOptions={
-                  attachedCount > 0
-                    ? [
-                        {
-                          label: '移除所有挂靠',
-                          count: attachedCount,
-                          onConfirm: () => {
-                            setIndicators(
-                              indicators.map((i) =>
-                                i.treeParentId === node.id
-                                  ? { ...i, treeParentId: undefined }
-                                  : i,
-                              ),
-                            )
-                          },
-                        },
-                      ]
-                    : []
-                }
-              >
                 <motion.div
                   data-testid={`indicator-tree-node-content-${node.id}`}
                   className="flex flex-col justify-center"
@@ -370,7 +348,6 @@ const IndicatorTreePanel = forwardRef<IndicatorTreePanelRef>(function IndicatorT
                     </div>
                   )}
                 </motion.div>
-              </BatchDetachMenu>
             )
           }}
           initialExpanded={initialExpandedIds}

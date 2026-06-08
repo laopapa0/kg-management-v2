@@ -44,7 +44,7 @@ export default function IndicatorAttachmentPage() {
   const treePanelRef = useRef<IndicatorTreePanelRef>(null)
   const pageRef = useRef<HTMLDivElement>(null)
   const rightColumnRef = useRef<HTMLDivElement>(null)
-  const { state, start, setHoverTarget, toggleContinuous, resetMisfireCount } = useConnectionMode()
+  const { state, start, setHoverTarget, confirm, cancel, toggleContinuous, resetMisfireCount } = useConnectionMode()
   const focusZone = useFocusZone()
   const focusZoneHint = useMemo(() => getFocusZoneHint(focusZone), [focusZone])
 
@@ -149,6 +149,41 @@ export default function IndicatorAttachmentPage() {
     const timer = setTimeout(() => setPaletteToastTargetId(null), 2000)
     return () => clearTimeout(timer)
   }, [paletteToastTargetId])
+
+  // Click-on-valid-target confirms attachment (no Space needed)
+  const confirmRef = useRef(confirm)
+  confirmRef.current = confirm
+  const cancelRef = useRef(cancel)
+  cancelRef.current = cancel
+
+  useEffect(() => {
+    if (!state.isConnecting) return
+
+    const handleClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement
+      const nodeEl = target.closest('[data-node-id]')
+      if (nodeEl) {
+        const nodeId = nodeEl.getAttribute('data-node-id')
+        if (nodeId && state.validTargetIds.has(nodeId)) {
+          e.preventDefault()
+          e.stopPropagation()
+          confirmRef.current()
+        }
+      }
+    }
+
+    const handleContextMenu = (e: MouseEvent) => {
+      e.preventDefault()
+      cancelRef.current()
+    }
+
+    document.addEventListener('click', handleClick, true)
+    document.addEventListener('contextmenu', handleContextMenu, true)
+    return () => {
+      document.removeEventListener('click', handleClick, true)
+      document.removeEventListener('contextmenu', handleContextMenu, true)
+    }
+  }, [state.isConnecting, state.validTargetIds, setHoverTarget])
 
   // Body cursor follows connection mode
   useEffect(() => {
