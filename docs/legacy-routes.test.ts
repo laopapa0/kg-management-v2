@@ -103,4 +103,38 @@ describe('legacy-routes.md documentation', () => {
     expect(content).toContain('src/components/Sidebar.tsx')
     expect(content).toContain('src/pages/')
   })
+
+  it('marks /noc/audit and /indicator/edit/:id as commented out (注释)', () => {
+    const content = readFileSync(docPath, 'utf-8')
+    // Verify the rows for these legacy routes use "注释" as the disposal strategy
+    const nocAuditRow = content
+      .split('\n')
+      .find((line) => line.includes('| `/noc/audit`'))
+    const indicatorEditRow = content
+      .split('\n')
+      .find((line) => line.includes('| `/indicator/edit/:id`'))
+
+    expect(nocAuditRow).toBeDefined()
+    expect(indicatorEditRow).toBeDefined()
+    expect(nocAuditRow).toContain('注释')
+    expect(indicatorEditRow).toContain('注释')
+  })
+
+  it('reflects hidden status for /noc/audit and /indicator/edit/:id (not active)', () => {
+    const content = readFileSync(docPath, 'utf-8')
+    const nocAuditRow = content
+      .split('\n')
+      .find((line) => line.includes('| `/noc/audit`'))
+    const indicatorEditRow = content
+      .split('\n')
+      .find((line) => line.includes('| `/indicator/edit/:id`'))
+
+    expect(nocAuditRow).toBeDefined()
+    expect(indicatorEditRow).toBeDefined()
+    // Current state should indicate the route is hidden/commented, not active
+    expect(nocAuditRow).toMatch(/已注释|已隐藏/)
+    expect(indicatorEditRow).toMatch(/已注释|已隐藏/)
+    expect(nocAuditRow).not.toMatch(/\|\s*在用\s*\|\s*注释/)
+    expect(indicatorEditRow).not.toMatch(/\|\s*在用\s*\|\s*注释/)
+  })
 })

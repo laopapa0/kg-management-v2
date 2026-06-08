@@ -34,7 +34,7 @@
 |----------|----------|----------|----------|----------|------------|--------------|
 | `/` | `DashboardPage` | 门户 | 在用 | **保留** | `src/pages/dashboard/DashboardPage.tsx` | 清理 NOC 卡片，替换为四大核心入口（指标管理、知识库管理、血缘画布、报告管理） |
 | `/indicator/create` | `IndicatorCreatePage` | 指标旧表单 | 在用 | **注释** | `src/pages/indicator-create/IndicatorCreatePage.tsx` | 旧表单页面；指标录入逻辑未来可复用于知识库/反哺场景 |
-| `/indicator/edit/:id` | `IndicatorEditPage` | 指标旧表单 | 在用 | **注释** | `src/pages/indicator-edit/IndicatorEditPage.tsx` | 同上，编辑逻辑未来可复用 |
+| `/indicator/edit/:id` | `IndicatorEditPage` | 指标旧表单 | 已注释 | **注释** | `src/pages/indicator-edit/IndicatorEditPage.tsx` | 同上，编辑逻辑未来可复用 |
 | `/indicator-management` | `IndicatorManagementPage` | 指标挂靠 | 在用 | **保留** | `src/pages/indicator-management/IndicatorManagementPage.tsx`<br>`IndicatorAttachmentPage.tsx`<br>`IndicatorTreePanel.tsx`<br>`TagSetPanel.tsx`<br>`RulePanel.tsx` | 四大核心菜单之一；当前已实现指标树、标签集、规则树、待选指标、连线挂靠 |
 | `/lineage` | `LineageCanvasPage` | 血缘画布 | 在用 | **保留** | `src/pages/lineage/LineageCanvasPage.tsx`<br>`src/components/lineage/` | 四大核心菜单之一；沿用 v1 SVG 实现，主题颜色联动 |
 | `/tag-config` | `TagConfigPage` | 配置旧页面 | 在用 | **注释** | `src/pages/tag-config/TagConfigPage.tsx` | 标签配置已内置到「指标管理」页面的 TagSetPanel，旧独立页面可废弃 |
@@ -45,7 +45,7 @@
 | `/noc/property` | `NocPropertyPage` | NOC 管理 | 在用 | **注释** | `src/pages/noc/NocPropertyPage.tsx` | NOC 侧隐藏 |
 | `/noc/tag` | `NocTagPage` | NOC 管理 | 在用 | **注释** | `src/pages/noc/NocTagPage.tsx` | NOC 侧隐藏；业务侧标签由 TagSetPanel 维护 |
 | `/noc/rule` | `NocRulePage` | NOC 管理 | 在用 | **注释** | `src/pages/noc/NocRulePage.tsx` | NOC 侧隐藏；业务侧规则由 RulePanel 维护 |
-| `/noc/audit` | `NocAuditPage` | NOC 管理 | 在用 | **注释** | `src/pages/noc/NocAuditPage.tsx` | **审核已砍掉**，无复用价值，长期可物理删除 |
+| `/noc/audit` | `NocAuditPage` | NOC 管理 | 已注释 | **注释** | `src/pages/noc/NocAuditPage.tsx` | **审核已砍掉**，无复用价值，长期可物理删除 |
 | `/noc/inspection` | `InspectionManagementPage` | NOC 管理 | 在用 | **注释** | `src/pages/noc/inspection/InspectionManagementPage.tsx` | **巡检 → 报告管理**：计划/模板/版本管理逻辑复用于新报告管理 |
 | `/knowledge-management` | `KnowledgeManagementPage` | 知识管理（旧） | 在用 | **注释** | `src/pages/knowledge-management/KnowledgeManagementPage.tsx`<br>`KnowledgeBaseList.tsx`<br>`KnowledgeBaseDetailDrawer.tsx` | **知识管理 → 知识库管理**：文件列表、详情抽屉复用于新知识库管理 |
 | `/knowledge-upload` | `KnowledgeUploadPage` | 知识上传（旧） | 在用 | **注释** | `src/pages/knowledge-upload/KnowledgeUploadPage.tsx`<br>`MyDocumentsList.tsx`<br>`DocumentReeditForm.tsx` | **知识上传 → 知识库管理**：文档上传、版本替换逻辑复用 |
