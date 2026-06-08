@@ -125,3 +125,15 @@
 .animate-ant-line {
   animation: ant-line 0.5s linear infinite;
 }
+
+/* Focus mode dimming: non-target panels are desaturated and darkened */
+[data-dim-mode="true"] [data-focus-zone] {
+  filter: saturate(0.3) brightness(0.6);
+  transition: filter 200ms;
+  will-change: filter;
+}
+
+/* Spotlight exclusion: source and valid targets remain vivid */
+[data-dim-mode="true"] .spotlight-exclude {
+  filter: none !important;
+}

@@ -66,6 +66,58 @@ describe('ConnectionLayer', () => {
     expect(path).toHaveClass('animate-ant-line')
   })
 
+  it('turns red and stops ant-line when hovering invalid target', () => {
+    const { rerender } = render(
+      <ConnectionLayer
+        sourceId="test-source"
+        hoverTargetId="invalid-target"
+        validTargetIds={new Set(['valid-1'])}
+      />,
+    )
+
+    const path = screen.getByTestId('connection-line-path')
+    expect(path).toHaveAttribute('stroke', '#EF4444')
+    expect(path).not.toHaveClass('animate-ant-line')
+  })
+
+  it('keeps default color and ant-line when hovering valid target', () => {
+    const { rerender } = render(
+      <ConnectionLayer
+        sourceId="test-source"
+        hoverTargetId="valid-1"
+        validTargetIds={new Set(['valid-1'])}
+      />,
+    )
+
+    const path = screen.getByTestId('connection-line-path')
+    expect(path).toHaveAttribute('stroke', '#64748B')
+    expect(path).toHaveClass('animate-ant-line')
+  })
+
+  it('restores default color when hover target is cleared', () => {
+    const { rerender } = render(
+      <ConnectionLayer
+        sourceId="test-source"
+        hoverTargetId="invalid-target"
+        validTargetIds={new Set(['valid-1'])}
+      />,
+    )
+
+    const path = screen.getByTestId('connection-line-path')
+    expect(path).toHaveAttribute('stroke', '#EF4444')
+
+    rerender(
+      <ConnectionLayer
+        sourceId="test-source"
+        hoverTargetId={null}
+        validTargetIds={new Set(['valid-1'])}
+      />,
+    )
+
+    expect(path).toHaveAttribute('stroke', '#64748B')
+    expect(path).toHaveClass('animate-ant-line')
+  })
+
   it('registers mousemove and scroll listeners on mount', () => {
     render(<ConnectionLayer sourceId="test-source" />)
 

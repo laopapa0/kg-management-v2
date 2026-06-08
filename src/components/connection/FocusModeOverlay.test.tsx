@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, cleanup } from '@testing-library/react'
 import FocusModeOverlay from './FocusModeOverlay'
 
 describe('FocusModeOverlay', () => {
@@ -13,6 +13,9 @@ describe('FocusModeOverlay', () => {
   })
 
   afterEach(() => {
+    // Clean up manually added test elements to avoid cross-test DOM pollution
+    document.querySelectorAll('.test-cleanup').forEach((el) => el.remove())
+    cleanup()
     vi.useRealTimers()
     addEventListenerSpy.mockRestore()
     removeEventListenerSpy.mockRestore()
@@ -73,8 +76,8 @@ describe('FocusModeOverlay', () => {
   })
 
   it('creates a spotlight hole for the source indicator element', () => {
-    // create a source indicator element in DOM
     const sourceEl = document.createElement('div')
+    sourceEl.classList.add('test-cleanup')
     sourceEl.setAttribute('data-indicator-id', 'ind-1')
     sourceEl.style.position = 'absolute'
     sourceEl.style.left = '100px'
@@ -83,7 +86,6 @@ describe('FocusModeOverlay', () => {
     sourceEl.style.height = '120px'
     document.body.appendChild(sourceEl)
 
-    // mock getBoundingClientRect for the source element
     sourceEl.getBoundingClientRect = vi.fn(() => ({
       x: 100,
       y: 200,
@@ -105,10 +107,8 @@ describe('FocusModeOverlay', () => {
       />,
     )
 
-    // advance timers to let the update effect run
     vi.advanceTimersByTime(100)
 
-    // query inside the rendered SVG for mask black rects
     const svg = screen.getByTestId('focus-mode-overlay')
     const maskRects = svg.querySelectorAll('mask rect[fill="black"]')
     expect(maskRects.length).toBe(1)
@@ -116,27 +116,40 @@ describe('FocusModeOverlay', () => {
     expect(maskRects[0]).toHaveAttribute('y', '200')
     expect(maskRects[0]).toHaveAttribute('width', '260')
     expect(maskRects[0]).toHaveAttribute('height', '120')
-
-    document.body.removeChild(sourceEl)
   })
 
-  it('creates spotlight holes for valid target elements', () => {
-    // create source indicator
+  it('adds spotlight-exclude class to source indicator element', () => {
     const sourceEl = document.createElement('div')
-    sourceEl.setAttribute('data-indicator-id', 'src-1')
+    sourceEl.classList.add('test-cleanup')
+    sourceEl.setAttribute('data-indicator-id', 'ind-1')
     sourceEl.style.position = 'absolute'
     sourceEl.style.left = '10px'
     sourceEl.style.top = '10px'
     sourceEl.style.width = '100px'
     sourceEl.style.height = '50px'
     document.body.appendChild(sourceEl)
+
     sourceEl.getBoundingClientRect = vi.fn(() => ({
       x: 10, y: 10, width: 100, height: 50,
       top: 10, left: 10, right: 110, bottom: 60, toJSON: () => '',
     }))
 
-    // create a valid tree target
+    render(
+      <FocusModeOverlay
+        isVisible={true}
+        sourceId="ind-1"
+        validTargetIds={new Set()}
+        targetType={null}
+      />,
+    )
+
+    vi.advanceTimersByTime(100)
+    expect(sourceEl).toHaveClass('spotlight-exclude')
+  })
+
+  it('adds spotlight-exclude class to valid target elements', () => {
     const targetEl = document.createElement('div')
+    targetEl.classList.add('test-cleanup')
     targetEl.setAttribute('data-node-id', 'tree-1')
     targetEl.style.position = 'absolute'
     targetEl.style.left = '400px'
@@ -144,6 +157,83 @@ describe('FocusModeOverlay', () => {
     targetEl.style.width = '200px'
     targetEl.style.height = '40px'
     document.body.appendChild(targetEl)
+
+    targetEl.getBoundingClientRect = vi.fn(() => ({
+      x: 400, y: 100, width: 200, height: 40,
+      top: 100, left: 400, right: 600, bottom: 140, toJSON: () => '',
+    }))
+
+    render(
+      <FocusModeOverlay
+        isVisible={true}
+        sourceId={null}
+        validTargetIds={new Set(['tree-1'])}
+        targetType="tree"
+      />,
+    )
+
+    vi.advanceTimersByTime(100)
+    expect(targetEl).toHaveClass('spotlight-exclude')
+  })
+
+  it('removes spotlight-exclude class on unmount', () => {
+    const sourceEl = document.createElement('div')
+    sourceEl.classList.add('test-cleanup')
+    sourceEl.setAttribute('data-indicator-id', 'ind-1')
+    sourceEl.style.position = 'absolute'
+    sourceEl.style.left = '10px'
+    sourceEl.style.top = '10px'
+    sourceEl.style.width = '100px'
+    sourceEl.style.height = '50px'
+    document.body.appendChild(sourceEl)
+
+    sourceEl.getBoundingClientRect = vi.fn(() => ({
+      x: 10, y: 10, width: 100, height: 50,
+      top: 10, left: 10, right: 110, bottom: 60, toJSON: () => '',
+    }))
+
+    const { unmount } = render(
+      <FocusModeOverlay
+        isVisible={true}
+        sourceId="ind-1"
+        validTargetIds={new Set()}
+        targetType={null}
+      />,
+    )
+
+    vi.advanceTimersByTime(100)
+    expect(sourceEl).toHaveClass('spotlight-exclude')
+
+    unmount()
+    expect(sourceEl).not.toHaveClass('spotlight-exclude')
+  })
+
+  it('creates spotlight holes for valid target elements', () => {
+    const sourceEl = document.createElement('div')
+    sourceEl.classList.add('test-cleanup')
+    sourceEl.setAttribute('data-indicator-id', 'src-1')
+    sourceEl.style.position = 'absolute'
+    sourceEl.style.left = '10px'
+    sourceEl.style.top = '10px'
+    sourceEl.style.width = '100px'
+    sourceEl.style.height = '50px'
+    document.body.appendChild(sourceEl)
+
+    sourceEl.getBoundingClientRect = vi.fn(() => ({
+      x: 10, y: 10, width: 100, height: 50,
+      top: 10, left: 10, right: 110, bottom: 60, toJSON: () => '',
+    }))
+
+    const targetEl = document.createElement('div')
+    targetEl.classList.add('test-cleanup')
+    targetEl.setAttribute('data-node-id', 'tree-1')
+    targetEl.style.position = 'absolute'
+    targetEl.style.left = '400px'
+    targetEl.style.top = '100px'
+    targetEl.style.width = '200px'
+    targetEl.style.height = '40px'
+    document.body.appendChild(targetEl)
+
     targetEl.getBoundingClientRect = vi.fn(() => ({
       x: 400, y: 100, width: 200, height: 40,
       top: 100, left: 400, right: 600, bottom: 140, toJSON: () => '',
@@ -171,9 +261,6 @@ describe('FocusModeOverlay', () => {
     // target rect
     expect(maskRects[1]).toHaveAttribute('x', '400')
     expect(maskRects[1]).toHaveAttribute('y', '100')
-
-    document.body.removeChild(sourceEl)
-    document.body.removeChild(targetEl)
   })
 
   it('registers scroll and resize listeners when visible', () => {

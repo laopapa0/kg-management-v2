@@ -170,6 +170,7 @@ export default function IndicatorAttachmentPage() {
   return (
     <div
       data-testid="indicator-attachment-page"
+      data-dim-mode={state.isConnecting ? 'true' : undefined}
       className="relative h-full w-full bg-dark-page p-3 text-dark-text-primary"
     >
       {/* Connection mode status bar */}
@@ -313,7 +314,11 @@ export default function IndicatorAttachmentPage() {
 
       {/* SVG connection layer */}
       {state.isConnecting && state.sourceId && (
-        <ConnectionLayer sourceId={state.sourceId} />
+        <ConnectionLayer
+          sourceId={state.sourceId}
+          hoverTargetId={state.hoverTargetId}
+          validTargetIds={state.validTargetIds}
+        />
       )}
 
       {/* Source anchor marker when source scrolls out of viewport */}

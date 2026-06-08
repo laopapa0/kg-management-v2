@@ -67,6 +67,44 @@ function getTargetRects(
   return rects
 }
 
+const SPOTLIGHT_EXCLUDE_CLASS = 'spotlight-exclude'
+
+function addSpotlightExclude(el: Element | null) {
+  if (el) el.classList.add(SPOTLIGHT_EXCLUDE_CLASS)
+}
+
+function clearAllSpotlightExclude() {
+  document.querySelectorAll(`.${SPOTLIGHT_EXCLUDE_CLASS}`).forEach((el) => {
+    el.classList.remove(SPOTLIGHT_EXCLUDE_CLASS)
+  })
+}
+
+function updateSpotlightExcludes(
+  sourceId: string | null,
+  targetType: 'tree' | 'tag' | 'rule' | null,
+  validTargetIds: Set<string>,
+) {
+  clearAllSpotlightExclude()
+
+  // Source indicator
+  if (sourceId) {
+    const sourceEl = document.querySelector(`[data-indicator-id="${sourceId}"]`)
+    addSpotlightExclude(sourceEl)
+  }
+
+  // Valid targets
+  const selector = getTargetSelector(targetType)
+  const attr = getTargetAttr(targetType)
+  if (selector && attr) {
+    document.querySelectorAll(selector).forEach((el) => {
+      const id = el.getAttribute(attr)
+      if (id && validTargetIds.has(id)) {
+        addSpotlightExclude(el)
+      }
+    })
+  }
+}
+
 export default function FocusModeOverlay({
   isVisible,
   sourceId,
@@ -90,21 +128,30 @@ export default function FocusModeOverlay({
     if (isVisible) {
       timerRef.current = setTimeout(() => setOpacity(1), 0)
       updateRects()
+      updateSpotlightExcludes(sourceId, targetType, validTargetIds)
 
-      const handleScroll = () => updateRects()
-      const handleResize = () => updateRects()
+      const handleScroll = () => {
+        updateRects()
+        updateSpotlightExcludes(sourceId, targetType, validTargetIds)
+      }
+      const handleResize = () => {
+        updateRects()
+        updateSpotlightExcludes(sourceId, targetType, validTargetIds)
+      }
       window.addEventListener('scroll', handleScroll, { passive: true })
       window.addEventListener('resize', handleResize)
 
       return () => {
         if (timerRef.current) clearTimeout(timerRef.current)
+        clearAllSpotlightExclude()
         window.removeEventListener('scroll', handleScroll)
         window.removeEventListener('resize', handleResize)
       }
     } else {
       setOpacity(0)
+      clearAllSpotlightExclude()
     }
-  }, [isVisible, updateRects])
+  }, [isVisible, updateRects, sourceId, targetType, validTargetIds])
 
   if (!isVisible) return null
 

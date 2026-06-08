@@ -3,9 +3,15 @@ import { getElementCenter, createPathD } from './connectionGeometry'
 
 interface ConnectionLayerProps {
   sourceId: string | null
+  hoverTargetId?: string | null
+  validTargetIds?: Set<string>
 }
 
-export default function ConnectionLayer({ sourceId }: ConnectionLayerProps) {
+export default function ConnectionLayer({
+  sourceId,
+  hoverTargetId = null,
+  validTargetIds = new Set(),
+}: ConnectionLayerProps) {
   const pathRef = useRef<SVGPathElement>(null)
   const mouseRef = useRef({ x: 0, y: 0 })
   const rafRef = useRef<number>(0)
@@ -69,12 +75,20 @@ export default function ConnectionLayer({ sourceId }: ConnectionLayerProps) {
       <path
         ref={pathRef}
         data-testid="connection-line-path"
-        stroke="#64748B"
+        stroke={
+          hoverTargetId !== null && !validTargetIds.has(hoverTargetId)
+            ? '#EF4444'
+            : '#64748B'
+        }
         strokeWidth={2.5}
         strokeDasharray="6 4"
         fill="none"
         markerEnd="url(#conn-arrow)"
-        className="animate-ant-line"
+        className={
+          hoverTargetId !== null && !validTargetIds.has(hoverTargetId)
+            ? ''
+            : 'animate-ant-line'
+        }
       />
     </svg>
   )

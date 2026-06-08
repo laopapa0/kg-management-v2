@@ -504,5 +504,25 @@ describe('IndicatorAttachmentPage', () => {
 
       expect(screen.queryByTestId('focus-mode-overlay')).not.toBeInTheDocument()
     })
+
+    it('sets data-dim-mode on root container in connection mode', async () => {
+      render(<IndicatorAttachmentPage />)
+
+      const cards = screen.getAllByTestId('indicator-card')
+      act(() => {
+        fireEvent.click(cards[0])
+      })
+
+      const root = screen.getByTestId('indicator-attachment-page')
+      expect(root).toHaveAttribute('data-dim-mode', 'true')
+    })
+
+    it('does not set data-dim-mode when not in connection mode', () => {
+      render(<IndicatorAttachmentPage />)
+
+      const root = screen.getByTestId('indicator-attachment-page')
+      expect(root).not.toHaveAttribute('data-dim-mode')
+    })
+
   })
 })
