@@ -8,8 +8,8 @@ import IndicatorManagementPage from './pages/indicator-management/IndicatorManag
 import LineageCanvasPage from './pages/lineage/LineageCanvasPage'
 import KnowledgeUploadPage from './pages/knowledge-upload/KnowledgeUploadPage'
 import ReportManagementPage from './pages/report-management/ReportManagementPage'
-import { mockReportPlans } from './models/reportModel'
-import { getReportPlans, saveReportPlans } from './utils/reportStorage'
+import { mockReportPlans } from '@/models/reportModel'
+import { getReportPlans, saveReportPlans } from '@/utils/reportStorage'
 
 export default function App() {
   useEffect(() => {
