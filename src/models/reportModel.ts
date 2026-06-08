@@ -15,6 +15,8 @@ export interface ReportPlan {
   filterSummary: string
   latestVersion: number
   lastGeneratedAt?: string
+  autoSchedule?: boolean
+  nextRunAt?: string
   createdAt: string
 }
 

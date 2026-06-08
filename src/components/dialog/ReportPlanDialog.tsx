@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
+import { Switch } from '@/components/ui/switch'
 import {
   Select,
   SelectContent,
@@ -24,7 +25,7 @@ export interface ReportPlanDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   initialData?: ReportPlan | null
-  onConfirm: (data: { name: string; schedule: ReportPlan['schedule']; description: string }) => void
+  onConfirm: (data: { name: string; schedule: ReportPlan['schedule']; description: string; autoSchedule: boolean }) => void
 }
 
 export default function ReportPlanDialog({
@@ -36,19 +37,21 @@ export default function ReportPlanDialog({
   const [name, setName] = useState('')
   const [schedule, setSchedule] = useState<ReportPlan['schedule']>('daily')
   const [description, setDescription] = useState('')
+  const [autoSchedule, setAutoSchedule] = useState(false)
 
   useEffect(() => {
     if (open) {
       setName(initialData?.name ?? '')
       setSchedule(initialData?.schedule ?? 'daily')
       setDescription(initialData?.description ?? '')
+      setAutoSchedule(initialData?.autoSchedule ?? false)
     }
   }, [open, initialData])
 
   const handleConfirm = () => {
     const trimmed = name.trim()
     if (!trimmed) return
-    onConfirm({ name: trimmed, schedule, description: description.trim() })
+    onConfirm({ name: trimmed, schedule, description: description.trim(), autoSchedule })
     onOpenChange(false)
   }
 
@@ -108,6 +111,17 @@ export default function ReportPlanDialog({
               placeholder="请输入描述（可选）"
               className="bg-dark-card-l2 text-dark-text-primary min-h-[80px]"
             />
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Switch
+              data-testid="report-plan-auto-schedule"
+              checked={autoSchedule}
+              onCheckedChange={setAutoSchedule}
+            />
+            <Label className="text-sm text-dark-text-secondary">
+              {autoSchedule ? '自动执行已启用' : '启用自动执行'}
+            </Label>
           </div>
         </div>
 

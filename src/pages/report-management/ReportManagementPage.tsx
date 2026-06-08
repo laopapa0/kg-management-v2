@@ -31,7 +31,7 @@ export default function ReportManagementPage() {
           if (editingPlan) {
             const next = plans.map((p) =>
               p.id === editingPlan.id
-                ? { ...p, name: data.name, schedule: data.schedule, description: data.description }
+                ? { ...p, name: data.name, schedule: data.schedule, description: data.description, autoSchedule: data.autoSchedule }
                 : p,
             )
             setPlans(next)
@@ -42,6 +42,7 @@ export default function ReportManagementPage() {
               schedule: data.schedule,
               description: data.description,
               filterSummary: '全部指标 / 全部部门',
+              autoSchedule: data.autoSchedule,
             })
             const next = [...plans, newPlan]
             setPlans(next)
@@ -113,7 +114,7 @@ export default function ReportManagementPage() {
           if (editingPlan) {
             const next = plans.map((p) =>
               p.id === editingPlan.id
-                ? { ...p, name: data.name, schedule: data.schedule, description: data.description }
+                ? { ...p, name: data.name, schedule: data.schedule, description: data.description, autoSchedule: data.autoSchedule }
                 : p,
             )
             setPlans(next)
@@ -124,6 +125,7 @@ export default function ReportManagementPage() {
               schedule: data.schedule,
               description: data.description,
               filterSummary: '全部指标 / 全部部门',
+              autoSchedule: data.autoSchedule,
             })
             const next = [...plans, newPlan]
             setPlans(next)
@@ -145,6 +147,11 @@ export default function ReportManagementPage() {
                 <span className="rounded-full bg-dark-card-l2 px-2 py-0.5 text-xs text-dark-text-secondary">
                   {SCHEDULE_LABELS[plan.schedule]}
                 </span>
+                {plan.autoSchedule && (
+                  <span className="rounded-full bg-dark-accent-primary/15 px-2 py-0.5 text-xs text-dark-accent-primary">
+                    自动
+                  </span>
+                )}
               </div>
               <span className="text-sm text-dark-text-secondary">{plan.filterSummary}</span>
             </div>

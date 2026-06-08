@@ -18,22 +18,12 @@ import ThemeSwitcher from './theme/ThemeSwitcher';
 /* ─── 面包屑映射 ─── */
 const routeNameMap: Record<string, string> = {
   '/': '工作台',
-  '/indicator/create': '新增对象实例',
-  '/indicator/edit': '变更对象实例',
   '/indicator-management': '指标管理',
-  '/lineage': '配置链接关系',
-  '/tag-config': '配置标签',
-  '/rule-config': '配置业务规则',
-  '/noc/object-type': '对象类型管理',
-  '/noc/link-relation': '链接关系管理',
-  '/noc/property': '属性管理',
-  '/noc/tag': '标签管理',
-  '/noc/rule': '业务规则管理',
-  '/noc/audit': '审核待办列表',
-  '/platform/object-type': '对象类型管理',
-  '/platform/link-type': '链接类型管理',
-  '/platform/property': '属性管理',
-  '/platform/graph': '图谱管理',
+  '/lineage': '血缘画布',
+  '/reports': '报告管理',
+  '/reports/templates': '报告模板',
+  '/reports/generate': '生成报告',
+  '/knowledge-upload': '知识库管理',
 };
 
 function getBreadcrumbItems(pathname: string) {
