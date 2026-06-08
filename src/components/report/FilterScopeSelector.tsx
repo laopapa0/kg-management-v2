@@ -225,22 +225,20 @@ export default function FilterScopeSelector({ value, onChange }: FilterScopeSele
       {/* 标签树 */}
       <div className="rounded-lg border border-dark-border bg-dark-card-l1 p-4">
         <h3 className="mb-2 font-medium text-dark-text-primary">标签范围</h3>
-        <TreeView
-          nodes={tagTree as { id: string; children?: { id: string; children?: { id: string }[] }[] }[]}
-          renderNode={(node) => (
-            <div className="flex items-center gap-2">
+        <div className="flex flex-col gap-1">
+          {tagTree.map((tag) => (
+            <label key={tag.id} className="flex items-center gap-2 cursor-pointer">
               <input
                 type="checkbox"
-                data-testid={`scope-tag-checkbox-${node.id}`}
-                checked={checkedTagIds.has(node.id)}
-                onChange={() => toggleTag(node.id)}
-                onClick={(e) => e.stopPropagation()}
+                data-testid={`scope-tag-checkbox-${tag.id}`}
+                checked={checkedTagIds.has(tag.id)}
+                onChange={() => toggleTag(tag.id)}
                 className="size-4 cursor-pointer accent-dark-accent-primary"
               />
-              <span>{(node as unknown as TagNode).name}</span>
-            </div>
-          )}
-        />
+              <span className="text-sm text-dark-text-secondary">{tag.name}</span>
+            </label>
+          ))}
+        </div>
       </div>
 
       {/* 剔除规则 */}
