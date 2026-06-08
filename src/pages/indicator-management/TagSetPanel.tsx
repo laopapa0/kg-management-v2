@@ -67,7 +67,7 @@ function computeSearchResult(tree: TagNode[], term: string): SearchResult {
   return { matchedIds, ancestorIds, matchCounts }
 }
 
-export default function TagSetPanel() {
+export default function TagSetPanel({ selectedIndicatorId }: { selectedIndicatorId?: string | null }) {
   const tagNodes = useAttachmentStore((state) => state.tagNodes)
   const indicators = useAttachmentStore((state) => state.indicators)
   const setTagNodes = useAttachmentStore((state) => state.setTagNodes)
@@ -210,6 +210,31 @@ export default function TagSetPanel() {
   const isFilterEmpty =
     searchMode === 'filter' && debouncedTerm && filteredRootNodes.length === 0
 
+  const selectedIndicator = useMemo(
+    () => (selectedIndicatorId ? indicators.find((i) => i.id === selectedIndicatorId) : null),
+    [indicators, selectedIndicatorId],
+  )
+
+  const selectedTagIds = useMemo(
+    () => new Set(selectedIndicator?.tagIds ?? []),
+    [selectedIndicator],
+  )
+
+  const toggleTagForIndicator = useCallback(
+    (tagId: string) => {
+      if (!selectedIndicator) return
+      const hasTag = selectedIndicator.tagIds.includes(tagId)
+      const nextTagIds = hasTag
+        ? selectedIndicator.tagIds.filter((id) => id !== tagId)
+        : [...selectedIndicator.tagIds, tagId]
+      const next = indicators.map((i) =>
+        i.id === selectedIndicator.id ? { ...i, tagIds: nextTagIds } : i,
+      )
+      setIndicators(next)
+    },
+    [selectedIndicator, indicators, setIndicators],
+  )
+
   if (tree.length === 0) {
     return (
       <div className="flex-1 overflow-y-auto px-3 pb-2" data-testid="tag-set-panel">
@@ -314,6 +339,15 @@ export default function TagSetPanel() {
               }
             >
               <div className="flex items-center gap-2">
+                {selectedIndicatorId ? (
+                  <input
+                    type="checkbox"
+                    data-testid={`tag-config-checkbox-${fullNode.id}`}
+                    checked={selectedTagIds.has(fullNode.id)}
+                    onChange={() => toggleTagForIndicator(fullNode.id)}
+                    className="size-4 cursor-pointer accent-dark-accent-primary"
+                  />
+                ) : null}
                 <TagPill
                   tag={fullNode}
                   selected={selection.selected.has(fullNode.id)}
@@ -321,8 +355,6 @@ export default function TagSetPanel() {
                   onClick={() => handleToggle(fullNode.id)}
                   searchTerm={debouncedTerm}
                   dimmed={isDimmed}
-                  editable
-                  onColorChange={(color) => handleColorChange(fullNode.id, color)}
                 />
                 {debouncedTerm && matchCount ? (
                   <span
