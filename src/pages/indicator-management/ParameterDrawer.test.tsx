@@ -113,7 +113,8 @@ describe('ParameterDrawer', () => {
       initializeAttachmentStore()
       render(<ParameterDrawer {...defaultProps} ruleId="rule-fluctuation-yoy" />)
       expect(screen.getByTestId('select-algorithm')).toBeInTheDocument()
-      expect(screen.getByTestId('input-window')).toBeInTheDocument()
+      expect(screen.getByTestId('input-window-num')).toBeInTheDocument()
+      expect(screen.getByTestId('select-window-unit')).toBeInTheDocument()
     })
 
     it('renders ParameterFields for topn rule', () => {

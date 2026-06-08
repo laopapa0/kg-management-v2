@@ -17,10 +17,10 @@ const LEVEL_COLORS: Record<
   'P1' | 'P2' | 'P3' | 'P4',
   { bg: string; text: string; border: string }
 > = {
-  P1: { bg: 'bg-red-100', text: 'text-red-700', border: 'border-red-200' },
-  P2: { bg: 'bg-orange-100', text: 'text-orange-700', border: 'border-orange-200' },
-  P3: { bg: 'bg-yellow-100', text: 'text-yellow-800', border: 'border-yellow-200' },
-  P4: { bg: 'bg-blue-100', text: 'text-blue-700', border: 'border-blue-200' },
+  P1: { bg: 'bg-red-900/30', text: 'text-red-300', border: 'border-red-800/40' },
+  P2: { bg: 'bg-orange-900/30', text: 'text-orange-300', border: 'border-orange-800/40' },
+  P3: { bg: 'bg-yellow-900/30', text: 'text-yellow-300', border: 'border-yellow-800/40' },
+  P4: { bg: 'bg-blue-900/30', text: 'text-blue-300', border: 'border-blue-800/40' },
 }
 
 function formatThresholdSummary(param: RuleParameter): string | null {
@@ -102,7 +102,7 @@ export default function RuleSummaryBadge({ rule, parameters = [] }: RuleSummaryB
     setIsUpdating(true)
     const timer = setTimeout(() => setIsUpdating(false), 200)
     return () => clearTimeout(timer)
-  }, [parameters, summary])
+  }, [parameters])
 
   if (!summary) {
     return (

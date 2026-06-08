@@ -34,7 +34,8 @@ const CONTENT_FIELDS: Record<string, string[]> = {
 }
 
 const INTERACTION_FIELDS = ['isInherited', 'overriddenFields']
-const APPEARANCE_FIELDS: string[] = []
+// Appearance section fields (reserved for future display settings)
+const APPEARANCE_FIELDS: string[] = ['showBadge', 'highlightColor']
 
 function countConfigured(
   fields: string[],
@@ -107,12 +108,7 @@ export default function ParameterDrawer({
     >
       <DrawerContent
         data-testid="parameter-drawer-content"
-        className="w-[480px] border-l border-dark-border-default bg-dark-card-l1"
-        style={{
-          width: '480px',
-          maxWidth: '480px',
-          boxShadow: '-4px 0 24px rgba(0, 0, 0, 0.4)',
-        }}
+        className="w-[480px] max-w-[480px] border-l border-dark-border-default bg-dark-card-l1 shadow-[-4px_0_24px_rgba(0,0,0,0.4)]"
       >
         <DrawerHeader className="relative border-b border-dark-border-default pb-3 pt-4" data-testid="drawer-header">
           <button

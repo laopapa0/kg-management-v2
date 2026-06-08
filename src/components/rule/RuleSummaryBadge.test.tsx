@@ -67,7 +67,7 @@ describe('RuleSummaryBadge', () => {
       expect(screen.getByTestId('rule-summary-r1')).toHaveTextContent('待配置')
     })
 
-    it('renders threshold summary badge with P2 pastel colors', () => {
+    it('renders threshold summary badge with P2 dark theme colors', () => {
       const rule: Rule = { id: 'r1', name: '营收阈值', type: 'threshold' }
       const params: RuleParameter[] = [
         { ruleId: 'r1', indicatorId: 'i1', upperLimit: 120, lowerLimit: 80, unit: '百分比', level: 'P2' },
@@ -75,8 +75,8 @@ describe('RuleSummaryBadge', () => {
       render(<RuleSummaryBadge rule={rule} parameters={params} />)
       const badge = screen.getByTestId('rule-summary-r1')
       expect(badge).toHaveTextContent('阈值: 80~120百分比 · P2')
-      expect(badge.className).toContain('bg-orange-100')
-      expect(badge.className).toContain('text-orange-700')
+      expect(badge.className).toContain('bg-orange-900/30')
+      expect(badge.className).toContain('text-orange-300')
     })
 
     it('renders fluctuation summary badge', () => {
@@ -87,7 +87,7 @@ describe('RuleSummaryBadge', () => {
       render(<RuleSummaryBadge rule={rule} parameters={params} />)
       const badge = screen.getByTestId('rule-summary-r2')
       expect(badge).toHaveTextContent('波动: 3σ · 5min')
-      expect(badge.className).toContain('bg-red-100')
+      expect(badge.className).toContain('bg-red-900/30')
     })
 
     it('renders topn summary badge', () => {
@@ -98,7 +98,7 @@ describe('RuleSummaryBadge', () => {
       render(<RuleSummaryBadge rule={rule} parameters={params} />)
       const badge = screen.getByTestId('rule-summary-r3')
       expect(badge).toHaveTextContent('TOP10 · 按QPS')
-      expect(badge.className).toContain('bg-blue-100')
+      expect(badge.className).toContain('bg-blue-900/30')
     })
 
     it('shows tooltip with parameter details on hover', async () => {

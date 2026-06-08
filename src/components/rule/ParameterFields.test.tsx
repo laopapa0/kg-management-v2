@@ -15,7 +15,7 @@ describe('ParameterFields', () => {
 
   const fluctuationDefaults = {
     algorithm: '同比',
-    window: '5min',
+    window: '5分',
   }
 
   const topnDefaults = {
@@ -110,7 +110,8 @@ describe('ParameterFields', () => {
     it('renders algorithm select and window input', () => {
       render(<ParameterFields ruleType="fluctuation" onSubmit={vi.fn()} />)
       expect(screen.getByTestId('select-algorithm')).toBeInTheDocument()
-      expect(screen.getByTestId('input-window')).toBeInTheDocument()
+      expect(screen.getByTestId('input-window-num')).toBeInTheDocument()
+      expect(screen.getByTestId('select-window-unit')).toBeInTheDocument()
     })
 
     it('populates default values', () => {
@@ -121,7 +122,8 @@ describe('ParameterFields', () => {
           onSubmit={vi.fn()}
         />,
       )
-      expect(screen.getByTestId('input-window')).toHaveValue('5min')
+      expect(screen.getByTestId('input-window-num')).toHaveValue(5)
+      expect(screen.getByTestId('select-window-unit')).toHaveTextContent('分')
     })
 
     it('submits valid fluctuation data', async () => {
@@ -137,8 +139,8 @@ describe('ParameterFields', () => {
         />,
       )
 
-      const windowInput = screen.getByTestId('input-window')
-      fireEvent.change(windowInput, { target: { value: '10min' } })
+      const windowNumInput = screen.getByTestId('input-window-num')
+      fireEvent.change(windowNumInput, { target: { value: '10' } })
 
       ref.current?.submit()
 
@@ -147,7 +149,7 @@ describe('ParameterFields', () => {
       })
 
       const submitted = onSubmit.mock.calls[0][0]
-      expect(submitted.window).toBe('10min')
+      expect(submitted.window).toBe('10分')
     })
   })
 

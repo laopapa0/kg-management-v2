@@ -216,3 +216,30 @@
   background-color: rgba(59, 130, 246, 0.08) !important;
   transform: scale(1.02);
 }
+
+/* ─── Slice 8 review fixes ─── */
+
+/* Accordion animation durations: expand 250ms, collapse 200ms */
+.animate-accordion-down {
+  animation-duration: 250ms;
+}
+
+.animate-accordion-up {
+  animation-duration: 200ms;
+}
+
+/* Error slide-in animation for form validation messages */
+@keyframes error-slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-error-slide-in {
+  animation: error-slide-in 200ms ease-out forwards;
+}
