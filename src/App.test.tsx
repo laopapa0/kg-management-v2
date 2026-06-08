@@ -27,7 +27,7 @@ describe('App routing', () => {
     expect(screen.getByText('规则')).toBeInTheDocument()
   })
 
-  it('renders ReportManagementPage placeholder at /reports', () => {
+  it('renders ReportManagementPage at /reports', () => {
     render(
       <MemoryRouter initialEntries={['/reports']}>
         <App />
@@ -35,7 +35,8 @@ describe('App routing', () => {
     )
 
     expect(screen.getByTestId('report-management-page')).toBeInTheDocument()
-    expect(screen.getByText(/四大核心菜单之一/i)).toBeInTheDocument()
+    expect(screen.getByText('报告管理')).toBeInTheDocument()
+    expect(screen.getByTestId('new-report-plan-button')).toBeInTheDocument()
   })
 
   it('renders LineageCanvasPage at /lineage', () => {
