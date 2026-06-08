@@ -65,4 +65,36 @@ describe('LinkRelationManagePage', () => {
     expect(screen.queryByText('AGGREGATES')).not.toBeInTheDocument()
     expect(screen.queryByText('DRIVES')).not.toBeInTheDocument()
   })
+
+  it('shows usage tracking stats in expanded detail', async () => {
+    render(<LinkRelationManagePage />)
+    const detailButtons = screen.getAllByText('查看详情')
+    await userEvent.click(detailButtons[0]) // AGGREGATES
+    const usageSection = screen.getByTestId('usage-tracking')
+    expect(usageSection.textContent).toContain('被')
+    expect(usageSection.textContent).toContain('3')
+    expect(usageSection.textContent).toContain('个血缘连线引用')
+  })
+
+  it('shows connection list in expanded detail', async () => {
+    render(<LinkRelationManagePage />)
+    const detailButtons = screen.getAllByText('查看详情')
+    await userEvent.click(detailButtons[0]) // AGGREGATES
+    const usageSection = screen.getByTestId('usage-tracking')
+    expect(usageSection.textContent).toContain('月_收入_总收入')
+    expect(usageSection.textContent).toContain('季_收入_总收入')
+    expect(usageSection.textContent).toContain('日_用户_新增用户')
+    expect(usageSection.textContent).toContain('月_用户_新增用户')
+    expect(usageSection.textContent).toContain('月_成本_运营成本')
+    expect(usageSection.textContent).toContain('季_成本_总成本')
+  })
+
+  it('shows change timeline in expanded detail', async () => {
+    render(<LinkRelationManagePage />)
+    const detailButtons = screen.getAllByText('查看详情')
+    await userEvent.click(detailButtons[0]) // AGGREGATES
+    expect(screen.getByText('变更记录')).toBeInTheDocument()
+    expect(screen.getByText('2026-01-15 09:30:00')).toBeInTheDocument()
+    expect(screen.getByText('创建')).toBeInTheDocument()
+  })
 })
