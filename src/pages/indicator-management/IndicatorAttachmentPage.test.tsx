@@ -701,7 +701,8 @@ describe('IndicatorAttachmentPage', () => {
       expect(screen.getByTestId('pulse-ring')).toBeInTheDocument()
     })
 
-    it('shows mini toast when connection-confirmed event is dispatched', () => {
+    it('shows mini toast when connection-confirmed event is dispatched', async () => {
+      vi.useFakeTimers({ shouldAdvanceTime: true })
       createFeedbackTarget('feedback-tree-2')
       render(<IndicatorAttachmentPage />)
 
@@ -713,8 +714,14 @@ describe('IndicatorAttachmentPage', () => {
         )
       })
 
+      // Mini toast is delayed by 400ms until pulse ring dissipates
+      act(() => {
+        vi.advanceTimersByTime(400)
+      })
       expect(screen.getByTestId('mini-toast')).toBeInTheDocument()
       expect(screen.getByText('✓ 指标已挂靠')).toBeInTheDocument()
+
+      vi.useRealTimers()
     })
 
     it('auto-removes pulse ring after 450ms', () => {
@@ -756,10 +763,15 @@ describe('IndicatorAttachmentPage', () => {
         )
       })
 
+      // Mini toast appears after 400ms delay
+      act(() => {
+        vi.advanceTimersByTime(400)
+      })
       expect(screen.getByTestId('mini-toast')).toBeInTheDocument()
 
+      // Auto-removes after 2 seconds from appearance
       act(() => {
-        vi.advanceTimersByTime(2100)
+        vi.advanceTimersByTime(2000)
       })
 
       expect(screen.queryByTestId('mini-toast')).not.toBeInTheDocument()

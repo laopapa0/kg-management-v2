@@ -1,17 +1,9 @@
 import { useEffect, useState } from 'react'
+import { findTargetElement } from '@/utils/findTargetElement'
 
 interface MiniToastProps {
   targetId: string
   message: string
-}
-
-function findTargetElement(targetId: string): HTMLElement | null {
-  return (
-    document.querySelector(`[data-node-id="${targetId}"]`) ||
-    document.querySelector(`[data-tag-id="${targetId}"]`) ||
-    document.querySelector(`[data-rule-id="${targetId}"]`) ||
-    document.querySelector(`[data-indicator-id="${targetId}"]`)
-  ) as HTMLElement | null
 }
 
 export default function MiniToast({ targetId, message }: MiniToastProps) {

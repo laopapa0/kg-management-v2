@@ -194,7 +194,6 @@ export default function RulePanel() {
 
             return (
               <BatchDetachMenu
-                onViewAttached={() => {}}
                 detachOptions={
                   count > 0
                     ? [

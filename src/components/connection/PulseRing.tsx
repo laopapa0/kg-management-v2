@@ -1,16 +1,8 @@
 import { useEffect, useState } from 'react'
+import { findTargetElement } from '@/utils/findTargetElement'
 
 interface PulseRingProps {
   targetId: string
-}
-
-function findTargetElement(targetId: string): HTMLElement | null {
-  return (
-    document.querySelector(`[data-node-id="${targetId}"]`) ||
-    document.querySelector(`[data-tag-id="${targetId}"]`) ||
-    document.querySelector(`[data-rule-id="${targetId}"]`) ||
-    document.querySelector(`[data-indicator-id="${targetId}"]`)
-  ) as HTMLElement | null
 }
 
 export default function PulseRing({ targetId }: PulseRingProps) {
@@ -42,12 +34,12 @@ export default function PulseRing({ targetId }: PulseRingProps) {
       }}
     >
       <div
-        className="absolute inset-0 rounded-full border-[3px]"
-        style={{ borderColor: '#3B82F6' }}
+        className="absolute inset-0 rounded-full animate-pulse-ring-stroke"
+        style={{ borderColor: '#3B82F6', borderStyle: 'solid' }}
       />
       <div
-        className="absolute inset-[-4px] rounded-full border-[3px]"
-        style={{ borderColor: '#22C55E' }}
+        className="absolute inset-[-4px] rounded-full animate-pulse-ring-stroke"
+        style={{ borderColor: '#22C55E', borderStyle: 'solid' }}
       />
     </div>
   )

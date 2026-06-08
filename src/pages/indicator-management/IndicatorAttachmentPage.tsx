@@ -50,6 +50,7 @@ export default function IndicatorAttachmentPage() {
   // Feedback state for successful attachment
   const [pulseTargetId, setPulseTargetId] = useState<string | null>(null)
   const [toastTargetId, setToastTargetId] = useState<string | null>(null)
+  const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   useTargetBounce()
 
   // Listen for connection-confirmed to trigger feedback
@@ -57,10 +58,17 @@ export default function IndicatorAttachmentPage() {
     const handler = (e: Event) => {
       const detail = (e as CustomEvent).detail as { targetId: string }
       setPulseTargetId(detail.targetId)
-      setToastTargetId(detail.targetId)
+      // Delay toast until pulse ring dissipates (400ms)
+      toastTimerRef.current = setTimeout(() => setToastTargetId(detail.targetId), 400)
     }
     window.addEventListener('connection-confirmed', handler)
-    return () => window.removeEventListener('connection-confirmed', handler)
+    return () => {
+      window.removeEventListener('connection-confirmed', handler)
+      if (toastTimerRef.current) {
+        clearTimeout(toastTimerRef.current)
+        toastTimerRef.current = null
+      }
+    }
   }, [])
 
   // Auto-clear pulse after 450ms

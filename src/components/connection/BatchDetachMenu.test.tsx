@@ -53,6 +53,20 @@ describe('BatchDetachMenu', () => {
     })
   })
 
+  it('does not show view attached menu item when onViewAttached is not provided', async () => {
+    render(
+      <BatchDetachMenu detachOptions={defaultProps.detachOptions}>
+        <div data-testid="trigger">右键这里</div>
+      </BatchDetachMenu>,
+    )
+
+    await userEvent.pointer({ keys: '[MouseRight]', target: screen.getByTestId('trigger') })
+
+    await waitFor(() => {
+      expect(screen.queryByTestId('menu-view-attached')).not.toBeInTheDocument()
+    })
+  })
+
   it('calls onViewAttached when clicking view option', async () => {
     const onViewAttached = vi.fn()
     render(

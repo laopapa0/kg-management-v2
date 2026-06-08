@@ -16,7 +16,7 @@ interface DetachOption {
 
 interface BatchDetachMenuProps {
   children: React.ReactNode
-  onViewAttached: () => void
+  onViewAttached?: () => void
   detachOptions: DetachOption[]
 }
 
@@ -32,15 +32,18 @@ export default function BatchDetachMenu({
       <ContextMenu>
         <ContextMenuTrigger asChild>{children}</ContextMenuTrigger>
         <ContextMenuContent data-testid="batch-detach-menu" className="w-48">
-          <ContextMenuItem
-            data-testid="menu-view-attached"
-            onClick={onViewAttached}
-          >
-            <Eye className="size-4" />
-            <span>查看已挂靠指标</span>
-          </ContextMenuItem>
-
-          <ContextMenuSeparator />
+          {onViewAttached && (
+            <>
+              <ContextMenuItem
+                data-testid="menu-view-attached"
+                onClick={onViewAttached}
+              >
+                <Eye className="size-4" />
+                <span>查看已挂靠指标</span>
+              </ContextMenuItem>
+              {detachOptions.length > 0 && <ContextMenuSeparator />}
+            </>
+          )}
 
           {detachOptions.map((option, index) => (
             <ContextMenuItem

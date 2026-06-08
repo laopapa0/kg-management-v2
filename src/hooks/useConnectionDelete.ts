@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react'
+import { useState, useCallback, useRef, useEffect } from 'react'
 import { useAttachmentStore } from '@/stores/attachmentStore'
 
 export interface DeletedConnection {
@@ -96,6 +96,11 @@ export function useConnectionDelete() {
     setLastDeleted(null)
     clearTimer()
   }, [lastDeleted])
+
+  // Cleanup timer on unmount to avoid memory leaks
+  useEffect(() => {
+    return () => clearTimer()
+  }, [])
 
   return { lastDeleted, deleteConnection, undoDelete }
 }

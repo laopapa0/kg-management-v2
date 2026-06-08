@@ -266,7 +266,6 @@ export default function TagSetPanel() {
 
           return (
             <BatchDetachMenu
-              onViewAttached={() => {}}
               detachOptions={
                 attachedCount > 0
                   ? [

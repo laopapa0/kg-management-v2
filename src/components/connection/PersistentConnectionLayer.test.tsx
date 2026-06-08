@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { render, screen, cleanup, fireEvent, waitFor } from '@testing-library/react'
+import { render, screen, cleanup, fireEvent, waitFor, act } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import PersistentConnectionLayer from './PersistentConnectionLayer'
 
@@ -45,7 +45,7 @@ describe('PersistentConnectionLayer', () => {
     const lines = screen.getAllByTestId('persistent-connection-line')
     expect(lines).toHaveLength(2)
     lines.forEach((line) => {
-      expect(line).toHaveAttribute('stroke', 'var(--dark-conn-line-valid)')
+      expect(line).toHaveAttribute('stroke', '#3B82F6')
       expect(line).toHaveAttribute('stroke-width', '2')
       expect(line).toHaveAttribute('fill', 'none')
     })
@@ -243,7 +243,7 @@ describe('PersistentConnectionLayer', () => {
       render(<PersistentConnectionLayer connections={[{ sourceId: 'src-1', targetId: 'tree-1' }]} />)
 
       const path = screen.getByTestId('persistent-connection-line')
-      expect(path).toHaveAttribute('stroke', 'var(--dark-conn-line-valid)')
+      expect(path).toHaveAttribute('stroke', '#3B82F6')
       expect(path).toHaveAttribute('stroke-width', '2')
 
       fireEvent.mouseEnter(path)
@@ -262,7 +262,7 @@ describe('PersistentConnectionLayer', () => {
       expect(path).toHaveAttribute('stroke', '#7B8CDE')
 
       fireEvent.mouseLeave(path)
-      expect(path).toHaveAttribute('stroke', 'var(--dark-conn-line-valid)')
+      expect(path).toHaveAttribute('stroke', '#3B82F6')
       expect(path).toHaveAttribute('stroke-width', '2')
     })
 
@@ -315,6 +315,52 @@ describe('PersistentConnectionLayer', () => {
 
       const path = screen.getByTestId('persistent-connection-line')
       expect(path).toHaveStyle({ pointerEvents: 'stroke' })
+    })
+
+    it('fades out path over 200ms before removing from DOM', async () => {
+      vi.useFakeTimers({ shouldAdvanceTime: true })
+      const onDelete = vi.fn()
+      setupConnectionElements()
+      const { rerender } = render(
+        <PersistentConnectionLayer
+          connections={[{ sourceId: 'src-1', targetId: 'tree-1' }]}
+          onDelete={onDelete}
+        />,
+      )
+
+      const path = screen.getByTestId('persistent-connection-line')
+      fireEvent.mouseEnter(path)
+
+      act(() => {
+        fireEvent.click(screen.getByTestId('delete-connection-button'))
+      })
+
+      // onDelete is called immediately
+      expect(onDelete).toHaveBeenCalledTimes(1)
+
+      // Path should still be in DOM immediately after click, fading out
+      expect(screen.getByTestId('persistent-connection-line')).toBeInTheDocument()
+      const updatedPath = screen.getByTestId('persistent-connection-line')
+      expect(updatedPath).toHaveAttribute('opacity', '0')
+
+      // Simulate parent removing connection from props
+      rerender(
+        <PersistentConnectionLayer
+          connections={[]}
+          onDelete={onDelete}
+        />,
+      )
+
+      // Path still rendered because it's in exitingKeys
+      expect(screen.getByTestId('persistent-connection-line')).toBeInTheDocument()
+
+      // After 200ms fade-out, exitingKeys is cleared and path is removed
+      act(() => {
+        vi.advanceTimersByTime(200)
+      })
+      expect(screen.queryByTestId('persistent-connection-line')).not.toBeInTheDocument()
+
+      vi.useRealTimers()
     })
   })
 

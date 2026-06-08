@@ -219,4 +219,18 @@ describe('useConnectionDelete', () => {
     const indicator = useAttachmentStore.getState().indicators.find((i) => i.id === 'ind-1')
     expect(indicator?.treeParentId).toBe('tree-1')
   })
+
+  it('clears pending timer on unmount', () => {
+    const { result, unmount } = renderHook(() => useConnectionDelete())
+
+    act(() => {
+      result.current.deleteConnection({ sourceId: 'ind-1', targetId: 'tree-1' })
+    })
+
+    const clearTimeoutSpy = vi.spyOn(global, 'clearTimeout')
+    unmount()
+
+    expect(clearTimeoutSpy).toHaveBeenCalled()
+    clearTimeoutSpy.mockRestore()
+  })
 })

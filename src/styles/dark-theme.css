@@ -152,6 +152,19 @@
   animation: pulse-ring-scale 400ms ease-out forwards;
 }
 
+@keyframes pulse-ring-stroke {
+  from {
+    border-width: 3px;
+  }
+  to {
+    border-width: 1px;
+  }
+}
+
+.animate-pulse-ring-stroke {
+  animation: pulse-ring-stroke 400ms ease-out forwards;
+}
+
 /* Scale-in animation for delete connection button */
 @keyframes scale-in {
   from { transform: scale(0); opacity: 0; }
@@ -160,6 +173,20 @@
 
 .animate-scale-in {
   animation: scale-in 150ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* Persistent connection line fade-in */
+@keyframes persistent-line-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-persistent-line-fade-in {
+  animation: persistent-line-fade-in 200ms ease-out forwards;
 }
 
 /* Focus mode dimming: non-target panels are desaturated and darkened */

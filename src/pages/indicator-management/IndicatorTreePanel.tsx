@@ -227,7 +227,6 @@ const IndicatorTreePanel = forwardRef<IndicatorTreePanelRef>(function IndicatorT
 
             return (
               <BatchDetachMenu
-                onViewAttached={() => {}}
                 detachOptions={
                   attachedCount > 0
                     ? [
