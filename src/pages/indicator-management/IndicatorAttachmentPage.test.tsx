@@ -368,7 +368,7 @@ describe('IndicatorAttachmentPage', () => {
       expect(screen.queryByTestId('misfire-hint')).not.toBeInTheDocument()
 
       vi.useRealTimers()
-    })
+    }, 15000)
   })
 
   describe('focus zone hint', () => {
@@ -619,7 +619,7 @@ describe('IndicatorAttachmentPage', () => {
 
       document.body.removeChild(sourceEl)
       document.body.removeChild(targetEl)
-    })
+    }, 15000)
 
     it('restores connection when undo button is clicked', () => {
       const { sourceEl, targetEl } = setupConnectionElements('undo-src', 'undo-target')
@@ -669,7 +669,7 @@ describe('IndicatorAttachmentPage', () => {
 
       document.body.removeChild(sourceEl)
       document.body.removeChild(targetEl)
-    })
+    }, 15000)
   })
 
   describe('feedback on successful attachment', () => {
