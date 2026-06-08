@@ -340,7 +340,7 @@ describe('IndicatorAttachmentPage', () => {
       }
 
       expect(screen.getByTestId('misfire-hint')).toBeInTheDocument()
-      expect(screen.getByText(/请将连线拖拽到目标指标后按空格确认/i)).toBeInTheDocument()
+      expect(screen.getByText(/点击目录节点即可挂靠/i)).toBeInTheDocument()
     })
 
     it('auto-dismisses misfire hint after 3s and resets counter', async () => {
