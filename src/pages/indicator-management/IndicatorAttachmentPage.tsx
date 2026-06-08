@@ -127,6 +127,14 @@ export default function IndicatorAttachmentPage() {
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
+        const target = event.target as HTMLElement
+        if (
+          target.tagName === 'INPUT' ||
+          target.tagName === 'TEXTAREA' ||
+          target.isContentEditable
+        ) {
+          return
+        }
         event.preventDefault()
         setPaletteOpen((open) => !open)
       }
@@ -580,6 +588,14 @@ export default function IndicatorAttachmentPage() {
         onSelectIndicator={handleSelectIndicator}
         onToggleTag={handleToggleTag}
         onToggleRule={handleToggleRule}
+        onNavigateToTag={(tagId) => {
+          const el = document.querySelector(`[data-tag-id="${tagId}"]`)
+          el?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        }}
+        onNavigateToRule={(ruleId) => {
+          const el = document.querySelector(`[data-rule-id="${ruleId}"]`)
+          el?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        }}
       />
 
       {/* Palette action toast */}

@@ -150,7 +150,7 @@ export function useTreeKeyboard<T extends TreeNode>({
         }
       }
     },
-    [nodes, expanded, selectedId, onSelect, onToggle, onExpandedChange],
+    [nodes, expanded, selectedId, onSelect, onToggle, onExpandedChange, onEditNode, onDeleteNode],
   )
 
   return { handleKeyDown }

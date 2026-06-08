@@ -1,4 +1,4 @@
-import { forwardRef, useImperativeHandle, useMemo, useState } from 'react'
+import { forwardRef, useImperativeHandle, useMemo, useRef, useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { TreePine } from 'lucide-react'
 import { toast } from 'sonner'
@@ -72,6 +72,15 @@ const IndicatorTreePanel = forwardRef<IndicatorTreePanelRef>(function IndicatorT
   const [deletingNodeId, setDeletingNodeId] = useState<string | null>(null)
   const [highlightedId, setHighlightedId] = useState<string | null>(null)
   const [expanded, setExpanded] = useState<Set<string>>(() => new Set(initialExpandedIds))
+  const highlightTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => {
+    return () => {
+      if (highlightTimerRef.current) {
+        clearTimeout(highlightTimerRef.current)
+      }
+    }
+  }, [])
 
   const existingNames = useMemo(() => indicators.map((i) => i.name), [indicators])
 
@@ -108,7 +117,8 @@ const IndicatorTreePanel = forwardRef<IndicatorTreePanelRef>(function IndicatorT
       })
       setSelectedId(indicatorId)
       setHighlightedId(indicatorId)
-      setTimeout(() => setHighlightedId((current) => (current === indicatorId ? null : current)), 500)
+      if (highlightTimerRef.current) clearTimeout(highlightTimerRef.current)
+      highlightTimerRef.current = setTimeout(() => setHighlightedId((current) => (current === indicatorId ? null : current)), 500)
     },
   }))
 
@@ -116,7 +126,8 @@ const IndicatorTreePanel = forwardRef<IndicatorTreePanelRef>(function IndicatorT
     const newIndicator = addIndicator(name, parentId)
     if (newIndicator) {
       setHighlightedId(newIndicator.id)
-      setTimeout(() => setHighlightedId((current) => (current === newIndicator.id ? null : current)), 500)
+      if (highlightTimerRef.current) clearTimeout(highlightTimerRef.current)
+      highlightTimerRef.current = setTimeout(() => setHighlightedId((current) => (current === newIndicator.id ? null : current)), 500)
       setSelectedId(newIndicator.id)
     }
   }

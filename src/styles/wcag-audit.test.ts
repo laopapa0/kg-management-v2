@@ -1,4 +1,11 @@
+// @vitest-environment node
 import { describe, it, expect } from 'vitest'
+import { readFileSync } from 'node:fs'
+import { resolve, dirname } from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+const __dirname = dirname(fileURLToPath(import.meta.url))
+const cssPath = resolve(__dirname, 'dark-theme.css')
 
 /**
  * 将十六进制颜色转为 {r, g, b}（0-255）
@@ -72,7 +79,6 @@ describe('WCAG focus indicators', () => {
     const css = document.createElement('style')
     css.textContent = '[data-theme="dark"] { --dark-focus-ring: rgba(91, 141, 239, 0.6); }'
     document.head.appendChild(css)
-    const computed = getComputedStyle(document.documentElement)
     // Focus ring color is defined in CSS variables
     expect(true).toBe(true)
     document.head.removeChild(css)
@@ -80,24 +86,23 @@ describe('WCAG focus indicators', () => {
 })
 
 describe('prefers-reduced-motion', () => {
+  const cssContent = readFileSync(cssPath, 'utf-8')
+
   it('dark-theme.css contains reduced-motion media query', () => {
-    const content = require('fs').readFileSync(require('path').join(__dirname, 'dark-theme.css'), 'utf-8')
-    expect(content).toContain('@media (prefers-reduced-motion: reduce)')
+    expect(cssContent).toContain('@media (prefers-reduced-motion: reduce)')
   })
 
   it('media query sets animation-duration to 0.01ms', () => {
-    const content = require('fs').readFileSync(require('path').join(__dirname, 'dark-theme.css'), 'utf-8')
-    const idx = content.indexOf('@media (prefers-reduced-motion: reduce)')
+    const idx = cssContent.indexOf('@media (prefers-reduced-motion: reduce)')
     expect(idx).toBeGreaterThan(-1)
-    const block = content.slice(idx, idx + 800)
+    const block = cssContent.slice(idx, idx + 800)
     expect(block).toContain('animation-duration: 0.01ms')
   })
 
   it('media query limits transition to functional properties', () => {
-    const content = require('fs').readFileSync(require('path').join(__dirname, 'dark-theme.css'), 'utf-8')
-    const idx = content.indexOf('@media (prefers-reduced-motion: reduce)')
+    const idx = cssContent.indexOf('@media (prefers-reduced-motion: reduce)')
     expect(idx).toBeGreaterThan(-1)
-    const block = content.slice(idx, idx + 800)
+    const block = cssContent.slice(idx, idx + 800)
     expect(block).toContain('transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity')
   })
 })

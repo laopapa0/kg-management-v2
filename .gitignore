@@ -24,3 +24,7 @@ aws.credentials
 .handoff/
 .deepseek/
 *.agent.final/
+
+# Python
+__pycache__/
+*.pyc
