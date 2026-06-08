@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
+import { MemoryRouter } from 'react-router-dom'
 import userEvent from '@testing-library/user-event'
 import { __resetReportStorageCache } from '@/utils/reportStorage'
 import { mockReportPlans } from '@/models/reportModel'
@@ -13,7 +14,7 @@ describe('ReportManagementPage', () => {
   })
 
   it('shows empty state with new plan button when no plans exist', () => {
-    render(<ReportManagementPage />)
+    render(<MemoryRouter><ReportManagementPage /></MemoryRouter>)
 
     expect(screen.getByText('暂无报告计划')).toBeInTheDocument()
     expect(screen.getByText('创建报告计划以开始自动生成报告')).toBeInTheDocument()
@@ -22,7 +23,7 @@ describe('ReportManagementPage', () => {
 
   it('creates a new report plan and adds it to the list', async () => {
     const user = userEvent.setup()
-    render(<ReportManagementPage />)
+    render(<MemoryRouter><ReportManagementPage /></MemoryRouter>)
 
     const newButton = screen.getByTestId('new-report-plan-button')
     await user.click(newButton)
@@ -55,7 +56,7 @@ describe('ReportManagementPage', () => {
     const user = userEvent.setup()
     saveReportPlans(mockReportPlans)
 
-    render(<ReportManagementPage />)
+    render(<MemoryRouter><ReportManagementPage /></MemoryRouter>)
 
     const editButton = screen.getByTestId('edit-report-plan-report-plan-001')
     await user.click(editButton)
@@ -82,7 +83,7 @@ describe('ReportManagementPage', () => {
     const user = userEvent.setup()
     saveReportPlans(mockReportPlans)
 
-    render(<ReportManagementPage />)
+    render(<MemoryRouter><ReportManagementPage /></MemoryRouter>)
 
     expect(screen.getByText('核心指标日报')).toBeInTheDocument()
 
@@ -100,7 +101,7 @@ describe('ReportManagementPage', () => {
 
   it('opens create dialog when new plan button is clicked', async () => {
     const user = userEvent.setup()
-    render(<ReportManagementPage />)
+    render(<MemoryRouter><ReportManagementPage /></MemoryRouter>)
 
     const newButton = screen.getByTestId('new-report-plan-button')
     await user.click(newButton)
@@ -115,7 +116,7 @@ describe('ReportManagementPage', () => {
   it('renders report plan list with name, schedule, filter summary, version and generation time', () => {
     saveReportPlans(mockReportPlans)
 
-    render(<ReportManagementPage />)
+    render(<MemoryRouter><ReportManagementPage /></MemoryRouter>)
 
     expect(screen.getByText('核心指标日报')).toBeInTheDocument()
     expect(screen.getByText('每日')).toBeInTheDocument()

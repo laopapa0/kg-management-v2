@@ -1,4 +1,4 @@
-import { FileText, Plus, Pencil, Trash2 } from 'lucide-react'
+import { FileText, Plus, Pencil, Trash2, Play } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import EmptyState from '@/components/empty-state/EmptyState'
 import { Button } from '@/components/ui/button'
@@ -6,9 +6,11 @@ import ReportPlanDialog from '@/components/dialog/ReportPlanDialog'
 import { SCHEDULE_LABELS, createReportPlan } from '@/models/reportModel'
 import type { ReportPlan } from '@/models/reportModel'
 import { getReportPlans, saveReportPlans } from '@/utils/reportStorage'
+import { useNavigate } from 'react-router-dom'
 
 
 export default function ReportManagementPage() {
+  const navigate = useNavigate()
   const [plans, setPlans] = useState(getReportPlans)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editingPlan, setEditingPlan] = useState<ReportPlan | null>(null)
@@ -79,16 +81,27 @@ export default function ReportManagementPage() {
     >
       <div className="flex items-center justify-between">
         <h2 className="text-h2 font-semibold text-dark-text-primary">报告管理</h2>
-        <Button
-          data-testid="new-report-plan-button"
-          onClick={() => {
-            setEditingPlan(null)
-            setDialogOpen(true)
-          }}
-        >
-          <Plus size={16} />
-          新建报告计划
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            data-testid="generate-report-button"
+            variant="outline"
+            onClick={() => navigate('/reports/generate')}
+            className="border-dark-border text-dark-text-primary"
+          >
+            <Play size={16} />
+            生成报告
+          </Button>
+          <Button
+            data-testid="new-report-plan-button"
+            onClick={() => {
+              setEditingPlan(null)
+              setDialogOpen(true)
+            }}
+          >
+            <Plus size={16} />
+            新建报告计划
+          </Button>
+        </div>
       </div>
 
       <ReportPlanDialog
