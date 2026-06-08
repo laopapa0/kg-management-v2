@@ -650,7 +650,7 @@ export default function LineageCanvasPage() {
 
   // 弹窗状态
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [showPreviewModal, setShowPreviewModal] = useState(false);
+  const [showPreviewModal, setShowPreviewModal] = useState(false)
 
   // 创建关系表单 - 预填充示例数据
   const [createForm, setCreateForm] = useState({
@@ -846,15 +846,6 @@ export default function LineageCanvasPage() {
           >
             <Plus size={16} className="mr-1.5" />
             添加关系
-          </Button>
-          <Button
-            variant="outline"
-            className="h-9 px-4 text-[14px]"
-            onClick={() => setShowPreviewModal(true)}
-            disabled={relations.length === 0}
-          >
-            <Eye size={16} className="mr-1.5" />
-            血缘预览
           </Button>
           <Button
             variant="ghost"
@@ -1080,6 +1071,40 @@ export default function LineageCanvasPage() {
               pan={pan}
             />
           </div>
+
+          {/* 浮动快捷操作栏 */}
+          <AnimatePresence>
+            {selectedNode && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 10 }}
+                className="absolute top-4 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2 rounded-lg border border-dark-border bg-dark-elevated/95 backdrop-blur px-4 py-2 shadow-lg"
+              >
+                <button
+                  onClick={() => {
+                    setCreateForm({ sourceId: '', targetId: selectedNode.id, relationType: '', correlation: '', confidence: 70, description: '' })
+                    setShowCreateModal(true)
+                  }}
+                  className="flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm text-dark-text-primary hover:bg-dark-accent-primary/10 transition-colors"
+                >
+                  <PlusCircle size={16} />
+                  添加上游关系
+                </button>
+                <div className="w-px h-5 bg-dark-border" />
+                <button
+                  onClick={() => {
+                    setCreateForm({ sourceId: selectedNode.id, targetId: '', relationType: '', correlation: '', confidence: 70, description: '' })
+                    setShowCreateModal(true)
+                  }}
+                  className="flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm text-dark-text-primary hover:bg-dark-accent-primary/10 transition-colors"
+                >
+                  <PlusCircle size={16} />
+                  添加下游关系
+                </button>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* 节点详情浮窗 */}
           <AnimatePresence>
@@ -1392,7 +1417,6 @@ export default function LineageCanvasPage() {
                   return;
                 }
                 setShowCreateModal(false);
-                setShowPreviewModal(true);
               }}
             >
               <Eye size={14} className="mr-1.5" />
