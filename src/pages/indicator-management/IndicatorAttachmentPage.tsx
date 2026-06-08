@@ -271,7 +271,7 @@ export default function IndicatorAttachmentPage() {
         if (card) {
           e.preventDefault()
           e.stopPropagation()
-          start(card.dataset.indicatorId!, 'tree')
+          start(card.dataset.indicatorId!)
         }
       } else if (zone === 'tag') {
         const pill = target.closest('button[data-tag-id]') as HTMLButtonElement | null
@@ -368,7 +368,7 @@ export default function IndicatorAttachmentPage() {
     ...ind,
     onClick: () => {
       setSelectedIndicatorId(ind.id)
-      start(ind.id, 'tree')
+      start(ind.id)
     },
   }))
 
@@ -530,7 +530,7 @@ export default function IndicatorAttachmentPage() {
         isVisible={state.isConnecting}
         sourceId={state.sourceId}
         validTargetIds={state.validTargetIds}
-        targetType={state.targetType}
+        targetType="tree"
       />
 
       {/* Persistent solid connection lines */}
