@@ -37,4 +37,24 @@ describe('App routing', () => {
     expect(screen.getByTestId('report-management-page')).toBeInTheDocument()
     expect(screen.getByText(/四大核心菜单之一/i)).toBeInTheDocument()
   })
+
+  it('renders LineageCanvasPage at /lineage', () => {
+    render(
+      <MemoryRouter initialEntries={['/lineage']}>
+        <App />
+      </MemoryRouter>
+    )
+
+    expect(screen.getByText('配置链接关系（血缘画布）')).toBeInTheDocument()
+  })
+
+  it('renders KnowledgeUploadPage at /knowledge-upload', () => {
+    render(
+      <MemoryRouter initialEntries={['/knowledge-upload']}>
+        <App />
+      </MemoryRouter>
+    )
+
+    expect(screen.getByText('知识上传')).toBeInTheDocument()
+  })
 })
