@@ -35,7 +35,7 @@ describe('App routing', () => {
     )
 
     expect(screen.getByTestId('report-management-page')).toBeInTheDocument()
-    expect(screen.getByText('报告管理')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: '报告管理' })).toBeInTheDocument()
     expect(screen.getByTestId('new-report-plan-button')).toBeInTheDocument()
   })
 

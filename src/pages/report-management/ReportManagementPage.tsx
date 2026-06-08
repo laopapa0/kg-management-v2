@@ -6,7 +6,7 @@ import ReportPlanDialog from '@/components/dialog/ReportPlanDialog'
 import { SCHEDULE_LABELS, createReportPlan } from '@/models/reportModel'
 import type { ReportPlan } from '@/models/reportModel'
 import { getReportPlans, saveReportPlans } from '@/utils/reportStorage'
-import { mockReportPlans } from '@/models/reportModel'
+
 
 export default function ReportManagementPage() {
   const [plans, setPlans] = useState(getReportPlans)
@@ -14,13 +14,7 @@ export default function ReportManagementPage() {
   const [editingPlan, setEditingPlan] = useState<ReportPlan | null>(null)
 
   useEffect(() => {
-    const stored = getReportPlans()
-    if (stored.length === 0) {
-      saveReportPlans(mockReportPlans)
-      setPlans(mockReportPlans)
-    } else {
-      setPlans(stored)
-    }
+    setPlans(getReportPlans())
   }, [])
 
   if (plans.length === 0) {
