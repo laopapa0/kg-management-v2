@@ -45,7 +45,7 @@ export default function AttachedBadge({
         onClick={() => setIsOpen((prev) => !prev)}
         className={[
           'inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold text-white',
-          'bg-[#7B8CDE] transition-all duration-150 hover:brightness-110',
+          'bg-[var(--dark-accent-primary)] transition-all duration-150 hover:brightness-110',
         ].join(' ')}
       >
         已挂靠 {count}
@@ -79,7 +79,7 @@ export default function AttachedBadge({
             {indicators.map((indicator) => (
               <div
                 key={indicator.id}
-                className="flex items-center justify-between px-3 py-2 hover:bg-white/[0.04]"
+                className="flex items-center justify-between px-3 py-2 hover:bg-dark-elevated/[0.04]"
               >
                 <span className="truncate text-xs text-dark-text-primary">{indicator.name}</span>
                 <button

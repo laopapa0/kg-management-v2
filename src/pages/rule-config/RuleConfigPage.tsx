@@ -199,17 +199,17 @@ function RuleTreeNode({ node, selectedTemplateId, expandedIds, onToggleExpand, o
         }}
         className={cn(
           'flex items-center h-9 px-2 rounded-md cursor-pointer transition-colors duration-100',
-          isSelected ? 'bg-[#eef4ff] text-[#3478f6] relative' : 'hover:bg-[#f8f9fb] text-[#4a5568]',
+          isSelected ? 'bg-dark-accent-primary/10 text-dark-accent-primary relative' : 'hover:bg-dark-page text-dark-text-secondary',
           node.type === 'subcategory' && 'pl-4',
           node.type === 'template' && 'pl-6'
         )}
       >
         {isSelected && (
-          <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-[#3478f6] rounded-r-full" />
+          <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-dark-accent-primary rounded-r-full" />
         )}
         {hasChildren && node.type !== 'template' ? (
           <span
-            className="mr-1 text-[#9ba4b3]"
+            className="mr-1 text-dark-text-tertiary"
             onClick={(e) => {
               e.stopPropagation();
               onToggleExpand(node.id);
@@ -222,7 +222,7 @@ function RuleTreeNode({ node, selectedTemplateId, expandedIds, onToggleExpand, o
         )}
         <span className={cn('text-[13px] truncate', isSelected && 'font-medium')}>{node.name}</span>
         {node.type === 'template' && (
-          <span className="ml-auto text-[11px] text-[#9ba4b3] bg-[#f1f3f6] px-1.5 py-0.5 rounded">
+          <span className="ml-auto text-[11px] text-dark-text-tertiary bg-dark-card-l2 px-1.5 py-0.5 rounded">
             {(node as any).ruleCount ?? 0} 条
           </span>
         )}
@@ -330,30 +330,30 @@ function CategoryIcon({ name, className }: { name: string; className?: string })
 function getTemplateIcon(id: string) {
   switch (id) {
     case 'threshold':
-      return <AlertTriangle size={18} className="text-[#ef4444]" />;
+      return <AlertTriangle size={18} className="text-error-500" />;
     case 'topn':
-      return <BarChart3 size={18} className="text-[#3478f6]" />;
+      return <BarChart3 size={18} className="text-dark-accent-primary" />;
     case 'fluctuation':
-      return <TrendingUp size={18} className="text-[#10b981]" />;
+      return <TrendingUp size={18} className="text-success-500" />;
     case 'pearson':
-      return <Activity size={18} className="text-[#f59e0b]" />;
+      return <Activity size={18} className="text-warning-500" />;
     default:
-      return <Code size={18} className="text-[#4a5568]" />;
+      return <Code size={18} className="text-dark-text-secondary" />;
   }
 }
 
 function getTemplateBg(id: string) {
   switch (id) {
     case 'threshold':
-      return 'bg-[#fef2f2]';
+      return 'bg-error-500/10';
     case 'topn':
-      return 'bg-[#eef4ff]';
+      return 'bg-dark-accent-primary/10';
     case 'fluctuation':
-      return 'bg-[#ecfdf5]';
+      return 'bg-success-500/10';
     case 'pearson':
-      return 'bg-[#fffbeb]';
+      return 'bg-warning-500/10';
     default:
-      return 'bg-[#f1f3f6]';
+      return 'bg-dark-card-l2';
   }
 }
 
@@ -549,12 +549,12 @@ export default function RuleConfigPage() {
     (indicatorName: string): { text: string; className: string } => {
       const indRules = rules.filter((r) => r.indicators.includes(indicatorName));
       if (indRules.length === 0) {
-        return { text: '未配置', className: 'bg-[#f1f3f6] text-[#9ba4b3]' };
+        return { text: '未配置', className: 'bg-dark-card-l2 text-dark-text-tertiary' };
       }
       if (indRules.some((r) => r.status === 'active')) {
-        return { text: '启用', className: 'bg-[#ecfdf5] text-[#059669]' };
+        return { text: '启用', className: 'bg-success-500/10 text-success-600' };
       }
-      return { text: '草稿', className: 'bg-[#fffbeb] text-[#d97706]' };
+      return { text: '草稿', className: 'bg-warning-500/10 text-warning-600' };
     },
     [rules]
   );
@@ -813,15 +813,15 @@ export default function RuleConfigPage() {
           <div>
             <button
               onClick={() => navigate('/')}
-              className="inline-flex items-center h-7 px-3 rounded-md border border-[#dde1e8] bg-white text-[13px] text-[#4a5568] hover:bg-[#f8f9fb] transition-colors mb-3"
+              className="inline-flex items-center h-7 px-3 rounded-md border border-dark-border-hover bg-dark-elevated text-[13px] text-dark-text-secondary hover:bg-dark-page transition-colors mb-3"
             >
               <ArrowLeft size={14} className="mr-1" />
               返回
             </button>
-            <h1 className="text-[22px] font-semibold text-[#1a202c] leading-tight tracking-tight">
+            <h1 className="text-[22px] font-semibold text-dark-text-primary leading-tight tracking-tight">
               配置业务规则
             </h1>
-            <p className="text-[13px] text-[#6b7789] mt-1">
+            <p className="text-[13px] text-dark-text-secondary mt-1">
               维护业务规则与指标的关联关系，支持多种规则模板配置
             </p>
           </div>
@@ -835,18 +835,18 @@ export default function RuleConfigPage() {
           initial={{ opacity: 0, x: -12 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.3, delay: 0.1 }}
-          className="w-[320px] shrink-0 bg-white rounded-lg border border-[#e8ecf1] shadow-[0_1px_3px_rgba(0,0,0,0.06)] flex flex-col overflow-hidden"
+          className="w-[320px] shrink-0 bg-dark-elevated rounded-lg border border-dark-border shadow-[0_1px_3px_rgba(0,0,0,0.06)] flex flex-col overflow-hidden"
         >
           {/* Left Header */}
-          <div className="shrink-0 px-4 py-3.5 border-b border-[#e8ecf1] flex justify-between items-center">
-            <h2 className="text-[15px] font-semibold text-[#2d3748]">规则目录</h2>
-            <span className="px-2 py-0.5 rounded text-[11px] font-medium bg-[#f1f3f6] text-[#4a5568]">
+          <div className="shrink-0 px-4 py-3.5 border-b border-dark-border flex justify-between items-center">
+            <h2 className="text-[15px] font-semibold text-dark-text-primary">规则目录</h2>
+            <span className="px-2 py-0.5 rounded text-[11px] font-medium bg-dark-card-l2 text-dark-text-secondary">
               {rules.length} 条
             </span>
           </div>
 
           {/* Tree Search */}
-          <div className="shrink-0 px-3 py-2.5 border-b border-[#e8ecf1]">
+          <div className="shrink-0 px-3 py-2.5 border-b border-dark-border">
             <SearchInput
               placeholder="搜索分类或模板"
               value={treeSearch}
@@ -859,7 +859,7 @@ export default function RuleConfigPage() {
           <ScrollArea className="flex-1">
             <div className="p-3">
               {filteredTree.length === 0 && (
-                <div className="text-center py-10 text-[13px] text-[#9ba4b3]">
+                <div className="text-center py-10 text-[13px] text-dark-text-tertiary">
                   无匹配分类
                 </div>
               )}
@@ -877,10 +877,10 @@ export default function RuleConfigPage() {
           </ScrollArea>
 
           {/* Left: Add Button */}
-          <div className="shrink-0 p-3 border-t border-[#e8ecf1] bg-[#fafbfc]">
+          <div className="shrink-0 p-3 border-t border-dark-border bg-dark-page">
             <button
               onClick={openAddDialog}
-              className="w-full h-9 flex items-center justify-center gap-1.5 rounded-md border border-dashed border-[#c4cad4] text-[13px] text-[#3478f6] font-medium hover:border-[#3478f6] hover:bg-[#eef4ff] transition-all"
+              className="w-full h-9 flex items-center justify-center gap-1.5 rounded-md border border-dashed border-dark-border-hover text-[13px] text-dark-accent-primary font-medium hover:border-dark-accent-primary hover:bg-dark-accent-primary/10 transition-all"
             >
               <Plus size={15} />
               添加新规则
@@ -889,20 +889,20 @@ export default function RuleConfigPage() {
         </motion.div>
 
         {/* ═══ Right Panel: Indicator Table ═══ */}
-        <div className="flex-1 min-w-0 bg-white rounded-lg border border-[#e8ecf1] shadow-[0_1px_3px_rgba(0,0,0,0.06)] flex flex-col overflow-hidden">
+        <div className="flex-1 min-w-0 bg-dark-elevated rounded-lg border border-dark-border shadow-[0_1px_3px_rgba(0,0,0,0.06)] flex flex-col overflow-hidden">
           {/* Right Header: Filter tag + Search + Add */}
-          <div className="shrink-0 px-5 py-3.5 border-b border-[#e8ecf1]">
+          <div className="shrink-0 px-5 py-3.5 border-b border-dark-border">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
-                <h2 className="text-[16px] font-semibold text-[#2d3748]">
+                <h2 className="text-[16px] font-semibold text-dark-text-primary">
                   指标列表
                 </h2>
                 {selectedTemplateId && (
-                  <div className="flex items-center gap-2 px-2.5 py-1 rounded-md bg-[#eef4ff] text-[12px] text-[#3478f6]">
+                  <div className="flex items-center gap-2 px-2.5 py-1 rounded-md bg-dark-accent-primary/10 text-[12px] text-dark-accent-primary">
                     <span>已筛选：{selectedTemplatePath.join(' > ')}</span>
                     <button
                       onClick={() => setSelectedTemplateId('')}
-                      className="hover:text-[#1d5ee0]"
+                      className="hover:text-dark-accent-primary-active"
                     >
                       <X size={12} />
                     </button>
@@ -911,7 +911,7 @@ export default function RuleConfigPage() {
               </div>
               <button
                 onClick={openAddDialog}
-                className="inline-flex items-center gap-1.5 h-8 px-3 rounded-md bg-[#3478f6] text-white text-[13px] font-medium hover:bg-[#1d5ee0] transition-colors"
+                className="inline-flex items-center gap-1.5 h-8 px-3 rounded-md bg-dark-accent-primary text-white text-[13px] font-medium hover:bg-dark-accent-primary-active transition-colors"
               >
                 <Plus size={14} />
                 添加新规则
@@ -924,7 +924,7 @@ export default function RuleConfigPage() {
                 onChange={setIndicatorSearch}
                 width="w-64"
               />
-              <span className="text-[13px] text-[#6b7789]">
+              <span className="text-[13px] text-dark-text-secondary">
                 共 {filteredIndicators.length} 个指标
               </span>
             </div>
@@ -935,10 +935,10 @@ export default function RuleConfigPage() {
             <div className="p-5">
               {filteredIndicators.length === 0 ? (
                 <div className="text-center py-16">
-                  <div className="w-12 h-12 rounded-full bg-[#f1f3f6] flex items-center justify-center mx-auto mb-3">
-                    <Search size={20} className="text-[#c4cad4]" />
+                  <div className="w-12 h-12 rounded-full bg-dark-card-l2 flex items-center justify-center mx-auto mb-3">
+                    <Search size={20} className="text-dark-text-tertiary" />
                   </div>
-                  <p className="text-[14px] text-[#9ba4b3]">
+                  <p className="text-[14px] text-dark-text-tertiary">
                     {indicatorSearch
                       ? '未找到匹配的指标'
                       : selectedTemplateId
@@ -947,17 +947,17 @@ export default function RuleConfigPage() {
                   </p>
                 </div>
               ) : (
-                <div className="border border-[#e8ecf1] rounded-lg overflow-hidden">
+                <div className="border border-dark-border rounded-lg overflow-hidden">
                   <table className="w-full">
-                    <thead className="bg-[#f1f3f6]">
-                      <tr className="border-b border-[#e8ecf1]">
-                        <th className="h-10 px-4 text-left text-[12px] font-medium text-[#4a5568] w-10"></th>
-                        <th className="h-10 px-4 text-left text-[12px] font-medium text-[#4a5568]">指标名称</th>
-                        <th className="h-10 px-4 text-left text-[12px] font-medium text-[#4a5568]">指标编码</th>
-                        <th className="h-10 px-4 text-left text-[12px] font-medium text-[#4a5568]">一级/二级</th>
-                        <th className="h-10 px-4 text-left text-[12px] font-medium text-[#4a5568]">单位</th>
-                        <th className="h-10 px-4 text-left text-[12px] font-medium text-[#4a5568] w-[80px]">状态</th>
-                        <th className="h-10 px-4 text-left text-[12px] font-medium text-[#4a5568] w-[80px]">操作</th>
+                    <thead className="bg-dark-card-l2">
+                      <tr className="border-b border-dark-border">
+                        <th className="h-10 px-4 text-left text-[12px] font-medium text-dark-text-secondary w-10"></th>
+                        <th className="h-10 px-4 text-left text-[12px] font-medium text-dark-text-secondary">指标名称</th>
+                        <th className="h-10 px-4 text-left text-[12px] font-medium text-dark-text-secondary">指标编码</th>
+                        <th className="h-10 px-4 text-left text-[12px] font-medium text-dark-text-secondary">一级/二级</th>
+                        <th className="h-10 px-4 text-left text-[12px] font-medium text-dark-text-secondary">单位</th>
+                        <th className="h-10 px-4 text-left text-[12px] font-medium text-dark-text-secondary w-[80px]">状态</th>
+                        <th className="h-10 px-4 text-left text-[12px] font-medium text-dark-text-secondary w-[80px]">操作</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -969,19 +969,19 @@ export default function RuleConfigPage() {
                           <Fragment key={ind.id}>
                             <tr
                               onClick={() => toggleIndicatorExpand(ind.id)}
-                              className="border-b border-[#e8ecf1] hover:bg-[#f8f9fb] cursor-pointer"
+                              className="border-b border-dark-border hover:bg-dark-page cursor-pointer"
                             >
                               <td className="h-11 px-4">
                                 {isExpanded ? (
-                                  <ChevronUp size={14} className="text-[#9ba4b3]" />
+                                  <ChevronUp size={14} className="text-dark-text-tertiary" />
                                 ) : (
-                                  <ChevronDown size={14} className="text-[#9ba4b3]" />
+                                  <ChevronDown size={14} className="text-dark-text-tertiary" />
                                 )}
                               </td>
-                              <td className="h-11 px-4 text-[13px] text-[#2d3748] font-medium">{ind.name}</td>
-                              <td className="h-11 px-4 text-[12px] text-[#9ba4b3] font-mono">{ind.code}</td>
-                              <td className="h-11 px-4 text-[12px] text-[#6b7789]">{ind.level1} &gt; {ind.level2}</td>
-                              <td className="h-11 px-4 text-[12px] text-[#6b7789]">{ind.unit}</td>
+                              <td className="h-11 px-4 text-[13px] text-dark-text-primary font-medium">{ind.name}</td>
+                              <td className="h-11 px-4 text-[12px] text-dark-text-tertiary font-mono">{ind.code}</td>
+                              <td className="h-11 px-4 text-[12px] text-dark-text-secondary">{ind.level1} &gt; {ind.level2}</td>
+                              <td className="h-11 px-4 text-[12px] text-dark-text-secondary">{ind.unit}</td>
                               <td className="h-11 px-4">
                                 <span className={cn('text-[11px] px-2 py-0.5 rounded', status.className)}>
                                   {status.text}
@@ -993,49 +993,49 @@ export default function RuleConfigPage() {
                                     e.stopPropagation();
                                     openAddDialog();
                                   }}
-                                  className="text-[12px] text-[#3478f6] hover:underline"
+                                  className="text-[12px] text-dark-accent-primary hover:underline"
                                 >
                                   添加规则
                                 </button>
                               </td>
                             </tr>
                             {isExpanded && (
-                              <tr className="bg-[#fafbfc]">
+                              <tr className="bg-dark-page">
                                 <td colSpan={7} className="px-4 py-3">
                                   {indRules.length === 0 ? (
-                                    <div className="text-center py-6 text-[13px] text-[#9ba4b3]">
+                                    <div className="text-center py-6 text-[13px] text-dark-text-tertiary">
                                       <p>暂无规则</p>
                                       <button
                                         onClick={openAddDialog}
-                                        className="mt-2 text-[12px] text-[#3478f6] hover:underline"
+                                        className="mt-2 text-[12px] text-dark-accent-primary hover:underline"
                                       >
                                         为此指标添加规则
                                       </button>
                                     </div>
                                   ) : (
-                                    <div className="border border-[#e8ecf1] rounded-lg overflow-hidden">
+                                    <div className="border border-dark-border rounded-lg overflow-hidden">
                                       <table className="w-full">
-                                        <thead className="bg-[#f1f3f6]">
-                                          <tr className="border-b border-[#e8ecf1]">
-                                            <th className="h-8 px-3 text-left text-[11px] font-medium text-[#4a5568]">规则名称</th>
+                                        <thead className="bg-dark-card-l2">
+                                          <tr className="border-b border-dark-border">
+                                            <th className="h-8 px-3 text-left text-[11px] font-medium text-dark-text-secondary">规则名称</th>
                                             {!selectedTemplateId && (
-                                              <th className="h-8 px-3 text-left text-[11px] font-medium text-[#4a5568]">模板类型</th>
+                                              <th className="h-8 px-3 text-left text-[11px] font-medium text-dark-text-secondary">模板类型</th>
                                             )}
-                                            <th className="h-8 px-3 text-left text-[11px] font-medium text-[#4a5568]">参数</th>
-                                            <th className="h-8 px-3 text-left text-[11px] font-medium text-[#4a5568] w-[60px]">状态</th>
-                                            <th className="h-8 px-3 text-left text-[11px] font-medium text-[#4a5568] w-[80px]">操作</th>
+                                            <th className="h-8 px-3 text-left text-[11px] font-medium text-dark-text-secondary">参数</th>
+                                            <th className="h-8 px-3 text-left text-[11px] font-medium text-dark-text-secondary w-[60px]">状态</th>
+                                            <th className="h-8 px-3 text-left text-[11px] font-medium text-dark-text-secondary w-[80px]">操作</th>
                                           </tr>
                                         </thead>
                                         <tbody>
                                           {indRules.map((rule) => (
-                                            <tr key={rule.id} className="border-b border-[#e8ecf1] last:border-0 hover:bg-white">
-                                              <td className="h-9 px-3 text-[12px] text-[#2d3748]">{rule.name}</td>
+                                            <tr key={rule.id} className="border-b border-dark-border last:border-0 hover:bg-dark-elevated">
+                                              <td className="h-9 px-3 text-[12px] text-dark-text-primary">{rule.name}</td>
                                               {!selectedTemplateId && (
-                                                <td className="h-9 px-3 text-[11px] text-[#6b7789]">{rule.type}</td>
+                                                <td className="h-9 px-3 text-[11px] text-dark-text-secondary">{rule.type}</td>
                                               )}
-                                              <td className="h-9 px-3 text-[11px] text-[#6b7789]">{getParamSummary(rule.params)}</td>
+                                              <td className="h-9 px-3 text-[11px] text-dark-text-secondary">{getParamSummary(rule.params)}</td>
                                               <td className="h-9 px-3">
-                                                <span className={cn('text-[10px] px-1.5 py-0.5 rounded', rule.status === 'active' ? 'bg-[#ecfdf5] text-[#059669]' : 'bg-[#f1f3f6] text-[#9ba4b3]')}>
+                                                <span className={cn('text-[10px] px-1.5 py-0.5 rounded', rule.status === 'active' ? 'bg-success-500/10 text-success-600' : 'bg-dark-card-l2 text-dark-text-tertiary')}>
                                                   {rule.status === 'active' ? '启用' : '草稿'}
                                                 </span>
                                               </td>
@@ -1043,7 +1043,7 @@ export default function RuleConfigPage() {
                                                 <div className="flex items-center gap-2">
                                                   <button
                                                     onClick={() => openEditDialog(rule)}
-                                                    className="text-[11px] text-[#3478f6] hover:underline"
+                                                    className="text-[11px] text-dark-accent-primary hover:underline"
                                                   >
                                                     编辑
                                                   </button>
@@ -1052,7 +1052,7 @@ export default function RuleConfigPage() {
                                                       setDeleteTargetId(rule.id);
                                                       setShowDeleteDialog(true);
                                                     }}
-                                                    className="text-[11px] text-[#ef4444] hover:underline"
+                                                    className="text-[11px] text-error-500 hover:underline"
                                                   >
                                                     删除
                                                   </button>
@@ -1084,14 +1084,14 @@ export default function RuleConfigPage() {
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.3, delay: 0.2 }}
-        className="fixed bottom-0 left-0 right-0 bg-white border-t border-[#e8ecf1] px-6 py-3.5 flex justify-between items-center z-40"
+        className="fixed bottom-0 left-0 right-0 bg-dark-elevated border-t border-dark-border px-6 py-3.5 flex justify-between items-center z-40"
         style={{ marginLeft: 240 }}
       >
-        <div className="text-[13px] text-[#6b7789]">
-          共 <span className="font-medium text-[#2d3748]">{rules.length}</span> 条规则
+        <div className="text-[13px] text-dark-text-secondary">
+          共 <span className="font-medium text-dark-text-primary">{rules.length}</span> 条规则
           {rules.filter((r) => r.status === 'active').length > 0 && (
             <span className="ml-2">
-              (<span className="text-[#10b981]">{rules.filter((r) => r.status === 'active').length} 条启用</span>
+              (<span className="text-success-500">{rules.filter((r) => r.status === 'active').length} 条启用</span>
               {rules.filter((r) => r.status === 'draft').length > 0 &&
                 ` / ${rules.filter((r) => r.status === 'draft').length} 条草稿`}
               )
@@ -1103,13 +1103,13 @@ export default function RuleConfigPage() {
             onClick={() => {
               toast.success('草稿已保存');
             }}
-            className="h-9 px-4 rounded-md border border-[#dde1e8] bg-white text-[14px] text-[#4a5568] hover:bg-[#f8f9fb] transition-colors"
+            className="h-9 px-4 rounded-md border border-dark-border-hover bg-dark-elevated text-[14px] text-dark-text-secondary hover:bg-dark-page transition-colors"
           >
             保存草稿
           </button>
           <button
             onClick={() => setShowPublishDialog(true)}
-            className="h-10 px-6 rounded-md bg-[#3478f6] text-white text-[14px] font-medium hover:bg-[#1d5ee0] transition-colors shadow-sm"
+            className="h-10 px-6 rounded-md bg-dark-accent-primary text-white text-[14px] font-medium hover:bg-dark-accent-primary-active transition-colors shadow-sm"
           >
             确认发布到图谱
           </button>
@@ -1120,23 +1120,23 @@ export default function RuleConfigPage() {
       <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <DialogContent className="sm:max-w-[400px]">
           <DialogHeader>
-            <DialogTitle className="text-[18px] font-semibold text-[#1a202c]">
+            <DialogTitle className="text-[18px] font-semibold text-dark-text-primary">
               确认删除规则？
             </DialogTitle>
           </DialogHeader>
-          <p className="text-[14px] text-[#6b7789] py-2">
+          <p className="text-[14px] text-dark-text-secondary py-2">
             删除后无法恢复，该规则将不再生效。
           </p>
           <DialogFooter className="gap-2">
             <button
               onClick={() => setShowDeleteDialog(false)}
-              className="h-9 px-4 rounded-md border border-[#dde1e8] bg-white text-[14px] text-[#4a5568] hover:bg-[#f8f9fb] transition-colors"
+              className="h-9 px-4 rounded-md border border-dark-border-hover bg-dark-elevated text-[14px] text-dark-text-secondary hover:bg-dark-page transition-colors"
             >
               取消
             </button>
             <button
               onClick={handleDeleteRule}
-              className="h-9 px-4 rounded-md bg-[#ef4444] text-white text-[14px] font-medium hover:bg-[#dc2626] transition-colors"
+              className="h-9 px-4 rounded-md bg-error-500 text-white text-[14px] font-medium hover:bg-error-600 transition-colors"
             >
               删除
             </button>
@@ -1148,49 +1148,49 @@ export default function RuleConfigPage() {
       <Dialog open={showPublishDialog} onOpenChange={setShowPublishDialog}>
         <DialogContent className="sm:max-w-[480px]">
           <DialogHeader>
-            <DialogTitle className="text-[18px] font-semibold text-[#1a202c]">
+            <DialogTitle className="text-[18px] font-semibold text-dark-text-primary">
               确认发布规则？
             </DialogTitle>
           </DialogHeader>
           <div className="py-4">
-            <div className="p-4 rounded-lg bg-[#f8f9fb] space-y-3">
+            <div className="p-4 rounded-lg bg-dark-page space-y-3">
               <div className="flex justify-between text-[14px]">
-                <span className="text-[#6b7789]">指标数</span>
-                <span className="font-medium text-[#2d3748]">
+                <span className="text-dark-text-secondary">指标数</span>
+                <span className="font-medium text-dark-text-primary">
                   {new Set(rules.flatMap((r) => r.indicators)).size} 个
                 </span>
               </div>
               <div className="flex justify-between text-[14px]">
-                <span className="text-[#6b7789]">发布规则数</span>
-                <span className="font-medium text-[#2d3748]">{rules.length} 条</span>
+                <span className="text-dark-text-secondary">发布规则数</span>
+                <span className="font-medium text-dark-text-primary">{rules.length} 条</span>
               </div>
               <div className="flex justify-between text-[14px]">
-                <span className="text-[#6b7789]">启用规则</span>
-                <span className="font-medium text-[#10b981]">
+                <span className="text-dark-text-secondary">启用规则</span>
+                <span className="font-medium text-success-500">
                   {rules.filter((r) => r.status === 'active').length} 条
                 </span>
               </div>
               <div className="flex justify-between text-[14px]">
-                <span className="text-[#6b7789]">草稿规则</span>
-                <span className="font-medium text-[#f59e0b]">
+                <span className="text-dark-text-secondary">草稿规则</span>
+                <span className="font-medium text-warning-500">
                   {rules.filter((r) => r.status === 'draft').length} 条
                 </span>
               </div>
             </div>
-            <p className="text-[13px] text-[#6b7789] mt-3">
+            <p className="text-[13px] text-dark-text-secondary mt-3">
               发布后将更新图谱中的规则配置
             </p>
           </div>
           <DialogFooter className="gap-2">
             <button
               onClick={() => setShowPublishDialog(false)}
-              className="h-9 px-4 rounded-md border border-[#dde1e8] bg-white text-[14px] text-[#4a5568] hover:bg-[#f8f9fb] transition-colors"
+              className="h-9 px-4 rounded-md border border-dark-border-hover bg-dark-elevated text-[14px] text-dark-text-secondary hover:bg-dark-page transition-colors"
             >
               取消
             </button>
             <button
               onClick={handlePublish}
-              className="h-9 px-4 rounded-md bg-[#3478f6] text-white text-[14px] font-medium hover:bg-[#1d5ee0] transition-colors"
+              className="h-9 px-4 rounded-md bg-dark-accent-primary text-white text-[14px] font-medium hover:bg-dark-accent-primary-active transition-colors"
             >
               确认发布
             </button>
@@ -1219,11 +1219,11 @@ export default function RuleConfigPage() {
             {/* Cascade selects */}
             <div className="grid grid-cols-3 gap-3">
               <div>
-                <Label className="text-[13px] text-[#4a5568]">规则大类</Label>
+                <Label className="text-[13px] text-dark-text-secondary">规则大类</Label>
                 <select
                   value={dialogCategoryId}
                   onChange={(e) => handleDialogCategoryChange(e.target.value)}
-                  className="mt-1.5 h-9 w-full px-3 rounded-md border border-[#dde1e8] text-[13px] bg-white focus:outline-none focus:border-[#5a96ff]"
+                  className="mt-1.5 h-9 w-full px-3 rounded-md border border-dark-border-hover text-[13px] bg-dark-elevated focus:outline-none focus:border-dark-accent-primary-hover"
                 >
                   {ruleCategories.map((cat) => (
                     <option key={cat.id} value={cat.id} disabled={!cat.enabled}>
@@ -1233,11 +1233,11 @@ export default function RuleConfigPage() {
                 </select>
               </div>
               <div>
-                <Label className="text-[13px] text-[#4a5568]">规则子类</Label>
+                <Label className="text-[13px] text-dark-text-secondary">规则子类</Label>
                 <select
                   value={dialogSubCategoryId}
                   onChange={(e) => handleDialogSubCategoryChange(e.target.value)}
-                  className="mt-1.5 h-9 w-full px-3 rounded-md border border-[#dde1e8] text-[13px] bg-white focus:outline-none focus:border-[#5a96ff]"
+                  className="mt-1.5 h-9 w-full px-3 rounded-md border border-dark-border-hover text-[13px] bg-dark-elevated focus:outline-none focus:border-dark-accent-primary-hover"
                 >
                   {(ruleSubCategories[dialogCategoryId] || []).map((sub) => (
                     <option key={sub.id} value={sub.id}>
@@ -1247,11 +1247,11 @@ export default function RuleConfigPage() {
                 </select>
               </div>
               <div>
-                <Label className="text-[13px] text-[#4a5568]">规则模板</Label>
+                <Label className="text-[13px] text-dark-text-secondary">规则模板</Label>
                 <select
                   value={dialogTemplateId}
                   onChange={(e) => handleDialogTemplateChange(e.target.value)}
-                  className="mt-1.5 h-9 w-full px-3 rounded-md border border-[#dde1e8] text-[13px] bg-white focus:outline-none focus:border-[#5a96ff]"
+                  className="mt-1.5 h-9 w-full px-3 rounded-md border border-dark-border-hover text-[13px] bg-dark-elevated focus:outline-none focus:border-dark-accent-primary-hover"
                 >
                   {(ruleTemplatesDef[dialogSubCategoryId] || []).map((tmpl) => (
                     <option key={tmpl.id} value={tmpl.id}>
@@ -1276,7 +1276,7 @@ export default function RuleConfigPage() {
             {/* Indicator select */}
             <div>
               <Label className="text-[14px] font-medium">
-                关联指标 <span className="text-[#ef4444]">*</span>
+                关联指标 <span className="text-error-500">*</span>
               </Label>
               <Select
                 value={dialogIndicators[0] || ''}
@@ -1297,8 +1297,8 @@ export default function RuleConfigPage() {
 
             {/* Dynamic params */}
             {dialogTemplateId && (
-              <div className="border-t border-[#e8ecf1] pt-4">
-                <h4 className="text-[14px] font-medium text-[#2d3748] mb-3 flex items-center gap-2">
+              <div className="border-t border-dark-border pt-4">
+                <h4 className="text-[14px] font-medium text-dark-text-primary mb-3 flex items-center gap-2">
                   {getTemplateIcon(dialogTemplateId)}
                   <span>规则参数</span>
                 </h4>
@@ -1307,7 +1307,7 @@ export default function RuleConfigPage() {
                     .find((t) => t.id === dialogTemplateId)
                     ?.params.map((paramDef) => (
                       <div key={paramDef.name}>
-                        <label className="block text-[13px] text-[#4a5568] mb-1">
+                        <label className="block text-[13px] text-dark-text-secondary mb-1">
                           {getParamLabel(paramDef.name)}
                         </label>
                         {paramDef.type === 'select' ? (
@@ -1319,7 +1319,7 @@ export default function RuleConfigPage() {
                                 [paramDef.name]: e.target.value,
                               }))
                             }
-                            className="h-9 w-full px-3 rounded-md border border-[#dde1e8] text-[13px] bg-white focus:outline-none focus:border-[#5a96ff]"
+                            className="h-9 w-full px-3 rounded-md border border-dark-border-hover text-[13px] bg-dark-elevated focus:outline-none focus:border-dark-accent-primary-hover"
                           >
                             {getSelectOptions(paramDef.name).map((opt) => (
                               <option key={opt} value={opt}>
@@ -1338,7 +1338,7 @@ export default function RuleConfigPage() {
                                 [paramDef.name]: e.target.value,
                               }))
                             }
-                            className="h-9 w-full px-3 rounded-md border border-[#dde1e8] text-[13px] focus:outline-none focus:border-[#5a96ff]"
+                            className="h-9 w-full px-3 rounded-md border border-dark-border-hover text-[13px] focus:outline-none focus:border-dark-accent-primary-hover"
                           />
                         )}
                       </div>
@@ -1348,7 +1348,7 @@ export default function RuleConfigPage() {
             )}
 
             {/* Knowledge docs */}
-            <div className="border-t border-[#e8ecf1] pt-4">
+            <div className="border-t border-dark-border pt-4">
               <Label className="text-[14px] font-medium">关联知识文档</Label>
               <div className="relative mt-1.5">
                 <input
@@ -1360,18 +1360,18 @@ export default function RuleConfigPage() {
                   }}
                   onFocus={() => setShowDocDropdown(true)}
                   placeholder="搜索知识文档..."
-                  className="h-9 w-full px-3 rounded-md border border-[#dde1e8] text-[13px] focus:outline-none focus:border-[#5a96ff]"
+                  className="h-9 w-full px-3 rounded-md border border-dark-border-hover text-[13px] focus:outline-none focus:border-dark-accent-primary-hover"
                 />
                 {showDocDropdown && filteredDocs.length > 0 && (
-                  <div className="absolute z-20 w-full mt-1 bg-white border border-[#e8ecf1] rounded-md shadow-lg max-h-48 overflow-y-auto">
+                  <div className="absolute z-20 w-full mt-1 bg-dark-elevated border border-dark-border rounded-md shadow-lg max-h-48 overflow-y-auto">
                     {filteredDocs.map((doc) => (
                       <button
                         key={doc.id}
                         onClick={() => addDoc(doc)}
-                        className="w-full px-3 py-2 text-left hover:bg-[#f8f9fb] text-[13px]"
+                        className="w-full px-3 py-2 text-left hover:bg-dark-page text-[13px]"
                       >
-                        <div className="font-medium text-[#2d3748]">{doc.title}</div>
-                        <div className="text-[11px] text-[#9ba4b3]">{doc.category}</div>
+                        <div className="font-medium text-dark-text-primary">{doc.title}</div>
+                        <div className="text-[11px] text-dark-text-tertiary">{doc.category}</div>
                       </button>
                     ))}
                   </div>
@@ -1382,16 +1382,16 @@ export default function RuleConfigPage() {
                   {dialogDocs.map((doc) => (
                     <div
                       key={doc.id}
-                      className="flex items-center gap-2 p-2 rounded-md bg-[#f8f9fb] border border-[#e8ecf1]"
+                      className="flex items-center gap-2 p-2 rounded-md bg-dark-page border border-dark-border"
                     >
-                      <BookOpen size={14} className="text-[#3478f6] shrink-0" />
+                      <BookOpen size={14} className="text-dark-accent-primary shrink-0" />
                       <div className="flex-1 min-w-0">
-                        <div className="text-[12px] font-medium text-[#2d3748]">{doc.title}</div>
-                        <div className="text-[11px] text-[#9ba4b3]">{doc.summary}</div>
+                        <div className="text-[12px] font-medium text-dark-text-primary">{doc.title}</div>
+                        <div className="text-[11px] text-dark-text-tertiary">{doc.summary}</div>
                       </div>
                       <button
                         onClick={() => removeDoc(doc.id)}
-                        className="text-[#9ba4b3] hover:text-[#ef4444]"
+                        className="text-dark-text-tertiary hover:text-error-500"
                       >
                         <X size={14} />
                       </button>
@@ -1407,7 +1407,7 @@ export default function RuleConfigPage() {
               <select
                 value={dialogBusinessCalendar}
                 onChange={(e) => setDialogBusinessCalendar(e.target.value)}
-                className="mt-1.5 h-9 w-full px-3 rounded-md border border-[#dde1e8] text-[13px] bg-white focus:outline-none focus:border-[#5a96ff]"
+                className="mt-1.5 h-9 w-full px-3 rounded-md border border-dark-border-hover text-[13px] bg-dark-elevated focus:outline-none focus:border-dark-accent-primary-hover"
               >
                 <option value="workday">工作日</option>
                 <option value="holiday">节假日</option>
@@ -1437,7 +1437,7 @@ export default function RuleConfigPage() {
             >
               取消
             </Button>
-            <Button className="bg-[#3478f6] hover:bg-[#1d5ee0] text-white" onClick={handleSaveDialog}>
+            <Button className="bg-dark-accent-primary hover:bg-dark-accent-primary-active text-white" onClick={handleSaveDialog}>
               保存
             </Button>
           </DialogFooter>

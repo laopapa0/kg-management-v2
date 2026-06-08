@@ -243,24 +243,24 @@ function TreeNodeItem({ node, selectedId, expandedIds, onSelect, onToggleExpand 
         onClick={handleClick}
         className={cn(
           'flex items-center h-9 px-2 rounded-md cursor-pointer transition-colors duration-100 select-none',
-          isSelected && isLeaf ? 'bg-[#eef4ff] text-[#3478f6] relative' : 'hover:bg-[#e8ecf1] text-[#4a5568]',
+          isSelected && isLeaf ? 'bg-dark-accent-primary/10 text-dark-accent-primary relative' : 'hover:bg-dark-tree-hover-bg text-dark-text-secondary',
         )}
         style={{ paddingLeft: `${8 + (node.level - 1) * 20}px` }}
       >
         {isSelected && isLeaf && (
-          <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-[#3478f6] rounded-r-full" />
+          <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-dark-accent-primary rounded-r-full" />
         )}
         {hasChildren ? (
-          <span className="mr-1 text-[#9ba4b3]" onClick={(e) => { e.stopPropagation(); onToggleExpand(node.id); }}>
+          <span className="mr-1 text-dark-text-tertiary" onClick={(e) => { e.stopPropagation(); onToggleExpand(node.id); }}>
             {isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
           </span>
         ) : (
           <span className="w-[14px] mr-1" />
         )}
         {isLeaf ? (
-          <Tag size={14} className={cn('mr-2 shrink-0', isSelected ? 'text-[#3478f6]' : 'text-[#9ba4b3]')} />
+          <Tag size={14} className={cn('mr-2 shrink-0', isSelected ? 'text-dark-accent-primary' : 'text-dark-text-tertiary')} />
         ) : (
-          <span className="mr-2 shrink-0 text-[#9ba4b3]">
+          <span className="mr-2 shrink-0 text-dark-text-tertiary">
             {isExpanded ? <FolderOpen size={14} /> : <Folder size={14} />}
           </span>
         )}
@@ -268,7 +268,7 @@ function TreeNodeItem({ node, selectedId, expandedIds, onSelect, onToggleExpand 
           {node.name}
         </span>
         {node.status === 'disabled' && (
-          <span className="ml-2 text-[10px] text-[#9ba4b3] bg-[#f1f3f6] px-1 rounded">已停用</span>
+          <span className="ml-2 text-[10px] text-dark-text-tertiary bg-dark-card-l2 px-1 rounded">已停用</span>
         )}
       </div>
       {hasChildren && isExpanded && (
@@ -357,7 +357,7 @@ function AttrValueTagConfigView() {
           {record.tags.map((tag) => (
             <span
               key={tag}
-              className="text-[11px] px-2 py-0.5 rounded bg-[#eef4ff] text-[#3478f6] border border-[#dbeafe]"
+              className="text-[11px] px-2 py-0.5 rounded bg-dark-accent-primary/10 text-dark-accent-primary border border-dark-accent-primary/20"
             >
               {tag}
             </span>
@@ -372,14 +372,14 @@ function AttrValueTagConfigView() {
         <div className="flex items-center gap-2">
           <button
             onClick={() => handleEditConfig(record)}
-            className="text-[12px] text-[#3478f6] hover:underline flex items-center gap-0.5"
+            className="text-[12px] text-dark-accent-primary hover:underline flex items-center gap-0.5"
           >
             <Edit size={12} />
             编辑
           </button>
           <button
             onClick={() => handleDeleteConfig(record.id)}
-            className="text-[12px] text-[#ef4444] hover:underline flex items-center gap-0.5"
+            className="text-[12px] text-error-500 hover:underline flex items-center gap-0.5"
           >
             <Trash2 size={12} />
             删除
@@ -398,20 +398,20 @@ function AttrValueTagConfigView() {
       {/* 标题 */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h2 className="text-[18px] font-semibold text-[#1a202c]">属性值标签配置</h2>
-          <p className="text-[13px] text-[#6b7789] mt-1">
+          <h2 className="text-[18px] font-semibold text-dark-text-primary">属性值标签配置</h2>
+          <p className="text-[13px] text-dark-text-secondary mt-1">
             为对象类型的枚举值批量关联标签，自动打标到对应指标
           </p>
         </div>
       </div>
 
       {/* 配置表单 */}
-      <div className="border border-[#e8ecf1] rounded-lg p-5 mb-6 bg-white">
-        <h3 className="text-[14px] font-medium text-[#4a5568] mb-4">新增配置</h3>
+      <div className="border border-dark-border rounded-lg p-5 mb-6 bg-dark-elevated">
+        <h3 className="text-[14px] font-medium text-dark-text-secondary mb-4">新增配置</h3>
         <div className="grid grid-cols-3 gap-4">
           {/* 对象类型选择器 */}
           <div>
-            <Label className="text-[13px] text-[#4a5568]">对象类型</Label>
+            <Label className="text-[13px] text-dark-text-secondary">对象类型</Label>
             <Select value={selectedObjectType} onValueChange={setSelectedObjectType}>
               <SelectTrigger className="mt-1.5 h-9 text-[14px]">
                 <SelectValue placeholder="选择对象类型" />
@@ -426,7 +426,7 @@ function AttrValueTagConfigView() {
 
           {/* 枚举值选择器 */}
           <div>
-            <Label className="text-[13px] text-[#4a5568]">枚举值（多选）</Label>
+            <Label className="text-[13px] text-dark-text-secondary">枚举值（多选）</Label>
             <div className="mt-1.5 relative">
               <Select>
                 <SelectTrigger className="h-9 text-[14px]">
@@ -440,14 +440,14 @@ function AttrValueTagConfigView() {
                 </SelectTrigger>
                 <SelectContent>
                   {availableEnumValues.length === 0 ? (
-                    <div className="px-3 py-2 text-[13px] text-[#9ba4b3]">
+                    <div className="px-3 py-2 text-[13px] text-dark-text-tertiary">
                       请先选择对象类型
                     </div>
                   ) : (
                     availableEnumValues.map((ev) => (
                       <div
                         key={ev}
-                        className="flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-[#f8f9fb] text-[13px]"
+                        className="flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-dark-page text-[13px]"
                         onClick={(e) => {
                           e.preventDefault();
                           e.stopPropagation();
@@ -458,9 +458,9 @@ function AttrValueTagConfigView() {
                           type="checkbox"
                           checked={selectedEnumValues.includes(ev)}
                           onChange={() => {}}
-                          className="w-4 h-4 rounded border-[#dde1e8] accent-[#3478f6]"
+                          className="w-4 h-4 rounded border-dark-border-hover accent-[#3478f6]"
                         />
-                        <span className="text-[#4a5568]">{ev}</span>
+                        <span className="text-dark-text-secondary">{ev}</span>
                       </div>
                     ))
                   )}
@@ -471,7 +471,7 @@ function AttrValueTagConfigView() {
 
           {/* 标签选择器 */}
           <div>
-            <Label className="text-[13px] text-[#4a5568]">标签（多选搜索）</Label>
+            <Label className="text-[13px] text-dark-text-secondary">标签（多选搜索）</Label>
             <div className="mt-1.5 relative">
               <Select>
                 <SelectTrigger className="h-9 text-[14px]">
@@ -484,18 +484,18 @@ function AttrValueTagConfigView() {
                   />
                 </SelectTrigger>
                 <SelectContent>
-                  <div className="px-3 py-2 border-b border-[#e8ecf1]">
+                  <div className="px-3 py-2 border-b border-dark-border">
                     <input
                       type="text"
                       placeholder="搜索标签..."
-                      className="w-full text-[13px] px-2 py-1 border border-[#dde1e8] rounded outline-none focus:border-[#3478f6]"
+                      className="w-full text-[13px] px-2 py-1 border border-dark-border-hover rounded outline-none focus:border-dark-accent-primary"
                       onClick={(e) => e.stopPropagation()}
                     />
                   </div>
                   {allTagsForSelect.map((tag) => (
                     <div
                       key={tag}
-                      className="flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-[#f8f9fb] text-[13px]"
+                      className="flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-dark-page text-[13px]"
                       onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
@@ -506,9 +506,9 @@ function AttrValueTagConfigView() {
                         type="checkbox"
                         checked={selectedTags.includes(tag)}
                         onChange={() => {}}
-                        className="w-4 h-4 rounded border-[#dde1e8] accent-[#3478f6]"
+                        className="w-4 h-4 rounded border-dark-border-hover accent-[#3478f6]"
                       />
-                      <span className="text-[#4a5568]">{tag}</span>
+                      <span className="text-dark-text-secondary">{tag}</span>
                     </div>
                   ))}
                 </SelectContent>
@@ -521,7 +521,7 @@ function AttrValueTagConfigView() {
           <Button
             onClick={handleAddConfig}
             disabled={!selectedObjectType || selectedEnumValues.length === 0 || selectedTags.length === 0}
-            className="h-8 px-4 text-[13px] bg-[#3478f6] hover:bg-[#1d5ee0] disabled:opacity-50"
+            className="h-8 px-4 text-[13px] bg-dark-accent-primary hover:bg-dark-accent-primary-active disabled:opacity-50"
           >
             <Plus size={14} className="mr-1" />
             添加配置
@@ -533,7 +533,7 @@ function AttrValueTagConfigView() {
               setSelectedEnumValues([]);
               setSelectedTags([]);
             }}
-            className="h-8 px-4 text-[13px] border-[#dde1e8]"
+            className="h-8 px-4 text-[13px] border-dark-border-hover"
           >
             重置
           </Button>
@@ -542,19 +542,19 @@ function AttrValueTagConfigView() {
 
       {/* 编辑弹窗 */}
       {editingId && editForm && (
-        <div className="border border-[#dbeafe] rounded-lg p-5 mb-6 bg-[#f8fbff]">
-          <h3 className="text-[14px] font-medium text-[#4a5568] mb-4">编辑配置</h3>
+        <div className="border border-dark-accent-primary/20 rounded-lg p-5 mb-6 bg-dark-page">
+          <h3 className="text-[14px] font-medium text-dark-text-secondary mb-4">编辑配置</h3>
           <div className="grid grid-cols-3 gap-4">
             <div>
-              <Label className="text-[13px] text-[#4a5568]">对象类型</Label>
-              <Input value={editForm.objectType} disabled className="mt-1.5 h-9 text-[14px] bg-[#f1f3f6]" />
+              <Label className="text-[13px] text-dark-text-secondary">对象类型</Label>
+              <Input value={editForm.objectType} disabled className="mt-1.5 h-9 text-[14px] bg-dark-card-l2" />
             </div>
             <div>
-              <Label className="text-[13px] text-[#4a5568]">枚举值</Label>
-              <Input value={editForm.enumValue} disabled className="mt-1.5 h-9 text-[14px] bg-[#f1f3f6]" />
+              <Label className="text-[13px] text-dark-text-secondary">枚举值</Label>
+              <Input value={editForm.enumValue} disabled className="mt-1.5 h-9 text-[14px] bg-dark-card-l2" />
             </div>
             <div>
-              <Label className="text-[13px] text-[#4a5568]">标签</Label>
+              <Label className="text-[13px] text-dark-text-secondary">标签</Label>
               <Select
                 value={editForm.tags.join(',')}
                 onValueChange={(v) => {
@@ -574,11 +574,11 @@ function AttrValueTagConfigView() {
             </div>
           </div>
           <div className="flex items-center gap-2 mt-4">
-            <Button onClick={handleSaveEdit} className="h-8 px-4 text-[13px] bg-[#3478f6] hover:bg-[#1d5ee0]">
+            <Button onClick={handleSaveEdit} className="h-8 px-4 text-[13px] bg-dark-accent-primary hover:bg-dark-accent-primary-active">
               <Save size={14} className="mr-1" />
               保存
             </Button>
-            <Button variant="outline" onClick={handleCancelEdit} className="h-8 px-4 text-[13px] border-[#dde1e8]">
+            <Button variant="outline" onClick={handleCancelEdit} className="h-8 px-4 text-[13px] border-dark-border-hover">
               <X size={14} className="mr-1" />
               取消
             </Button>
@@ -587,11 +587,11 @@ function AttrValueTagConfigView() {
       )}
 
       {/* 已配置表格 */}
-      <div className="border border-[#e8ecf1] rounded-lg p-5 bg-white">
+      <div className="border border-dark-border rounded-lg p-5 bg-dark-elevated">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-[14px] font-medium text-[#4a5568]">
+          <h3 className="text-[14px] font-medium text-dark-text-secondary">
             已配置列表
-            <span className="ml-2 text-[12px] text-[#9ba4b3]">共 {configs.length} 条</span>
+            <span className="ml-2 text-[12px] text-dark-text-tertiary">共 {configs.length} 条</span>
           </h3>
         </div>
         <DataTable
@@ -709,7 +709,7 @@ export default function NocTagPage() {
       key: 'status',
       title: '状态',
       render: (_: TagNode) => (
-        <span className="text-[12px] px-2 py-0.5 rounded bg-[#ecfdf5] text-[#059669]">启用</span>
+        <span className="text-[12px] px-2 py-0.5 rounded bg-success-500/10 text-success-600">启用</span>
       ),
     },
     {
@@ -717,8 +717,8 @@ export default function NocTagPage() {
       title: '操作',
       render: (record: TagNode) => (
         <div className="flex items-center gap-2">
-          <button onClick={() => openEditTagModal(record)} className="text-[12px] text-[#3478f6] hover:underline">编辑</button>
-          <button className="text-[12px] text-[#ef4444] hover:underline">删除</button>
+          <button onClick={() => openEditTagModal(record)} className="text-[12px] text-dark-accent-primary hover:underline">编辑</button>
+          <button className="text-[12px] text-error-500 hover:underline">删除</button>
         </div>
       ),
     },
@@ -741,15 +741,15 @@ export default function NocTagPage() {
       {/* ── Page Header ── */}
       <div className="flex items-center justify-between mb-5">
         <div>
-          <h1 className="text-[28px] font-semibold text-[#1a202c] leading-tight tracking-[-0.02em]">标签管理</h1>
-          <p className="text-[13px] text-[#6b7789] mt-1">维护标签库的分类体系与命名规范，审核业务部门提交的新标签申请</p>
+          <h1 className="text-[28px] font-semibold text-dark-text-primary leading-tight tracking-[-0.02em]">标签管理</h1>
+          <p className="text-[13px] text-dark-text-secondary mt-1">维护标签库的分类体系与命名规范，审核业务部门提交的新标签申请</p>
         </div>
         <div className="flex items-center gap-3">
-          <Button onClick={openNewTagModal} className="bg-[#3478f6] hover:bg-[#1d5ee0] h-9 px-4 text-[14px]">
+          <Button onClick={openNewTagModal} className="bg-dark-accent-primary hover:bg-dark-accent-primary-active h-9 px-4 text-[14px]">
             <Plus size={16} className="mr-1.5" />
             新增标签
           </Button>
-          <Button onClick={openNewCatModal} variant="outline" className="h-9 px-4 text-[14px] border-[#dde1e8] text-[#4a5568] hover:bg-[#f8f9fb]">
+          <Button onClick={openNewCatModal} variant="outline" className="h-9 px-4 text-[14px] border-dark-border-hover text-dark-text-secondary hover:bg-dark-page">
             <FolderPlus size={16} className="mr-1.5" />
             新建分类
           </Button>
@@ -757,10 +757,10 @@ export default function NocTagPage() {
       </div>
 
       {/* ── 左右分栏 ── */}
-      <div className="flex gap-0 border border-[#e8ecf1] rounded-lg bg-white overflow-hidden" style={{ height: 'calc(100vh - 200px)' }}>
+      <div className="flex gap-0 border border-dark-border rounded-lg bg-dark-elevated overflow-hidden" style={{ height: 'calc(100vh - 200px)' }}>
         {/* 左侧：标签分类树 */}
-        <div className="w-[260px] min-w-[260px] bg-[#f8f9fb] border-r border-[#e8ecf1] flex flex-col">
-          <div className="p-3 border-b border-[#e8ecf1]">
+        <div className="w-[260px] min-w-[260px] bg-dark-page border-r border-dark-border flex flex-col">
+          <div className="p-3 border-b border-dark-border">
             <SearchInput
               placeholder="搜索标签或分类"
               value={treeSearch}
@@ -768,15 +768,15 @@ export default function NocTagPage() {
               width="w-full"
             />
             <div className="flex items-center gap-2 mt-2">
-              <button onClick={handleExpandAll} className="text-[11px] text-[#6b7789] hover:text-[#3478f6] transition-colors">展开全部</button>
-              <span className="text-[#c4cad4]">|</span>
-              <button onClick={handleCollapseAll} className="text-[11px] text-[#6b7789] hover:text-[#3478f6] transition-colors">收起全部</button>
+              <button onClick={handleExpandAll} className="text-[11px] text-dark-text-secondary hover:text-dark-accent-primary transition-colors">展开全部</button>
+              <span className="text-dark-text-tertiary">|</span>
+              <button onClick={handleCollapseAll} className="text-[11px] text-dark-text-secondary hover:text-dark-accent-primary transition-colors">收起全部</button>
             </div>
           </div>
           <div className="flex-1 overflow-y-auto p-2">
             {/* 标签分类分组 */}
             <div className="mb-2">
-              <div className="px-2 py-1.5 text-[11px] font-medium text-[#9ba4b3] uppercase tracking-wider">
+              <div className="px-2 py-1.5 text-[11px] font-medium text-dark-text-tertiary uppercase tracking-wider">
                 标签分类
               </div>
               {filteredTree.map((node) => (
@@ -792,7 +792,7 @@ export default function NocTagPage() {
             </div>
 
             {/* 【新增】属性值标签节点 */}
-            <div className="mt-2 pt-2 border-t border-[#e8ecf1]">
+            <div className="mt-2 pt-2 border-t border-dark-border">
               <div
                 onClick={() => {
                   setActiveView('attr-value-tag');
@@ -801,14 +801,14 @@ export default function NocTagPage() {
                 className={cn(
                   'flex items-center h-9 px-2 rounded-md cursor-pointer transition-colors duration-100 select-none',
                   activeView === 'attr-value-tag'
-                    ? 'bg-[#eef4ff] text-[#3478f6] relative font-medium'
-                    : 'hover:bg-[#e8ecf1] text-[#4a5568]'
+                    ? 'bg-dark-accent-primary/10 text-dark-accent-primary relative font-medium'
+                    : 'hover:bg-dark-tree-hover-bg text-dark-text-secondary'
                 )}
               >
                 {activeView === 'attr-value-tag' && (
-                  <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-[#3478f6] rounded-r-full" />
+                  <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-dark-accent-primary rounded-r-full" />
                 )}
-                <Settings size={14} className={cn('mr-2 shrink-0', activeView === 'attr-value-tag' ? 'text-[#3478f6]' : 'text-[#9ba4b3]')} />
+                <Settings size={14} className={cn('mr-2 shrink-0', activeView === 'attr-value-tag' ? 'text-dark-accent-primary' : 'text-dark-text-tertiary')} />
                 <span className="text-[13px] truncate">属性值标签</span>
               </div>
             </div>
@@ -820,9 +820,9 @@ export default function NocTagPage() {
           {activeView === 'attr-value-tag' ? (
             <AttrValueTagConfigView />
           ) : !selectedNode ? (
-            <div className="flex flex-col items-center justify-center h-full text-[#9ba4b3]">
-              <Tag size={64} className="text-[#c4cad4] mb-4" />
-              <p className="text-[14px] text-[#6b7789]">请从左侧选择一个标签或分类</p>
+            <div className="flex flex-col items-center justify-center h-full text-dark-text-tertiary">
+              <Tag size={64} className="text-dark-text-tertiary mb-4" />
+              <p className="text-[14px] text-dark-text-secondary">请从左侧选择一个标签或分类</p>
             </div>
           ) : !isLeafSelected ? (
             /* ── 分类详情视图 ── */
@@ -832,8 +832,8 @@ export default function NocTagPage() {
               transition={{ duration: 0.2 }}
             >
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-[18px] font-semibold text-[#1a202c]">分类详情</h2>
-                <Button variant="outline" size="sm" className="h-8 text-[13px] border-[#dde1e8]" onClick={() => setIsEditing(!isEditing)}>
+                <h2 className="text-[18px] font-semibold text-dark-text-primary">分类详情</h2>
+                <Button variant="outline" size="sm" className="h-8 text-[13px] border-dark-border-hover" onClick={() => setIsEditing(!isEditing)}>
                   {isEditing ? <><X size={14} className="mr-1" />取消</> : <><Pencil size={14} className="mr-1" />编辑</>}
                 </Button>
               </div>
@@ -841,11 +841,11 @@ export default function NocTagPage() {
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label className="text-[13px] text-[#4a5568]">分类名称</Label>
+                    <Label className="text-[13px] text-dark-text-secondary">分类名称</Label>
                     <Input defaultValue={selectedNode.name} disabled={!isEditing} className="mt-1 h-9 text-[14px]" />
                   </div>
                   <div>
-                    <Label className="text-[13px] text-[#4a5568]">父分类</Label>
+                    <Label className="text-[13px] text-dark-text-secondary">父分类</Label>
                     <Select disabled={!isEditing}>
                       <SelectTrigger className="mt-1 h-9 text-[14px]">
                         <SelectValue placeholder={parentCatName || '顶级分类'} />
@@ -858,23 +858,23 @@ export default function NocTagPage() {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label className="text-[13px] text-[#4a5568]">分类编码</Label>
-                    <Input defaultValue={selectedNode.id} disabled className="mt-1 h-9 text-[14px] bg-[#f8f9fb]" />
+                    <Label className="text-[13px] text-dark-text-secondary">分类编码</Label>
+                    <Input defaultValue={selectedNode.id} disabled className="mt-1 h-9 text-[14px] bg-dark-page" />
                   </div>
                   <div>
-                    <Label className="text-[13px] text-[#4a5568]">包含标签数</Label>
-                    <div className="mt-1 h-9 flex items-center text-[14px] text-[#4a5568]">{countTagsInNode(selectedNode)}</div>
+                    <Label className="text-[13px] text-dark-text-secondary">包含标签数</Label>
+                    <div className="mt-1 h-9 flex items-center text-[14px] text-dark-text-secondary">{countTagsInNode(selectedNode)}</div>
                   </div>
                 </div>
                 <div>
-                  <Label className="text-[13px] text-[#4a5568]">描述</Label>
+                  <Label className="text-[13px] text-dark-text-secondary">描述</Label>
                   <Textarea defaultValue="" disabled={!isEditing} className="mt-1 text-[14px] min-h-[80px]" placeholder="分类描述..." />
                 </div>
               </div>
 
               {/* 分类下标签列表 */}
               <div className="mt-8">
-                <h3 className="text-[16px] font-semibold text-[#1a202c] mb-3">标签列表</h3>
+                <h3 className="text-[16px] font-semibold text-dark-text-primary mb-3">标签列表</h3>
                 <DataTable
                   columns={categoryTagColumns as unknown as Column<Record<string, unknown>>[]}
                   data={(selectedNode.children?.filter(c => c.code) ?? []) as unknown as Record<string, unknown>[]}
@@ -890,11 +890,11 @@ export default function NocTagPage() {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.2, delay: 0 }}
-                className="border border-[#e8ecf1] rounded-lg p-5"
+                className="border border-dark-border rounded-lg p-5"
               >
                 <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-[18px] font-semibold text-[#1a202c]">标签详情</h2>
-                  <Button variant="outline" size="sm" className="h-8 text-[13px] border-[#dde1e8]" onClick={() => setIsEditing(!isEditing)}>
+                  <h2 className="text-[18px] font-semibold text-dark-text-primary">标签详情</h2>
+                  <Button variant="outline" size="sm" className="h-8 text-[13px] border-dark-border-hover" onClick={() => setIsEditing(!isEditing)}>
                     {isEditing ? <><Save size={14} className="mr-1" />保存</> : <><Pencil size={14} className="mr-1" />编辑</>}
                   </Button>
                 </div>
@@ -902,17 +902,17 @@ export default function NocTagPage() {
                 <div className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <Label className="text-[13px] text-[#4a5568]">标签名称</Label>
+                      <Label className="text-[13px] text-dark-text-secondary">标签名称</Label>
                       <Input defaultValue={selectedNode.name} disabled={!isEditing} className="mt-1 h-9 text-[14px]" />
                     </div>
                     <div>
-                      <Label className="text-[13px] text-[#4a5568]">标签编码</Label>
-                      <Input defaultValue={selectedNode.code} disabled className="mt-1 h-9 text-[14px] bg-[#f8f9fb]" />
+                      <Label className="text-[13px] text-dark-text-secondary">标签编码</Label>
+                      <Input defaultValue={selectedNode.code} disabled className="mt-1 h-9 text-[14px] bg-dark-page" />
                     </div>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <Label className="text-[13px] text-[#4a5568]">所属分类</Label>
+                      <Label className="text-[13px] text-dark-text-secondary">所属分类</Label>
                       <Select disabled={!isEditing}>
                         <SelectTrigger className="mt-1 h-9 text-[14px]">
                           <SelectValue placeholder={parentCatName} />
@@ -926,12 +926,12 @@ export default function NocTagPage() {
                       </Select>
                     </div>
                     <div>
-                      <Label className="text-[13px] text-[#4a5568]">排序号</Label>
+                      <Label className="text-[13px] text-dark-text-secondary">排序号</Label>
                       <Input type="number" defaultValue={1} disabled={!isEditing} className="mt-1 h-9 text-[14px]" />
                     </div>
                   </div>
                   <div>
-                    <Label className="text-[13px] text-[#4a5568]">命名规范说明</Label>
+                    <Label className="text-[13px] text-dark-text-secondary">命名规范说明</Label>
                     <Textarea
                       defaultValue="用于标识需要重点关注的业务指标，由业务部门申请，NOC 审核后使用"
                       disabled={!isEditing}
@@ -940,19 +940,19 @@ export default function NocTagPage() {
                   </div>
                   <div className="grid grid-cols-3 gap-4">
                     <div className="flex items-center justify-between">
-                      <Label className="text-[13px] text-[#4a5568]">状态</Label>
+                      <Label className="text-[13px] text-dark-text-secondary">状态</Label>
                       <div className="flex items-center gap-2">
-                        <span className="text-[13px] text-[#4a5568]">{selectedNode.status === 'enabled' ? '启用' : '停用'}</span>
+                        <span className="text-[13px] text-dark-text-secondary">{selectedNode.status === 'enabled' ? '启用' : '停用'}</span>
                         <Switch checked={selectedNode.status === 'enabled'} disabled={!isEditing} />
                       </div>
                     </div>
                     <div>
-                      <Label className="text-[13px] text-[#4a5568]">创建时间</Label>
-                      <div className="mt-1 text-[13px] text-[#6b7789]">2026-01-15 10:30</div>
+                      <Label className="text-[13px] text-dark-text-secondary">创建时间</Label>
+                      <div className="mt-1 text-[13px] text-dark-text-secondary">2026-01-15 10:30</div>
                     </div>
                     <div>
-                      <Label className="text-[13px] text-[#4a5568]">最后修改</Label>
-                      <div className="mt-1 text-[13px] text-[#6b7789]">2026-05-20 14:20</div>
+                      <Label className="text-[13px] text-dark-text-secondary">最后修改</Label>
+                      <div className="mt-1 text-[13px] text-dark-text-secondary">2026-05-20 14:20</div>
                     </div>
                   </div>
                 </div>
@@ -963,18 +963,18 @@ export default function NocTagPage() {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.2, delay: 0.1 }}
-                className="border border-[#e8ecf1] rounded-lg p-5"
+                className="border border-dark-border rounded-lg p-5"
               >
                 <div className="mb-4">
-                  <h2 className="text-[18px] font-semibold text-[#1a202c]">关联约束</h2>
-                  <p className="text-[12px] text-[#6b7789] mt-0.5">规定哪些标签可以打给哪些对象类型</p>
+                  <h2 className="text-[18px] font-semibold text-dark-text-primary">关联约束</h2>
+                  <p className="text-[12px] text-dark-text-secondary mt-0.5">规定哪些标签可以打给哪些对象类型</p>
                 </div>
 
                 <div className="flex items-center gap-3 mb-3">
-                  <Button variant="outline" size="sm" className="h-7 text-[12px] border-[#dde1e8]" onClick={handleSelectAllConstraints}>
+                  <Button variant="outline" size="sm" className="h-7 text-[12px] border-dark-border-hover" onClick={handleSelectAllConstraints}>
                     全选
                   </Button>
-                  <Button variant="outline" size="sm" className="h-7 text-[12px] border-[#dde1e8]" onClick={handleDeselectAllConstraints}>
+                  <Button variant="outline" size="sm" className="h-7 text-[12px] border-dark-border-hover" onClick={handleDeselectAllConstraints}>
                     取消全选
                   </Button>
                 </div>
@@ -982,24 +982,24 @@ export default function NocTagPage() {
                 <div className="overflow-x-auto">
                   <table className="w-full border-collapse">
                     <thead>
-                      <tr className="bg-[#f1f3f6] border-b-2 border-[#e8ecf1]">
-                        <th className="h-9 px-3 text-left text-[13px] font-medium text-[#4a5568]">对象类型</th>
-                        <th className="h-9 px-3 text-left text-[13px] font-medium text-[#4a5568]">一级</th>
-                        <th className="h-9 px-3 text-center text-[13px] font-medium text-[#4a5568]">允许打标</th>
-                        <th className="h-9 px-3 text-left text-[13px] font-medium text-[#4a5568]">约束方式</th>
+                      <tr className="bg-dark-card-l2 border-b-2 border-dark-border">
+                        <th className="h-9 px-3 text-left text-[13px] font-medium text-dark-text-secondary">对象类型</th>
+                        <th className="h-9 px-3 text-left text-[13px] font-medium text-dark-text-secondary">一级</th>
+                        <th className="h-9 px-3 text-center text-[13px] font-medium text-dark-text-secondary">允许打标</th>
+                        <th className="h-9 px-3 text-left text-[13px] font-medium text-dark-text-secondary">约束方式</th>
                       </tr>
                     </thead>
                     <tbody>
                       {constraints.map((row, idx) => (
-                        <tr key={idx} className="h-10 border-b border-[#e8ecf1] hover:bg-[#f8f9fb]">
-                          <td className="px-3 text-[14px] text-[#4a5568]">{row.objectType}</td>
-                          <td className="px-3 text-[14px] text-[#6b7789]">{row.level1}</td>
+                        <tr key={idx} className="h-10 border-b border-dark-border hover:bg-dark-page">
+                          <td className="px-3 text-[14px] text-dark-text-secondary">{row.objectType}</td>
+                          <td className="px-3 text-[14px] text-dark-text-secondary">{row.level1}</td>
                           <td className="px-3 text-center">
                             <input
                               type="checkbox"
                               checked={row.allowed}
                               onChange={(e) => handleConstraintChange(idx, e.target.checked)}
-                              className="w-4 h-4 rounded border-[#dde1e8] text-[#3478f6] accent-[#3478f6]"
+                              className="w-4 h-4 rounded border-dark-border-hover text-dark-accent-primary accent-[#3478f6]"
                             />
                           </td>
                           <td className="px-3">
@@ -1014,7 +1014,7 @@ export default function NocTagPage() {
                                       onChange={() => handleConstraintTypeChange(idx, type)}
                                       className="w-3.5 h-3.5 accent-[#3478f6]"
                                     />
-                                    <span className="text-[12px] text-[#4a5568]">
+                                    <span className="text-[12px] text-dark-text-secondary">
                                       {type === 'required' ? '必须' : type === 'recommended' ? '推荐' : '可选'}
                                     </span>
                                   </label>
@@ -1034,38 +1034,38 @@ export default function NocTagPage() {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.2, delay: 0.2 }}
-                className="border border-[#e8ecf1] rounded-lg p-5"
+                className="border border-dark-border rounded-lg p-5"
               >
-                <h2 className="text-[18px] font-semibold text-[#1a202c] mb-4">使用统计</h2>
+                <h2 className="text-[18px] font-semibold text-dark-text-primary mb-4">使用统计</h2>
 
                 <div className="grid grid-cols-4 gap-4 mb-6">
                   {statsCards.map((stat) => (
-                    <div key={stat.label} className="bg-[#f8f9fb] rounded-lg p-4 text-center">
-                      <div className="text-[24px] font-semibold text-[#1a202c]">{stat.value}</div>
-                      <div className="text-[12px] text-[#6b7789] mt-1">{stat.label}</div>
+                    <div key={stat.label} className="bg-dark-page rounded-lg p-4 text-center">
+                      <div className="text-[24px] font-semibold text-dark-text-primary">{stat.value}</div>
+                      <div className="text-[12px] text-dark-text-secondary mt-1">{stat.label}</div>
                     </div>
                   ))}
                 </div>
 
-                <h3 className="text-[14px] font-medium text-[#4a5568] mb-3">最近打标记录</h3>
+                <h3 className="text-[14px] font-medium text-dark-text-secondary mb-3">最近打标记录</h3>
                 <div className="overflow-x-auto">
                   <table className="w-full border-collapse">
                     <thead>
-                      <tr className="bg-[#f1f3f6] border-b-2 border-[#e8ecf1]">
-                        <th className="h-9 px-3 text-left text-[13px] font-medium text-[#4a5568]">指标名称</th>
-                        <th className="h-9 px-3 text-left text-[13px] font-medium text-[#4a5568]">打标人</th>
-                        <th className="h-9 px-3 text-left text-[13px] font-medium text-[#4a5568]">打标时间</th>
-                        <th className="h-9 px-3 text-left text-[13px] font-medium text-[#4a5568]">操作</th>
+                      <tr className="bg-dark-card-l2 border-b-2 border-dark-border">
+                        <th className="h-9 px-3 text-left text-[13px] font-medium text-dark-text-secondary">指标名称</th>
+                        <th className="h-9 px-3 text-left text-[13px] font-medium text-dark-text-secondary">打标人</th>
+                        <th className="h-9 px-3 text-left text-[13px] font-medium text-dark-text-secondary">打标时间</th>
+                        <th className="h-9 px-3 text-left text-[13px] font-medium text-dark-text-secondary">操作</th>
                       </tr>
                     </thead>
                     <tbody>
                       {recentTaggings.map((record, idx) => (
-                        <tr key={idx} className="h-10 border-b border-[#e8ecf1] hover:bg-[#f8f9fb]">
-                          <td className="px-3 text-[14px] text-[#4a5568]">{record.indicator}</td>
-                          <td className="px-3 text-[14px] text-[#6b7789]">{record.user}</td>
-                          <td className="px-3 text-[13px] text-[#9ba4b3]">{record.time}</td>
+                        <tr key={idx} className="h-10 border-b border-dark-border hover:bg-dark-page">
+                          <td className="px-3 text-[14px] text-dark-text-secondary">{record.indicator}</td>
+                          <td className="px-3 text-[14px] text-dark-text-secondary">{record.user}</td>
+                          <td className="px-3 text-[13px] text-dark-text-tertiary">{record.time}</td>
                           <td className="px-3">
-                            <button className="text-[12px] text-[#ef4444] hover:underline">移除标签</button>
+                            <button className="text-[12px] text-error-500 hover:underline">移除标签</button>
                           </td>
                         </tr>
                       ))}
@@ -1088,7 +1088,7 @@ export default function NocTagPage() {
           </DialogHeader>
           <div className="space-y-4 mt-2">
             <div>
-              <Label className="text-[13px] text-[#4a5568]">标签名称 <span className="text-[#ef4444]">*</span></Label>
+              <Label className="text-[13px] text-dark-text-secondary">标签名称 <span className="text-error-500">*</span></Label>
               <Input
                 value={tagForm.name}
                 onChange={(e) => setTagForm(prev => ({ ...prev, name: e.target.value }))}
@@ -1097,7 +1097,7 @@ export default function NocTagPage() {
               />
             </div>
             <div>
-              <Label className="text-[13px] text-[#4a5568]">所属分类</Label>
+              <Label className="text-[13px] text-dark-text-secondary">所属分类</Label>
               <Select value={tagForm.category} onValueChange={(v) => setTagForm(prev => ({ ...prev, category: v }))}>
                 <SelectTrigger className="mt-1 h-9 text-[14px]">
                   <SelectValue placeholder="选择分类" />
@@ -1114,7 +1114,7 @@ export default function NocTagPage() {
               </Select>
             </div>
             <div>
-              <Label className="text-[13px] text-[#4a5568]">命名规范说明</Label>
+              <Label className="text-[13px] text-dark-text-secondary">命名规范说明</Label>
               <Textarea
                 value={tagForm.description}
                 onChange={(e) => setTagForm(prev => ({ ...prev, description: e.target.value }))}
@@ -1123,7 +1123,7 @@ export default function NocTagPage() {
               />
             </div>
             <div>
-              <Label className="text-[13px] text-[#4a5568]">排序号</Label>
+              <Label className="text-[13px] text-dark-text-secondary">排序号</Label>
               <Input
                 type="number"
                 value={tagForm.sortOrder}
@@ -1133,10 +1133,10 @@ export default function NocTagPage() {
             </div>
           </div>
           <div className="flex justify-end gap-3 mt-6">
-            <Button variant="outline" className="h-9 px-4 text-[14px] border-[#dde1e8]" onClick={() => setTagModalOpen(false)}>
+            <Button variant="outline" className="h-9 px-4 text-[14px] border-dark-border-hover" onClick={() => setTagModalOpen(false)}>
               取消
             </Button>
-            <Button className="h-9 px-4 text-[14px] bg-[#3478f6] hover:bg-[#1d5ee0]" onClick={() => setTagModalOpen(false)}>
+            <Button className="h-9 px-4 text-[14px] bg-dark-accent-primary hover:bg-dark-accent-primary-active" onClick={() => setTagModalOpen(false)}>
               保存
             </Button>
           </div>
@@ -1151,7 +1151,7 @@ export default function NocTagPage() {
           </DialogHeader>
           <div className="space-y-4 mt-2">
             <div>
-              <Label className="text-[13px] text-[#4a5568]">分类名称 <span className="text-[#ef4444]">*</span></Label>
+              <Label className="text-[13px] text-dark-text-secondary">分类名称 <span className="text-error-500">*</span></Label>
               <Input
                 value={catForm.name}
                 onChange={(e) => setCatForm(prev => ({ ...prev, name: e.target.value }))}
@@ -1160,7 +1160,7 @@ export default function NocTagPage() {
               />
             </div>
             <div>
-              <Label className="text-[13px] text-[#4a5568]">父分类</Label>
+              <Label className="text-[13px] text-dark-text-secondary">父分类</Label>
               <Select value={catForm.parent} onValueChange={(v) => setCatForm(prev => ({ ...prev, parent: v }))}>
                 <SelectTrigger className="mt-1 h-9 text-[14px]">
                   <SelectValue placeholder="顶级分类（可选）" />
@@ -1175,7 +1175,7 @@ export default function NocTagPage() {
               </Select>
             </div>
             <div>
-              <Label className="text-[13px] text-[#4a5568]">排序号</Label>
+              <Label className="text-[13px] text-dark-text-secondary">排序号</Label>
               <Input
                 type="number"
                 value={catForm.sortOrder}
@@ -1184,7 +1184,7 @@ export default function NocTagPage() {
               />
             </div>
             <div>
-              <Label className="text-[13px] text-[#4a5568]">描述</Label>
+              <Label className="text-[13px] text-dark-text-secondary">描述</Label>
               <Textarea
                 value={catForm.description}
                 onChange={(e) => setCatForm(prev => ({ ...prev, description: e.target.value }))}
@@ -1194,10 +1194,10 @@ export default function NocTagPage() {
             </div>
           </div>
           <div className="flex justify-end gap-3 mt-6">
-            <Button variant="outline" className="h-9 px-4 text-[14px] border-[#dde1e8]" onClick={() => setCatModalOpen(false)}>
+            <Button variant="outline" className="h-9 px-4 text-[14px] border-dark-border-hover" onClick={() => setCatModalOpen(false)}>
               取消
             </Button>
-            <Button className="h-9 px-4 text-[14px] bg-[#3478f6] hover:bg-[#1d5ee0]" onClick={() => setCatModalOpen(false)}>
+            <Button className="h-9 px-4 text-[14px] bg-dark-accent-primary hover:bg-dark-accent-primary-active" onClick={() => setCatModalOpen(false)}>
               创建
             </Button>
           </div>

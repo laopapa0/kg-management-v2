@@ -30,8 +30,8 @@ export default function MyIndicatorList({
       title: '指标名称',
       render: (record) => (
         <div>
-          <div className="text-[14px] font-medium text-[#1a202c]">{record.name}</div>
-          <div className="text-[12px] text-[#9ba4b3]">{record.code}</div>
+          <div className="text-[14px] font-medium text-dark-text-primary">{record.name}</div>
+          <div className="text-[12px] text-dark-text-tertiary">{record.code}</div>
         </div>
       ),
     },

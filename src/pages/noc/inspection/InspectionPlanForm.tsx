@@ -90,11 +90,11 @@ export default function InspectionPlanForm({ initialData, onCancel, onSave }: In
     <div className="space-y-5">
       {/* 基础信息 */}
       <div>
-        <h3 className="text-[15px] font-semibold text-[#1a202c] mb-4">基础信息</h3>
+        <h3 className="text-[15px] font-semibold text-dark-text-primary mb-4">基础信息</h3>
         <div className="space-y-4">
           {/* 计划名称 */}
           <div className="space-y-1.5">
-            <Label htmlFor="plan-name" className="text-[13px] text-[#1a202c]">
+            <Label htmlFor="plan-name" className="text-[13px] text-dark-text-primary">
               计划名称
             </Label>
             <Input
@@ -105,16 +105,16 @@ export default function InspectionPlanForm({ initialData, onCancel, onSave }: In
                 if (errors.name) setErrors({});
               }}
               placeholder="请输入巡检计划名称"
-              className="h-9 text-[13px] border-[#e8ecf1] focus-visible:ring-[#3478f6]"
+              className="h-9 text-[13px] border-dark-border focus-visible:ring-[#3478f6]"
             />
             {errors.name && (
-              <p className="text-[12px] text-[#dc2626]">{errors.name}</p>
+              <p className="text-[12px] text-error-600">{errors.name}</p>
             )}
           </div>
 
           {/* 触发周期类型 */}
           <div className="space-y-1.5">
-            <Label className="text-[13px] text-[#1a202c]">触发周期类型</Label>
+            <Label className="text-[13px] text-dark-text-primary">触发周期类型</Label>
             <RadioGroup
               value={formData.triggerType}
               onValueChange={(value) =>
@@ -126,7 +126,7 @@ export default function InspectionPlanForm({ initialData, onCancel, onSave }: In
                 <RadioGroupItem value="periodic" id="trigger-periodic" />
                 <Label
                   htmlFor="trigger-periodic"
-                  className="text-[13px] text-[#1a202c] cursor-pointer font-normal"
+                  className="text-[13px] text-dark-text-primary cursor-pointer font-normal"
                 >
                   定期
                 </Label>
@@ -135,7 +135,7 @@ export default function InspectionPlanForm({ initialData, onCancel, onSave }: In
                 <RadioGroupItem value="rule-based" id="trigger-rule-based" />
                 <Label
                   htmlFor="trigger-rule-based"
-                  className="text-[13px] text-[#1a202c] cursor-pointer font-normal"
+                  className="text-[13px] text-dark-text-primary cursor-pointer font-normal"
                 >
                   自动触发
                 </Label>
@@ -144,7 +144,7 @@ export default function InspectionPlanForm({ initialData, onCancel, onSave }: In
                 <RadioGroupItem value="manual" id="trigger-manual" />
                 <Label
                   htmlFor="trigger-manual"
-                  className="text-[13px] text-[#1a202c] cursor-pointer font-normal"
+                  className="text-[13px] text-dark-text-primary cursor-pointer font-normal"
                 >
                   手动触发
                 </Label>
@@ -155,20 +155,20 @@ export default function InspectionPlanForm({ initialData, onCancel, onSave }: In
           {/* 周期类型对应的动态配置 */}
           {formData.triggerType === 'periodic' && (
             <div className="space-y-1.5">
-              <Label htmlFor="cron-expression" className="text-[13px] text-[#1a202c]">
+              <Label htmlFor="cron-expression" className="text-[13px] text-dark-text-primary">
                 执行周期
               </Label>
               <Select
                 value={formData.cronExpression}
                 onValueChange={(value) => updateField('cronExpression', value)}
               >
-                <SelectTrigger id="cron-expression" className="h-9 text-[13px] border-[#e8ecf1] w-[220px]">
+                <SelectTrigger id="cron-expression" className="h-9 text-[13px] border-dark-border w-[220px]">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
                   {periodicOptions.map((group) => (
                     <div key={group.label}>
-                      <div className="px-2 py-1.5 text-xs text-[#6b7789] font-medium">
+                      <div className="px-2 py-1.5 text-xs text-dark-text-secondary font-medium">
                         {group.label}
                       </div>
                       {group.options.map((opt) => (
@@ -184,8 +184,8 @@ export default function InspectionPlanForm({ initialData, onCancel, onSave }: In
           )}
 
           {formData.triggerType === 'rule-based' && (
-            <div className="rounded-md border border-dashed border-[#e8ecf1] bg-[#f8f9fb] p-4">
-              <p className="text-[13px] text-[#6b7789]">
+            <div className="rounded-md border border-dashed border-dark-border bg-dark-page p-4">
+              <p className="text-[13px] text-dark-text-secondary">
                 选择要监听的异常规则，具体 UI 在后续 slice 实现
               </p>
             </div>
@@ -202,15 +202,15 @@ export default function InspectionPlanForm({ initialData, onCancel, onSave }: In
 
       {/* 图谱版本 */}
       <div>
-        <h3 className="text-[15px] font-semibold text-[#1a202c] mb-4">图谱版本</h3>
+        <h3 className="text-[15px] font-semibold text-dark-text-primary mb-4">图谱版本</h3>
         <div className="space-y-1.5">
-          <Label htmlFor="graph-version" className="text-[13px] text-[#1a202c]">
+          <Label htmlFor="graph-version" className="text-[13px] text-dark-text-primary">
             版本
           </Label>
           <Select value={formData.graphVersion} disabled>
             <SelectTrigger
               id="graph-version"
-              className="h-9 text-[13px] border-[#e8ecf1] w-[180px]"
+              className="h-9 text-[13px] border-dark-border w-[180px]"
             >
               <SelectValue />
             </SelectTrigger>
@@ -234,7 +234,7 @@ export default function InspectionPlanForm({ initialData, onCancel, onSave }: In
         <Button
           variant="outline"
           onClick={onCancel}
-          className="text-[13px] border-[#e8ecf1] text-[#6b7789] hover:text-[#1a202c]"
+          className="text-[13px] border-dark-border text-dark-text-secondary hover:text-dark-text-primary"
         >
           取消
         </Button>
@@ -247,7 +247,7 @@ export default function InspectionPlanForm({ initialData, onCancel, onSave }: In
             setErrors({});
             onSave(formData);
           }}
-          className="text-[13px] bg-[#3478f6] hover:bg-[#2563eb] text-white"
+          className="text-[13px] bg-dark-accent-primary hover:bg-dark-accent-primary text-white"
         >
           保存
         </Button>

@@ -12,7 +12,7 @@ export default function Layout({ children }: LayoutProps) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   return (
-    <div className="min-h-[100dvh] bg-[#f8f9fb]">
+    <div className="min-h-[100dvh] bg-dark-page">
       {/* 侧边栏 */}
       <Sidebar
         collapsed={sidebarCollapsed}

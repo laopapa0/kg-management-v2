@@ -33,7 +33,7 @@ function HighlightText({ text, term }: { text: string; term: string }) {
       <mark
         key={key++}
         data-testid="tag-pill-highlight"
-        className="rounded bg-[#B8860B]/20 px-0.5 font-bold text-[#FFD700]"
+        className="rounded bg-[var(--dark-accent-gold)]/20 px-0.5 font-bold text-[var(--dark-accent-gold)]"
       >
         {remaining.slice(idx, idx + term.length)}
       </mark>,
@@ -71,11 +71,11 @@ export default function TagPill({
           'inline-flex h-7 items-center gap-1 whitespace-nowrap rounded-md px-2.5 text-xs font-medium transition-colors',
           'border',
           selected && [
-            'bg-[#111B26] text-[#4DA6FF] border-[#15417E]',
+            'bg-dark-card-l1 text-dark-accent-primary border-dark-accent-primary',
             'shadow-[0_0_8px_rgba(77,166,255,0.25)]',
           ],
           partial && [
-            'bg-[#111B26]/50 text-[#4DA6FF] border-dashed border-[#15417E]',
+            'bg-dark-card-l1/50 text-dark-accent-primary border-dashed border-dark-accent-primary',
           ],
           !selected && !partial && [
             !hasColorBackground && 'bg-dark-card-l2',
@@ -94,8 +94,8 @@ export default function TagPill({
           data-testid={`tag-pill-check-${tag.id}`}
           className={cn(
             'inline-flex size-4 items-center justify-center rounded-full transition-transform duration-150 ease-out',
-            selected && 'scale-100 bg-[#4DA6FF] text-[#111B26]',
-            partial && 'scale-100 bg-[#4DA6FF]/50 text-[#111B26]',
+            selected && 'scale-100 bg-dark-accent-primary text-dark-text-primary',
+            partial && 'scale-100 bg-dark-accent-primary/50 text-dark-text-primary',
             !isChecked && 'scale-0',
           )}
         >

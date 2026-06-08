@@ -327,7 +327,7 @@ export default function TagSetPanel() {
                 {debouncedTerm && matchCount ? (
                   <span
                     data-testid={`tag-match-count-${fullNode.id}`}
-                    className="inline-flex items-center rounded-full border border-[#15417E] bg-[#111B26] px-2 py-0.5 text-xs font-medium text-[#4DA6FF]"
+                    className="inline-flex items-center rounded-full border border-dark-accent-primary bg-dark-card-l1 px-2 py-0.5 text-xs font-medium text-dark-accent-primary"
                   >
                     {matchCount}
                   </span>

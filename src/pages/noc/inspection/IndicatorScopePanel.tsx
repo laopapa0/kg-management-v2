@@ -63,7 +63,7 @@ function TreeNodeView({
   if (node.nodeType === 'root') {
     return (
       <div>
-        <div className="text-[13px] font-medium text-[#1a202c] mb-2">{node.name}</div>
+        <div className="text-[13px] font-medium text-dark-text-primary mb-2">{node.name}</div>
         <div className="pl-2 space-y-1">
           {node.children.map((child) => (
             <TreeNodeView
@@ -87,7 +87,7 @@ function TreeNodeView({
 
     return (
       <div>
-        <div className="text-[11px] text-[#9ba4b3] mb-1">{node.name}</div>
+        <div className="text-[11px] text-dark-text-tertiary mb-1">{node.name}</div>
         <div className="pl-2 space-y-0.5">
           {visibleChildren.map((child) => (
             <TreeNodeView
@@ -113,8 +113,8 @@ function TreeNodeView({
       onClick={() => onSelectField(node.fieldKey)}
       className={`w-full text-left text-[13px] px-2 py-1 rounded transition-colors cursor-pointer ${
         isSelected
-          ? 'bg-[#eef2ff] text-[#4f46e5] font-medium'
-          : 'text-[#1a202c] hover:bg-[#f8fafc]'
+          ? 'bg-[var(--accent-noc)]/10 text-[var(--accent-noc)] font-medium'
+          : 'text-dark-text-primary hover:bg-dark-page'
       }`}
     >
       {node.name}
@@ -198,16 +198,16 @@ export default function IndicatorScopePanel({
 
   return (
     <div className="space-y-3">
-      <h4 className="text-[14px] font-medium text-[#1a202c]">指标范围</h4>
+      <h4 className="text-[14px] font-medium text-dark-text-primary">指标范围</h4>
 
       <div className="flex gap-3">
         {/* 左侧：字段树 */}
-        <div className="flex-1 rounded-md border border-[#e8ecf1] bg-white p-3">
+        <div className="flex-1 rounded-md border border-dark-border bg-dark-elevated p-3">
           <Input
             placeholder="搜索对象类型字段"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="h-8 text-[13px] border-[#e8ecf1] mb-3"
+            className="h-8 text-[13px] border-dark-border mb-3"
           />
           <div className="max-h-[320px] overflow-y-auto">
             <TreeNodeView
@@ -220,11 +220,11 @@ export default function IndicatorScopePanel({
         </div>
 
         {/* 右侧：枚举值 + 指标预览 */}
-        <div className="flex-1 rounded-md border border-[#e8ecf1] bg-white p-3 flex flex-col">
+        <div className="flex-1 rounded-md border border-dark-border bg-dark-elevated p-3 flex flex-col">
           {/* 枚举值复选框 */}
           {selectedField && enumOptions && enumOptions.length > 0 ? (
             <div className="mb-3">
-              <div className="text-[11px] text-[#9ba4b3] mb-1.5">
+              <div className="text-[11px] text-dark-text-tertiary mb-1.5">
                 {fieldNameMap.get(selectedField) ?? selectedField}
               </div>
               <div className="flex flex-wrap gap-2">
@@ -240,7 +240,7 @@ export default function IndicatorScopePanel({
                     />
                     <label
                       htmlFor={`enum-${selectedField}-${opt}`}
-                      className="text-[13px] text-[#1a202c] cursor-pointer select-none"
+                      className="text-[13px] text-dark-text-primary cursor-pointer select-none"
                     >
                       {opt}
                     </label>
@@ -249,11 +249,11 @@ export default function IndicatorScopePanel({
               </div>
             </div>
           ) : selectedField ? (
-            <div className="text-[13px] text-[#9ba4b3] mb-3">该字段暂无可选枚举值</div>
+            <div className="text-[13px] text-dark-text-tertiary mb-3">该字段暂无可选枚举值</div>
           ) : null}
 
           {/* 数量统计 */}
-          <div className="text-[13px] font-medium text-[#1a202c] mb-3">
+          <div className="text-[13px] font-medium text-dark-text-primary mb-3">
             {isAllSelected
               ? `已选择全部 ${filteredByTags.length} 个指标`
               : `已选择 ${filteredByTags.length} 个指标`}
@@ -265,7 +265,7 @@ export default function IndicatorScopePanel({
               {filteredByTags.map((ind) => (
                 <span
                   key={ind.id}
-                  className="inline-flex items-center px-2 py-0.5 rounded text-[11px] bg-white border border-[#e8ecf1] text-[#1a202c]"
+                  className="inline-flex items-center px-2 py-0.5 rounded text-[11px] bg-dark-elevated border border-dark-border text-dark-text-primary"
                 >
                   {ind.name}
                 </span>

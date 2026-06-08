@@ -161,8 +161,8 @@ export default function KnowledgeUploadPage() {
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-[20px] font-semibold text-[#1a202c]">知识上传</h1>
-        <p className="text-[13px] text-[#6b7789] mt-1">
+        <h1 className="text-[20px] font-semibold text-dark-text-primary">知识上传</h1>
+        <p className="text-[13px] text-dark-text-secondary mt-1">
           上传业务文档到知识库，配置分段参数后提交 NOC 审核
         </p>
       </div>
@@ -178,8 +178,8 @@ export default function KnowledgeUploadPage() {
             {/* 左侧：表单内容 */}
             <div className="lg:col-span-7 space-y-6">
               {/* 知识库选择 */}
-              <div className="bg-white rounded-lg border border-[#e8ecf1] p-5">
-                <h3 className="text-[15px] font-semibold text-[#1a202c] mb-4">
+              <div className="bg-dark-elevated rounded-lg border border-dark-border p-5">
+                <h3 className="text-[15px] font-semibold text-dark-text-primary mb-4">
                   目标知识库
                 </h3>
                 <div className="space-y-3">
@@ -199,7 +199,7 @@ export default function KnowledgeUploadPage() {
                       <Label className="text-[13px] shrink-0">额外知识库:</Label>
                       <select
                         aria-label="额外知识库"
-                        className="text-[13px] border border-[#e8ecf1] rounded-md px-3 py-1.5 bg-white"
+                        className="text-[13px] border border-dark-border rounded-md px-3 py-1.5 bg-dark-elevated"
                         value={selectedExtraKb}
                         onChange={(e) => setSelectedExtraKb(e.target.value)}
                       >
@@ -216,18 +216,18 @@ export default function KnowledgeUploadPage() {
               </div>
 
               {/* 文件上传 */}
-              <div className="bg-white rounded-lg border border-[#e8ecf1] p-5">
-                <h3 className="text-[15px] font-semibold text-[#1a202c] mb-4">
+              <div className="bg-dark-elevated rounded-lg border border-dark-border p-5">
+                <h3 className="text-[15px] font-semibold text-dark-text-primary mb-4">
                   文件上传
                 </h3>
 
                 {!selectedFile ? (
-                  <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-[#e8ecf1] rounded-lg cursor-pointer hover:border-[#3478f6] hover:bg-[#f8f9fb] transition-colors">
-                    <Upload size={24} className="text-[#9ba4b3] mb-2" />
-                    <span className="text-[13px] text-[#6b7789]">
+                  <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-dark-border rounded-lg cursor-pointer hover:border-dark-accent-primary hover:bg-dark-page transition-colors">
+                    <Upload size={24} className="text-dark-text-tertiary mb-2" />
+                    <span className="text-[13px] text-dark-text-secondary">
                       点击或拖拽上传文件
                     </span>
-                    <span className="text-[11px] text-[#9ba4b3] mt-1">
+                    <span className="text-[11px] text-dark-text-tertiary mt-1">
                       支持 PDF/DOCX/MD/TXT/XML/CSV/PPTX/XLSX/HTM，≤15MB
                     </span>
                     <input
@@ -238,14 +238,14 @@ export default function KnowledgeUploadPage() {
                     />
                   </label>
                 ) : (
-                  <div className="flex items-center justify-between bg-[#f8f9fb] rounded-lg p-3">
+                  <div className="flex items-center justify-between bg-dark-page rounded-lg p-3">
                     <div className="flex items-center gap-3">
-                      <FileText size={20} className="text-[#3478f6]" />
+                      <FileText size={20} className="text-dark-accent-primary" />
                       <div>
-                        <p className="text-[13px] font-medium text-[#1a202c]">
+                        <p className="text-[13px] font-medium text-dark-text-primary">
                           {selectedFile.name}
                         </p>
-                        <p className="text-[11px] text-[#9ba4b3]">
+                        <p className="text-[11px] text-dark-text-tertiary">
                           {formatFileSize(selectedFile.size)}
                         </p>
                       </div>
@@ -266,9 +266,9 @@ export default function KnowledgeUploadPage() {
               </div>
 
               {/* 分段设置 */}
-              <div className="bg-white rounded-lg border border-[#e8ecf1] p-5">
+              <div className="bg-dark-elevated rounded-lg border border-dark-border p-5">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-[15px] font-semibold text-[#1a202c]">
+                  <h3 className="text-[15px] font-semibold text-dark-text-primary">
                     分段设置
                   </h3>
                   <Button variant="outline" size="sm" onClick={handleReset}>
@@ -368,40 +368,40 @@ export default function KnowledgeUploadPage() {
 
             {/* 右侧：预览面板 */}
             <div className="lg:col-span-5">
-              <div className="bg-white rounded-lg border border-[#e8ecf1] p-5 lg:sticky lg:top-4">
-                <h3 className="text-[15px] font-semibold text-[#1a202c] mb-4">
+              <div className="bg-dark-elevated rounded-lg border border-dark-border p-5 lg:sticky lg:top-4">
+                <h3 className="text-[15px] font-semibold text-dark-text-primary mb-4">
                   分块预览
                 </h3>
 
                 {previewChunks.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-12 text-center">
-                    <Eye size={40} className="text-[#d1d5db] mb-3" />
-                    <p className="text-[13px] text-[#9ba4b3]">
+                    <Eye size={40} className="text-dark-text-tertiary mb-3" />
+                    <p className="text-[13px] text-dark-text-tertiary">
                       上传文件后点击「预览块」
                     </p>
-                    <p className="text-[12px] text-[#b0b8c4] mt-1">
+                    <p className="text-[12px] text-dark-text-tertiary mt-1">
                       查看文档分段预览结果
                     </p>
                   </div>
                 ) : (
                   <div className="space-y-3 max-h-[520px] overflow-y-auto pr-1">
-                    <p className="text-[12px] text-[#9ba4b3] mb-2">
+                    <p className="text-[12px] text-dark-text-tertiary mb-2">
                       前 5 个分块
                     </p>
                     {previewChunks.map((chunk, index) => (
                       <div
                         key={chunk.id}
-                        className="border border-[#e8ecf1] rounded-lg p-3"
+                        className="border border-dark-border rounded-lg p-3"
                       >
                         <div className="flex items-center justify-between mb-2">
-                          <span className="text-[12px] font-medium text-[#3478f6]">
+                          <span className="text-[12px] font-medium text-dark-accent-primary">
                             #{index + 1}
                           </span>
-                          <span className="text-[11px] text-[#9ba4b3]">
+                          <span className="text-[11px] text-dark-text-tertiary">
                             {chunk.charCount} 字符
                           </span>
                         </div>
-                        <p className="text-[13px] text-[#4a5568] line-clamp-3">
+                        <p className="text-[13px] text-dark-text-secondary line-clamp-3">
                           {chunk.content.slice(0, 200)}
                           {chunk.content.length > 200 && '...'}
                         </p>

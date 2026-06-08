@@ -16,13 +16,13 @@ interface StatusBadgeProps {
 }
 
 const typeStyles: Record<StatusType, { bg: string; text: string }> = {
-  default: { bg: 'bg-[#f1f3f6]', text: 'text-[#4a5568]' },
-  primary: { bg: 'bg-[#eef4ff]', text: 'text-[#3478f6]' },
-  success: { bg: 'bg-[#ecfdf5]', text: 'text-[#059669]' },
-  warning: { bg: 'bg-[#fffbeb]', text: 'text-[#d97706]' },
-  error: { bg: 'bg-[#fef2f2]', text: 'text-[#dc2626]' },
-  info: { bg: 'bg-[#eff6ff]', text: 'text-[#3b82f6]' },
-  noc: { bg: 'bg-[#f3f0ff]', text: 'text-[#7c5cfc]' },
+  default: { bg: 'bg-dark-card-l2', text: 'text-dark-text-secondary' },
+  primary: { bg: 'bg-dark-accent-primary/10', text: 'text-dark-accent-primary' },
+  success: { bg: 'bg-success-500/10', text: 'text-success-600' },
+  warning: { bg: 'bg-warning-500/10', text: 'text-warning-600' },
+  error: { bg: 'bg-error-500/10', text: 'text-error-600' },
+  info: { bg: 'bg-info-500/10', text: 'text-info-500' },
+  noc: { bg: 'bg-[var(--accent-noc)]/10', text: 'text-[var(--accent-noc)]' },
 };
 
 export default function StatusBadge({ text, type = 'default', className }: StatusBadgeProps) {

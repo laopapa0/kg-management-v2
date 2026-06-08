@@ -87,7 +87,7 @@ export default function SourceAnchorMarker({ sourceId, onClick }: SourceAnchorMa
       className="flex h-8 w-8 items-center justify-center rounded-full bg-dark-accent-primary text-white shadow-lg hover:bg-dark-accent-primary/80"
       style={style}
     >
-      <span className="h-2 w-2 rounded-full bg-white" />
+      <span className="h-2 w-2 rounded-full bg-dark-elevated" />
     </button>
   )
 }

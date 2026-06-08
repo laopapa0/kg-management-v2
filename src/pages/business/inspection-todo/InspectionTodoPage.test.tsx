@@ -533,14 +533,14 @@ describe('InspectionTodoPage', () => {
 
     // Click "是误报" for first anomaly
     fireEvent.click(fpButtons[0]);
-    expect(fpButtons[0]).toHaveClass('bg-[#fff7ed]');
-    expect(fpButtons[0]).toHaveClass('text-[#ea580c]');
+    expect(fpButtons[0]).toHaveClass('bg-warning-50');
+    expect(fpButtons[0]).toHaveClass('text-warning-600');
 
     // Click "非误报" for first anomaly — should switch
     fireEvent.click(taButtons[0]);
-    expect(taButtons[0]).toHaveClass('bg-[#ecfdf5]');
-    expect(taButtons[0]).toHaveClass('text-[#059669]');
-    expect(fpButtons[0]).not.toHaveClass('bg-[#fff7ed]');
+    expect(taButtons[0]).toHaveClass('bg-success-500/10');
+    expect(taButtons[0]).toHaveClass('text-success-600');
+    expect(fpButtons[0]).not.toHaveClass('bg-warning-50');
   });
 
   it('shows comment input for each anomaly', () => {
@@ -640,7 +640,7 @@ describe('InspectionTodoPage', () => {
     // Should show evaluated result (anom-4 is non-false-positive)
     const taButton = screen.getByRole('button', { name: '非误报' });
     expect(taButton).toBeDisabled();
-    expect(taButton).toHaveClass('bg-[#ecfdf5]');
+    expect(taButton).toHaveClass('bg-success-500/10');
 
     const fpButton = screen.getByRole('button', { name: '是误报' });
     expect(fpButton).toBeDisabled();

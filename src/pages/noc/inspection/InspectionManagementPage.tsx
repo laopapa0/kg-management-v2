@@ -34,8 +34,8 @@ interface InspectionManagementPageProps {
 
 function StatCard({ label, value, color }: { label: string; value: number; color: string }) {
   return (
-    <div className="bg-white rounded-lg border border-[#e8ecf1] shadow-[0_1px_3px_rgba(0,0,0,0.06)] p-4">
-      <div className="text-[13px] text-[#6b7789] mb-1">{label}</div>
+    <div className="bg-dark-elevated rounded-lg border border-dark-border shadow-[0_1px_3px_rgba(0,0,0,0.06)] p-4">
+      <div className="text-[13px] text-dark-text-secondary mb-1">{label}</div>
       <div className={`text-[28px] font-semibold ${color}`}>{value}</div>
     </div>
   );
@@ -208,21 +208,21 @@ export default function InspectionManagementPage({ defaultTab = 'plans' }: Inspe
       <div className="flex justify-between items-start mb-1">
         <div>
           <h1 className="text-display">巡检管理</h1>
-          <p className="text-small text-[#6b7789] mt-1">巡检计划配置、执行监控与报告查看</p>
+          <p className="text-small text-dark-text-secondary mt-1">巡检计划配置、执行监控与报告查看</p>
         </div>
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="mb-4 bg-white border border-[#e8ecf1]">
+        <TabsList className="mb-4 bg-dark-elevated border border-dark-border">
           <TabsTrigger
             value="plans"
-            className="data-[state=active]:text-[#3478f6] data-[state=active]:border-b-2 data-[state=active]:border-[#3478f6]"
+            className="data-[state=active]:text-dark-accent-primary data-[state=active]:border-b-2 data-[state=active]:border-dark-accent-primary"
           >
             当前巡检计划
           </TabsTrigger>
           <TabsTrigger
             value="results"
-            className="data-[state=active]:text-[#3478f6] data-[state=active]:border-b-2 data-[state=active]:border-[#3478f6]"
+            className="data-[state=active]:text-dark-accent-primary data-[state=active]:border-b-2 data-[state=active]:border-dark-accent-primary"
           >
             巡检结果
           </TabsTrigger>
@@ -233,7 +233,7 @@ export default function InspectionManagementPage({ defaultTab = 'plans' }: Inspe
           <div className="flex justify-end">
             <Button
               onClick={handleNewPlan}
-              className="bg-[#3478f6] hover:bg-[#2563eb] text-white"
+              className="bg-dark-accent-primary hover:bg-dark-accent-primary text-white"
             >
               新建巡检计划
             </Button>
@@ -241,21 +241,21 @@ export default function InspectionManagementPage({ defaultTab = 'plans' }: Inspe
 
           {/* 统计卡片 */}
           <div className="grid grid-cols-3 gap-4">
-            <StatCard label="运行中" value={stats.running} color="text-[#3478f6]" />
-            <StatCard label="待执行" value={stats.pending} color="text-[#f59e0b]" />
-            <StatCard label="已暂停" value={stats.paused} color="text-[#9ba4b3]" />
+            <StatCard label="运行中" value={stats.running} color="text-dark-accent-primary" />
+            <StatCard label="待执行" value={stats.pending} color="text-warning-500" />
+            <StatCard label="已暂停" value={stats.paused} color="text-dark-text-tertiary" />
           </div>
 
           {/* 计划列表表格 */}
-          <div className="bg-white rounded-lg border border-[#e8ecf1] shadow-[0_1px_3px_rgba(0,0,0,0.06)] overflow-hidden">
+          <div className="bg-dark-elevated rounded-lg border border-dark-border shadow-[0_1px_3px_rgba(0,0,0,0.06)] overflow-hidden">
             <table className="w-full text-[13px]">
               <thead>
-                <tr className="border-b border-[#e8ecf1] bg-[#f8f9fb]">
-                  <th className="px-4 py-3 text-left font-medium text-[#6b7789]">计划名称</th>
-                  <th className="px-4 py-3 text-left font-medium text-[#6b7789]">周期类型</th>
-                  <th className="px-4 py-3 text-left font-medium text-[#6b7789]">下次执行时间</th>
-                  <th className="px-4 py-3 text-left font-medium text-[#6b7789]">最近执行结果</th>
-                  <th className="px-4 py-3 text-left font-medium text-[#6b7789]">操作</th>
+                <tr className="border-b border-dark-border bg-dark-page">
+                  <th className="px-4 py-3 text-left font-medium text-dark-text-secondary">计划名称</th>
+                  <th className="px-4 py-3 text-left font-medium text-dark-text-secondary">周期类型</th>
+                  <th className="px-4 py-3 text-left font-medium text-dark-text-secondary">下次执行时间</th>
+                  <th className="px-4 py-3 text-left font-medium text-dark-text-secondary">最近执行结果</th>
+                  <th className="px-4 py-3 text-left font-medium text-dark-text-secondary">操作</th>
                 </tr>
               </thead>
               <tbody>
@@ -264,30 +264,30 @@ export default function InspectionManagementPage({ defaultTab = 'plans' }: Inspe
                   const execStatus = formatExecutionStatus(lastExec);
                   const isExecuting = executingIds.has(plan.id);
                   return (
-                    <tr key={plan.id} className="border-b border-[#e8ecf1] last:border-b-0">
+                    <tr key={plan.id} className="border-b border-dark-border last:border-b-0">
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2">
                           {plan.name}
                           {plan.status === 'paused' && (
-                            <span className="text-[11px] px-1.5 py-0.5 rounded bg-[#f1f3f6] text-[#9ba4b3]">
+                            <span className="text-[11px] px-1.5 py-0.5 rounded bg-dark-card-l2 text-dark-text-tertiary">
                               已暂停
                             </span>
                           )}
                         </div>
                       </td>
                       <td className="px-4 py-3">{formatTriggerType(plan.triggerType)}</td>
-                      <td className="px-4 py-3 text-[#6b7789]">
+                      <td className="px-4 py-3 text-dark-text-secondary">
                         {plan.triggerType === 'manual' ? '手动触发' : plan.cronExpression || '—'}
                       </td>
                       <td className="px-4 py-3">
                         {isExecuting ? (
-                          <div className="flex items-center gap-2 text-[#3478f6]">
+                          <div className="flex items-center gap-2 text-dark-accent-primary">
                             <Loader2 size={14} className="animate-spin" />
                             <span className="text-[13px]">执行中...</span>
                           </div>
                         ) : lastExec ? (
                           <div className="flex items-center gap-2">
-                            <span className="text-[#6b7789]">
+                            <span className="text-dark-text-secondary">
                               {new Date(lastExec.executedAt).toLocaleString('zh-CN', {
                                 month: '2-digit',
                                 day: '2-digit',
@@ -301,11 +301,11 @@ export default function InspectionManagementPage({ defaultTab = 'plans' }: Inspe
                               className="text-[11px]"
                             />
                             {lastExec.anomalyCount > 0 && (
-                              <span className="text-[#dc2626]">{lastExec.anomalyCount} 个异常</span>
+                              <span className="text-error-600">{lastExec.anomalyCount} 个异常</span>
                             )}
                           </div>
                         ) : (
-                          <span className="text-[#9ba4b3]">—</span>
+                          <span className="text-dark-text-tertiary">—</span>
                         )}
                       </td>
                       <td className="px-4 py-3">
@@ -313,28 +313,28 @@ export default function InspectionManagementPage({ defaultTab = 'plans' }: Inspe
                           <button
                             onClick={() => handleExecute(plan.id)}
                             disabled={isExecuting || plan.status === 'paused'}
-                            className="text-[#3478f6] hover:text-[#2563eb] disabled:text-[#9ba4b3] disabled:cursor-not-allowed"
+                            className="text-dark-accent-primary hover:text-dark-accent-primary disabled:text-dark-text-tertiary disabled:cursor-not-allowed"
                             title="执行"
                           >
                             <Play size={14} />
                           </button>
                           <button
                             onClick={() => handleEdit(plan)}
-                            className="text-[#6b7789] hover:text-[#3478f6]"
+                            className="text-dark-text-secondary hover:text-dark-accent-primary"
                             title="编辑"
                           >
                             <Pencil size={14} />
                           </button>
                           <button
                             onClick={() => handleToggleStatus(plan.id)}
-                            className="text-[#6b7789] hover:text-[#f59e0b]"
+                            className="text-dark-text-secondary hover:text-warning-500"
                             title={plan.status === 'active' ? '停用' : '启用'}
                           >
                             <Pause size={14} />
                           </button>
                           <button
                             onClick={() => setDeleteConfirmId(plan.id)}
-                            className="text-[#6b7789] hover:text-[#dc2626]"
+                            className="text-dark-text-secondary hover:text-error-600"
                             title="删除"
                           >
                             <Trash2 size={14} />
@@ -351,22 +351,22 @@ export default function InspectionManagementPage({ defaultTab = 'plans' }: Inspe
           {/* 删除确认弹窗 */}
           {deleteConfirmId && (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
-              <div className="bg-white rounded-lg border border-[#e8ecf1] shadow-lg p-5 w-[360px]">
-                <h3 className="text-[15px] font-semibold text-[#1a202c] mb-2" data-testid="delete-dialog-title">删除巡检计划</h3>
-                <p className="text-[13px] text-[#6b7789] mb-4">
+              <div className="bg-dark-elevated rounded-lg border border-dark-border shadow-lg p-5 w-[360px]">
+                <h3 className="text-[15px] font-semibold text-dark-text-primary mb-2" data-testid="delete-dialog-title">删除巡检计划</h3>
+                <p className="text-[13px] text-dark-text-secondary mb-4">
                   确定要删除该巡检计划吗？删除后历史报告仍将保留。
                 </p>
                 <div className="flex justify-end gap-3">
                   <Button
                     variant="outline"
                     onClick={() => setDeleteConfirmId(null)}
-                    className="text-[13px] border-[#e8ecf1]"
+                    className="text-[13px] border-dark-border"
                   >
                     取消
                   </Button>
                   <Button
                     onClick={() => handleDelete(deleteConfirmId)}
-                    className="text-[13px] bg-[#dc2626] hover:bg-[#b91c1c] text-white"
+                    className="text-[13px] bg-error-600 hover:bg-error-700 text-white"
                   >
                     确认删除
                   </Button>
@@ -386,7 +386,7 @@ export default function InspectionManagementPage({ defaultTab = 'plans' }: Inspe
                 className="overflow-hidden"
                 data-testid="plan-form-wrapper"
               >
-                <div className="bg-white rounded-lg border border-[#e8ecf1] shadow-[0_1px_3px_rgba(0,0,0,0.06)] p-5">
+                <div className="bg-dark-elevated rounded-lg border border-dark-border shadow-[0_1px_3px_rgba(0,0,0,0.06)] p-5">
                   <InspectionPlanForm
                     initialData={getEditingFormData()}
                     onCancel={handleCancelForm}

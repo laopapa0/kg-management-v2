@@ -79,7 +79,7 @@ describe('MyIndicatorList', () => {
     renderList({ onSelect, selectedId: 'app-002' });
 
     const row = screen.getByText('5G用户渗透率').closest('tr');
-    expect(row).toHaveClass('bg-[#eef4ff]');
+    expect(row).toHaveClass('bg-dark-accent-primary/10');
 
     fireEvent.click(row!);
     expect(onSelect).toHaveBeenCalledTimes(1);

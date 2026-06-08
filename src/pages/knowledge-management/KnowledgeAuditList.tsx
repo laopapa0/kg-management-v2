@@ -69,16 +69,16 @@ function AuditRow({ doc, onOpenDetail }: AuditRowProps) {
   const kb = getKnowledgeBaseById(doc.targetKnowledgeBaseId);
 
   return (
-    <tr className="border-b border-[#e8ecf1] last:border-b-0 hover:bg-[#f8f9fb]">
-      <td className="px-4 py-3 text-[#1a202c]">{doc.name}</td>
-      <td className="px-4 py-3 text-[#6b7789]">{doc.uploader}</td>
-      <td className="px-4 py-3 text-[#6b7789]">
+    <tr className="border-b border-dark-border last:border-b-0 hover:bg-dark-page">
+      <td className="px-4 py-3 text-dark-text-primary">{doc.name}</td>
+      <td className="px-4 py-3 text-dark-text-secondary">{doc.uploader}</td>
+      <td className="px-4 py-3 text-dark-text-secondary">
         {kb?.name || doc.targetKnowledgeBaseId}
       </td>
-      <td className="px-4 py-3 text-[#6b7789]">
+      <td className="px-4 py-3 text-dark-text-secondary">
         {new Date(doc.uploadTime).toLocaleDateString('zh-CN')}
       </td>
-      <td className="px-4 py-3 text-[#6b7789]">
+      <td className="px-4 py-3 text-dark-text-secondary">
         {formatFileSize(doc.fileSize)}
       </td>
       <td className="px-4 py-3">
@@ -92,14 +92,14 @@ function AuditRow({ doc, onOpenDetail }: AuditRowProps) {
         {doc.status === 'pending' || doc.status === 'auditing' ? (
           <button
             onClick={() => onOpenDetail(doc)}
-            className="text-[13px] text-[#3478f6] hover:text-[#2868e0] font-medium"
+            className="text-[13px] text-dark-accent-primary hover:text-dark-accent-primary font-medium"
           >
             审核
           </button>
         ) : (
           <button
             onClick={() => onOpenDetail(doc)}
-            className="text-[13px] text-[#6b7789] hover:text-[#1a202c]"
+            className="text-[13px] text-dark-text-secondary hover:text-dark-text-primary"
           >
             查看
           </button>
@@ -174,15 +174,15 @@ export default function KnowledgeAuditList() {
   return (
     <div className="space-y-4">
       {/* 筛选栏 */}
-      <div className="bg-white rounded-lg border border-[#e8ecf1] p-4 flex items-center gap-4">
+      <div className="bg-dark-elevated rounded-lg border border-dark-border p-4 flex items-center gap-4">
         <div className="flex items-center gap-2">
-          <label htmlFor="kb-filter" className="text-[13px] text-[#6b7789]">
+          <label htmlFor="kb-filter" className="text-[13px] text-dark-text-secondary">
             知识库
           </label>
           <select
             id="kb-filter"
             aria-label="知识库"
-            className="text-[13px] border border-[#e8ecf1] rounded-md px-3 py-1.5 bg-white"
+            className="text-[13px] border border-dark-border rounded-md px-3 py-1.5 bg-dark-elevated"
             value={kbFilter}
             onChange={(e) => setKbFilter(e.target.value)}
           >
@@ -196,13 +196,13 @@ export default function KnowledgeAuditList() {
         </div>
 
         <div className="flex items-center gap-2">
-          <label htmlFor="status-filter" className="text-[13px] text-[#6b7789]">
+          <label htmlFor="status-filter" className="text-[13px] text-dark-text-secondary">
             状态
           </label>
           <select
             id="status-filter"
             aria-label="状态"
-            className="text-[13px] border border-[#e8ecf1] rounded-md px-3 py-1.5 bg-white"
+            className="text-[13px] border border-dark-border rounded-md px-3 py-1.5 bg-dark-elevated"
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
           >
@@ -215,13 +215,13 @@ export default function KnowledgeAuditList() {
         </div>
 
         <div className="flex items-center gap-2">
-          <label htmlFor="time-filter" className="text-[13px] text-[#6b7789]">
+          <label htmlFor="time-filter" className="text-[13px] text-dark-text-secondary">
             时间范围
           </label>
           <select
             id="time-filter"
             aria-label="时间范围"
-            className="text-[13px] border border-[#e8ecf1] rounded-md px-3 py-1.5 bg-white"
+            className="text-[13px] border border-dark-border rounded-md px-3 py-1.5 bg-dark-elevated"
             value={timeFilter}
             onChange={(e) => setTimeFilter(e.target.value as TimeRange)}
           >
@@ -233,10 +233,10 @@ export default function KnowledgeAuditList() {
       </div>
 
       {/* 列表 */}
-      <div className="bg-white rounded-lg border border-[#e8ecf1]">
+      <div className="bg-dark-elevated rounded-lg border border-dark-border">
         <table className="w-full text-[13px]">
           <thead>
-            <tr className="border-b border-[#e8ecf1] text-[#6b7789]">
+            <tr className="border-b border-dark-border text-dark-text-secondary">
               <th className="text-left font-medium px-4 py-3">文档名称</th>
               <th className="text-left font-medium px-4 py-3">上传人</th>
               <th className="text-left font-medium px-4 py-3">目标知识库</th>
@@ -249,7 +249,7 @@ export default function KnowledgeAuditList() {
           <tbody>
             {filteredDocs.length === 0 && (
               <tr>
-                <td colSpan={7} className="text-center text-[#6b7789] py-12">
+                <td colSpan={7} className="text-center text-dark-text-secondary py-12">
                   暂无符合条件的文档
                 </td>
               </tr>

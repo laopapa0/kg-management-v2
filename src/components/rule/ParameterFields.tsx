@@ -360,7 +360,7 @@ const ParameterFields = forwardRef<ParameterFieldsRef, ParameterFieldsProps>(
                   return (
                     <FormItem className="relative">
                       {isOverridden && (
-                        <div className="absolute -left-2 top-0 bottom-0 w-0.5 bg-[#F5A623] rounded-l" />
+                        <div className="absolute -left-2 top-0 bottom-0 w-0.5 bg-[var(--dark-accent-gold)] rounded-l" />
                       )}
                       <FormLabel className="text-xs text-dark-text-secondary">
                         单位
@@ -411,7 +411,7 @@ const ParameterFields = forwardRef<ParameterFieldsRef, ParameterFieldsProps>(
                   return (
                     <FormItem className="relative">
                       {isOverridden && (
-                        <div className="absolute -left-2 top-0 bottom-0 w-0.5 bg-[#F5A623] rounded-l" />
+                        <div className="absolute -left-2 top-0 bottom-0 w-0.5 bg-[var(--dark-accent-gold)] rounded-l" />
                       )}
                       <FormLabel className="text-xs text-dark-text-secondary">
                         告警级别
@@ -431,7 +431,7 @@ const ParameterFields = forwardRef<ParameterFieldsRef, ParameterFieldsProps>(
                                 className={cn(
                                   'rounded-full px-3 py-1 text-xs font-medium transition-colors',
                                   field.value === level
-                                    ? 'bg-[#3B82F6] text-white'
+                                    ? 'bg-dark-accent-primary text-white'
                                     : 'bg-dark-card-l2 text-dark-text-secondary hover:bg-dark-card-l3',
                                 )}
                               >
@@ -471,7 +471,7 @@ const ParameterFields = forwardRef<ParameterFieldsRef, ParameterFieldsProps>(
                   return (
                     <FormItem className="relative">
                       {isOverridden && (
-                        <div className="absolute -left-2 top-0 bottom-0 w-0.5 bg-[#F5A623] rounded-l" />
+                        <div className="absolute -left-2 top-0 bottom-0 w-0.5 bg-[var(--dark-accent-gold)] rounded-l" />
                       )}
                       <FormLabel className="text-xs text-dark-text-secondary">
                         算法
@@ -539,7 +539,7 @@ const ParameterFields = forwardRef<ParameterFieldsRef, ParameterFieldsProps>(
                   return (
                     <FormItem className="relative">
                       {isOverridden && (
-                        <div className="absolute -left-2 top-0 bottom-0 w-0.5 bg-[#F5A623] rounded-l" />
+                        <div className="absolute -left-2 top-0 bottom-0 w-0.5 bg-[var(--dark-accent-gold)] rounded-l" />
                       )}
                       <FormLabel className="text-xs text-dark-text-secondary">
                         时间窗口
@@ -604,7 +604,7 @@ const ParameterFields = forwardRef<ParameterFieldsRef, ParameterFieldsProps>(
                   return (
                     <FormItem className="relative">
                       {isOverridden && (
-                        <div className="absolute -left-2 top-0 bottom-0 w-0.5 bg-[#F5A623] rounded-l" />
+                        <div className="absolute -left-2 top-0 bottom-0 w-0.5 bg-[var(--dark-accent-gold)] rounded-l" />
                       )}
                       <FormLabel className="text-xs text-dark-text-secondary">
                         TOP N
@@ -653,7 +653,7 @@ const ParameterFields = forwardRef<ParameterFieldsRef, ParameterFieldsProps>(
                   return (
                     <FormItem className="relative">
                       {isOverridden && (
-                        <div className="absolute -left-2 top-0 bottom-0 w-0.5 bg-[#F5A623] rounded-l" />
+                        <div className="absolute -left-2 top-0 bottom-0 w-0.5 bg-[var(--dark-accent-gold)] rounded-l" />
                       )}
                       <FormLabel className="text-xs text-dark-text-secondary">
                         维度

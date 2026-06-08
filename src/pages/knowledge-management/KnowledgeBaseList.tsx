@@ -19,31 +19,31 @@ export default function KnowledgeBaseList({
         <div
           key={base.id}
           data-testid="kb-card"
-          className="bg-white rounded-lg border border-[#e8ecf1] shadow-[0_1px_3px_rgba(0,0,0,0.06)] p-5 hover:shadow-md transition-shadow"
+          className="bg-dark-elevated rounded-lg border border-dark-border shadow-[0_1px_3px_rgba(0,0,0,0.06)] p-5 hover:shadow-md transition-shadow"
         >
           <div className="flex items-start justify-between mb-3">
             <div className="flex items-center gap-2">
-              <Database size={18} className="text-[#7c5cfc]" />
-              <h3 className="text-[15px] font-semibold text-[#1a202c]">
+              <Database size={18} className="text-[var(--accent-noc)]" />
+              <h3 className="text-[15px] font-semibold text-dark-text-primary">
                 {base.name}
               </h3>
             </div>
             <span
               className={`text-[11px] px-2 py-0.5 rounded-full ${
                 base.type === 'default'
-                  ? 'bg-[#eef4ff] text-[#3478f6]'
-                  : 'bg-[#f3f0ff] text-[#7c5cfc]'
+                  ? 'bg-dark-accent-primary/10 text-dark-accent-primary'
+                  : 'bg-[var(--accent-noc)]/10 text-[var(--accent-noc)]'
               }`}
             >
               {base.type === 'default' ? '默认' : '专业'}
             </span>
           </div>
 
-          <p className="text-[13px] text-[#6b7789] mb-4 line-clamp-2 min-h-[36px]">
+          <p className="text-[13px] text-dark-text-secondary mb-4 line-clamp-2 min-h-[36px]">
             {base.description || '暂无描述'}
           </p>
 
-          <div className="flex items-center justify-between text-[12px] text-[#9ba4b3] mb-4">
+          <div className="flex items-center justify-between text-[12px] text-dark-text-tertiary mb-4">
             <span>文档数: {base.documentCount}</span>
             <span>{new Date(base.createdAt).toLocaleDateString('zh-CN')}</span>
           </div>

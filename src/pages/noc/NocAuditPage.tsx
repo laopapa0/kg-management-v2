@@ -154,10 +154,10 @@ export default function NocAuditPage() {
   }, [activeTab, search, typeFilter, deptFilter, allAudits]);
 
   const statsCards = [
-    { label: '待审核（新增）', value: 8, icon: <PlusCircle size={20} />, bg: 'bg-[#eef4ff]', text: 'text-[#3478f6]' },
-    { label: '待审核（变更）', value: 4, icon: <Pencil size={20} />, bg: 'bg-[#fffbeb]', text: 'text-[#d97706]' },
-    { label: '今日已审核', value: 15, icon: <CheckCircle size={20} />, bg: 'bg-[#ecfdf5]', text: 'text-[#059669]' },
-    { label: '今日驳回', value: 2, icon: <XCircle size={20} />, bg: 'bg-[#fef2f2]', text: 'text-[#dc2626]' },
+    { label: '待审核（新增）', value: 8, icon: <PlusCircle size={20} />, bg: 'bg-dark-accent-primary/10', text: 'text-dark-accent-primary' },
+    { label: '待审核（变更）', value: 4, icon: <Pencil size={20} />, bg: 'bg-warning-500/10', text: 'text-warning-600' },
+    { label: '今日已审核', value: 15, icon: <CheckCircle size={20} />, bg: 'bg-success-500/10', text: 'text-success-600' },
+    { label: '今日驳回', value: 2, icon: <XCircle size={20} />, bg: 'bg-error-500/10', text: 'text-error-600' },
   ];
 
   const openDrawer = (audit: AuditItem) => {
@@ -222,7 +222,7 @@ export default function NocAuditPage() {
       render: (record: AuditItem) => (
         <Button
           size="sm"
-          className="h-7 px-3 text-[12px] bg-[#10b981] hover:bg-[#059669]"
+          className="h-7 px-3 text-[12px] bg-success-500 hover:bg-success-600"
           onClick={() => openDrawer(record)}
         >
           审核
@@ -268,15 +268,15 @@ export default function NocAuditPage() {
       {/* ── Page Header ── */}
       <div className="flex items-center justify-between mb-5">
         <div>
-          <h1 className="text-[28px] font-semibold text-[#1a202c] leading-tight tracking-[-0.02em]">审核待办列表</h1>
-          <p className="text-[13px] text-[#6b7789] mt-1">审核业务部门提交的指标新增与变更申请，把控命名规范、业务口径与核心属性</p>
+          <h1 className="text-[28px] font-semibold text-dark-text-primary leading-tight tracking-[-0.02em]">审核待办列表</h1>
+          <p className="text-[13px] text-dark-text-secondary mt-1">审核业务部门提交的指标新增与变更申请，把控命名规范、业务口径与核心属性</p>
         </div>
         <div className="flex items-center gap-3">
-          <Button variant="ghost" className="h-9 px-3 text-[14px] text-[#4a5568] hover:bg-[#f1f3f6]">
+          <Button variant="ghost" className="h-9 px-3 text-[14px] text-dark-text-secondary hover:bg-dark-card-l2">
             <RefreshCw size={16} className="mr-1.5" />
             刷新
           </Button>
-          <Button variant="ghost" className="h-9 px-3 text-[14px] text-[#4a5568] hover:bg-[#f1f3f6]">
+          <Button variant="ghost" className="h-9 px-3 text-[14px] text-dark-text-secondary hover:bg-dark-card-l2">
             <Filter size={16} className="mr-1.5" />
             筛选
           </Button>
@@ -296,21 +296,21 @@ export default function NocAuditPage() {
               card.bg
             )}
           >
-            <div className={cn('w-10 h-10 rounded-lg flex items-center justify-center', card.text, 'bg-white/60')}>
+            <div className={cn('w-10 h-10 rounded-lg flex items-center justify-center', card.text, 'bg-dark-elevated/60')}>
               {card.icon}
             </div>
             <div>
               <div className={cn('text-[24px] font-semibold leading-tight', card.text)}>{card.value}</div>
-              <div className="text-[12px] text-[#6b7789] mt-0.5">{card.label}</div>
+              <div className="text-[12px] text-dark-text-secondary mt-0.5">{card.label}</div>
             </div>
           </motion.div>
         ))}
       </div>
 
       {/* ── 审核列表表格 ── */}
-      <div className="border border-[#e8ecf1] rounded-lg bg-white">
+      <div className="border border-dark-border rounded-lg bg-dark-elevated">
         {/* 工具栏 */}
-        <div className="flex items-center justify-between p-4 border-b border-[#e8ecf1]">
+        <div className="flex items-center justify-between p-4 border-b border-dark-border">
           <div className="flex items-center gap-2">
             {(['pending', 'completed', 'all'] as const).map((tab) => (
               <button
@@ -319,8 +319,8 @@ export default function NocAuditPage() {
                 className={cn(
                   'px-4 py-2 text-[14px] font-medium rounded-md transition-colors',
                   activeTab === tab
-                    ? 'bg-[#eef4ff] text-[#3478f6]'
-                    : 'text-[#6b7789] hover:bg-[#f8f9fb]'
+                    ? 'bg-dark-accent-primary/10 text-dark-accent-primary'
+                    : 'text-dark-text-secondary hover:bg-dark-page'
                 )}
               >
                 {tab === 'pending' ? '待审核' : tab === 'completed' ? '已审核' : '全部'}
@@ -388,26 +388,26 @@ export default function NocAuditPage() {
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] }}
-              className="fixed right-0 top-0 bottom-0 w-[720px] bg-white z-50 shadow-2xl overflow-y-auto"
+              className="fixed right-0 top-0 bottom-0 w-[720px] bg-dark-elevated z-50 shadow-2xl overflow-y-auto"
             >
               {/* Drawer Header */}
-              <div className="sticky top-0 bg-white border-b border-[#e8ecf1] px-6 py-4 z-10">
+              <div className="sticky top-0 bg-dark-elevated border-b border-dark-border px-6 py-4 z-10">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-3">
-                    <h2 className="text-[18px] font-semibold text-[#1a202c]">{selectedAudit.id}</h2>
+                    <h2 className="text-[18px] font-semibold text-dark-text-primary">{selectedAudit.id}</h2>
                     <StatusBadge text={selectedAudit.type} type={getTypeBadgeType(selectedAudit.type)} />
                   </div>
                   <button
                     onClick={() => { setDrawerOpen(false); setSelectedAudit(null); }}
-                    className="w-8 h-8 rounded-md flex items-center justify-center hover:bg-[#f1f3f6] transition-colors"
+                    className="w-8 h-8 rounded-md flex items-center justify-center hover:bg-dark-card-l2 transition-colors"
                   >
-                    <X size={18} className="text-[#6b7789]" />
+                    <X size={18} className="text-dark-text-secondary" />
                   </button>
                 </div>
-                <div className="flex items-center gap-6 text-[13px] text-[#6b7789]">
-                  <span>部门: <span className="text-[#4a5568]">{selectedAudit.dept}</span></span>
-                  <span>申请人: <span className="text-[#4a5568]">{selectedAudit.applicant}</span></span>
-                  <span>时间: <span className="text-[#4a5568]">2026-{selectedAudit.submitTime}</span></span>
+                <div className="flex items-center gap-6 text-[13px] text-dark-text-secondary">
+                  <span>部门: <span className="text-dark-text-secondary">{selectedAudit.dept}</span></span>
+                  <span>申请人: <span className="text-dark-text-secondary">{selectedAudit.applicant}</span></span>
+                  <span>时间: <span className="text-dark-text-secondary">2026-{selectedAudit.submitTime}</span></span>
                   <span className="flex items-center gap-1">
                     紧急程度:
                     <StatusBadge text={selectedAudit.urgency} type={getUrgencyBadgeType(selectedAudit.urgency)} />
@@ -425,10 +425,10 @@ export default function NocAuditPage() {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.1 }}
-                      className="border border-[#e8ecf1] rounded-lg p-5"
+                      className="border border-dark-border rounded-lg p-5"
                     >
-                      <h3 className="text-[16px] font-semibold text-[#1a202c] mb-4 flex items-center gap-2">
-                        <FileText size={18} className="text-[#3478f6]" />
+                      <h3 className="text-[16px] font-semibold text-dark-text-primary mb-4 flex items-center gap-2">
+                        <FileText size={18} className="text-dark-accent-primary" />
                         指标信息
                       </h3>
                       <div className="grid grid-cols-2 gap-x-6 gap-y-3">
@@ -442,13 +442,13 @@ export default function NocAuditPage() {
                           { label: '计量单位', value: '百分比' },
                         ].map((item) => (
                           <div key={item.label}>
-                            <Label className="text-[12px] text-[#9ba4b3]">{item.label}</Label>
-                            <div className="text-[14px] text-[#4a5568] mt-0.5">{item.value}</div>
+                            <Label className="text-[12px] text-dark-text-tertiary">{item.label}</Label>
+                            <div className="text-[14px] text-dark-text-secondary mt-0.5">{item.value}</div>
                           </div>
                         ))}
                         <div className="col-span-2">
-                          <Label className="text-[12px] text-[#9ba4b3]">描述</Label>
-                          <div className="text-[14px] text-[#4a5568] mt-0.5">适用于全网5G业务发展监控，涵盖个人用户及家庭用户</div>
+                          <Label className="text-[12px] text-dark-text-tertiary">描述</Label>
+                          <div className="text-[14px] text-dark-text-secondary mt-0.5">适用于全网5G业务发展监控，涵盖个人用户及家庭用户</div>
                         </div>
                       </div>
                     </motion.div>
@@ -458,23 +458,23 @@ export default function NocAuditPage() {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.2 }}
-                      className="border border-[#e8ecf1] rounded-lg p-5"
+                      className="border border-dark-border rounded-lg p-5"
                     >
                       <div className="flex items-center justify-between mb-3">
-                        <h3 className="text-[16px] font-semibold text-[#1a202c] flex items-center gap-2">
-                          <Activity size={18} className="text-[#3478f6]" />
+                        <h3 className="text-[16px] font-semibold text-dark-text-primary flex items-center gap-2">
+                          <Activity size={18} className="text-dark-accent-primary" />
                           影响分析
                         </h3>
                         <StatusBadge text="自动分析" type="noc" />
                       </div>
-                      <p className="text-[12px] text-[#6b7789] mb-3">以下指标可能依赖于该指标</p>
+                      <p className="text-[12px] text-dark-text-secondary mb-3">以下指标可能依赖于该指标</p>
                       <div className="overflow-x-auto">
                         <table className="w-full border-collapse">
                           <thead>
-                            <tr className="bg-[#f1f3f6] border-b-2 border-[#e8ecf1]">
-                              <th className="h-9 px-3 text-left text-[13px] font-medium text-[#4a5568]">指标名称</th>
-                              <th className="h-9 px-3 text-left text-[13px] font-medium text-[#4a5568]">关系类型</th>
-                              <th className="h-9 px-3 text-left text-[13px] font-medium text-[#4a5568]">影响说明</th>
+                            <tr className="bg-dark-card-l2 border-b-2 border-dark-border">
+                              <th className="h-9 px-3 text-left text-[13px] font-medium text-dark-text-secondary">指标名称</th>
+                              <th className="h-9 px-3 text-left text-[13px] font-medium text-dark-text-secondary">关系类型</th>
+                              <th className="h-9 px-3 text-left text-[13px] font-medium text-dark-text-secondary">影响说明</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -482,10 +482,10 @@ export default function NocAuditPage() {
                               { indicator: '5G流量占比', relationType: 'DEPENDS_ON', description: '该指标依赖5G用户渗透率' },
                               { indicator: '全网约收入', relationType: '间接影响', description: '通过5G套餐收入间接影响' },
                             ].map((row, idx) => (
-                              <tr key={idx} className="h-10 border-b border-[#e8ecf1] hover:bg-[#f8f9fb]">
-                                <td className="px-3 text-[14px] text-[#4a5568]">{row.indicator}</td>
-                                <td className="px-3 text-[13px] text-[#7c5cfc]">{row.relationType}</td>
-                                <td className="px-3 text-[13px] text-[#6b7789]">{row.description}</td>
+                              <tr key={idx} className="h-10 border-b border-dark-border hover:bg-dark-page">
+                                <td className="px-3 text-[14px] text-dark-text-secondary">{row.indicator}</td>
+                                <td className="px-3 text-[13px] text-[var(--accent-noc)]">{row.relationType}</td>
+                                <td className="px-3 text-[13px] text-dark-text-secondary">{row.description}</td>
                               </tr>
                             ))}
                           </tbody>
@@ -498,20 +498,20 @@ export default function NocAuditPage() {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.3 }}
-                      className="border border-[#fecaca] rounded-lg p-5 bg-[#fef2f2]"
+                      className="border border-error-200 rounded-lg p-5 bg-error-500/10"
                     >
-                      <h3 className="text-[16px] font-semibold text-[#dc2626] flex items-center gap-2 mb-3">
+                      <h3 className="text-[16px] font-semibold text-error-600 flex items-center gap-2 mb-3">
                         <AlertTriangle size={18} />
                         同义冲突警告
                       </h3>
-                      <p className="text-[13px] text-[#6b7789] mb-3">检测到以下已有指标与该指标口径可能冲突：</p>
+                      <p className="text-[13px] text-dark-text-secondary mb-3">检测到以下已有指标与该指标口径可能冲突：</p>
                       <div className="overflow-x-auto">
                         <table className="w-full border-collapse">
                           <thead>
-                            <tr className="bg-[#fee2e2] border-b border-[#fecaca]">
-                              <th className="h-9 px-3 text-left text-[13px] font-medium text-[#7f1d1d]">已有指标</th>
-                              <th className="h-9 px-3 text-left text-[13px] font-medium text-[#7f1d1d]">口径说明</th>
-                              <th className="h-9 px-3 text-left text-[13px] font-medium text-[#7f1d1d]">相似度</th>
+                            <tr className="bg-error-100 border-b border-error-200">
+                              <th className="h-9 px-3 text-left text-[13px] font-medium text-error-900">已有指标</th>
+                              <th className="h-9 px-3 text-left text-[13px] font-medium text-error-900">口径说明</th>
+                              <th className="h-9 px-3 text-left text-[13px] font-medium text-error-900">相似度</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -519,18 +519,18 @@ export default function NocAuditPage() {
                               { indicator: '5G在网用户率', caliber: '5G在网用户数/移动出账用户总数', similarity: 85 },
                               { indicator: '5G网络渗透率', caliber: '5G网络覆盖用户/总用户数', similarity: 72 },
                             ].map((row, idx) => (
-                              <tr key={idx} className="h-10 border-b border-[#fecaca]">
-                                <td className="px-3 text-[14px] text-[#4a5568]">{row.indicator}</td>
-                                <td className="px-3 text-[13px] text-[#6b7789]">{row.caliber}</td>
+                              <tr key={idx} className="h-10 border-b border-error-200">
+                                <td className="px-3 text-[14px] text-dark-text-secondary">{row.indicator}</td>
+                                <td className="px-3 text-[13px] text-dark-text-secondary">{row.caliber}</td>
                                 <td className="px-3">
-                                  <span className="text-[13px] font-medium text-[#dc2626]">{row.similarity}%</span>
+                                  <span className="text-[13px] font-medium text-error-600">{row.similarity}%</span>
                                 </td>
                               </tr>
                             ))}
                           </tbody>
                         </table>
                       </div>
-                      <button className="mt-3 text-[13px] text-[#3478f6] hover:underline">查看详情对比</button>
+                      <button className="mt-3 text-[13px] text-dark-accent-primary hover:underline">查看详情对比</button>
                     </motion.div>
                   </div>
                 ) : (
@@ -541,32 +541,32 @@ export default function NocAuditPage() {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.1 }}
-                      className="border border-[#e8ecf1] rounded-lg p-5"
+                      className="border border-dark-border rounded-lg p-5"
                     >
-                      <h3 className="text-[16px] font-semibold text-[#1a202c] mb-4 flex items-center gap-2">
-                        <GitBranch size={18} className="text-[#3478f6]" />
+                      <h3 className="text-[16px] font-semibold text-dark-text-primary mb-4 flex items-center gap-2">
+                        <GitBranch size={18} className="text-dark-accent-primary" />
                         修改前后对比
                       </h3>
-                      <p className="text-[12px] text-[#6b7789] mb-3">系统自动记录修改前后对比</p>
+                      <p className="text-[12px] text-dark-text-secondary mb-3">系统自动记录修改前后对比</p>
                       <div className="overflow-x-auto">
                         <table className="w-full border-collapse">
                           <thead>
-                            <tr className="bg-[#f1f3f6] border-b-2 border-[#e8ecf1]">
-                              <th className="h-9 px-3 text-left text-[13px] font-medium text-[#4a5568]">字段名</th>
-                              <th className="h-9 px-3 text-left text-[13px] font-medium text-[#4a5568]">修改前</th>
-                              <th className="h-9 px-3 text-left text-[13px] font-medium text-[#4a5568]">修改后</th>
-                              <th className="h-9 px-3 text-left text-[13px] font-medium text-[#4a5568]">变更类型</th>
+                            <tr className="bg-dark-card-l2 border-b-2 border-dark-border">
+                              <th className="h-9 px-3 text-left text-[13px] font-medium text-dark-text-secondary">字段名</th>
+                              <th className="h-9 px-3 text-left text-[13px] font-medium text-dark-text-secondary">修改前</th>
+                              <th className="h-9 px-3 text-left text-[13px] font-medium text-dark-text-secondary">修改后</th>
+                              <th className="h-9 px-3 text-left text-[13px] font-medium text-dark-text-secondary">变更类型</th>
                             </tr>
                           </thead>
                           <tbody>
                             {mockDiffData.map((row, idx) => (
-                              <tr key={idx} className="h-10 border-b border-[#e8ecf1]">
-                                <td className="px-3 text-[14px] text-[#4a5568]">{row.field}</td>
+                              <tr key={idx} className="h-10 border-b border-dark-border">
+                                <td className="px-3 text-[14px] text-dark-text-secondary">{row.field}</td>
                                 <td className="px-3">
-                                  <span className="text-[13px] text-[#9ba4b3] bg-[#f1f3f6] px-2 py-0.5 rounded line-through">{row.oldValue}</span>
+                                  <span className="text-[13px] text-dark-text-tertiary bg-dark-card-l2 px-2 py-0.5 rounded line-through">{row.oldValue}</span>
                                 </td>
                                 <td className="px-3">
-                                  <span className="text-[13px] text-[#d97706] bg-[#fffbeb] px-2 py-0.5 rounded">{row.newValue}</span>
+                                  <span className="text-[13px] text-warning-600 bg-warning-500/10 px-2 py-0.5 rounded">{row.newValue}</span>
                                 </td>
                                 <td className="px-3">
                                   <StatusBadge text={row.changeType} type={getChangeTypeBadgeType(row.changeType)} />
@@ -583,24 +583,24 @@ export default function NocAuditPage() {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.2 }}
-                      className="border border-[#e8ecf1] rounded-lg p-5"
+                      className="border border-dark-border rounded-lg p-5"
                     >
                       <div className="flex items-center justify-between mb-3">
-                        <h3 className="text-[16px] font-semibold text-[#1a202c] flex items-center gap-2">
-                          <Activity size={18} className="text-[#3478f6]" />
+                        <h3 className="text-[16px] font-semibold text-dark-text-primary flex items-center gap-2">
+                          <Activity size={18} className="text-dark-accent-primary" />
                           变更影响分析
                         </h3>
                         <StatusBadge text="自动分析" type="noc" />
                       </div>
-                      <p className="text-[12px] text-[#6b7789] mb-3">以下下游指标/关系将受本次变更影响</p>
+                      <p className="text-[12px] text-dark-text-secondary mb-3">以下下游指标/关系将受本次变更影响</p>
                       <div className="overflow-x-auto">
                         <table className="w-full border-collapse">
                           <thead>
-                            <tr className="bg-[#f1f3f6] border-b-2 border-[#e8ecf1]">
-                              <th className="h-9 px-3 text-left text-[13px] font-medium text-[#4a5568]">受影响指标</th>
-                              <th className="h-9 px-3 text-left text-[13px] font-medium text-[#4a5568]">影响类型</th>
-                              <th className="h-9 px-3 text-left text-[13px] font-medium text-[#4a5568]">影响程度</th>
-                              <th className="h-9 px-3 text-left text-[13px] font-medium text-[#4a5568]">建议操作</th>
+                            <tr className="bg-dark-card-l2 border-b-2 border-dark-border">
+                              <th className="h-9 px-3 text-left text-[13px] font-medium text-dark-text-secondary">受影响指标</th>
+                              <th className="h-9 px-3 text-left text-[13px] font-medium text-dark-text-secondary">影响类型</th>
+                              <th className="h-9 px-3 text-left text-[13px] font-medium text-dark-text-secondary">影响程度</th>
+                              <th className="h-9 px-3 text-left text-[13px] font-medium text-dark-text-secondary">建议操作</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -609,13 +609,13 @@ export default function NocAuditPage() {
                               { indicator: '全网约收入', impactType: '间接计算', severity: '低' as const, suggestion: '无需操作' },
                               { indicator: '5G用户波动告警', impactType: '规则参数', severity: '高' as const, suggestion: '需同步更新规则阈值' },
                             ].map((row, idx) => (
-                              <tr key={idx} className="h-10 border-b border-[#e8ecf1] hover:bg-[#f8f9fb]">
-                                <td className="px-3 text-[14px] text-[#4a5568]">{row.indicator}</td>
-                                <td className="px-3 text-[13px] text-[#6b7789]">{row.impactType}</td>
+                              <tr key={idx} className="h-10 border-b border-dark-border hover:bg-dark-page">
+                                <td className="px-3 text-[14px] text-dark-text-secondary">{row.indicator}</td>
+                                <td className="px-3 text-[13px] text-dark-text-secondary">{row.impactType}</td>
                                 <td className="px-3">
                                   <StatusBadge text={row.severity} type={getSeverityBadgeType(row.severity)} />
                                 </td>
-                                <td className="px-3 text-[13px] text-[#6b7789]">{row.suggestion}</td>
+                                <td className="px-3 text-[13px] text-dark-text-secondary">{row.suggestion}</td>
                               </tr>
                             ))}
                           </tbody>
@@ -628,62 +628,62 @@ export default function NocAuditPage() {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.3 }}
-                      className="border border-[#fecaca] rounded-lg p-5 bg-[#fef2f2]"
+                      className="border border-error-200 rounded-lg p-5 bg-error-500/10"
                     >
-                      <h3 className="text-[16px] font-semibold text-[#dc2626] flex items-center gap-2 mb-3">
+                      <h3 className="text-[16px] font-semibold text-error-600 flex items-center gap-2 mb-3">
                         <AlertTriangle size={18} />
                         同义冲突警告
                       </h3>
-                      <p className="text-[13px] text-[#6b7789] mb-3">检测到以下已有指标与变更后的指标口径可能冲突：</p>
+                      <p className="text-[13px] text-dark-text-secondary mb-3">检测到以下已有指标与变更后的指标口径可能冲突：</p>
                       <div className="overflow-x-auto">
                         <table className="w-full border-collapse">
                           <thead>
-                            <tr className="bg-[#fee2e2] border-b border-[#fecaca]">
-                              <th className="h-9 px-3 text-left text-[13px] font-medium text-[#7f1d1d]">已有指标</th>
-                              <th className="h-9 px-3 text-left text-[13px] font-medium text-[#7f1d1d]">口径说明</th>
-                              <th className="h-9 px-3 text-left text-[13px] font-medium text-[#7f1d1d]">相似度</th>
+                            <tr className="bg-error-100 border-b border-error-200">
+                              <th className="h-9 px-3 text-left text-[13px] font-medium text-error-900">已有指标</th>
+                              <th className="h-9 px-3 text-left text-[13px] font-medium text-error-900">口径说明</th>
+                              <th className="h-9 px-3 text-left text-[13px] font-medium text-error-900">相似度</th>
                             </tr>
                           </thead>
                           <tbody>
                             {[
                               { indicator: '5G在网用户率', caliber: '5G在网用户数/移动出账用户总数', similarity: 78 },
                             ].map((row, idx) => (
-                              <tr key={idx} className="h-10 border-b border-[#fecaca]">
-                                <td className="px-3 text-[14px] text-[#4a5568]">{row.indicator}</td>
-                                <td className="px-3 text-[13px] text-[#6b7789]">{row.caliber}</td>
+                              <tr key={idx} className="h-10 border-b border-error-200">
+                                <td className="px-3 text-[14px] text-dark-text-secondary">{row.indicator}</td>
+                                <td className="px-3 text-[13px] text-dark-text-secondary">{row.caliber}</td>
                                 <td className="px-3">
-                                  <span className="text-[13px] font-medium text-[#dc2626]">{row.similarity}%</span>
+                                  <span className="text-[13px] font-medium text-error-600">{row.similarity}%</span>
                                 </td>
                               </tr>
                             ))}
                           </tbody>
                         </table>
                       </div>
-                      <button className="mt-3 text-[13px] text-[#3478f6] hover:underline">查看详情对比</button>
+                      <button className="mt-3 text-[13px] text-dark-accent-primary hover:underline">查看详情对比</button>
                     </motion.div>
                   </div>
                 )}
               </div>
 
               {/* 审核操作区（固定底部） */}
-              <div className="sticky bottom-0 bg-white border-t border-[#e8ecf1] px-6 py-4 flex items-center justify-center gap-4">
+              <div className="sticky bottom-0 bg-dark-elevated border-t border-dark-border px-6 py-4 flex items-center justify-center gap-4">
                 <Button
                   onClick={handleApprove}
-                  className="h-11 px-8 text-[15px] bg-[#10b981] hover:bg-[#059669]"
+                  className="h-11 px-8 text-[15px] bg-success-500 hover:bg-success-600"
                 >
                   <CheckCircle size={18} className="mr-2" />
                   通过
                 </Button>
                 <Button
                   onClick={handleReject}
-                  className="h-11 px-8 text-[15px] bg-[#ef4444] hover:bg-[#dc2626]"
+                  className="h-11 px-8 text-[15px] bg-error-500 hover:bg-error-600"
                 >
                   <XCircle size={18} className="mr-2" />
                   驳回
                 </Button>
                 <Button
                   onClick={handleTransfer}
-                  className="h-11 px-8 text-[15px] bg-[#3478f6] hover:bg-[#1d5ee0]"
+                  className="h-11 px-8 text-[15px] bg-dark-accent-primary hover:bg-dark-accent-primary-active"
                 >
                   <ArrowRight size={18} className="mr-2" />
                   转交
@@ -699,13 +699,13 @@ export default function NocAuditPage() {
         <DialogContent className="w-[480px]">
           <DialogHeader>
             <DialogTitle className="text-[18px] font-semibold flex items-center gap-2">
-              <XCircle size={20} className="text-[#ef4444]" />
+              <XCircle size={20} className="text-error-500" />
               驳回申请
             </DialogTitle>
           </DialogHeader>
           <div className="mt-4 space-y-4">
             <div>
-              <Label className="text-[13px] text-[#4a5568]">驳回原因 <span className="text-[#ef4444]">*</span></Label>
+              <Label className="text-[13px] text-dark-text-secondary">驳回原因 <span className="text-error-500">*</span></Label>
               <div className="flex flex-wrap gap-2 mt-2">
                 {rejectReasons.map((reason) => (
                   <button
@@ -714,8 +714,8 @@ export default function NocAuditPage() {
                     className={cn(
                       'px-3 py-1.5 text-[12px] rounded-md border transition-colors',
                       rejectForm.reason === reason
-                        ? 'border-[#ef4444] bg-[#fef2f2] text-[#dc2626]'
-                        : 'border-[#dde1e8] text-[#4a5568] hover:border-[#ef4444] hover:text-[#dc2626]'
+                        ? 'border-error-500 bg-error-500/10 text-error-600'
+                        : 'border-dark-border-hover text-dark-text-secondary hover:border-error-500 hover:text-error-600'
                     )}
                   >
                     {reason}
@@ -724,7 +724,7 @@ export default function NocAuditPage() {
               </div>
             </div>
             <div>
-              <Label className="text-[13px] text-[#4a5568]">详细说明</Label>
+              <Label className="text-[13px] text-dark-text-secondary">详细说明</Label>
               <Textarea
                 value={rejectForm.customReason}
                 onChange={(e) => setRejectForm(prev => ({ ...prev, customReason: e.target.value }))}
@@ -734,11 +734,11 @@ export default function NocAuditPage() {
             </div>
           </div>
           <div className="flex justify-end gap-3 mt-6">
-            <Button variant="outline" className="h-9 px-4 text-[14px] border-[#dde1e8]" onClick={() => setRejectModalOpen(false)}>
+            <Button variant="outline" className="h-9 px-4 text-[14px] border-dark-border-hover" onClick={() => setRejectModalOpen(false)}>
               取消
             </Button>
             <Button
-              className="h-9 px-4 text-[14px] bg-[#ef4444] hover:bg-[#dc2626]"
+              className="h-9 px-4 text-[14px] bg-error-500 hover:bg-error-600"
               onClick={confirmReject}
               disabled={!rejectForm.reason && !rejectForm.customReason}
             >
@@ -753,13 +753,13 @@ export default function NocAuditPage() {
         <DialogContent className="w-[440px]">
           <DialogHeader>
             <DialogTitle className="text-[18px] font-semibold flex items-center gap-2">
-              <ArrowRight size={20} className="text-[#3478f6]" />
+              <ArrowRight size={20} className="text-dark-accent-primary" />
               转交审核
             </DialogTitle>
           </DialogHeader>
           <div className="mt-4 space-y-4">
             <div>
-              <Label className="text-[13px] text-[#4a5568]">转交人 <span className="text-[#ef4444]">*</span></Label>
+              <Label className="text-[13px] text-dark-text-secondary">转交人 <span className="text-error-500">*</span></Label>
               <Select value={transferForm.target} onValueChange={(v) => setTransferForm(prev => ({ ...prev, target: v }))}>
                 <SelectTrigger className="mt-1 h-9 text-[14px]">
                   <SelectValue placeholder="选择转交人" />
@@ -772,7 +772,7 @@ export default function NocAuditPage() {
               </Select>
             </div>
             <div>
-              <Label className="text-[13px] text-[#4a5568]">转交说明</Label>
+              <Label className="text-[13px] text-dark-text-secondary">转交说明</Label>
               <Textarea
                 value={transferForm.note}
                 onChange={(e) => setTransferForm(prev => ({ ...prev, note: e.target.value }))}
@@ -782,11 +782,11 @@ export default function NocAuditPage() {
             </div>
           </div>
           <div className="flex justify-end gap-3 mt-6">
-            <Button variant="outline" className="h-9 px-4 text-[14px] border-[#dde1e8]" onClick={() => setTransferModalOpen(false)}>
+            <Button variant="outline" className="h-9 px-4 text-[14px] border-dark-border-hover" onClick={() => setTransferModalOpen(false)}>
               取消
             </Button>
             <Button
-              className="h-9 px-4 text-[14px] bg-[#3478f6] hover:bg-[#1d5ee0]"
+              className="h-9 px-4 text-[14px] bg-dark-accent-primary hover:bg-dark-accent-primary-active"
               onClick={confirmTransfer}
               disabled={!transferForm.target}
             >

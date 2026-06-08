@@ -1,68 +1,141 @@
-[data-theme="dark"] {
+/* ─── Light Theme ─── */
+[data-theme="light"] {
   /* Background */
+  --dark-bg-page: #f8f9fb;
+  --dark-bg-elevated: #ffffff;
+  --dark-bg-overlay: rgba(0, 0, 0, 0.45);
+
+  /* Card */
+  --dark-card-l1: #ffffff;
+  --dark-card-l2: #f8f9fb;
+  --dark-card-l3: #f1f3f6;
+
+  /* Text */
+  --dark-text-primary: #1a202c;
+  --dark-text-secondary: #4a5568;
+  --dark-text-tertiary: #6b7789;
+  --dark-text-disabled: #9ba4b3;
+
+  /* Accent */
+  --dark-accent-primary: #2563eb;
+  --dark-accent-primary-hover: #3b82f6;
+  --dark-accent-primary-active: #1d4ed8;
+  --dark-accent-secondary: #10b981;
+  --dark-accent-gold: #f59e0b;
+
+  /* Border */
+  --dark-border-default: rgba(0, 0, 0, 0.08);
+  --dark-border-hover: rgba(0, 0, 0, 0.15);
+  --dark-border-active: rgba(52, 120, 246, 0.5);
+
+  /* Status - passive */
+  --dark-status-success: #10b981;
+  --dark-status-error: #ef4444;
+  --dark-status-warning: #f59e0b;
+  --dark-status-info: #3b82f6;
+
+  /* Status - active */
+  --dark-status-success-active: #059669;
+  --dark-status-error-active: #dc2626;
+  --dark-status-warning-active: #d97706;
+  --dark-status-info-active: #2563eb;
+
+  /* Connection */
+  --dark-conn-line-default: #94a3b8;
+  --dark-conn-line-valid: #10b981;
+  --dark-conn-line-invalid: #ef4444;
+  --dark-conn-spotlight: rgba(0, 0, 0, 0.45);
+  --dark-conn-dim: saturate(0.3) brightness(0.6);
+
+  /* Tree */
+  --dark-tree-hover-bg: rgba(0, 0, 0, 0.04);
+  --dark-tree-selected-bg: rgba(52, 120, 246, 0.12);
+  --dark-tree-guide-line: rgba(0, 0, 0, 0.06);
+  --dark-tree-guide-line-hover: rgba(0, 0, 0, 0.15);
+
+  /* Drag & Drop */
+  --dark-drop-highlight: #dbeafe;
+  --dark-drop-glow: rgba(52, 120, 246, 0.6);
+
+  /* Focus / Input / Backdrop */
+  --dark-focus-ring: rgba(52, 120, 246, 0.6);
+  --dark-backdrop: rgba(0, 0, 0, 0.6);
+  --dark-input-bg: #f8f9fb;
+  --dark-input-bg-hover: #f1f3f6;
+
+  /* shadcn/ui semantic overrides */
+  --background: 0 0% 100%;
+  --foreground: 220 26% 14%;
+  --card: 0 0% 100%;
+  --card-foreground: 220 26% 14%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 220 26% 14%;
+  --primary: 219 92% 58%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 216 22% 95%;
+  --secondary-foreground: 220 26% 14%;
+  --muted: 216 22% 95%;
+  --muted-foreground: 215 14% 46%;
+  --accent: 216 22% 95%;
+  --accent-foreground: 220 26% 14%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 216 20% 92%;
+  --input: 216 20% 92%;
+  --ring: 219 92% 58%;
+  --sidebar-background: 0 0% 97%;
+  --sidebar-foreground: 215 14% 34%;
+  --sidebar-primary: 219 92% 58%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 216 22% 94%;
+  --sidebar-accent-foreground: 220 26% 14%;
+  --sidebar-border: 216 20% 92%;
+  --sidebar-ring: 219 92% 58%;
+}
+
+/* ─── Dark (default) ─── */
+[data-theme="dark"] {
   --dark-bg-page: #0F141F;
   --dark-bg-elevated: #1A2030;
   --dark-bg-overlay: rgba(15, 23, 42, 0.45);
-
-  /* Card */
   --dark-card-l1: #1A2030;
   --dark-card-l2: #232B3D;
   --dark-card-l3: #2A344D;
-
-  /* Text */
   --dark-text-primary: #E8ECF1;
   --dark-text-secondary: #94A3B8;
   --dark-text-tertiary: #7A8FA8;
   --dark-text-disabled: #475569;
-
-  /* Accent */
   --dark-accent-primary: #5B8DEF;
   --dark-accent-primary-hover: #7AA6F5;
   --dark-accent-primary-active: #4A7BD4;
   --dark-accent-secondary: #22C55E;
   --dark-accent-gold: #F5A623;
-
-  /* Border */
   --dark-border-default: rgba(255, 255, 255, 0.08);
   --dark-border-hover: rgba(255, 255, 255, 0.15);
   --dark-border-active: rgba(91, 141, 239, 0.5);
-
-  /* Status - passive */
   --dark-status-success: #6BC98F;
   --dark-status-error: #E57D7D;
   --dark-status-warning: #F0C674;
   --dark-status-info: #7AA6F5;
-
-  /* Status - active (high saturation for connection lines) */
   --dark-status-success-active: #22C55E;
   --dark-status-error-active: #EF4444;
   --dark-status-warning-active: #F59E0B;
   --dark-status-info-active: #3B82F6;
-
-  /* Connection */
   --dark-conn-line-default: #64748B;
   --dark-conn-line-valid: #22C55E;
   --dark-conn-line-invalid: #EF4444;
   --dark-conn-spotlight: rgba(15, 23, 42, 0.45);
   --dark-conn-dim: saturate(0.3) brightness(0.6);
-
-  /* Tree */
   --dark-tree-hover-bg: rgba(255, 255, 255, 0.04);
   --dark-tree-selected-bg: rgba(59, 130, 246, 0.12);
   --dark-tree-guide-line: rgba(255, 255, 255, 0.06);
   --dark-tree-guide-line-hover: rgba(255, 255, 255, 0.15);
-
-  /* Drag & Drop */
   --dark-drop-highlight: #DBEAFE;
   --dark-drop-glow: rgba(59, 130, 246, 0.6);
-
-  /* Focus / Input / Backdrop */
   --dark-focus-ring: rgba(91, 141, 239, 0.6);
   --dark-backdrop: rgba(0, 0, 0, 0.6);
   --dark-input-bg: #232B3D;
   --dark-input-bg-hover: #2A344D;
-
-  /* shadcn/ui semantic overrides */
   --background: 222 47% 9%;
   --foreground: 210 20% 93%;
   --card: 222 30% 15%;
@@ -92,7 +165,511 @@
   --sidebar-ring: 217 91% 65%;
 }
 
-/* Connection mode shake animation */
+/* ─── GitHub Dark ─── */
+[data-theme="github-dark"] {
+  --dark-bg-page: #0D1117;
+  --dark-bg-elevated: #161B22;
+  --dark-bg-overlay: rgba(13, 17, 23, 0.55);
+  --dark-card-l1: #161B22;
+  --dark-card-l2: #21262d;
+  --dark-card-l3: #30363d;
+  --dark-text-primary: #C9D1D9;
+  --dark-text-secondary: #8B949E;
+  --dark-text-tertiary: #6E7681;
+  --dark-text-disabled: #484F58;
+  --dark-accent-primary: #58A6FF;
+  --dark-accent-primary-hover: #79C0FF;
+  --dark-accent-primary-active: #388BFD;
+  --dark-accent-secondary: #3FB950;
+  --dark-accent-gold: #D29922;
+  --dark-border-default: rgba(255, 255, 255, 0.08);
+  --dark-border-hover: rgba(255, 255, 255, 0.15);
+  --dark-border-active: rgba(88, 166, 255, 0.5);
+  --dark-status-success: #56D364;
+  --dark-status-error: #F85149;
+  --dark-status-warning: #E3B341;
+  --dark-status-info: #79C0FF;
+  --dark-status-success-active: #3FB950;
+  --dark-status-error-active: #DA3633;
+  --dark-status-warning-active: #D29922;
+  --dark-status-info-active: #58A6FF;
+  --dark-conn-line-default: #8B949E;
+  --dark-conn-line-valid: #3FB950;
+  --dark-conn-line-invalid: #F85149;
+  --dark-conn-spotlight: rgba(13, 17, 23, 0.55);
+  --dark-conn-dim: saturate(0.3) brightness(0.6);
+  --dark-tree-hover-bg: rgba(255, 255, 255, 0.04);
+  --dark-tree-selected-bg: rgba(88, 166, 255, 0.12);
+  --dark-tree-guide-line: rgba(255, 255, 255, 0.06);
+  --dark-tree-guide-line-hover: rgba(255, 255, 255, 0.15);
+  --dark-drop-highlight: #388BFD;
+  --dark-drop-glow: rgba(88, 166, 255, 0.6);
+  --dark-focus-ring: rgba(88, 166, 255, 0.6);
+  --dark-backdrop: rgba(0, 0, 0, 0.6);
+  --dark-input-bg: #21262d;
+  --dark-input-bg-hover: #30363d;
+  --background: 216 28% 7%;
+  --foreground: 210 17% 82%;
+  --card: 215 21% 11%;
+  --card-foreground: 210 17% 82%;
+  --popover: 215 21% 11%;
+  --popover-foreground: 210 17% 82%;
+  --primary: 212 100% 67%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 215 15% 15%;
+  --secondary-foreground: 210 17% 82%;
+  --muted: 215 15% 15%;
+  --muted-foreground: 215 10% 55%;
+  --accent: 215 15% 20%;
+  --accent-foreground: 210 17% 90%;
+  --destructive: 0 72% 51%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 215 15% 10%;
+  --input: 215 15% 10%;
+  --ring: 212 100% 67%;
+  --sidebar-background: 215 21% 8%;
+  --sidebar-foreground: 215 10% 55%;
+  --sidebar-primary: 212 100% 67%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 215 15% 15%;
+  --sidebar-accent-foreground: 210 17% 82%;
+  --sidebar-border: 215 15% 10%;
+  --sidebar-ring: 212 100% 67%;
+}
+
+/* ─── Vercel Geist ─── */
+[data-theme="vercel-dark"] {
+  --dark-bg-page: #0A0A0A;
+  --dark-bg-elevated: #111111;
+  --dark-bg-overlay: rgba(0, 0, 0, 0.6);
+  --dark-card-l1: #111111;
+  --dark-card-l2: #171717;
+  --dark-card-l3: #1f1f1f;
+  --dark-text-primary: #FFFFFF;
+  --dark-text-secondary: #888888;
+  --dark-text-tertiary: #666666;
+  --dark-text-disabled: #444444;
+  --dark-accent-primary: #8888FF;
+  --dark-accent-primary-hover: #A5A5FF;
+  --dark-accent-primary-active: #6B6BDB;
+  --dark-accent-secondary: #4ADE80;
+  --dark-accent-gold: #FBBF24;
+  --dark-border-default: rgba(255, 255, 255, 0.08);
+  --dark-border-hover: rgba(255, 255, 255, 0.15);
+  --dark-border-active: rgba(136, 136, 255, 0.5);
+  --dark-status-success: #4ADE80;
+  --dark-status-error: #F87171;
+  --dark-status-warning: #FBBF24;
+  --dark-status-info: #A5A5FF;
+  --dark-status-success-active: #22C55E;
+  --dark-status-error-active: #EF4444;
+  --dark-status-warning-active: #F59E0B;
+  --dark-status-info-active: #8888FF;
+  --dark-conn-line-default: #666666;
+  --dark-conn-line-valid: #4ADE80;
+  --dark-conn-line-invalid: #F87171;
+  --dark-conn-spotlight: rgba(0, 0, 0, 0.6);
+  --dark-conn-dim: saturate(0.3) brightness(0.6);
+  --dark-tree-hover-bg: rgba(255, 255, 255, 0.04);
+  --dark-tree-selected-bg: rgba(136, 136, 255, 0.12);
+  --dark-tree-guide-line: rgba(255, 255, 255, 0.06);
+  --dark-tree-guide-line-hover: rgba(255, 255, 255, 0.15);
+  --dark-drop-highlight: #8888FF;
+  --dark-drop-glow: rgba(136, 136, 255, 0.6);
+  --dark-focus-ring: rgba(136, 136, 255, 0.6);
+  --dark-backdrop: rgba(0, 0, 0, 0.6);
+  --dark-input-bg: #171717;
+  --dark-input-bg-hover: #1f1f1f;
+  --background: 0 0% 4%;
+  --foreground: 0 0% 100%;
+  --card: 0 0% 7%;
+  --card-foreground: 0 0% 100%;
+  --popover: 0 0% 7%;
+  --popover-foreground: 0 0% 100%;
+  --primary: 240 100% 77%;
+  --primary-foreground: 0 0% 0%;
+  --secondary: 0 0% 9%;
+  --secondary-foreground: 0 0% 100%;
+  --muted: 0 0% 9%;
+  --muted-foreground: 0 0% 45%;
+  --accent: 0 0% 14%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 0 72% 51%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 0 0% 5%;
+  --input: 0 0% 5%;
+  --ring: 240 100% 77%;
+  --sidebar-background: 0 0% 4%;
+  --sidebar-foreground: 0 0% 45%;
+  --sidebar-primary: 240 100% 77%;
+  --sidebar-primary-foreground: 0 0% 0%;
+  --sidebar-accent: 0 0% 9%;
+  --sidebar-accent-foreground: 0 0% 100%;
+  --sidebar-border: 0 0% 5%;
+  --sidebar-ring: 240 100% 77%;
+}
+
+/* ─── Linear ─── */
+[data-theme="linear-dark"] {
+  --dark-bg-page: #0D0D0D;
+  --dark-bg-elevated: #1A1A1A;
+  --dark-bg-overlay: rgba(0, 0, 0, 0.6);
+  --dark-card-l1: #1A1A1A;
+  --dark-card-l2: #1f1f1f;
+  --dark-card-l3: #262626;
+  --dark-text-primary: #FFFFFF;
+  --dark-text-secondary: #8A8F98;
+  --dark-text-tertiary: #5C5F66;
+  --dark-text-disabled: #444444;
+  --dark-accent-primary: #7B87E8;
+  --dark-accent-primary-hover: #9AA2F0;
+  --dark-accent-primary-active: #5E6AD2;
+  --dark-accent-secondary: #4EC9B0;
+  --dark-accent-gold: #E5C07B;
+  --dark-border-default: rgba(255, 255, 255, 0.08);
+  --dark-border-hover: rgba(255, 255, 255, 0.15);
+  --dark-border-active: rgba(94, 106, 210, 0.5);
+  --dark-status-success: #4EC9B0;
+  --dark-status-error: #F48771;
+  --dark-status-warning: #E5C07B;
+  --dark-status-info: #7F87E4;
+  --dark-status-success-active: #3AAE99;
+  --dark-status-error-active: #D95555;
+  --dark-status-warning-active: #D4A843;
+  --dark-status-info-active: #5E6AD2;
+  --dark-conn-line-default: #5C5F66;
+  --dark-conn-line-valid: #4EC9B0;
+  --dark-conn-line-invalid: #F48771;
+  --dark-conn-spotlight: rgba(0, 0, 0, 0.6);
+  --dark-conn-dim: saturate(0.3) brightness(0.6);
+  --dark-tree-hover-bg: rgba(255, 255, 255, 0.04);
+  --dark-tree-selected-bg: rgba(94, 106, 210, 0.12);
+  --dark-tree-guide-line: rgba(255, 255, 255, 0.06);
+  --dark-tree-guide-line-hover: rgba(255, 255, 255, 0.15);
+  --dark-drop-highlight: #5E6AD2;
+  --dark-drop-glow: rgba(94, 106, 210, 0.6);
+  --dark-focus-ring: rgba(94, 106, 210, 0.6);
+  --dark-backdrop: rgba(0, 0, 0, 0.6);
+  --dark-input-bg: #1f1f1f;
+  --dark-input-bg-hover: #262626;
+  --background: 0 0% 5%;
+  --foreground: 0 0% 100%;
+  --card: 0 0% 10%;
+  --card-foreground: 0 0% 100%;
+  --popover: 0 0% 10%;
+  --popover-foreground: 0 0% 100%;
+  --primary: 234 56% 60%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 0 0% 12%;
+  --secondary-foreground: 0 0% 100%;
+  --muted: 0 0% 12%;
+  --muted-foreground: 225 5% 45%;
+  --accent: 0 0% 15%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 0 65% 55%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 0 0% 7%;
+  --input: 0 0% 7%;
+  --ring: 234 56% 60%;
+  --sidebar-background: 0 0% 7%;
+  --sidebar-foreground: 225 5% 45%;
+  --sidebar-primary: 234 56% 60%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 0 0% 12%;
+  --sidebar-accent-foreground: 0 0% 100%;
+  --sidebar-border: 0 0% 7%;
+  --sidebar-ring: 234 56% 60%;
+}
+
+/* ─── Tailwind Plus ─── */
+[data-theme="tailwind-dark"] {
+  --dark-bg-page: #0B1121;
+  --dark-bg-elevated: #151F32;
+  --dark-bg-overlay: rgba(11, 17, 33, 0.55);
+  --dark-card-l1: #151F32;
+  --dark-card-l2: #1e293b;
+  --dark-card-l3: #27354f;
+  --dark-text-primary: #F8FAFC;
+  --dark-text-secondary: #94A3B8;
+  --dark-text-tertiary: #64748B;
+  --dark-text-disabled: #475569;
+  --dark-accent-primary: #38BDF8;
+  --dark-accent-primary-hover: #7DD3FC;
+  --dark-accent-primary-active: #0EA5E9;
+  --dark-accent-secondary: #34D399;
+  --dark-accent-gold: #FBBF24;
+  --dark-border-default: rgba(255, 255, 255, 0.08);
+  --dark-border-hover: rgba(255, 255, 255, 0.15);
+  --dark-border-active: rgba(56, 189, 248, 0.5);
+  --dark-status-success: #34D399;
+  --dark-status-error: #FB7185;
+  --dark-status-warning: #FBBF24;
+  --dark-status-info: #7DD3FC;
+  --dark-status-success-active: #10B981;
+  --dark-status-error-active: #F43F5E;
+  --dark-status-warning-active: #F59E0B;
+  --dark-status-info-active: #38BDF8;
+  --dark-conn-line-default: #64748B;
+  --dark-conn-line-valid: #34D399;
+  --dark-conn-line-invalid: #FB7185;
+  --dark-conn-spotlight: rgba(11, 17, 33, 0.55);
+  --dark-conn-dim: saturate(0.3) brightness(0.6);
+  --dark-tree-hover-bg: rgba(255, 255, 255, 0.04);
+  --dark-tree-selected-bg: rgba(56, 189, 248, 0.12);
+  --dark-tree-guide-line: rgba(255, 255, 255, 0.06);
+  --dark-tree-guide-line-hover: rgba(255, 255, 255, 0.15);
+  --dark-drop-highlight: #38BDF8;
+  --dark-drop-glow: rgba(56, 189, 248, 0.6);
+  --dark-focus-ring: rgba(56, 189, 248, 0.6);
+  --dark-backdrop: rgba(0, 0, 0, 0.6);
+  --dark-input-bg: #1e293b;
+  --dark-input-bg-hover: #27354f;
+  --background: 224 50% 9%;
+  --foreground: 210 40% 98%;
+  --card: 219 41% 14%;
+  --card-foreground: 210 40% 98%;
+  --popover: 219 41% 14%;
+  --popover-foreground: 210 40% 98%;
+  --primary: 198 93% 60%;
+  --primary-foreground: 224 50% 9%;
+  --secondary: 217 33% 17%;
+  --secondary-foreground: 210 40% 98%;
+  --muted: 217 33% 17%;
+  --muted-foreground: 215 20% 55%;
+  --accent: 217 33% 22%;
+  --accent-foreground: 210 40% 98%;
+  --destructive: 0 72% 51%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 217 33% 12%;
+  --input: 217 33% 12%;
+  --ring: 198 93% 60%;
+  --sidebar-background: 219 41% 11%;
+  --sidebar-foreground: 215 20% 55%;
+  --sidebar-primary: 198 93% 60%;
+  --sidebar-primary-foreground: 224 50% 9%;
+  --sidebar-accent: 217 33% 17%;
+  --sidebar-accent-foreground: 210 40% 98%;
+  --sidebar-border: 217 33% 12%;
+  --sidebar-ring: 198 93% 60%;
+}
+
+/* ─── VS Code ─── */
+[data-theme="vscode-dark"] {
+  --dark-bg-page: #1E1E1E;
+  --dark-bg-elevated: #252526;
+  --dark-bg-overlay: rgba(0, 0, 0, 0.5);
+  --dark-card-l1: #252526;
+  --dark-card-l2: #333333;
+  --dark-card-l3: #3C3C3C;
+  --dark-text-primary: #D4D4D4;
+  --dark-text-secondary: #858585;
+  --dark-text-tertiary: #6E6E6E;
+  --dark-text-disabled: #555555;
+  --dark-accent-primary: #569CD6;
+  --dark-accent-primary-hover: #7AB8E8;
+  --dark-accent-primary-active: #3D8BC7;
+  --dark-accent-secondary: #4EC9B0;
+  --dark-accent-gold: #DCDCAA;
+  --dark-border-default: rgba(255, 255, 255, 0.08);
+  --dark-border-hover: rgba(255, 255, 255, 0.15);
+  --dark-border-active: rgba(86, 156, 214, 0.5);
+  --dark-status-success: #4EC9B0;
+  --dark-status-error: #F48771;
+  --dark-status-warning: #DCDCAA;
+  --dark-status-info: #7AB8E8;
+  --dark-status-success-active: #3AAE99;
+  --dark-status-error-active: #D95555;
+  --dark-status-warning-active: #C4B74A;
+  --dark-status-info-active: #569CD6;
+  --dark-conn-line-default: #6E6E6E;
+  --dark-conn-line-valid: #4EC9B0;
+  --dark-conn-line-invalid: #F48771;
+  --dark-conn-spotlight: rgba(0, 0, 0, 0.5);
+  --dark-conn-dim: saturate(0.3) brightness(0.6);
+  --dark-tree-hover-bg: rgba(255, 255, 255, 0.04);
+  --dark-tree-selected-bg: rgba(86, 156, 214, 0.12);
+  --dark-tree-guide-line: rgba(255, 255, 255, 0.06);
+  --dark-tree-guide-line-hover: rgba(255, 255, 255, 0.15);
+  --dark-drop-highlight: #569CD6;
+  --dark-drop-glow: rgba(86, 156, 214, 0.6);
+  --dark-focus-ring: rgba(86, 156, 214, 0.6);
+  --dark-backdrop: rgba(0, 0, 0, 0.5);
+  --dark-input-bg: #333333;
+  --dark-input-bg-hover: #3C3C3C;
+  --background: 0 0% 12%;
+  --foreground: 0 0% 83%;
+  --card: 240 1% 15%;
+  --card-foreground: 0 0% 83%;
+  --popover: 240 1% 15%;
+  --popover-foreground: 0 0% 83%;
+  --primary: 207 61% 59%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 0 0% 20%;
+  --secondary-foreground: 0 0% 83%;
+  --muted: 0 0% 20%;
+  --muted-foreground: 0 0% 50%;
+  --accent: 0 0% 25%;
+  --accent-foreground: 0 0% 90%;
+  --destructive: 0 65% 55%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 0 0% 15%;
+  --input: 0 0% 15%;
+  --ring: 207 61% 59%;
+  --sidebar-background: 240 1% 12%;
+  --sidebar-foreground: 0 0% 50%;
+  --sidebar-primary: 207 61% 59%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 0 0% 20%;
+  --sidebar-accent-foreground: 0 0% 83%;
+  --sidebar-border: 0 0% 15%;
+  --sidebar-ring: 207 61% 59%;
+}
+
+/* ─── Notion ─── */
+[data-theme="notion-dark"] {
+  --dark-bg-page: #191919;
+  --dark-bg-elevated: #202020;
+  --dark-bg-overlay: rgba(0, 0, 0, 0.5);
+  --dark-card-l1: #202020;
+  --dark-card-l2: #2a2a2a;
+  --dark-card-l3: #333333;
+  --dark-text-primary: #FFFFFF;
+  --dark-text-secondary: #999999;
+  --dark-text-tertiary: #777777;
+  --dark-text-disabled: #555555;
+  --dark-accent-primary: #2383E2;
+  --dark-accent-primary-hover: #4B9FE8;
+  --dark-accent-primary-active: #1A6BBF;
+  --dark-accent-secondary: #4EC9B0;
+  --dark-accent-gold: #F5C518;
+  --dark-border-default: rgba(255, 255, 255, 0.08);
+  --dark-border-hover: rgba(255, 255, 255, 0.15);
+  --dark-border-active: rgba(35, 131, 226, 0.5);
+  --dark-status-success: #4EC9B0;
+  --dark-status-error: #FF6B6B;
+  --dark-status-warning: #F5C518;
+  --dark-status-info: #4B9FE8;
+  --dark-status-success-active: #3AAE99;
+  --dark-status-error-active: #E85555;
+  --dark-status-warning-active: #D4A820;
+  --dark-status-info-active: #2383E2;
+  --dark-conn-line-default: #777777;
+  --dark-conn-line-valid: #4EC9B0;
+  --dark-conn-line-invalid: #FF6B6B;
+  --dark-conn-spotlight: rgba(0, 0, 0, 0.5);
+  --dark-conn-dim: saturate(0.3) brightness(0.6);
+  --dark-tree-hover-bg: rgba(255, 255, 255, 0.04);
+  --dark-tree-selected-bg: rgba(35, 131, 226, 0.12);
+  --dark-tree-guide-line: rgba(255, 255, 255, 0.06);
+  --dark-tree-guide-line-hover: rgba(255, 255, 255, 0.15);
+  --dark-drop-highlight: #2383E2;
+  --dark-drop-glow: rgba(35, 131, 226, 0.6);
+  --dark-focus-ring: rgba(35, 131, 226, 0.6);
+  --dark-backdrop: rgba(0, 0, 0, 0.5);
+  --dark-input-bg: #2a2a2a;
+  --dark-input-bg-hover: #333333;
+  --background: 0 0% 10%;
+  --foreground: 0 0% 100%;
+  --card: 0 0% 13%;
+  --card-foreground: 0 0% 100%;
+  --popover: 0 0% 13%;
+  --popover-foreground: 0 0% 100%;
+  --primary: 210 77% 51%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 0 0% 16%;
+  --secondary-foreground: 0 0% 100%;
+  --muted: 0 0% 16%;
+  --muted-foreground: 0 0% 50%;
+  --accent: 0 0% 20%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 0 65% 55%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 0 0% 11%;
+  --input: 0 0% 11%;
+  --ring: 210 77% 51%;
+  --sidebar-background: 0 0% 10%;
+  --sidebar-foreground: 0 0% 50%;
+  --sidebar-primary: 210 77% 51%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 0 0% 16%;
+  --sidebar-accent-foreground: 0 0% 100%;
+  --sidebar-border: 0 0% 11%;
+  --sidebar-ring: 210 77% 51%;
+}
+
+/* ─── Stripe ─── */
+[data-theme="stripe-dark"] {
+  --dark-bg-page: #0C1222;
+  --dark-bg-elevated: #1A2235;
+  --dark-bg-overlay: rgba(12, 18, 34, 0.55);
+  --dark-card-l1: #1A2235;
+  --dark-card-l2: #1e283a;
+  --dark-card-l3: #263044;
+  --dark-text-primary: #FFFFFF;
+  --dark-text-secondary: #A3ACB9;
+  --dark-text-tertiary: #6B7280;
+  --dark-text-disabled: #4B5563;
+  --dark-accent-primary: #7B8CDE;
+  --dark-accent-primary-hover: #9CA8E8;
+  --dark-accent-primary-active: #5F6EC8;
+  --dark-accent-secondary: #34D399;
+  --dark-accent-gold: #FBBF24;
+  --dark-border-default: rgba(255, 255, 255, 0.08);
+  --dark-border-hover: rgba(255, 255, 255, 0.15);
+  --dark-border-active: rgba(123, 140, 222, 0.5);
+  --dark-status-success: #34D399;
+  --dark-status-error: #FCA5A5;
+  --dark-status-warning: #FBBF24;
+  --dark-status-info: #9CA8E8;
+  --dark-status-success-active: #10B981;
+  --dark-status-error-active: #EF4444;
+  --dark-status-warning-active: #F59E0B;
+  --dark-status-info-active: #7B8CDE;
+  --dark-conn-line-default: #6B7280;
+  --dark-conn-line-valid: #34D399;
+  --dark-conn-line-invalid: #FCA5A5;
+  --dark-conn-spotlight: rgba(12, 18, 34, 0.55);
+  --dark-conn-dim: saturate(0.3) brightness(0.6);
+  --dark-tree-hover-bg: rgba(255, 255, 255, 0.04);
+  --dark-tree-selected-bg: rgba(123, 140, 222, 0.12);
+  --dark-tree-guide-line: rgba(255, 255, 255, 0.06);
+  --dark-tree-guide-line-hover: rgba(255, 255, 255, 0.15);
+  --dark-drop-highlight: #7B8CDE;
+  --dark-drop-glow: rgba(123, 140, 222, 0.6);
+  --dark-focus-ring: rgba(123, 140, 222, 0.6);
+  --dark-backdrop: rgba(0, 0, 0, 0.6);
+  --dark-input-bg: #1e283a;
+  --dark-input-bg-hover: #263044;
+  --background: 224 48% 9%;
+  --foreground: 0 0% 100%;
+  --card: 222 34% 15%;
+  --card-foreground: 0 0% 100%;
+  --popover: 222 34% 15%;
+  --popover-foreground: 0 0% 100%;
+  --primary: 230 60% 68%;
+  --primary-foreground: 224 48% 9%;
+  --secondary: 219 32% 17%;
+  --secondary-foreground: 0 0% 100%;
+  --muted: 219 32% 17%;
+  --muted-foreground: 220 10% 55%;
+  --accent: 219 32% 22%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 0 72% 51%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 219 32% 12%;
+  --input: 219 32% 12%;
+  --ring: 230 60% 68%;
+  --sidebar-background: 222 34% 12%;
+  --sidebar-foreground: 220 10% 55%;
+  --sidebar-primary: 230 60% 68%;
+  --sidebar-primary-foreground: 224 48% 9%;
+  --sidebar-accent: 219 32% 17%;
+  --sidebar-accent-foreground: 0 0% 100%;
+  --sidebar-border: 219 32% 12%;
+  --sidebar-ring: 230 60% 68%;
+}
+
+/* ─── Animations ─── */
 @keyframes shake-connection {
   0%, 100% { transform: translateX(0); }
   25% { transform: translateX(-3px); }
@@ -103,7 +680,6 @@
   animation: shake-connection 150ms ease-in-out 2;
 }
 
-/* Misfire hint fade animation */
 @keyframes misfire-hint-fade {
   0% { opacity: 0; transform: translateY(10px); }
   10% { opacity: 1; transform: translateY(0); }
@@ -115,18 +691,14 @@
   animation: misfire-hint-fade 3000ms linear forwards;
 }
 
-/* Ant-line dash animation for connection line */
 @keyframes ant-line {
-  to {
-    stroke-dashoffset: -10;
-  }
+  to { stroke-dashoffset: -10; }
 }
 
 .animate-ant-line {
   animation: ant-line 0.5s linear infinite;
 }
 
-/* Target bounce animation on successful attachment */
 @keyframes target-bounce {
   0%, 100% { transform: scale(1); }
   50% { transform: scale(1.02); }
@@ -136,16 +708,9 @@
   animation: target-bounce 200ms ease-in-out;
 }
 
-/* Pulse ring animation for connection confirmation feedback */
 @keyframes pulse-ring-scale {
-  from {
-    transform: scale(1);
-    opacity: 0.6;
-  }
-  to {
-    transform: scale(1.4);
-    opacity: 0;
-  }
+  from { transform: scale(1); opacity: 0.6; }
+  to { transform: scale(1.4); opacity: 0; }
 }
 
 .animate-pulse-ring {
@@ -153,19 +718,14 @@
 }
 
 @keyframes pulse-ring-stroke {
-  from {
-    border-width: 3px;
-  }
-  to {
-    border-width: 1px;
-  }
+  from { border-width: 3px; }
+  to { border-width: 1px; }
 }
 
 .animate-pulse-ring-stroke {
   animation: pulse-ring-stroke 400ms ease-out forwards;
 }
 
-/* Scale-in animation for delete connection button */
 @keyframes scale-in {
   from { transform: scale(0); opacity: 0; }
   to { transform: scale(1); opacity: 1; }
@@ -175,21 +735,16 @@
   animation: scale-in 150ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 
-/* Persistent connection line fade-in */
 @keyframes persistent-line-fade-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .animate-persistent-line-fade-in {
   animation: persistent-line-fade-in 200ms ease-out forwards;
 }
 
-/* Focus mode dimming: non-target panels are desaturated and darkened */
+/* Focus mode dimming */
 [data-dim-mode="true"] [data-focus-zone] {
   filter: saturate(0.3) brightness(0.6);
   transition: filter 200ms;
@@ -197,13 +752,11 @@
   cursor: not-allowed;
 }
 
-/* Spotlight exclusion: source and valid targets remain vivid */
 [data-dim-mode="true"] .spotlight-exclude {
   filter: none !important;
   cursor: crosshair;
 }
 
-/* Valid target three-layer hover feedback */
 [data-dim-mode="true"] .spotlight-exclude {
   border: 1px solid transparent;
   transition: border-width 200ms ease, border-color 200ms ease, background-color 200ms ease, transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -217,9 +770,7 @@
   transform: scale(1.02);
 }
 
-/* ─── Slice 8 review fixes ─── */
-
-/* Accordion animation durations: expand 250ms, collapse 200ms */
+/* Slice 8 review fixes */
 .animate-accordion-down {
   animation-duration: 250ms;
 }
@@ -228,26 +779,17 @@
   animation-duration: 200ms;
 }
 
-/* Error slide-in animation for form validation messages */
 @keyframes error-slide-in {
-  from {
-    opacity: 0;
-    transform: translateY(-4px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .animate-error-slide-in {
   animation: error-slide-in 200ms ease-out forwards;
 }
 
-/* ─── prefers-reduced-motion 降级 ─── */
-
+/* prefers-reduced-motion */
 @media (prefers-reduced-motion: reduce) {
-  /* 取消所有自定义动画 */
   .animate-shake-connection,
   .animate-misfire-hint,
   .animate-ant-line,
@@ -265,20 +807,17 @@
     animation-iteration-count: 1 !important;
   }
 
-  /* 限制过渡为功能性属性（颜色、透明度），去除装饰性运动 */
   .transition-all,
   .transition {
     transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity !important;
     transition-duration: 100ms !important;
   }
 
-  /* 保留颜色/透明度过渡 */
   .transition-colors,
   .transition-opacity {
     transition-duration: 100ms !important;
   }
 
-  /* 完全取消 transform 过渡（装饰性运动） */
   .transition-transform {
     transition-duration: 0ms !important;
   }

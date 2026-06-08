@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import { MotionProvider } from './components/motion/MotionProvider'
+import { getStoredTheme, applyTheme } from './components/theme/ThemeSwitcher'
 import Layout from './components/Layout'
 import DashboardPage from './pages/dashboard/DashboardPage'
 import IndicatorCreatePage from './pages/indicator-create/IndicatorCreatePage'
@@ -26,7 +27,8 @@ import PlatformGraphPage from './pages/platform/PlatformGraphPage'
 
 export default function App() {
   useEffect(() => {
-    document.documentElement.setAttribute('data-theme', 'dark')
+    const theme = getStoredTheme()
+    applyTheme(theme)
   }, [])
 
   return (

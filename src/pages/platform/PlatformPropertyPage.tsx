@@ -154,14 +154,14 @@ export default function PlatformPropertyPage() {
   }, []);
 
   const renderMappingRule = (r: PropertyDef) => {
-    if (!r.mappingRule) return <span className="text-[#c4cad4]">—</span>;
+    if (!r.mappingRule) return <span className="text-dark-text-tertiary">—</span>;
     if (r.mappingType === '静态值') {
-      return <code className="text-[12px] font-mono bg-[#f1f3f6] px-1.5 py-0.5 rounded text-[#4a5568]">&apos;{r.mappingRule}&apos;</code>;
+      return <code className="text-[12px] font-mono bg-dark-card-l2 px-1.5 py-0.5 rounded text-dark-text-secondary">&apos;{r.mappingRule}&apos;</code>;
     }
     if (r.mappingType === '函数映射') {
-      return <code className="text-[12px] font-mono bg-[#ecfdf5] px-1.5 py-0.5 rounded text-[#059669]">{r.mappingRule}</code>;
+      return <code className="text-[12px] font-mono bg-success-500/10 px-1.5 py-0.5 rounded text-success-600">{r.mappingRule}</code>;
     }
-    return <code className="text-[12px] font-mono bg-[#f1f3f6] px-1.5 py-0.5 rounded text-[#4a5568]">{r.mappingRule}</code>;
+    return <code className="text-[12px] font-mono bg-dark-card-l2 px-1.5 py-0.5 rounded text-dark-text-secondary">{r.mappingRule}</code>;
   };
 
   const columns: Column<PropertyDef>[] = useMemo(() => [
@@ -184,7 +184,7 @@ export default function PlatformPropertyPage() {
       width: 'w-20',
       align: 'center',
       render: (r: PropertyDef) => (
-        r.isPrimary ? <Check size={16} className="text-[#10b981] mx-auto" /> : <span className="text-[#c4cad4]">—</span>
+        r.isPrimary ? <Check size={16} className="text-success-500 mx-auto" /> : <span className="text-dark-text-tertiary">—</span>
       ),
     },
     {
@@ -193,7 +193,7 @@ export default function PlatformPropertyPage() {
       width: 'w-20',
       align: 'center',
       render: (r: PropertyDef) => (
-        r.isTitle ? <Check size={16} className="text-[#10b981] mx-auto" /> : <span className="text-[#c4cad4]">—</span>
+        r.isTitle ? <Check size={16} className="text-success-500 mx-auto" /> : <span className="text-dark-text-tertiary">—</span>
       ),
     },
     { key: 'description', title: '描述', render: (r: PropertyDef) => <span className="truncate max-w-[180px] inline-block">{r.description}</span> },
@@ -210,7 +210,7 @@ export default function PlatformPropertyPage() {
           <Button
             variant="ghost"
             size="sm"
-            className="h-7 px-2 text-[13px] text-[#ef4444] hover:text-[#dc2626]"
+            className="h-7 px-2 text-[13px] text-error-500 hover:text-error-600"
             onClick={() => setDeleteConfirm(r.id)}
           >
             <Trash2 size={13} className="mr-1" />删除
@@ -233,23 +233,23 @@ export default function PlatformPropertyPage() {
       <div className="flex justify-between items-start mb-5">
         <div>
           <h1 className="text-display">属性管理</h1>
-          <p className="text-small text-[#6b7789] mt-1">统一管理所有属性的元数据，是图谱自动抽取和查询的基础</p>
+          <p className="text-small text-dark-text-secondary mt-1">统一管理所有属性的元数据，是图谱自动抽取和查询的基础</p>
         </div>
         <div className="flex gap-2">
-          <Button onClick={openCreate} className="bg-[#3478f6] hover:bg-[#1d5ee0] h-9">
+          <Button onClick={openCreate} className="bg-dark-accent-primary hover:bg-dark-accent-primary-active h-9">
             <Plus size={16} className="mr-1" />新增属性
           </Button>
-          <Button variant="outline" className="h-9 border-[#dde1e8]">
+          <Button variant="outline" className="h-9 border-dark-border-hover">
             <Upload size={16} className="mr-1" />批量导入
           </Button>
-          <Button variant="outline" className="h-9 border-[#dde1e8]">
+          <Button variant="outline" className="h-9 border-dark-border-hover">
             <Download size={16} className="mr-1" />导出
           </Button>
         </div>
       </div>
 
       {/* ── 搜索过滤工具栏 ── */}
-      <div className="bg-white rounded-lg border border-[#e8ecf1] shadow-[0_1px_3px_rgba(0,0,0,0.06)] px-5 py-4 mb-4">
+      <div className="bg-dark-elevated rounded-lg border border-dark-border shadow-[0_1px_3px_rgba(0,0,0,0.06)] px-5 py-4 mb-4">
         <div className="flex items-center gap-3 flex-wrap">
           <SearchInput
             placeholder="搜索属性名称或编码"
@@ -292,7 +292,7 @@ export default function PlatformPropertyPage() {
       </div>
 
       {/* ── 属性字段表格 ── */}
-      <div className="bg-white rounded-lg border border-[#e8ecf1] shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
+      <div className="bg-dark-elevated rounded-lg border border-dark-border shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
         <DataTable
           columns={columns}
           data={filteredData}
@@ -318,32 +318,32 @@ export default function PlatformPropertyPage() {
               <h3 className="text-h3 mb-3">基本信息</h3>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="text-[14px] font-medium text-[#2d3748]">属性编码</label>
+                  <label className="text-[14px] font-medium text-dark-text-primary">属性编码</label>
                   <input
                     type="text"
                     value={form.code || ''}
                     onChange={e => updateForm('code', e.target.value)}
                     disabled={!!editingId}
                     className={cn(
-                      'h-9 w-full px-3 rounded-md border border-[#dde1e8] text-[14px] text-[#4a5568]',
-                      'focus:outline-none focus:border-[#5a96ff] focus:ring-2 focus:ring-[#d9e6ff]',
-                      'disabled:bg-[#f1f3f6] disabled:text-[#9ba4b3]'
+                      'h-9 w-full px-3 rounded-md border border-dark-border-hover text-[14px] text-dark-text-secondary',
+                      'focus:outline-none focus:border-dark-accent-primary-hover focus:ring-2 focus:ring-dark-accent-primary/20',
+                      'disabled:bg-dark-card-l2 disabled:text-dark-text-tertiary'
                     )}
                     placeholder="如 PATTR-001"
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-[14px] font-medium text-[#2d3748]">属性名称 <span className="text-[#ef4444]">*</span></label>
+                  <label className="text-[14px] font-medium text-dark-text-primary">属性名称 <span className="text-error-500">*</span></label>
                   <input
                     type="text"
                     value={form.name || ''}
                     onChange={e => updateForm('name', e.target.value)}
-                    className="h-9 w-full px-3 rounded-md border border-[#dde1e8] text-[14px] text-[#4a5568] focus:outline-none focus:border-[#5a96ff] focus:ring-2 focus:ring-[#d9e6ff]"
+                    className="h-9 w-full px-3 rounded-md border border-dark-border-hover text-[14px] text-dark-text-secondary focus:outline-none focus:border-dark-accent-primary-hover focus:ring-2 focus:ring-dark-accent-primary/20"
                     placeholder="属性显示名称"
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-[14px] font-medium text-[#2d3748]">字段类型</label>
+                  <label className="text-[14px] font-medium text-dark-text-primary">字段类型</label>
                   <Select value={form.type || '字符串'} onValueChange={v => updateForm('type', v)}>
                     <SelectTrigger className="w-full h-9">
                       <SelectValue />
@@ -359,22 +359,22 @@ export default function PlatformPropertyPage() {
                       checked={!!form.isPrimary}
                       onCheckedChange={v => updateForm('isPrimary', v)}
                     />
-                    <label className="text-[14px] text-[#4a5568]">是否主键</label>
+                    <label className="text-[14px] text-dark-text-secondary">是否主键</label>
                   </div>
                   <div className="flex items-center gap-2">
                     <Switch
                       checked={!!form.isTitle}
                       onCheckedChange={v => updateForm('isTitle', v)}
                     />
-                    <label className="text-[14px] text-[#4a5568]">是否标题键</label>
+                    <label className="text-[14px] text-dark-text-secondary">是否标题键</label>
                   </div>
                 </div>
                 <div className="col-span-2 space-y-1.5">
-                  <label className="text-[14px] font-medium text-[#2d3748]">描述</label>
+                  <label className="text-[14px] font-medium text-dark-text-primary">描述</label>
                   <textarea
                     value={form.description || ''}
                     onChange={e => updateForm('description', e.target.value)}
-                    className="w-full min-h-[50px] px-3 py-2 rounded-md border border-[#dde1e8] text-[14px] text-[#4a5568] focus:outline-none focus:border-[#5a96ff] focus:ring-2 focus:ring-[#d9e6ff] resize-y"
+                    className="w-full min-h-[50px] px-3 py-2 rounded-md border border-dark-border-hover text-[14px] text-dark-text-secondary focus:outline-none focus:border-dark-accent-primary-hover focus:ring-2 focus:ring-dark-accent-primary/20 resize-y"
                     placeholder="属性的业务说明"
                   />
                 </div>
@@ -382,9 +382,9 @@ export default function PlatformPropertyPage() {
             </div>
 
             {/* 映射规则区 */}
-            <div className="border-t border-[#e8ecf1] pt-4">
+            <div className="border-t border-dark-border pt-4">
               <h3 className="text-h3 mb-1">映射规则</h3>
-              <p className="text-[12px] text-[#9ba4b3] mb-3">定义如何从数据源抽取该属性</p>
+              <p className="text-[12px] text-dark-text-tertiary mb-3">定义如何从数据源抽取该属性</p>
               <RadioGroup
                 value={currentMappingType}
                 onValueChange={v => updateForm('mappingType', v)}
@@ -393,7 +393,7 @@ export default function PlatformPropertyPage() {
                 {mappingTypeOptions.map(t => (
                   <div key={t} className="flex items-center gap-2">
                     <RadioGroupItem value={t} id={`map-${t}`} />
-                    <label htmlFor={`map-${t}`} className="text-[14px] text-[#4a5568] cursor-pointer">{t}</label>
+                    <label htmlFor={`map-${t}`} className="text-[14px] text-dark-text-secondary cursor-pointer">{t}</label>
                   </div>
                 ))}
               </RadioGroup>
@@ -401,7 +401,7 @@ export default function PlatformPropertyPage() {
               {currentMappingType === 'SQL 表达式' && (
                 <div className="space-y-3">
                   <div className="space-y-1.5">
-                    <label className="text-[14px] font-medium text-[#2d3748]">数据源表</label>
+                    <label className="text-[14px] font-medium text-dark-text-primary">数据源表</label>
                     <Select defaultValue="tbl-indicators">
                       <SelectTrigger className="w-full h-9">
                         <SelectValue />
@@ -412,36 +412,36 @@ export default function PlatformPropertyPage() {
                     </Select>
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-[14px] font-medium text-[#2d3748]">SQL 表达式</label>
+                    <label className="text-[14px] font-medium text-dark-text-primary">SQL 表达式</label>
                     <textarea
                       value={form.mappingRule || ''}
                       onChange={e => updateForm('mappingRule', e.target.value)}
-                      className="w-full min-h-[50px] px-3 py-2 rounded-md border border-[#dde1e8] text-[14px] font-mono text-[#4a5568] focus:outline-none focus:border-[#5a96ff] focus:ring-2 focus:ring-[#d9e6ff] resize-y"
+                      className="w-full min-h-[50px] px-3 py-2 rounded-md border border-dark-border-hover text-[14px] font-mono text-dark-text-secondary focus:outline-none focus:border-dark-accent-primary-hover focus:ring-2 focus:ring-dark-accent-primary/20 resize-y"
                       placeholder="如: caliber_desc"
                     />
-                    <p className="text-[12px] text-[#9ba4b3]">引用数据源表中的字段名即可</p>
+                    <p className="text-[12px] text-dark-text-tertiary">引用数据源表中的字段名即可</p>
                   </div>
                 </div>
               )}
 
               {currentMappingType === '静态值' && (
                 <div className="space-y-1.5">
-                  <label className="text-[14px] font-medium text-[#2d3748]">静态值</label>
+                  <label className="text-[14px] font-medium text-dark-text-primary">静态值</label>
                   <input
                     type="text"
                     value={form.mappingRule || ''}
                     onChange={e => updateForm('mappingRule', e.target.value)}
-                    className="h-9 w-full px-3 rounded-md border border-[#dde1e8] text-[14px] text-[#4a5568] focus:outline-none focus:border-[#5a96ff] focus:ring-2 focus:ring-[#d9e6ff]"
+                    className="h-9 w-full px-3 rounded-md border border-dark-border-hover text-[14px] text-dark-text-secondary focus:outline-none focus:border-dark-accent-primary-hover focus:ring-2 focus:ring-dark-accent-primary/20"
                     placeholder="输入固定值..."
                   />
-                  <p className="text-[12px] text-[#9ba4b3]">所有实例将使用此固定值</p>
+                  <p className="text-[12px] text-dark-text-tertiary">所有实例将使用此固定值</p>
                 </div>
               )}
 
               {currentMappingType === '函数映射' && (
                 <div className="space-y-3">
                   <div className="space-y-1.5">
-                    <label className="text-[14px] font-medium text-[#2d3748]">函数名</label>
+                    <label className="text-[14px] font-medium text-dark-text-primary">函数名</label>
                     <Select value={funcType} onValueChange={setFuncType}>
                       <SelectTrigger className="w-full h-9">
                         <SelectValue />
@@ -454,19 +454,19 @@ export default function PlatformPropertyPage() {
                   {funcType === 'sequence' && (
                     <div className="grid grid-cols-2 gap-3">
                       <div className="space-y-1.5">
-                        <label className="text-[14px] font-medium text-[#2d3748]">前缀</label>
-                        <input type="text" className="h-9 w-full px-3 rounded-md border border-[#dde1e8] text-[14px] text-[#4a5568] focus:outline-none focus:border-[#5a96ff] focus:ring-2 focus:ring-[#d9e6ff]" placeholder="如 IND_" />
+                        <label className="text-[14px] font-medium text-dark-text-primary">前缀</label>
+                        <input type="text" className="h-9 w-full px-3 rounded-md border border-dark-border-hover text-[14px] text-dark-text-secondary focus:outline-none focus:border-dark-accent-primary-hover focus:ring-2 focus:ring-dark-accent-primary/20" placeholder="如 IND_" />
                       </div>
                       <div className="space-y-1.5">
-                        <label className="text-[14px] font-medium text-[#2d3748]">起始值</label>
-                        <input type="number" className="h-9 w-full px-3 rounded-md border border-[#dde1e8] text-[14px] text-[#4a5568] focus:outline-none focus:border-[#5a96ff] focus:ring-2 focus:ring-[#d9e6ff]" placeholder="如 1" />
+                        <label className="text-[14px] font-medium text-dark-text-primary">起始值</label>
+                        <input type="number" className="h-9 w-full px-3 rounded-md border border-dark-border-hover text-[14px] text-dark-text-secondary focus:outline-none focus:border-dark-accent-primary-hover focus:ring-2 focus:ring-dark-accent-primary/20" placeholder="如 1" />
                       </div>
                     </div>
                   )}
                   {funcType === 'timestamp' && (
                     <div className="grid grid-cols-2 gap-3">
                       <div className="space-y-1.5">
-                        <label className="text-[14px] font-medium text-[#2d3748]">时区</label>
+                        <label className="text-[14px] font-medium text-dark-text-primary">时区</label>
                         <Select defaultValue="Asia/Shanghai">
                           <SelectTrigger className="w-full h-9"><SelectValue /></SelectTrigger>
                           <SelectContent>
@@ -476,29 +476,29 @@ export default function PlatformPropertyPage() {
                         </Select>
                       </div>
                       <div className="space-y-1.5">
-                        <label className="text-[14px] font-medium text-[#2d3748]">格式</label>
-                        <input type="text" className="h-9 w-full px-3 rounded-md border border-[#dde1e8] text-[14px] text-[#4a5568] focus:outline-none focus:border-[#5a96ff] focus:ring-2 focus:ring-[#d9e6ff]" placeholder="yyyy-MM-dd HH:mm:ss" />
+                        <label className="text-[14px] font-medium text-dark-text-primary">格式</label>
+                        <input type="text" className="h-9 w-full px-3 rounded-md border border-dark-border-hover text-[14px] text-dark-text-secondary focus:outline-none focus:border-dark-accent-primary-hover focus:ring-2 focus:ring-dark-accent-primary/20" placeholder="yyyy-MM-dd HH:mm:ss" />
                       </div>
                     </div>
                   )}
                   {funcType === 'custom' && (
                     <div className="space-y-1.5">
-                      <label className="text-[14px] font-medium text-[#2d3748]">自定义函数</label>
+                      <label className="text-[14px] font-medium text-dark-text-primary">自定义函数</label>
                       <textarea
                         value={form.mappingRule || ''}
                         onChange={e => updateForm('mappingRule', e.target.value)}
-                        className="w-full min-h-[60px] px-3 py-2 rounded-md border border-[#dde1e8] text-[14px] font-mono text-[#4a5568] focus:outline-none focus:border-[#5a96ff] focus:ring-2 focus:ring-[#d9e6ff] resize-y"
+                        className="w-full min-h-[60px] px-3 py-2 rounded-md border border-dark-border-hover text-[14px] font-mono text-dark-text-secondary focus:outline-none focus:border-dark-accent-primary-hover focus:ring-2 focus:ring-dark-accent-primary/20 resize-y"
                         placeholder="输入自定义函数..."
                       />
                     </div>
                   )}
                   {funcType !== 'custom' && funcType !== 'sequence' && funcType !== 'timestamp' && (
                     <div className="space-y-1.5">
-                      <label className="text-[14px] font-medium text-[#2d3748]">函数表达式</label>
+                      <label className="text-[14px] font-medium text-dark-text-primary">函数表达式</label>
                       <textarea
                         value={form.mappingRule || ''}
                         onChange={e => updateForm('mappingRule', e.target.value)}
-                        className="w-full min-h-[50px] px-3 py-2 rounded-md border border-[#dde1e8] text-[14px] font-mono text-[#4a5568] focus:outline-none focus:border-[#5a96ff] focus:ring-2 focus:ring-[#d9e6ff] resize-y"
+                        className="w-full min-h-[50px] px-3 py-2 rounded-md border border-dark-border-hover text-[14px] font-mono text-dark-text-secondary focus:outline-none focus:border-dark-accent-primary-hover focus:ring-2 focus:ring-dark-accent-primary/20 resize-y"
                         placeholder="函数表达式..."
                       />
                     </div>
@@ -507,13 +507,13 @@ export default function PlatformPropertyPage() {
               )}
 
               {currentMappingType === '无映射' && (
-                <p className="text-[14px] text-[#9ba4b3] py-2">该属性不参与自动抽取，需手动维护</p>
+                <p className="text-[14px] text-dark-text-tertiary py-2">该属性不参与自动抽取，需手动维护</p>
               )}
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setModalOpen(false)} className="border-[#dde1e8]">取消</Button>
-            <Button onClick={handleSave} className="bg-[#3478f6] hover:bg-[#1d5ee0]">保存</Button>
+            <Button variant="outline" onClick={() => setModalOpen(false)} className="border-dark-border-hover">取消</Button>
+            <Button onClick={handleSave} className="bg-dark-accent-primary hover:bg-dark-accent-primary-active">保存</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -524,11 +524,11 @@ export default function PlatformPropertyPage() {
           <DialogHeader>
             <DialogTitle className="text-h2">确认删除</DialogTitle>
           </DialogHeader>
-          <p className="text-[14px] text-[#4a5568] py-4">
+          <p className="text-[14px] text-dark-text-secondary py-4">
             删除后不可恢复，是否继续？
           </p>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setDeleteConfirm(null)} className="border-[#dde1e8]">取消</Button>
+            <Button variant="outline" onClick={() => setDeleteConfirm(null)} className="border-dark-border-hover">取消</Button>
             <Button variant="destructive" onClick={() => deleteConfirm && handleDelete(deleteConfirm)}>删除</Button>
           </DialogFooter>
         </DialogContent>

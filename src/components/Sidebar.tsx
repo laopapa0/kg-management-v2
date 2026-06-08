@@ -78,19 +78,19 @@ const navGroups: NavGroup[] = [
 /* ─── 模块样式映射 ─── */
 const moduleStyles = {
   business: {
-    activeBg: 'bg-[#eef4ff]',
-    activeText: 'text-[#3478f6]',
-    indicator: 'bg-[#3478f6]',
+    activeBg: 'bg-dark-accent-primary/10',
+    activeText: 'text-dark-accent-primary',
+    indicator: 'bg-dark-accent-primary',
   },
   noc: {
-    activeBg: 'bg-[#f3f0ff]',
-    activeText: 'text-[#7c5cfc]',
-    indicator: 'bg-[#7c5cfc]',
+    activeBg: 'bg-[var(--accent-noc)]/10',
+    activeText: 'text-[var(--accent-noc)]',
+    indicator: 'bg-[var(--accent-noc)]',
   },
   platform: {
-    activeBg: 'bg-[#f0f9ff]',
-    activeText: 'text-[#0ea5e9]',
-    indicator: 'bg-[#0ea5e9]',
+    activeBg: 'bg-[var(--accent-platform)]/10',
+    activeText: 'text-[var(--accent-platform)]',
+    indicator: 'bg-[var(--accent-platform)]',
   },
 };
 
@@ -120,21 +120,21 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
   return (
     <aside
       className={cn(
-        'fixed left-0 top-0 h-full bg-[#f1f3f6] border-r border-[#e8ecf1] flex flex-col z-50',
+        'fixed left-0 top-0 h-full bg-dark-card-l2 border-r border-dark-border flex flex-col z-50',
         'transition-[width] duration-250 ease-[cubic-bezier(0.4,0,0.2,1)]',
         collapsed ? 'w-16' : 'w-60'
       )}
     >
       {/* Logo 区域 */}
-      <div className="h-14 flex items-center px-4 border-b border-[#e8ecf1] shrink-0">
-        <Database size={24} className="text-[#3478f6] shrink-0" />
+      <div className="h-14 flex items-center px-4 border-b border-dark-border shrink-0">
+        <Database size={24} className="text-dark-accent-primary shrink-0" />
         <AnimatePresence>
           {!collapsed && (
             <motion.span
               initial={{ opacity: 0, width: 0 }}
               animate={{ opacity: 1, width: 'auto' }}
               exit={{ opacity: 0, width: 0 }}
-              className="ml-3 text-[15px] font-semibold text-[#1a202c] whitespace-nowrap overflow-hidden"
+              className="ml-3 text-[15px] font-semibold text-dark-text-primary whitespace-nowrap overflow-hidden"
             >
               图谱管理平台
             </motion.span>
@@ -152,12 +152,12 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
               'flex items-center h-10 rounded-md transition-colors duration-100 relative',
               collapsed ? 'justify-center px-0 mx-1' : 'px-3 mx-2',
               location.pathname === '/'
-                ? 'bg-[#eef4ff] text-[#3478f6]'
-                : 'text-[#4a5568] hover:bg-[#e8ecf1] hover:text-[#2d3748]'
+                ? 'bg-dark-accent-primary/10 text-dark-accent-primary'
+                : 'text-dark-text-secondary hover:bg-dark-tree-hover-bg hover:text-dark-text-primary'
             )}
           >
             {location.pathname === '/' && (
-              <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-[#3478f6] rounded-r-full" />
+              <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-dark-accent-primary rounded-r-full" />
             )}
             <Home size={18} className="shrink-0" />
             <AnimatePresence>
@@ -186,9 +186,9 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
               <button
                 onClick={() => toggleGroup(group.title)}
                 className={cn(
-                  'w-full flex items-center px-4 py-2 text-[11px] font-medium text-[#9ba4b3] uppercase tracking-[0.05em] transition-colors',
+                  'w-full flex items-center px-4 py-2 text-[11px] font-medium text-dark-text-tertiary uppercase tracking-[0.05em] transition-colors',
                   collapsed ? 'justify-center' : 'justify-between',
-                  !collapsed && 'hover:text-[#6b7789]'
+                  !collapsed && 'hover:text-dark-text-secondary'
                 )}
               >
                 {!collapsed && <span className="truncate">{group.title}</span>}
@@ -227,7 +227,7 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
                             collapsed ? 'justify-center px-0' : 'px-3',
                             active
                               ? `${styles.activeBg} ${styles.activeText}`
-                              : 'text-[#4a5568] hover:bg-[#e8ecf1] hover:text-[#2d3748]'
+                              : 'text-dark-text-secondary hover:bg-dark-tree-hover-bg hover:text-dark-text-primary'
                           )}
                         >
                           {active && (
@@ -236,7 +236,7 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
                               styles.indicator
                             )} />
                           )}
-                          <span className="shrink-0 text-[#9ba4b3] [&>svg]:text-current">
+                          <span className="shrink-0 text-dark-text-tertiary [&>svg]:text-current">
                             {item.icon}
                           </span>
                           <AnimatePresence>
@@ -263,8 +263,8 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
       </nav>
 
       {/* 底部用户区域 */}
-      <div className="shrink-0 border-t border-[#e8ecf1] h-12 flex items-center px-3">
-        <div className="w-7 h-7 rounded-full bg-[#3478f6] flex items-center justify-center text-white text-[12px] font-medium shrink-0">
+      <div className="shrink-0 border-t border-dark-border h-12 flex items-center px-3">
+        <div className="w-7 h-7 rounded-full bg-dark-accent-primary flex items-center justify-center text-white text-[12px] font-medium shrink-0">
           管
         </div>
         <AnimatePresence>
@@ -275,8 +275,8 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
               exit={{ opacity: 0, width: 0 }}
               className="ml-2 overflow-hidden"
             >
-              <div className="text-[13px] text-[#2d3748] font-medium truncate">管理员</div>
-              <div className="text-[11px] text-[#9ba4b3] truncate">系统管理员</div>
+              <div className="text-[13px] text-dark-text-primary font-medium truncate">管理员</div>
+              <div className="text-[11px] text-dark-text-tertiary truncate">系统管理员</div>
             </motion.div>
           )}
         </AnimatePresence>
@@ -285,7 +285,7 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
       {/* 收起/展开按钮 */}
       <button
         onClick={onToggle}
-        className="absolute -right-3 top-16 w-6 h-6 bg-white border border-[#e8ecf1] rounded-full flex items-center justify-center shadow-xs hover:shadow-md transition-shadow z-50"
+        className="absolute -right-3 top-16 w-6 h-6 bg-dark-elevated border border-dark-border rounded-full flex items-center justify-center shadow-xs hover:shadow-md transition-shadow z-50"
       >
         {collapsed ? <ChevronRight size={12} /> : <ChevronLeft size={12} />}
       </button>

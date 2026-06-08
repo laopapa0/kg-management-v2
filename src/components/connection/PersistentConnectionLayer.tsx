@@ -149,6 +149,7 @@ export default function PersistentConnectionLayer({
       <svg
         data-testid="persistent-connection-layer"
         className="fixed inset-0 pointer-events-none z-40"
+        style={{ width: '100%', height: '100%' }}
       >
         {allConnections.map(([key, conn]) => {
           const isHovered = (hoveredKey === key || confirmingKey === key) && !exitingKeys.has(key)

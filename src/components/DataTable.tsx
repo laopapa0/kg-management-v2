@@ -35,8 +35,8 @@ function SkeletonRow({ colCount }: { colCount: number }) {
   return (
     <tr className="animate-pulse">
       {Array.from({ length: colCount }).map((_, i) => (
-        <td key={i} className="h-12 px-4 border-b border-[#e8ecf1]">
-          <div className="h-4 bg-[#e8ecf1] rounded w-3/4" />
+        <td key={i} className="h-12 px-4 border-b border-dark-border">
+          <div className="h-4 bg-dark-card-l3 rounded w-3/4" />
         </td>
       ))}
     </tr>
@@ -71,11 +71,11 @@ export default function DataTable<T extends object>({
   const getSortIcon = (column: Column<T>) => {
     if (!column.sortable) return null;
     if (sortConfig?.key !== column.key) {
-      return <ChevronsUpDown size={14} className="text-[#c4cad4] ml-1" />;
+      return <ChevronsUpDown size={14} className="text-dark-text-tertiary ml-1" />;
     }
     return sortConfig.direction === 'asc'
-      ? <ChevronUp size={14} className="text-[#3478f6] ml-1" />
-      : <ChevronDown size={14} className="text-[#3478f6] ml-1" />;
+      ? <ChevronUp size={14} className="text-dark-accent-primary ml-1" />
+      : <ChevronDown size={14} className="text-dark-accent-primary ml-1" />;
   };
 
   return (
@@ -84,15 +84,15 @@ export default function DataTable<T extends object>({
         <table className="w-full border-collapse">
           {/* 表头 */}
           <thead>
-            <tr className="bg-[#f1f3f6] border-b-2 border-[#e8ecf1]">
+            <tr className="bg-dark-card-l2 border-b-2 border-dark-border">
               {columns.map((col) => (
                 <th
                   key={col.key}
                   className={cn(
-                    'h-10 px-4 text-left text-[13px] font-medium text-[#4a5568] whitespace-nowrap',
+                    'h-10 px-4 text-left text-[13px] font-medium text-dark-text-secondary whitespace-nowrap',
                     col.align === 'center' && 'text-center',
                     col.align === 'right' && 'text-right',
-                    col.sortable && 'cursor-pointer select-none hover:text-[#2d3748]',
+                    col.sortable && 'cursor-pointer select-none hover:text-dark-text-primary',
                     col.width
                   )}
                   style={col.width ? { width: col.width } : undefined}
@@ -124,13 +124,13 @@ export default function DataTable<T extends object>({
             ) : data.length === 0 ? (
               <tr>
                 <td colSpan={columns.length} className="py-16 text-center">
-                  <div className="flex flex-col items-center gap-2 text-[#9ba4b3]">
-                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-[#c4cad4]">
+                  <div className="flex flex-col items-center gap-2 text-dark-text-tertiary">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-dark-text-tertiary">
                       <rect x="3" y="3" width="18" height="18" rx="2" />
                       <path d="M3 9h18M9 21V9" />
                     </svg>
-                    <span className="text-[14px] text-[#6b7789]">{emptyText}</span>
-                    <span className="text-[12px] text-[#9ba4b3]">请添加数据或调整筛选条件</span>
+                    <span className="text-[14px] text-dark-text-secondary">{emptyText}</span>
+                    <span className="text-[12px] text-dark-text-tertiary">请添加数据或调整筛选条件</span>
                   </div>
                 </td>
               </tr>
@@ -143,17 +143,17 @@ export default function DataTable<T extends object>({
                     key={key}
                     onClick={() => handleRowClick(record)}
                     className={cn(
-                      'h-12 border-b border-[#e8ecf1] transition-colors duration-100 cursor-pointer',
+                      'h-12 border-b border-dark-border transition-colors duration-100 cursor-pointer',
                       isSelected
-                        ? 'bg-[#eef4ff] [&::before]:content-[""] [&::before]:absolute [&::before]:left-0 [&::before]:top-0 [&::before]:bottom-0 [&::before]:w-[3px] [&::before]:bg-[#3478f6] relative'
-                        : 'hover:bg-[#f8f9fb]'
+                        ? 'bg-dark-accent-primary/10 [&::before]:content-[""] [&::before]:absolute [&::before]:left-0 [&::before]:top-0 [&::before]:bottom-0 [&::before]:w-[3px] [&::before]:bg-dark-accent-primary relative'
+                        : 'hover:bg-dark-page'
                     )}
                   >
                     {columns.map((col) => (
                       <td
                         key={col.key}
                         className={cn(
-                          'px-4 text-[14px] text-[#4a5568]',
+                          'px-4 text-[14px] text-dark-text-secondary',
                           col.align === 'center' && 'text-center',
                           col.align === 'right' && 'text-right',
                         )}
@@ -175,7 +175,7 @@ export default function DataTable<T extends object>({
       {/* 分页 */}
       {pagination && pagination.total > 0 && (
         <div className="flex items-center justify-end gap-3 mt-4 px-2">
-          <span className="text-[13px] text-[#6b7789]">
+          <span className="text-[13px] text-dark-text-secondary">
             共 {pagination.total} 条
           </span>
           <div className="flex items-center gap-1">
@@ -186,8 +186,8 @@ export default function DataTable<T extends object>({
                 className={cn(
                   'w-8 h-8 rounded-md text-[13px] font-medium transition-colors',
                   pagination.current === i + 1
-                    ? 'bg-[#3478f6] text-white'
-                    : 'text-[#4a5568] hover:bg-[#f1f3f6]'
+                    ? 'bg-dark-accent-primary text-white'
+                    : 'text-dark-text-secondary hover:bg-dark-card-l2'
                 )}
               >
                 {i + 1}

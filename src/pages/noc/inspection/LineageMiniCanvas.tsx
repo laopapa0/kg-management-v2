@@ -48,7 +48,7 @@ export default function LineageMiniCanvas({ nodes, edges }: LineageMiniCanvasPro
     <div className="space-y-3">
       <svg
         viewBox={`${minX} ${minY} ${width} ${height}`}
-        className="w-full rounded-lg border border-[#e8ecf1] bg-white"
+        className="w-full rounded-lg border border-dark-border bg-dark-elevated"
         style={{ height: 260 }}
       >
         <defs>
@@ -136,7 +136,7 @@ export default function LineageMiniCanvas({ nodes, edges }: LineageMiniCanvasPro
                 className="w-3 h-3 rounded-sm"
                 style={{ backgroundColor: style.fill, border: `1.5px solid ${style.stroke}` }}
               />
-              <span className="text-[11px] text-[#6b7789]">{style.label}</span>
+              <span className="text-[11px] text-dark-text-secondary">{style.label}</span>
             </div>
           );
         })}

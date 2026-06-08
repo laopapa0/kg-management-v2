@@ -177,6 +177,8 @@ export default function FocusModeOverlay({
       data-testid="focus-mode-overlay"
       className="fixed inset-0 pointer-events-none"
       style={{
+        width: '100%',
+        height: '100%',
         zIndex: 40,
         opacity,
         transition: isVisible

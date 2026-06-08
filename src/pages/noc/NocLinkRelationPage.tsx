@@ -108,10 +108,10 @@ const relationTypeOptions = ['DEPENDS_ON', 'CAUSES', 'AGGREGATES', 'DERIVED_FROM
 /* ─── 严重程度 Badge ─── */
 function SeverityBadge({ severity }: { severity: QualityIssue['severity'] }) {
   const styles: Record<string, { bg: string; text: string }> = {
-    '严重': { bg: 'bg-[#fef2f2]', text: 'text-[#dc2626]' },
-    '警告': { bg: 'bg-[#fffbeb]', text: 'text-[#d97706]' },
-    '一般': { bg: 'bg-[#eef4ff]', text: 'text-[#3478f6]' },
-    '提示': { bg: 'bg-[#f1f3f6]', text: 'text-[#6b7789]' },
+    '严重': { bg: 'bg-error-500/10', text: 'text-error-600' },
+    '警告': { bg: 'bg-warning-500/10', text: 'text-warning-600' },
+    '一般': { bg: 'bg-dark-accent-primary/10', text: 'text-dark-accent-primary' },
+    '提示': { bg: 'bg-dark-card-l2', text: 'text-dark-text-secondary' },
   };
   const s = styles[severity] || styles['提示'];
   return (
@@ -152,7 +152,7 @@ function GraphView({ instances }: { instances: RelationInstance[] }) {
   }, [nodes.join(',')]);
 
   return (
-    <div className="w-full h-[500px] bg-[#f8f9fb] rounded-lg border border-[#e8ecf1] relative overflow-hidden">
+    <div className="w-full h-[500px] bg-dark-page rounded-lg border border-dark-border relative overflow-hidden">
       <svg width="100%" height="100%" viewBox="0 0 800 500">
         {instances.map((inst) => {
           const src = nodePositions[inst.source];
@@ -201,12 +201,12 @@ function GraphView({ instances }: { instances: RelationInstance[] }) {
           ))}
         </defs>
       </svg>
-      <div className="absolute top-3 right-3 bg-white/90 rounded-md border border-[#e8ecf1] p-2">
-        <div className="text-[11px] text-[#6b7789] mb-1">图例</div>
+      <div className="absolute top-3 right-3 bg-dark-elevated/90 rounded-md border border-dark-border p-2">
+        <div className="text-[11px] text-dark-text-secondary mb-1">图例</div>
         {relationTypeDefinitions.map((t) => (
           <div key={t.id} className="flex items-center gap-1.5 py-0.5">
             <div className="w-3 h-0.5 rounded" style={{ backgroundColor: t.color }} />
-            <span className="text-[11px] text-[#4a5568]">{t.name}</span>
+            <span className="text-[11px] text-dark-text-secondary">{t.name}</span>
           </div>
         ))}
       </div>
@@ -322,7 +322,7 @@ export default function NocLinkRelationPage() {
         <div
           className={cn(
             'w-4 h-4 rounded border cursor-pointer flex items-center justify-center transition-colors',
-            selectedRows.has(record.id) ? 'bg-[#7c5cfc] border-[#7c5cfc]' : 'border-[#c4cad4] hover:border-[#7c5cfc]'
+            selectedRows.has(record.id) ? 'bg-[var(--accent-noc)] border-[var(--accent-noc)]' : 'border-dark-border-hover hover:border-[var(--accent-noc)]'
           )}
           onClick={() => toggleRowSelect(record.id)}
         >
@@ -351,7 +351,7 @@ export default function NocLinkRelationPage() {
       render: (record) => (
         <span className={cn(
           'inline-flex items-center px-2 py-0.5 rounded text-[12px] font-medium',
-          record.direction === '有向' ? 'bg-[#eef4ff] text-[#3478f6]' : 'bg-[#f1f3f6] text-[#6b7789]'
+          record.direction === '有向' ? 'bg-dark-accent-primary/10 text-dark-accent-primary' : 'bg-dark-card-l2 text-dark-text-secondary'
         )}>
           {record.direction}
         </span>
@@ -367,7 +367,7 @@ export default function NocLinkRelationPage() {
           <Button variant="ghost" size="sm" className="h-7 px-2 text-[12px]" onClick={() => openEditRelType(record)}>
             <Pencil size={12} className="mr-1" />编辑
           </Button>
-          <Button variant="ghost" size="sm" className="h-7 px-2 text-[12px] text-[#ef4444] hover:text-[#dc2626]" onClick={() => deleteRelType(record.id)}>
+          <Button variant="ghost" size="sm" className="h-7 px-2 text-[12px] text-error-500 hover:text-error-600" onClick={() => deleteRelType(record.id)}>
             <Trash2 size={12} className="mr-1" />删除
           </Button>
         </div>
@@ -402,7 +402,7 @@ export default function NocLinkRelationPage() {
       render: (record) => (
         <span className={cn(
           'text-[13px] font-medium',
-          record.confidence >= 90 ? 'text-[#059669]' : record.confidence >= 70 ? 'text-[#d97706]' : 'text-[#6b7789]'
+          record.confidence >= 90 ? 'text-success-600' : record.confidence >= 70 ? 'text-warning-600' : 'text-dark-text-secondary'
         )}>
           {record.confidence}%
         </span>
@@ -415,7 +415,7 @@ export default function NocLinkRelationPage() {
       width: 'w-24',
       render: (record) => (
         <div className="flex items-center gap-1">
-          <Button variant="ghost" size="sm" className="h-7 px-2 text-[12px] text-[#ef4444] hover:text-[#dc2626]" onClick={() => deleteInstance(record.id)}>
+          <Button variant="ghost" size="sm" className="h-7 px-2 text-[12px] text-error-500 hover:text-error-600" onClick={() => deleteInstance(record.id)}>
             删除
           </Button>
         </div>
@@ -445,7 +445,7 @@ export default function NocLinkRelationPage() {
           <Button variant="ghost" size="sm" className="h-7 px-2 text-[12px]">
             <Eye size={12} className="mr-1" />查看
           </Button>
-          <Button variant="ghost" size="sm" className="h-7 px-2 text-[12px] text-[#ef4444] hover:text-[#dc2626]">
+          <Button variant="ghost" size="sm" className="h-7 px-2 text-[12px] text-error-500 hover:text-error-600">
             忽略
           </Button>
         </div>
@@ -459,30 +459,30 @@ export default function NocLinkRelationPage() {
       <div className="flex items-center justify-between mb-5">
         <div>
           <h1 className="text-display">链接关系管理</h1>
-          <p className="text-small text-[#6b7789] mt-1">维护指标间的血缘链接关系，配置关联类型与属性映射</p>
+          <p className="text-small text-dark-text-secondary mt-1">维护指标间的血缘链接关系，配置关联类型与属性映射</p>
         </div>
         {activeTab === 'type' ? (
           <div className="flex items-center gap-2">
-            <Button className="h-9 bg-[#7c5cfc] hover:bg-[#6b4ce0] text-white" onClick={openAddRelType}>
+            <Button className="h-9 bg-[var(--accent-noc)] hover:bg-[var(--accent-noc)] text-white" onClick={openAddRelType}>
               <Plus size={16} className="mr-1" />
               新增关系类型
             </Button>
-            <Button variant="outline" className="h-9 border-[#dde1e8] text-[#4a5568]" onClick={() => setImportModalOpen(true)}>
+            <Button variant="outline" className="h-9 border-dark-border-hover text-dark-text-secondary" onClick={() => setImportModalOpen(true)}>
               <Upload size={16} className="mr-1" />
               批量导入
             </Button>
-            <Button variant="outline" className="h-9 border-[#dde1e8] text-[#4a5568]">
+            <Button variant="outline" className="h-9 border-dark-border-hover text-dark-text-secondary">
               <Download size={16} className="mr-1" />
               导出
             </Button>
           </div>
         ) : (
           <div className="flex items-center gap-2">
-            <Button className="h-9 bg-[#7c5cfc] hover:bg-[#6b4ce0] text-white" onClick={openAddInstance}>
+            <Button className="h-9 bg-[var(--accent-noc)] hover:bg-[var(--accent-noc)] text-white" onClick={openAddInstance}>
               <Plus size={16} className="mr-1" />
               新增关系实例
             </Button>
-            <Button variant="outline" className="h-9 border-[#dde1e8] text-[#4a5568]">
+            <Button variant="outline" className="h-9 border-dark-border-hover text-dark-text-secondary">
               <AlertTriangle size={16} className="mr-1" />
               质量检测
             </Button>
@@ -491,29 +491,29 @@ export default function NocLinkRelationPage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center border-b border-[#e8ecf1] mb-5">
+      <div className="flex items-center border-b border-dark-border mb-5">
         <button
           className={cn(
             'px-4 py-3 text-[14px] font-medium transition-colors relative',
-            activeTab === 'type' ? 'text-[#7c5cfc]' : 'text-[#6b7789] hover:text-[#2d3748]'
+            activeTab === 'type' ? 'text-[var(--accent-noc)]' : 'text-dark-text-secondary hover:text-dark-text-primary'
           )}
           onClick={() => setActiveTab('type')}
         >
           关系类型定义
           {activeTab === 'type' && (
-            <motion.div layoutId="link-relation-tab" className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#7c5cfc]" />
+            <motion.div layoutId="link-relation-tab" className="absolute bottom-0 left-0 right-0 h-0.5 bg-[var(--accent-noc)]" />
           )}
         </button>
         <button
           className={cn(
             'px-4 py-3 text-[14px] font-medium transition-colors relative',
-            activeTab === 'instance' ? 'text-[#7c5cfc]' : 'text-[#6b7789] hover:text-[#2d3748]'
+            activeTab === 'instance' ? 'text-[var(--accent-noc)]' : 'text-dark-text-secondary hover:text-dark-text-primary'
           )}
           onClick={() => setActiveTab('instance')}
         >
           关系实例维护
           {activeTab === 'instance' && (
-            <motion.div layoutId="link-relation-tab" className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#7c5cfc]" />
+            <motion.div layoutId="link-relation-tab" className="absolute bottom-0 left-0 right-0 h-0.5 bg-[var(--accent-noc)]" />
           )}
         </button>
       </div>
@@ -530,16 +530,16 @@ export default function NocLinkRelationPage() {
           >
             {/* 批量操作栏 */}
             {selectedRows.size > 0 && (
-              <div className="flex items-center justify-between bg-[#f3f0ff] border border-[#e8ecf1] rounded-lg px-4 py-2 mb-3">
-                <span className="text-[13px] text-[#7c5cfc]">已选择 {selectedRows.size} 项</span>
+              <div className="flex items-center justify-between bg-[var(--accent-noc)]/10 border border-dark-border rounded-lg px-4 py-2 mb-3">
+                <span className="text-[13px] text-[var(--accent-noc)]">已选择 {selectedRows.size} 项</span>
                 <div className="flex gap-2">
-                  <Button variant="outline" size="sm" className="h-7 text-[12px] border-[#dde1e8]" onClick={() => setSelectedRows(new Set())}>
+                  <Button variant="outline" size="sm" className="h-7 text-[12px] border-dark-border-hover" onClick={() => setSelectedRows(new Set())}>
                     取消选择
                   </Button>
-                  <Button variant="outline" size="sm" className="h-7 text-[12px] border-[#dde1e8]">
+                  <Button variant="outline" size="sm" className="h-7 text-[12px] border-dark-border-hover">
                     <Download size={12} className="mr-1" />批量导出
                   </Button>
-                  <Button size="sm" className="h-7 text-[12px] bg-[#ef4444] hover:bg-[#dc2626] text-white" onClick={batchDelete}>
+                  <Button size="sm" className="h-7 text-[12px] bg-error-500 hover:bg-error-600 text-white" onClick={batchDelete}>
                     <Trash2 size={12} className="mr-1" />批量删除
                   </Button>
                 </div>
@@ -547,7 +547,7 @@ export default function NocLinkRelationPage() {
             )}
 
             {/* 关系类型表格 */}
-            <div className="bg-white rounded-lg border border-[#e8ecf1]">
+            <div className="bg-dark-elevated rounded-lg border border-dark-border">
               <div className="p-5">
                 <DataTable columns={relTypeColumns} data={relTypes} rowKey="id" />
               </div>
@@ -562,14 +562,14 @@ export default function NocLinkRelationPage() {
             transition={{ duration: 0.15 }}
           >
             {/* 关系实例卡片 */}
-            <div className="bg-white rounded-lg border border-[#e8ecf1]">
-              <div className="flex items-center justify-between px-5 py-4 border-b border-[#e8ecf1]">
+            <div className="bg-dark-elevated rounded-lg border border-dark-border">
+              <div className="flex items-center justify-between px-5 py-4 border-b border-dark-border">
                 <h2 className="text-h2">关系实例列表</h2>
-                <div className="flex items-center gap-1 bg-[#f1f3f6] rounded-md p-0.5">
+                <div className="flex items-center gap-1 bg-dark-card-l2 rounded-md p-0.5">
                   <button
                     className={cn(
                       'flex items-center gap-1 px-3 py-1.5 rounded text-[13px] font-medium transition-colors',
-                      viewMode === 'table' ? 'bg-white text-[#2d3748] shadow-sm' : 'text-[#6b7789] hover:text-[#2d3748]'
+                      viewMode === 'table' ? 'bg-dark-elevated text-dark-text-primary shadow-sm' : 'text-dark-text-secondary hover:text-dark-text-primary'
                     )}
                     onClick={() => setViewMode('table')}
                   >
@@ -578,7 +578,7 @@ export default function NocLinkRelationPage() {
                   <button
                     className={cn(
                       'flex items-center gap-1 px-3 py-1.5 rounded text-[13px] font-medium transition-colors',
-                      viewMode === 'graph' ? 'bg-white text-[#2d3748] shadow-sm' : 'text-[#6b7789] hover:text-[#2d3748]'
+                      viewMode === 'graph' ? 'bg-dark-elevated text-dark-text-primary shadow-sm' : 'text-dark-text-secondary hover:text-dark-text-primary'
                     )}
                     onClick={() => setViewMode('graph')}
                   >
@@ -596,16 +596,16 @@ export default function NocLinkRelationPage() {
             </div>
 
             {/* 质量监控 */}
-            <div className="mt-6 bg-[#fffbeb]/30 rounded-lg border border-[#fde68a]">
-              <div className="flex items-center justify-between px-5 py-4 border-b border-[#fde68a]">
+            <div className="mt-6 bg-warning-500/10/30 rounded-lg border border-warning-300">
+              <div className="flex items-center justify-between px-5 py-4 border-b border-warning-300">
                 <div className="flex items-center gap-2">
-                  <AlertTriangle size={18} className="text-[#f59e0b]" />
+                  <AlertTriangle size={18} className="text-warning-500" />
                   <h2 className="text-h2">质量监控</h2>
                 </div>
                 <Button
                   variant="outline"
                   size="sm"
-                  className="h-8 border-[#fde68a] text-[#d97706] hover:bg-[#fffbeb]"
+                  className="h-8 border-warning-300 text-warning-600 hover:bg-warning-500/10"
                   onClick={runDetection}
                   disabled={isDetecting}
                 >
@@ -614,7 +614,7 @@ export default function NocLinkRelationPage() {
                       <motion.div
                         animate={{ rotate: 360 }}
                         transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-                        className="w-4 h-4 border-2 border-[#d97706] border-t-transparent rounded-full mr-2"
+                        className="w-4 h-4 border-2 border-warning-600 border-t-transparent rounded-full mr-2"
                       />
                       检测中...
                     </>
@@ -641,7 +641,7 @@ export default function NocLinkRelationPage() {
                 )}
               </AnimatePresence>
               {!showQualityResults && (
-                <div className="px-5 py-8 text-center text-[13px] text-[#9ba4b3]">
+                <div className="px-5 py-8 text-center text-[13px] text-dark-text-tertiary">
                   点击「运行检测」开始质量检查
                 </div>
               )}
@@ -658,11 +658,11 @@ export default function NocLinkRelationPage() {
           </DialogHeader>
           <div className="space-y-4 pt-2">
             <div>
-              <Label>关系类型编码 {editingRelType && <span className="text-[#9ba4b3]">(自动生成)</span>}</Label>
-              <Input value={editingRelType?.id || ''} disabled className="mt-1 bg-[#f1f3f6] text-[#9ba4b3]" />
+              <Label>关系类型编码 {editingRelType && <span className="text-dark-text-tertiary">(自动生成)</span>}</Label>
+              <Input value={editingRelType?.id || ''} disabled className="mt-1 bg-dark-card-l2 text-dark-text-tertiary" />
             </div>
             <div>
-              <Label>关系名称 <span className="text-[#ef4444]">*</span></Label>
+              <Label>关系名称 <span className="text-error-500">*</span></Label>
               <Input value={relTypeForm.name} onChange={(e) => setRelTypeForm({ ...relTypeForm, name: e.target.value })} className="mt-1" placeholder="如 依赖关系" />
             </div>
             <div>
@@ -674,8 +674,8 @@ export default function NocLinkRelationPage() {
                     className={cn(
                       'px-3 py-1.5 rounded-md text-[12px] font-medium border transition-colors',
                       relTypeForm.sourceScope.includes(cat)
-                        ? 'bg-[#f3f0ff] border-[#7c5cfc] text-[#7c5cfc]'
-                        : 'bg-white border-[#dde1e8] text-[#4a5568] hover:border-[#c4cad4]'
+                        ? 'bg-[var(--accent-noc)]/10 border-[var(--accent-noc)] text-[var(--accent-noc)]'
+                        : 'bg-dark-elevated border-dark-border-hover text-dark-text-secondary hover:border-dark-border-hover'
                     )}
                     onClick={() => {
                       setRelTypeForm((prev) => {
@@ -701,8 +701,8 @@ export default function NocLinkRelationPage() {
                     className={cn(
                       'px-3 py-1.5 rounded-md text-[12px] font-medium border transition-colors',
                       relTypeForm.targetScope.includes(cat)
-                        ? 'bg-[#f3f0ff] border-[#7c5cfc] text-[#7c5cfc]'
-                        : 'bg-white border-[#dde1e8] text-[#4a5568] hover:border-[#c4cad4]'
+                        ? 'bg-[var(--accent-noc)]/10 border-[var(--accent-noc)] text-[var(--accent-noc)]'
+                        : 'bg-dark-elevated border-dark-border-hover text-dark-text-secondary hover:border-dark-border-hover'
                     )}
                     onClick={() => {
                       setRelTypeForm((prev) => {
@@ -744,7 +744,7 @@ export default function NocLinkRelationPage() {
                     type="color"
                     value={relTypeForm.color}
                     onChange={(e) => setRelTypeForm({ ...relTypeForm, color: e.target.value })}
-                    className="w-10 h-9 rounded border border-[#dde1e8] cursor-pointer"
+                    className="w-10 h-9 rounded border border-dark-border-hover cursor-pointer"
                   />
                   <Input value={relTypeForm.color} onChange={(e) => setRelTypeForm({ ...relTypeForm, color: e.target.value })} className="flex-1" />
                 </div>
@@ -770,7 +770,7 @@ export default function NocLinkRelationPage() {
           </div>
           <DialogFooter className="mt-4">
             <Button variant="outline" onClick={() => setRelTypeModalOpen(false)}>取消</Button>
-            <Button className="bg-[#7c5cfc] hover:bg-[#6b4ce0] text-white" onClick={saveRelType} disabled={!relTypeForm.name}>
+            <Button className="bg-[var(--accent-noc)] hover:bg-[var(--accent-noc)] text-white" onClick={saveRelType} disabled={!relTypeForm.name}>
               保存
             </Button>
           </DialogFooter>
@@ -784,20 +784,20 @@ export default function NocLinkRelationPage() {
             <DialogTitle className="text-h3">批量导入关系类型</DialogTitle>
           </DialogHeader>
           <div className="pt-2">
-            <div className="border-2 border-dashed border-[#dde1e8] rounded-lg p-8 text-center hover:border-[#8eb8ff] transition-colors cursor-pointer">
-              <Upload size={32} className="mx-auto text-[#c4cad4] mb-3" />
-              <p className="text-[14px] text-[#4a5568] mb-1">点击或拖拽上传文件</p>
-              <p className="text-[12px] text-[#9ba4b3]">支持 .csv, .xlsx, .xls</p>
+            <div className="border-2 border-dashed border-dark-border-hover rounded-lg p-8 text-center hover:border-dark-accent-primary-hover transition-colors cursor-pointer">
+              <Upload size={32} className="mx-auto text-dark-text-tertiary mb-3" />
+              <p className="text-[14px] text-dark-text-secondary mb-1">点击或拖拽上传文件</p>
+              <p className="text-[12px] text-dark-text-tertiary">支持 .csv, .xlsx, .xls</p>
             </div>
             <div className="mt-4 text-center">
-              <Button variant="link" className="text-[#7c5cfc] text-[13px]">
+              <Button variant="link" className="text-[var(--accent-noc)] text-[13px]">
                 <Download size={14} className="mr-1" /> 下载导入模板
               </Button>
             </div>
           </div>
           <DialogFooter className="mt-4">
             <Button variant="outline" onClick={() => setImportModalOpen(false)}>取消</Button>
-            <Button className="bg-[#7c5cfc] hover:bg-[#6b4ce0] text-white">确认导入</Button>
+            <Button className="bg-[var(--accent-noc)] hover:bg-[var(--accent-noc)] text-white">确认导入</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -810,7 +810,7 @@ export default function NocLinkRelationPage() {
           </DialogHeader>
           <div className="space-y-4 pt-2">
             <div>
-              <Label>源对象实例 <span className="text-[#ef4444]">*</span></Label>
+              <Label>源对象实例 <span className="text-error-500">*</span></Label>
               <SearchInput
                 placeholder="搜索指标..."
                 value={instanceForm.source}
@@ -820,18 +820,18 @@ export default function NocLinkRelationPage() {
               />
             </div>
             <div>
-              <Label>关系类型 <span className="text-[#ef4444]">*</span></Label>
+              <Label>关系类型 <span className="text-error-500">*</span></Label>
               <select
                 value={instanceForm.type}
                 onChange={(e) => setInstanceForm({ ...instanceForm, type: e.target.value })}
-                className="h-9 w-full mt-1 rounded-md border border-[#dde1e8] bg-white px-3 text-[14px] focus:outline-none focus:border-[#5a96ff] focus:ring-2 focus:ring-[#d9e6ff]"
+                className="h-9 w-full mt-1 rounded-md border border-dark-border-hover bg-dark-elevated px-3 text-[14px] focus:outline-none focus:border-dark-accent-primary-hover focus:ring-2 focus:ring-dark-accent-primary/20"
               >
                 <option value="">请选择</option>
                 {relationTypeOptions.map((t) => <option key={t} value={t}>{t}</option>)}
               </select>
             </div>
             <div>
-              <Label>目标对象实例 <span className="text-[#ef4444]">*</span></Label>
+              <Label>目标对象实例 <span className="text-error-500">*</span></Label>
               <SearchInput
                 placeholder="搜索指标..."
                 value={instanceForm.target}
@@ -843,7 +843,7 @@ export default function NocLinkRelationPage() {
             <div>
               <div className="flex items-center justify-between">
                 <Label>置信度</Label>
-                <span className="text-[13px] font-medium text-[#7c5cfc]">{instanceForm.confidence[0]}%</span>
+                <span className="text-[13px] font-medium text-[var(--accent-noc)]">{instanceForm.confidence[0]}%</span>
               </div>
               <Slider
                 value={instanceForm.confidence}
@@ -861,7 +861,7 @@ export default function NocLinkRelationPage() {
           <DialogFooter className="mt-4">
             <Button variant="outline" onClick={() => setInstanceModalOpen(false)}>取消</Button>
             <Button
-              className="bg-[#7c5cfc] hover:bg-[#6b4ce0] text-white"
+              className="bg-[var(--accent-noc)] hover:bg-[var(--accent-noc)] text-white"
               onClick={saveInstance}
               disabled={!instanceForm.source || !instanceForm.target || !instanceForm.type}
             >

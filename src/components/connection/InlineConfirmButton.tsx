@@ -82,7 +82,7 @@ export default function InlineConfirmButton({
       className={[
         'flex h-5 items-center justify-center rounded-full text-xs font-semibold text-white',
         'transition-all duration-150 ease-out overflow-hidden whitespace-nowrap',
-        isConfirming ? 'w-20 bg-red-500 px-2' : 'w-5 bg-[#EF4444]',
+        isConfirming ? 'w-20 bg-red-500 px-2' : 'w-5 bg-error-500',
       ].join(' ')}
       aria-label={isConfirming ? confirmText : '删除挂靠'}
     >

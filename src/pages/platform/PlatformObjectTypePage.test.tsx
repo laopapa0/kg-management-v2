@@ -59,7 +59,7 @@ describe('PlatformObjectTypePage', () => {
     fireEvent.change(codeInput, { target: { value: 'L1-TEST' } });
     fireEvent.change(valueInput, { target: { value: '测试值' } });
     const saveBtn = screen.getAllByRole('button', { name: '保存' }).find(
-      (b) => b.className.includes('bg-[#7c5cfc]')
+      (b) => b.className.includes('bg-[var(--accent-noc)]')
     );
     expect(saveBtn).toBeDefined();
     fireEvent.click(saveBtn!);

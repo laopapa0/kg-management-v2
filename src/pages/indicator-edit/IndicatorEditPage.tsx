@@ -89,8 +89,8 @@ const changeTypeOptions = [
     description: '修改名称、别名、描述、口径、计算方式、单位等。提交 NOC 审核后生效。',
     badge: '需 NOC 审核',
     badgeType: 'warning' as const,
-    borderColor: 'border-[#f59e0b]',
-    hoverBorder: 'hover:border-[#f59e0b]',
+    borderColor: 'border-warning-500',
+    hoverBorder: 'hover:border-warning-500',
     fields: ['名称 / 别名', '描述', '业务口径', '计算方式', '计量单位'],
   },
   {
@@ -99,8 +99,8 @@ const changeTypeOptions = [
     description: '修改聚合函数、维度组合、链接关系、业务规则参数等。基于业务自审 checklist 确认后直接发布。',
     badge: '自行处理',
     badgeType: 'primary' as const,
-    borderColor: 'border-[#3478f6]',
-    hoverBorder: 'hover:border-[#3478f6]',
+    borderColor: 'border-dark-accent-primary',
+    hoverBorder: 'hover:border-dark-accent-primary',
     fields: ['聚合函数', '维度组合', '链接关系', '规则参数'],
   },
 ];
@@ -267,25 +267,25 @@ export default function IndicatorEditPage() {
             <ChevronLeft size={14} className="mr-1" />
             返回
           </Button>
-          <h1 className="text-[28px] font-semibold text-[#1a202c] leading-tight">
+          <h1 className="text-[28px] font-semibold text-dark-text-primary leading-tight">
             变更对象实例（指标）
           </h1>
-          <p className="text-[13px] text-[#6b7789] mt-1">
+          <p className="text-[13px] text-dark-text-secondary mt-1">
             修改已发布指标的基础信息、计算方式、维度映射或业务规则，根据变更类型走审核或自审流程
           </p>
         </div>
-        <div className="bg-white border border-[#e8ecf1] rounded-lg p-4 shadow-sm">
-          <span className="text-[12px] text-[#9ba4b3] font-mono">{currentIndicator.id}</span>
-          <h4 className="text-[16px] font-medium text-[#2d3748]">{currentIndicator.name}</h4>
+        <div className="bg-dark-elevated border border-dark-border rounded-lg p-4 shadow-sm">
+          <span className="text-[12px] text-dark-text-tertiary font-mono">{currentIndicator.id}</span>
+          <h4 className="text-[16px] font-medium text-dark-text-primary">{currentIndicator.name}</h4>
           <StatusBadge text={currentIndicator.status} type="success" className="mt-1" />
         </div>
       </div>
 
       {/* ── Section 2: 变更类型选择 ── */}
       <motion.div {...fadeIn} className="mb-6">
-        <div className="bg-[#fffbeb] border border-[#fcd34d] rounded-lg p-5">
-          <h3 className="text-[16px] font-medium text-[#2d3748] flex items-center gap-2 mb-4">
-            <AlertTriangle size={18} className="text-[#f59e0b]" />
+        <div className="bg-warning-500/10 border border-warning-300 rounded-lg p-5">
+          <h3 className="text-[16px] font-medium text-dark-text-primary flex items-center gap-2 mb-4">
+            <AlertTriangle size={18} className="text-warning-500" />
             请选择变更类型
           </h3>
           <div className="grid grid-cols-2 gap-4">
@@ -299,15 +299,15 @@ export default function IndicatorEditPage() {
                   transition={{ duration: 0.3, delay: index * 0.15 }}
                   onClick={() => setChangeType(option.value)}
                   className={cn(
-                    'relative text-left p-4 bg-white rounded-lg border-2 transition-all duration-200',
-                    isSelected ? `${option.borderColor} shadow-md` : 'border-[#e8ecf1] hover:shadow-sm',
+                    'relative text-left p-4 bg-dark-elevated rounded-lg border-2 transition-all duration-200',
+                    isSelected ? `${option.borderColor} shadow-md` : 'border-dark-border hover:shadow-sm',
                     option.hoverBorder
                   )}
                 >
                   <div className="flex items-start gap-3">
                     <div className={cn(
                       'mt-0.5 w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors',
-                      isSelected ? `border-[${option.badgeType === 'warning' ? '#f59e0b' : '#3478f6'}] bg-[${option.badgeType === 'warning' ? '#f59e0b' : '#3478f6'}]` : 'border-[#c4cad4]'
+                      isSelected ? `border-[${option.badgeType === 'warning' ? '#f59e0b' : '#3478f6'}] bg-[${option.badgeType === 'warning' ? '#f59e0b' : '#3478f6'}]` : 'border-dark-border-hover'
                     )}
                       style={isSelected ? {
                         borderColor: option.badgeType === 'warning' ? '#f59e0b' : '#3478f6',
@@ -317,8 +317,8 @@ export default function IndicatorEditPage() {
                       {isSelected && <CheckCircle size={10} className="text-white" />}
                     </div>
                     <div className="flex-1">
-                      <h4 className="text-[15px] font-medium text-[#2d3748]">{option.label}</h4>
-                      <p className="text-[13px] text-[#6b7789] mt-1">{option.description}</p>
+                      <h4 className="text-[15px] font-medium text-dark-text-primary">{option.label}</h4>
+                      <p className="text-[13px] text-dark-text-secondary mt-1">{option.description}</p>
                       <StatusBadge
                         text={option.badge}
                         type={option.badgeType}
@@ -326,7 +326,7 @@ export default function IndicatorEditPage() {
                       />
                       <div className="mt-2 flex flex-wrap gap-1">
                         {option.fields.map((f) => (
-                          <span key={f} className="text-[11px] text-[#9ba4b3] bg-[#f8f9fb] px-1.5 py-0.5 rounded">
+                          <span key={f} className="text-[11px] text-dark-text-tertiary bg-dark-page px-1.5 py-0.5 rounded">
                             {f}
                           </span>
                         ))}
@@ -346,9 +346,9 @@ export default function IndicatorEditPage() {
           <motion.div {...expandAnimation} className="space-y-6 overflow-hidden">
             {/* Card 1: 选择指标 */}
             <motion.div {...fadeIn}>
-              <div className="bg-white rounded-lg border border-[#e8ecf1] shadow-sm">
-                <div className="px-5 py-4 border-b border-[#e8ecf1]">
-                  <h3 className="text-[16px] font-medium text-[#2d3748]">选择要变更的指标</h3>
+              <div className="bg-dark-elevated rounded-lg border border-dark-border shadow-sm">
+                <div className="px-5 py-4 border-b border-dark-border">
+                  <h3 className="text-[16px] font-medium text-dark-text-primary">选择要变更的指标</h3>
                 </div>
                 <div className="p-5">
                   <SearchInput
@@ -357,10 +357,10 @@ export default function IndicatorEditPage() {
                     onChange={() => {}}
                     width="w-full"
                   />
-                  <div className="mt-3 bg-[#eef4ff] border border-[#bcd3ff] rounded-lg p-4 flex items-center justify-between">
+                  <div className="mt-3 bg-dark-accent-primary/10 border border-dark-accent-primary/30 rounded-lg p-4 flex items-center justify-between">
                     <div>
-                      <span className="text-[12px] text-[#3478f6] font-mono">{currentIndicator.id}</span>
-                      <h4 className="text-[16px] font-medium text-[#154bc4] mt-0.5">{currentIndicator.name}</h4>
+                      <span className="text-[12px] text-dark-accent-primary font-mono">{currentIndicator.id}</span>
+                      <h4 className="text-[16px] font-medium text-dark-accent-primary-active mt-0.5">{currentIndicator.name}</h4>
                       <StatusBadge text="已发布" type="success" className="mt-1" />
                     </div>
                   </div>
@@ -370,10 +370,10 @@ export default function IndicatorEditPage() {
 
             {/* Card 2: 变更字段编辑 */}
             <motion.div {...fadeIn}>
-              <div className="bg-white rounded-lg border border-[#e8ecf1] shadow-sm">
-                <div className="px-5 py-4 border-b border-[#e8ecf1]">
-                  <h3 className="text-[16px] font-medium text-[#2d3748]">变更内容</h3>
-                  <p className="text-[13px] text-[#6b7789] mt-1">
+              <div className="bg-dark-elevated rounded-lg border border-dark-border shadow-sm">
+                <div className="px-5 py-4 border-b border-dark-border">
+                  <h3 className="text-[16px] font-medium text-dark-text-primary">变更内容</h3>
+                  <p className="text-[13px] text-dark-text-secondary mt-1">
                     以下字段的修改将生成变更申请单，提交 NOC 审核
                   </p>
                 </div>
@@ -381,28 +381,28 @@ export default function IndicatorEditPage() {
                   {/* 指标名称 */}
                   <div className={cn(
                     'relative pl-3 transition-colors',
-                    isFieldModified('newName', currentIndicator.name) && 'border-l-[3px] border-l-[#f59e0b] bg-[#fffbeb]'
+                    isFieldModified('newName', currentIndicator.name) && 'border-l-[3px] border-l-[#f59e0b] bg-warning-500/10'
                   )}>
                     <div className="flex items-center gap-2 mb-1">
-                      <Label className="text-[14px] font-medium text-[#2d3748]">指标名称</Label>
+                      <Label className="text-[14px] font-medium text-dark-text-primary">指标名称</Label>
                       {isFieldModified('newName', currentIndicator.name) && (
                         <StatusBadge text="已修改" type="warning" />
                       )}
                     </div>
-                    <div className="text-[12px] text-[#9ba4b3] mb-1">原值：{currentIndicator.name}</div>
+                    <div className="text-[12px] text-dark-text-tertiary mb-1">原值：{currentIndicator.name}</div>
                     <div className="relative">
                       <Input
                         value={branchAForm.newName}
                         onChange={(e) => handleBranchAChange('newName', e.target.value)}
                         className={cn(
                           'h-9',
-                          isFieldModified('newName', currentIndicator.name) && 'border-[#fcd34d]'
+                          isFieldModified('newName', currentIndicator.name) && 'border-warning-300'
                         )}
                       />
                       {isFieldModified('newName', currentIndicator.name) && (
                         <button
                           onClick={() => handleBranchAChange('newName', currentIndicator.name)}
-                          className="absolute right-2 top-1/2 -translate-y-1/2 text-[#9ba4b3] hover:text-[#3478f6] transition-colors"
+                          className="absolute right-2 top-1/2 -translate-y-1/2 text-dark-text-tertiary hover:text-dark-accent-primary transition-colors"
                           title="恢复原值"
                         >
                           <RotateCcw size={14} />
@@ -414,28 +414,28 @@ export default function IndicatorEditPage() {
                   {/* 指标别名 */}
                   <div className={cn(
                     'relative pl-3 transition-colors',
-                    isFieldModified('newAlias', currentIndicator.alias) && 'border-l-[3px] border-l-[#f59e0b] bg-[#fffbeb]'
+                    isFieldModified('newAlias', currentIndicator.alias) && 'border-l-[3px] border-l-[#f59e0b] bg-warning-500/10'
                   )}>
                     <div className="flex items-center gap-2 mb-1">
-                      <Label className="text-[14px] font-medium text-[#2d3748]">指标别名</Label>
+                      <Label className="text-[14px] font-medium text-dark-text-primary">指标别名</Label>
                       {isFieldModified('newAlias', currentIndicator.alias) && (
                         <StatusBadge text="已修改" type="warning" />
                       )}
                     </div>
-                    <div className="text-[12px] text-[#9ba4b3] mb-1">原值：{currentIndicator.alias}</div>
+                    <div className="text-[12px] text-dark-text-tertiary mb-1">原值：{currentIndicator.alias}</div>
                     <div className="relative">
                       <Input
                         value={branchAForm.newAlias}
                         onChange={(e) => handleBranchAChange('newAlias', e.target.value)}
                         className={cn(
                           'h-9',
-                          isFieldModified('newAlias', currentIndicator.alias) && 'border-[#fcd34d]'
+                          isFieldModified('newAlias', currentIndicator.alias) && 'border-warning-300'
                         )}
                       />
                       {isFieldModified('newAlias', currentIndicator.alias) && (
                         <button
                           onClick={() => handleBranchAChange('newAlias', currentIndicator.alias)}
-                          className="absolute right-2 top-1/2 -translate-y-1/2 text-[#9ba4b3] hover:text-[#3478f6] transition-colors"
+                          className="absolute right-2 top-1/2 -translate-y-1/2 text-dark-text-tertiary hover:text-dark-accent-primary transition-colors"
                           title="恢复原值"
                         >
                           <RotateCcw size={14} />
@@ -447,20 +447,20 @@ export default function IndicatorEditPage() {
                   {/* 对象类型属性 - 跨两列 */}
                   <div className={cn(
                     'col-span-2 relative pl-3 transition-colors',
-                    (isFieldModified('newLevel1', currentIndicator.level1) || isFieldModified('newLevel2', currentIndicator.level2) || isFieldModified('newGranularity', currentIndicator.granularity)) && 'border-l-[3px] border-l-[#f59e0b] bg-[#fffbeb]'
+                    (isFieldModified('newLevel1', currentIndicator.level1) || isFieldModified('newLevel2', currentIndicator.level2) || isFieldModified('newGranularity', currentIndicator.granularity)) && 'border-l-[3px] border-l-[#f59e0b] bg-warning-500/10'
                   )}>
                     <div className="flex items-center gap-2 mb-1">
-                      <Label className="text-[14px] font-medium text-[#2d3748]">对象类型属性</Label>
+                      <Label className="text-[14px] font-medium text-dark-text-primary">对象类型属性</Label>
                       {(isFieldModified('newLevel1', currentIndicator.level1) || isFieldModified('newLevel2', currentIndicator.level2) || isFieldModified('newGranularity', currentIndicator.granularity)) && (
                         <StatusBadge text="已修改" type="warning" />
                       )}
                     </div>
-                    <div className="text-[12px] text-[#9ba4b3] mb-1">
+                    <div className="text-[12px] text-dark-text-tertiary mb-1">
                       原值：{currentIndicator.level1} / {currentIndicator.level2} / {currentIndicator.granularity}
                     </div>
                     <div className={cn(
-                      'rounded-lg border border-[#e8ecf1] p-3',
-                      (isFieldModified('newLevel1', currentIndicator.level1) || isFieldModified('newLevel2', currentIndicator.level2) || isFieldModified('newGranularity', currentIndicator.granularity)) && 'border-[#fcd34d]'
+                      'rounded-lg border border-dark-border p-3',
+                      (isFieldModified('newLevel1', currentIndicator.level1) || isFieldModified('newLevel2', currentIndicator.level2) || isFieldModified('newGranularity', currentIndicator.granularity)) && 'border-warning-300'
                     )}>
                       <ObjectTypePropertyPanel
                         fieldKeys={['level1', 'level2', 'granularity']}
@@ -485,21 +485,21 @@ export default function IndicatorEditPage() {
                   {/* 业务口径 - 跨两列 */}
                   <div className={cn(
                     'col-span-2 relative pl-3 transition-colors',
-                    isFieldModified('newCaliber', currentIndicator.businessCaliber) && 'border-l-[3px] border-l-[#f59e0b] bg-[#fffbeb]'
+                    isFieldModified('newCaliber', currentIndicator.businessCaliber) && 'border-l-[3px] border-l-[#f59e0b] bg-warning-500/10'
                   )}>
                     <div className="flex items-center gap-2 mb-1">
-                      <Label className="text-[14px] font-medium text-[#2d3748]">业务口径</Label>
+                      <Label className="text-[14px] font-medium text-dark-text-primary">业务口径</Label>
                       {isFieldModified('newCaliber', currentIndicator.businessCaliber) && (
                         <StatusBadge text="已修改" type="warning" />
                       )}
                     </div>
-                    <div className="text-[12px] text-[#9ba4b3] mb-1">原值：{currentIndicator.businessCaliber}</div>
+                    <div className="text-[12px] text-dark-text-tertiary mb-1">原值：{currentIndicator.businessCaliber}</div>
                     <Textarea
                       value={branchAForm.newCaliber}
                       onChange={(e) => handleBranchAChange('newCaliber', e.target.value)}
                       className={cn(
                         'min-h-[80px]',
-                        isFieldModified('newCaliber', currentIndicator.businessCaliber) && 'border-[#fcd34d]'
+                        isFieldModified('newCaliber', currentIndicator.businessCaliber) && 'border-warning-300'
                       )}
                     />
                   </div>
@@ -507,22 +507,22 @@ export default function IndicatorEditPage() {
                   {/* 计算方式 */}
                   <div className={cn(
                     'relative pl-3 transition-colors',
-                    isFieldModified('newCalcMethod', currentIndicator.calcMethod) && 'border-l-[3px] border-l-[#f59e0b] bg-[#fffbeb]'
+                    isFieldModified('newCalcMethod', currentIndicator.calcMethod) && 'border-l-[3px] border-l-[#f59e0b] bg-warning-500/10'
                   )}>
                     <div className="flex items-center gap-2 mb-1">
-                      <Label className="text-[14px] font-medium text-[#2d3748]">计算方式</Label>
+                      <Label className="text-[14px] font-medium text-dark-text-primary">计算方式</Label>
                       {isFieldModified('newCalcMethod', currentIndicator.calcMethod) && (
                         <StatusBadge text="已修改" type="warning" />
                       )}
                     </div>
-                    <div className="text-[12px] text-[#9ba4b3] mb-1">原值：{currentIndicator.calcMethod}</div>
+                    <div className="text-[12px] text-dark-text-tertiary mb-1">原值：{currentIndicator.calcMethod}</div>
                     <Select
                       value={branchAForm.newCalcMethod}
                       onValueChange={(v) => handleBranchAChange('newCalcMethod', v)}
                     >
                       <SelectTrigger className={cn(
                         'h-9',
-                        isFieldModified('newCalcMethod', currentIndicator.calcMethod) && 'border-[#fcd34d]'
+                        isFieldModified('newCalcMethod', currentIndicator.calcMethod) && 'border-warning-300'
                       )}>
                         <SelectValue />
                       </SelectTrigger>
@@ -537,22 +537,22 @@ export default function IndicatorEditPage() {
                   {/* 计量单位 */}
                   <div className={cn(
                     'relative pl-3 transition-colors',
-                    isFieldModified('newUnit', currentIndicator.unit) && 'border-l-[3px] border-l-[#f59e0b] bg-[#fffbeb]'
+                    isFieldModified('newUnit', currentIndicator.unit) && 'border-l-[3px] border-l-[#f59e0b] bg-warning-500/10'
                   )}>
                     <div className="flex items-center gap-2 mb-1">
-                      <Label className="text-[14px] font-medium text-[#2d3748]">计量单位</Label>
+                      <Label className="text-[14px] font-medium text-dark-text-primary">计量单位</Label>
                       {isFieldModified('newUnit', currentIndicator.unit) && (
                         <StatusBadge text="已修改" type="warning" />
                       )}
                     </div>
-                    <div className="text-[12px] text-[#9ba4b3] mb-1">原值：{currentIndicator.unit}</div>
+                    <div className="text-[12px] text-dark-text-tertiary mb-1">原值：{currentIndicator.unit}</div>
                     <Select
                       value={branchAForm.newUnit}
                       onValueChange={(v) => handleBranchAChange('newUnit', v)}
                     >
                       <SelectTrigger className={cn(
                         'h-9',
-                        isFieldModified('newUnit', currentIndicator.unit) && 'border-[#fcd34d]'
+                        isFieldModified('newUnit', currentIndicator.unit) && 'border-warning-300'
                       )}>
                         <SelectValue />
                       </SelectTrigger>
@@ -567,22 +567,22 @@ export default function IndicatorEditPage() {
                   {/* 更新频率 */}
                   <div className={cn(
                     'relative pl-3 transition-colors',
-                    isFieldModified('newFrequency', currentIndicator.frequency) && 'border-l-[3px] border-l-[#f59e0b] bg-[#fffbeb]'
+                    isFieldModified('newFrequency', currentIndicator.frequency) && 'border-l-[3px] border-l-[#f59e0b] bg-warning-500/10'
                   )}>
                     <div className="flex items-center gap-2 mb-1">
-                      <Label className="text-[14px] font-medium text-[#2d3748]">更新频率</Label>
+                      <Label className="text-[14px] font-medium text-dark-text-primary">更新频率</Label>
                       {isFieldModified('newFrequency', currentIndicator.frequency) && (
                         <StatusBadge text="已修改" type="warning" />
                       )}
                     </div>
-                    <div className="text-[12px] text-[#9ba4b3] mb-1">原值：{currentIndicator.frequency}</div>
+                    <div className="text-[12px] text-dark-text-tertiary mb-1">原值：{currentIndicator.frequency}</div>
                     <Select
                       value={branchAForm.newFrequency}
                       onValueChange={(v) => handleBranchAChange('newFrequency', v)}
                     >
                       <SelectTrigger className={cn(
                         'h-9',
-                        isFieldModified('newFrequency', currentIndicator.frequency) && 'border-[#fcd34d]'
+                        isFieldModified('newFrequency', currentIndicator.frequency) && 'border-warning-300'
                       )}>
                         <SelectValue />
                       </SelectTrigger>
@@ -599,9 +599,9 @@ export default function IndicatorEditPage() {
 
             {/* Card 3: 变更说明 */}
             <motion.div {...fadeIn}>
-              <div className="bg-white rounded-lg border border-[#e8ecf1] shadow-sm">
-                <div className="px-5 py-4 border-b border-[#e8ecf1]">
-                  <h3 className="text-[16px] font-medium text-[#2d3748]">变更说明</h3>
+              <div className="bg-dark-elevated rounded-lg border border-dark-border shadow-sm">
+                <div className="px-5 py-4 border-b border-dark-border">
+                  <h3 className="text-[16px] font-medium text-dark-text-primary">变更说明</h3>
                 </div>
                 <div className="p-5">
                   <Textarea
@@ -610,7 +610,7 @@ export default function IndicatorEditPage() {
                     placeholder="请说明变更原因、影响范围..."
                     className="min-h-[100px]"
                   />
-                  <p className="text-[12px] text-[#9ba4b3] mt-1">必填，至少 10 个字符</p>
+                  <p className="text-[12px] text-dark-text-tertiary mt-1">必填，至少 10 个字符</p>
                 </div>
               </div>
             </motion.div>
@@ -622,19 +622,19 @@ export default function IndicatorEditPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3 }}
               >
-                <div className="bg-white rounded-lg border border-[#e8ecf1] shadow-sm">
-                  <div className="px-5 py-4 border-b border-[#e8ecf1]">
-                    <h3 className="text-[16px] font-medium text-[#2d3748]">修改对比预览</h3>
-                    <p className="text-[13px] text-[#6b7789] mt-1">系统自动生成，提交前请确认</p>
+                <div className="bg-dark-elevated rounded-lg border border-dark-border shadow-sm">
+                  <div className="px-5 py-4 border-b border-dark-border">
+                    <h3 className="text-[16px] font-medium text-dark-text-primary">修改对比预览</h3>
+                    <p className="text-[13px] text-dark-text-secondary mt-1">系统自动生成，提交前请确认</p>
                   </div>
                   <div className="p-5">
                     <table className="w-full">
                       <thead>
-                        <tr className="bg-[#f1f3f6] border-b-2 border-[#e8ecf1]">
-                          <th className="h-10 px-4 text-left text-[13px] font-medium text-[#4a5568]">字段名</th>
-                          <th className="h-10 px-4 text-left text-[13px] font-medium text-[#4a5568]">修改前</th>
-                          <th className="h-10 px-4 text-left text-[13px] font-medium text-[#4a5568]">修改后</th>
-                          <th className="h-10 px-4 text-left text-[13px] font-medium text-[#4a5568]">变更类型</th>
+                        <tr className="bg-dark-card-l2 border-b-2 border-dark-border">
+                          <th className="h-10 px-4 text-left text-[13px] font-medium text-dark-text-secondary">字段名</th>
+                          <th className="h-10 px-4 text-left text-[13px] font-medium text-dark-text-secondary">修改前</th>
+                          <th className="h-10 px-4 text-left text-[13px] font-medium text-dark-text-secondary">修改后</th>
+                          <th className="h-10 px-4 text-left text-[13px] font-medium text-dark-text-secondary">变更类型</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -644,11 +644,11 @@ export default function IndicatorEditPage() {
                             initial={{ opacity: 0, x: -10 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ duration: 0.2, delay: index * 0.05 }}
-                            className="border-b border-[#e8ecf1]"
+                            className="border-b border-dark-border"
                           >
-                            <td className="px-4 py-3 text-[14px] text-[#2d3748] font-medium">{field.field}</td>
-                            <td className="px-4 py-3 text-[14px] text-[#9ba4b3] bg-[#f8f9fb] line-through">{field.before}</td>
-                            <td className="px-4 py-3 text-[14px] text-[#2d3748] bg-[#fffbeb] font-medium">{field.after}</td>
+                            <td className="px-4 py-3 text-[14px] text-dark-text-primary font-medium">{field.field}</td>
+                            <td className="px-4 py-3 text-[14px] text-dark-text-tertiary bg-dark-page line-through">{field.before}</td>
+                            <td className="px-4 py-3 text-[14px] text-dark-text-primary bg-warning-500/10 font-medium">{field.after}</td>
                             <td className="px-4 py-3">
                               <StatusBadge text="修改" type="warning" />
                             </td>
@@ -666,7 +666,7 @@ export default function IndicatorEditPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3 }}
-              className="fixed bottom-0 left-0 right-0 bg-white border-t border-[#e8ecf1] px-6 py-4 z-30 flex items-center justify-between"
+              className="fixed bottom-0 left-0 right-0 bg-dark-elevated border-t border-dark-border px-6 py-4 z-30 flex items-center justify-between"
               style={{ marginLeft: 240 }}
             >
               <Button
@@ -685,7 +685,7 @@ export default function IndicatorEditPage() {
                   取消
                 </Button>
                 <Button
-                  className="h-10 px-6 text-[14px] bg-[#3478f6] hover:bg-[#1d5ee0] text-white"
+                  className="h-10 px-6 text-[14px] bg-dark-accent-primary hover:bg-dark-accent-primary-active text-white"
                   onClick={handleSubmitBranchA}
                 >
                   <FileText size={16} className="mr-1.5" />
@@ -703,9 +703,9 @@ export default function IndicatorEditPage() {
           <motion.div {...expandAnimation} className="space-y-6 overflow-hidden">
             {/* Card 1: 选择指标 */}
             <motion.div {...fadeIn}>
-              <div className="bg-white rounded-lg border border-[#e8ecf1] shadow-sm">
-                <div className="px-5 py-4 border-b border-[#e8ecf1]">
-                  <h3 className="text-[16px] font-medium text-[#2d3748]">选择要变更的指标</h3>
+              <div className="bg-dark-elevated rounded-lg border border-dark-border shadow-sm">
+                <div className="px-5 py-4 border-b border-dark-border">
+                  <h3 className="text-[16px] font-medium text-dark-text-primary">选择要变更的指标</h3>
                 </div>
                 <div className="p-5">
                   <SearchInput
@@ -714,10 +714,10 @@ export default function IndicatorEditPage() {
                     onChange={() => {}}
                     width="w-full"
                   />
-                  <div className="mt-3 bg-[#eef4ff] border border-[#bcd3ff] rounded-lg p-4 flex items-center justify-between">
+                  <div className="mt-3 bg-dark-accent-primary/10 border border-dark-accent-primary/30 rounded-lg p-4 flex items-center justify-between">
                     <div>
-                      <span className="text-[12px] text-[#3478f6] font-mono">{currentIndicator.id}</span>
-                      <h4 className="text-[16px] font-medium text-[#154bc4] mt-0.5">{currentIndicator.name}</h4>
+                      <span className="text-[12px] text-dark-accent-primary font-mono">{currentIndicator.id}</span>
+                      <h4 className="text-[16px] font-medium text-dark-accent-primary-active mt-0.5">{currentIndicator.name}</h4>
                       <StatusBadge text="已发布" type="success" className="mt-1" />
                     </div>
                   </div>
@@ -727,18 +727,18 @@ export default function IndicatorEditPage() {
 
             {/* Card 2: 度量映射 */}
             <motion.div {...fadeIn}>
-              <div className="bg-white rounded-lg border border-[#e8ecf1] shadow-sm">
-                <div className="px-5 py-4 border-b border-[#e8ecf1]">
-                  <h3 className="text-[16px] font-medium text-[#2d3748]">度量映射（可选）</h3>
+              <div className="bg-dark-elevated rounded-lg border border-dark-border shadow-sm">
+                <div className="px-5 py-4 border-b border-dark-border">
+                  <h3 className="text-[16px] font-medium text-dark-text-primary">度量映射（可选）</h3>
                 </div>
                 <div className="p-5 grid grid-cols-2 gap-6">
                   {/* 左卡片：指标间计算关系 */}
-                  <div className="border border-[#e8ecf1] rounded-lg p-4">
-                    <h4 className="text-[15px] font-medium text-[#2d3748] mb-1">指标间计算关系（可选填）</h4>
-                    <p className="text-[12px] text-[#9ba4b3] mb-4">该指标通过图谱中已有指标计算得出</p>
+                  <div className="border border-dark-border rounded-lg p-4">
+                    <h4 className="text-[15px] font-medium text-dark-text-primary mb-1">指标间计算关系（可选填）</h4>
+                    <p className="text-[12px] text-dark-text-tertiary mb-4">该指标通过图谱中已有指标计算得出</p>
                     <div>
-                      <Label className="text-[14px] font-medium text-[#2d3748]">聚合函数</Label>
-                      <div className="mt-1 p-2 bg-[#f1f3f6] rounded text-[13px] text-[#9ba4b3]">
+                      <Label className="text-[14px] font-medium text-dark-text-primary">聚合函数</Label>
+                      <div className="mt-1 p-2 bg-dark-card-l2 rounded text-[13px] text-dark-text-tertiary">
                         当前值：{currentIndicator.aggregateFunction}
                       </div>
                       <Select
@@ -756,8 +756,8 @@ export default function IndicatorEditPage() {
                       </Select>
                     </div>
                     <div className="mt-4">
-                      <Label className="text-[14px] font-medium text-[#2d3748]">自定义表达式</Label>
-                      <div className="mt-1 p-2 bg-[#f1f3f6] rounded text-[13px] text-[#9ba4b3] font-mono">
+                      <Label className="text-[14px] font-medium text-dark-text-primary">自定义表达式</Label>
+                      <div className="mt-1 p-2 bg-dark-card-l2 rounded text-[13px] text-dark-text-tertiary font-mono">
                         当前值：{currentIndicator.customExpression}
                       </div>
                       <Input
@@ -768,28 +768,28 @@ export default function IndicatorEditPage() {
                     </div>
                   </div>
                   {/* 右卡片：大数据溯源 */}
-                  <div className="border border-[#e8ecf1] rounded-lg p-4">
-                    <h4 className="text-[15px] font-medium text-[#2d3748] mb-1">大数据溯源（可选填）</h4>
-                    <p className="text-[12px] text-[#9ba4b3] mb-4">该指标独立存在，直接从大数据表通过 SQL 查询得出</p>
+                  <div className="border border-dark-border rounded-lg p-4">
+                    <h4 className="text-[15px] font-medium text-dark-text-primary mb-1">大数据溯源（可选填）</h4>
+                    <p className="text-[12px] text-dark-text-tertiary mb-4">该指标独立存在，直接从大数据表通过 SQL 查询得出</p>
                     <div>
-                      <Label className="text-[14px] font-medium text-[#2d3748]">数据源表名</Label>
+                      <Label className="text-[14px] font-medium text-dark-text-primary">数据源表名</Label>
                       <Input
                         value={branchBForm.newSourceTable}
                         onChange={(e) => handleBranchBChange('newSourceTable', e.target.value)}
                         className="mt-1.5 h-9 font-mono text-[13px]"
                         placeholder="dwd_5g_user_indicator"
                       />
-                      <p className="text-[12px] text-[#9ba4b3] mt-1">示例：dwd_5g_user_indicator</p>
+                      <p className="text-[12px] text-dark-text-tertiary mt-1">示例：dwd_5g_user_indicator</p>
                     </div>
                     <div className="mt-4">
-                      <Label className="text-[14px] font-medium text-[#2d3748]">SQL 语句</Label>
+                      <Label className="text-[14px] font-medium text-dark-text-primary">SQL 语句</Label>
                       <Textarea
                         value={branchBForm.newSourceSQL}
                         onChange={(e) => handleBranchBChange('newSourceSQL', e.target.value)}
                         className="mt-1.5 font-mono text-[13px] min-h-[100px]"
                         placeholder="SELECT COUNT(DISTINCT user_id) / total_users AS penetration_rate FROM dwd_5g_user WHERE month = '2024-05'"
                       />
-                      <p className="text-[12px] text-[#9ba4b3] mt-1">为 LLM 提供指标溯源信息，帮助 AI 理解指标来源</p>
+                      <p className="text-[12px] text-dark-text-tertiary mt-1">为 LLM 提供指标溯源信息，帮助 AI 理解指标来源</p>
                     </div>
                   </div>
                 </div>
@@ -798,22 +798,22 @@ export default function IndicatorEditPage() {
 
             {/* Card 3: 维度映射 */}
             <motion.div {...fadeIn}>
-              <div className="bg-white rounded-lg border border-[#e8ecf1] shadow-sm">
-                <div className="px-5 py-4 border-b border-[#e8ecf1]">
-                  <h3 className="text-[16px] font-medium text-[#2d3748]">维度映射</h3>
+              <div className="bg-dark-elevated rounded-lg border border-dark-border shadow-sm">
+                <div className="px-5 py-4 border-b border-dark-border">
+                  <h3 className="text-[16px] font-medium text-dark-text-primary">维度映射</h3>
                 </div>
                 <div className="p-5">
                   <div className="mb-4">
-                    <Label className="text-[13px] text-[#6b7789]">当前维度</Label>
+                    <Label className="text-[13px] text-dark-text-secondary">当前维度</Label>
                     <div className="mt-1 flex flex-wrap gap-1">
                       {currentIndicator.dimensions.map((dim) => (
-                        <span key={dim} className="px-2 py-0.5 bg-[#f1f3f6] text-[#9ba4b3] text-[12px] rounded">
+                        <span key={dim} className="px-2 py-0.5 bg-dark-card-l2 text-dark-text-tertiary text-[12px] rounded">
                           {dim}
                         </span>
                       ))}
                     </div>
                   </div>
-                  <Label className="text-[14px] font-medium text-[#2d3748]">新维度选择</Label>
+                  <Label className="text-[14px] font-medium text-dark-text-primary">新维度选择</Label>
                   <div className="mt-2 flex flex-wrap gap-2">
                     {dimensionOptions.map((dim) => {
                       const isSelected = branchBForm.newDimensions.includes(dim);
@@ -824,8 +824,8 @@ export default function IndicatorEditPage() {
                           className={cn(
                             'px-3 py-1.5 rounded-md text-[13px] font-medium border transition-colors',
                             isSelected
-                              ? 'bg-[#eef4ff] border-[#3478f6] text-[#3478f6]'
-                              : 'bg-white border-[#dde1e8] text-[#4a5568] hover:border-[#9ba4b3]'
+                              ? 'bg-dark-accent-primary/10 border-dark-accent-primary text-dark-accent-primary'
+                              : 'bg-dark-elevated border-dark-border-hover text-dark-text-secondary hover:border-dark-text-tertiary'
                           )}
                         >
                           {isSelected && <CheckCircle size={12} className="inline mr-1" />}
@@ -835,18 +835,18 @@ export default function IndicatorEditPage() {
                     })}
                   </div>
                   {/* 业务知识关联（预留） */}
-                  <div className="mt-6 pt-6 border-t border-[#e8ecf1]">
-                    <h4 className="text-[15px] font-medium text-[#2d3748] mb-1">业务知识关联（预留）</h4>
-                    <p className="text-[12px] text-[#9ba4b3] mb-4">
+                  <div className="mt-6 pt-6 border-t border-dark-border">
+                    <h4 className="text-[15px] font-medium text-dark-text-primary mb-1">业务知识关联（预留）</h4>
+                    <p className="text-[12px] text-dark-text-tertiary mb-4">
                       后续将支持关联业务知识库条目，描述指标的业务口径含义（如套餐指标 = WiFi指标 + 宽带指标 + 流量指标）
                     </p>
                     <div className="grid grid-cols-2 gap-6 opacity-50">
                       <div>
-                        <Label className="text-[14px] font-medium text-[#2d3748]">知识库条目搜索</Label>
+                        <Label className="text-[14px] font-medium text-dark-text-primary">知识库条目搜索</Label>
                         <Input disabled placeholder="功能开发中" className="mt-1.5 h-9" />
                       </div>
                       <div>
-                        <Label className="text-[14px] font-medium text-[#2d3748]">知识库条目多选</Label>
+                        <Label className="text-[14px] font-medium text-dark-text-primary">知识库条目多选</Label>
                         <Input disabled placeholder="功能开发中" className="mt-1.5 h-9" />
                       </div>
                     </div>
@@ -857,15 +857,15 @@ export default function IndicatorEditPage() {
 
             {/* Card 4: 链接关系 */}
             <motion.div {...fadeIn}>
-              <div className="bg-white rounded-lg border border-[#e8ecf1] shadow-sm">
-                <div className="px-5 py-4 border-b border-[#e8ecf1]">
-                  <h3 className="text-[16px] font-medium text-[#2d3748]">链接关系</h3>
+              <div className="bg-dark-elevated rounded-lg border border-dark-border shadow-sm">
+                <div className="px-5 py-4 border-b border-dark-border">
+                  <h3 className="text-[16px] font-medium text-dark-text-primary">链接关系</h3>
                 </div>
                 <div className="p-5">
-                  <p className="text-[14px] text-[#6b7789] mb-4">
+                  <p className="text-[14px] text-dark-text-secondary mb-4">
                     当前有 {currentIndicator.inboundLinks} 条入链，{currentIndicator.outboundLinks} 条出链
                   </p>
-                  <p className="text-[13px] text-[#9ba4b3] mb-3">
+                  <p className="text-[13px] text-dark-text-tertiary mb-3">
                     如需修改链接关系，请前往血缘画布进行详细配置
                   </p>
                   <Button
@@ -882,9 +882,9 @@ export default function IndicatorEditPage() {
 
             {/* Card 5: 业务规则参数 */}
             <motion.div {...fadeIn}>
-              <div className="bg-white rounded-lg border border-[#e8ecf1] shadow-sm">
-                <div className="px-5 py-4 border-b border-[#e8ecf1]">
-                  <h3 className="text-[16px] font-medium text-[#2d3748]">业务规则参数</h3>
+              <div className="bg-dark-elevated rounded-lg border border-dark-border shadow-sm">
+                <div className="px-5 py-4 border-b border-dark-border">
+                  <h3 className="text-[16px] font-medium text-dark-text-primary">业务规则参数</h3>
                 </div>
                 <div className="p-0">
                   <DataTable
@@ -925,7 +925,7 @@ export default function IndicatorEditPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3 }}
-              className="fixed bottom-0 left-0 right-0 bg-white border-t border-[#e8ecf1] px-6 py-4 z-30 flex items-center justify-between"
+              className="fixed bottom-0 left-0 right-0 bg-dark-elevated border-t border-dark-border px-6 py-4 z-30 flex items-center justify-between"
               style={{ marginLeft: 240 }}
             >
               <Button
@@ -944,7 +944,7 @@ export default function IndicatorEditPage() {
                   取消
                 </Button>
                 <Button
-                  className="h-10 px-6 text-[14px] bg-[#10b981] hover:bg-[#059669] text-white"
+                  className="h-10 px-6 text-[14px] bg-success-500 hover:bg-success-600 text-white"
                   onClick={handlePublishBranchB}
                 >
                   确认发布
@@ -960,10 +960,10 @@ export default function IndicatorEditPage() {
         <DialogContent className="sm:max-w-[480px]">
           <DialogHeader>
             <DialogTitle className="text-[18px]">确认提交变更审核？</DialogTitle>
-            <DialogDescription className="text-[14px] text-[#6b7789] mt-2">
+            <DialogDescription className="text-[14px] text-dark-text-secondary mt-2">
               变更字段数：<strong>{modifiedFields.length}</strong> 个<br />
               变更指标：<strong>{currentIndicator.name}</strong><br />
-              <span className="text-[#f59e0b] mt-2 block">
+              <span className="text-warning-500 mt-2 block">
                 审核期间该指标将处于锁定状态
               </span>
             </DialogDescription>
@@ -973,7 +973,7 @@ export default function IndicatorEditPage() {
               取消
             </Button>
             <Button
-              className="bg-[#3478f6] hover:bg-[#1d5ee0] text-white"
+              className="bg-dark-accent-primary hover:bg-dark-accent-primary-active text-white"
               onClick={handleConfirmSubmitA}
             >
               确认提交
@@ -987,7 +987,7 @@ export default function IndicatorEditPage() {
         <DialogContent className="sm:max-w-[480px]">
           <DialogHeader>
             <DialogTitle className="text-[18px]">确认发布变更？</DialogTitle>
-            <DialogDescription className="text-[14px] text-[#6b7789] mt-2">
+            <DialogDescription className="text-[14px] text-dark-text-secondary mt-2">
               变更将直接发布生效，请确认变更内容无误。
             </DialogDescription>
           </DialogHeader>
@@ -996,7 +996,7 @@ export default function IndicatorEditPage() {
               取消
             </Button>
             <Button
-              className="bg-[#10b981] hover:bg-[#059669] text-white"
+              className="bg-success-500 hover:bg-success-600 text-white"
               onClick={handleConfirmPublishB}
             >
               确认发布
@@ -1015,23 +1015,23 @@ export default function IndicatorEditPage() {
             {editRuleDrawer && (
               <div className="space-y-4">
                 <div>
-                  <Label className="text-[14px] font-medium text-[#2d3748]">规则名称</Label>
-                  <Input value={editRuleDrawer.name} disabled className="mt-1.5 h-9 bg-[#f1f3f6]" />
+                  <Label className="text-[14px] font-medium text-dark-text-primary">规则名称</Label>
+                  <Input value={editRuleDrawer.name} disabled className="mt-1.5 h-9 bg-dark-card-l2" />
                 </div>
                 <div>
-                  <Label className="text-[14px] font-medium text-[#2d3748]">规则类型</Label>
-                  <Input value={editRuleDrawer.type} disabled className="mt-1.5 h-9 bg-[#f1f3f6]" />
+                  <Label className="text-[14px] font-medium text-dark-text-primary">规则类型</Label>
+                  <Input value={editRuleDrawer.type} disabled className="mt-1.5 h-9 bg-dark-card-l2" />
                 </div>
                 <div>
-                  <Label className="text-[14px] font-medium text-[#2d3748]">当前参数</Label>
-                  <div className="mt-1.5 p-3 bg-[#f8f9fb] rounded-md text-[13px] text-[#4a5568] font-mono">
+                  <Label className="text-[14px] font-medium text-dark-text-primary">当前参数</Label>
+                  <div className="mt-1.5 p-3 bg-dark-page rounded-md text-[13px] text-dark-text-secondary font-mono">
                     {editRuleDrawer.displayParams}
                   </div>
                 </div>
                 {editRuleDrawer.type === '阈值告警' && (
                   <>
                     <div>
-                      <Label className="text-[14px] font-medium text-[#2d3748]">上限 (%)</Label>
+                      <Label className="text-[14px] font-medium text-dark-text-primary">上限 (%)</Label>
                       <Input
                         type="number"
                         defaultValue={editRuleDrawer.params.upperLimit as number}
@@ -1039,7 +1039,7 @@ export default function IndicatorEditPage() {
                       />
                     </div>
                     <div>
-                      <Label className="text-[14px] font-medium text-[#2d3748]">下限 (%)</Label>
+                      <Label className="text-[14px] font-medium text-dark-text-primary">下限 (%)</Label>
                       <Input
                         type="number"
                         defaultValue={editRuleDrawer.params.lowerLimit as number}
@@ -1051,7 +1051,7 @@ export default function IndicatorEditPage() {
                 {editRuleDrawer.type === '异常检测' && (
                   <>
                     <div>
-                      <Label className="text-[14px] font-medium text-[#2d3748]">敏感度</Label>
+                      <Label className="text-[14px] font-medium text-dark-text-primary">敏感度</Label>
                       <Select defaultValue={editRuleDrawer.params.sensitivity as string}>
                         <SelectTrigger className="mt-1.5 h-9">
                           <SelectValue />
@@ -1064,7 +1064,7 @@ export default function IndicatorEditPage() {
                       </Select>
                     </div>
                     <div>
-                      <Label className="text-[14px] font-medium text-[#2d3748]">窗口</Label>
+                      <Label className="text-[14px] font-medium text-dark-text-primary">窗口</Label>
                       <Select defaultValue={editRuleDrawer.params.window as string}>
                         <SelectTrigger className="mt-1.5 h-9">
                           <SelectValue />
@@ -1087,7 +1087,7 @@ export default function IndicatorEditPage() {
               取消
             </Button>
             <Button
-              className="bg-[#3478f6] hover:bg-[#1d5ee0] text-white"
+              className="bg-dark-accent-primary hover:bg-dark-accent-primary-active text-white"
               onClick={() => {
                 setEditRuleDrawer(null);
                 toast.success('规则参数已更新');

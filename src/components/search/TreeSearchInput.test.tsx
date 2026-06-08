@@ -61,7 +61,7 @@ describe('TreeSearchInput', () => {
     render(<ControlledInput />)
     const input = screen.getByTestId('tree-search-input')
     expect(input).toHaveClass('h-9')
-    expect(input).toHaveClass('focus:border-[#4DA6FF]')
+    expect(input).toHaveClass('focus:border-dark-accent-primary-hover')
   })
 
   describe('search mode toggle', () => {

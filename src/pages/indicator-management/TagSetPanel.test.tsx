@@ -334,8 +334,8 @@ describe('TagSetPanel', () => {
 
       const highlight = screen.getByTestId('tag-pill-highlight')
       expect(highlight).toHaveTextContent('核心')
-      expect(highlight).toHaveClass('bg-[#B8860B]/20')
-      expect(highlight).toHaveClass('text-[#FFD700]')
+      expect(highlight).toHaveClass('bg-[var(--dark-accent-gold)]/20')
+      expect(highlight).toHaveClass('text-[var(--dark-accent-gold)]')
       expect(highlight).toHaveClass('font-bold')
 
       vi.useRealTimers()
@@ -480,7 +480,7 @@ describe('TagSetPanel', () => {
       await user.click(screen.getByTestId(`tag-pill-${coloredRoot.id}`))
 
       const pill = screen.getByTestId(`tag-pill-${coloredRoot.id}`)
-      expect(pill).toHaveClass('bg-[#111B26]')
+      expect(pill).toHaveClass('bg-dark-card-l1')
       expect(pill).not.toHaveStyle({ backgroundColor: `${coloredRoot.color}1A` })
     })
   })

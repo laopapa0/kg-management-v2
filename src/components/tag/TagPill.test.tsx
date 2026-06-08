@@ -17,32 +17,32 @@ describe('TagPill', () => {
     render(<TagPill tag={sampleTag} selected />)
     const pill = screen.getByTestId('tag-pill-t1')
     expect(pill).toHaveAttribute('data-selected', 'true')
-    expect(pill).toHaveClass('bg-[#111B26]')
-    expect(pill).toHaveClass('text-[#4DA6FF]')
-    expect(pill).toHaveClass('border-[#15417E]')
+    expect(pill).toHaveClass('bg-dark-card-l1')
+    expect(pill).toHaveClass('text-dark-accent-primary')
+    expect(pill).toHaveClass('border-dark-accent-primary')
   })
 
   it('applies partial visual state', () => {
     render(<TagPill tag={sampleTag} selected={false} partial />)
     const pill = screen.getByTestId('tag-pill-t1')
     expect(pill).toHaveAttribute('data-partial', 'true')
-    expect(pill).toHaveClass('bg-[#111B26]/50')
+    expect(pill).toHaveClass('bg-dark-card-l1/50')
     expect(pill).toHaveClass('border-dashed')
-    expect(pill).toHaveClass('border-[#15417E]')
+    expect(pill).toHaveClass('border-dark-accent-primary')
   })
 
   it('shows check icon with scale animation when selected', () => {
     render(<TagPill tag={sampleTag} selected />)
     const check = screen.getByTestId('tag-pill-check-t1')
     expect(check).toHaveClass('scale-100')
-    expect(check).toHaveClass('bg-[#4DA6FF]')
+    expect(check).toHaveClass('bg-dark-accent-primary')
   })
 
   it('shows semi-transparent check icon when partial', () => {
     render(<TagPill tag={sampleTag} selected={false} partial />)
     const check = screen.getByTestId('tag-pill-check-t1')
     expect(check).toHaveClass('scale-100')
-    expect(check).toHaveClass('bg-[#4DA6FF]/50')
+    expect(check).toHaveClass('bg-dark-accent-primary/50')
     const checkIcon = check.querySelector('svg')
     expect(checkIcon).toHaveClass('opacity-70')
   })
@@ -77,7 +77,7 @@ describe('TagPill', () => {
   it('uses highlight background when selected regardless of tag color', () => {
     render(<TagPill tag={sampleTag} selected />)
     const pill = screen.getByTestId('tag-pill-t1')
-    expect(pill).toHaveClass('bg-[#111B26]')
+    expect(pill).toHaveClass('bg-dark-card-l1')
     expect(pill).not.toHaveStyle({ backgroundColor: '#3B82F61A' })
   })
 

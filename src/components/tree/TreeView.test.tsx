@@ -152,10 +152,10 @@ describe('TreeView', () => {
       render(<TreeView nodes={mockNodes} renderNode={renderNode} />)
 
       const firstNode = screen.getAllByTestId('tree-node-row')[0]
-      expect(firstNode).not.toHaveClass('bg-white/[0.04]')
+      expect(firstNode).not.toHaveClass('bg-dark-elevated/[0.04]')
 
       await user.hover(firstNode)
-      expect(firstNode).toHaveClass('bg-white/[0.04]')
+      expect(firstNode).toHaveClass('bg-dark-elevated/[0.04]')
     })
 
     it('shows left highlight bar at 50% opacity on hover', async () => {
@@ -394,8 +394,8 @@ describe('TreeView', () => {
       render(<TreeView nodes={mockNodes} renderNode={renderNode} initialExpanded={['root-1', 'child-1-2']} renderIndentGuides="always" />)
 
       const guide = screen.getAllByTestId('tree-indent-guide')[0]
-      expect(guide).toHaveClass('bg-white/[0.06]')
-      expect(guide).toHaveClass('group-hover:bg-white/[0.15]')
+      expect(guide).toHaveClass('bg-dark-elevated/[0.06]')
+      expect(guide).toHaveClass('group-hover:bg-dark-elevated/[0.15]')
     })
   })
 

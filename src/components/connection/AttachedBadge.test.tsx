@@ -21,7 +21,7 @@ describe('AttachedBadge', () => {
     )
     const badge = screen.getByTestId('attached-badge')
     expect(badge).toHaveTextContent('已挂靠 3')
-    expect(badge).toHaveClass('bg-[#7B8CDE]')
+    expect(badge).toHaveClass('bg-[var(--dark-accent-primary)]')
   })
 
   it('does not render when count is 0', () => {

@@ -112,13 +112,13 @@ export default function TagColorPicker({
                 if (e.key === 'Enter') handleApplyHex()
               }}
               placeholder="1890FF"
-              className="h-7 flex-1 rounded-md border border-dark-border bg-dark-card-l1 px-2 text-xs text-dark-text-primary placeholder:text-dark-text-tertiary focus:border-[#4DA6FF] focus:outline-none"
+              className="h-7 flex-1 rounded-md border border-dark-border bg-dark-card-l1 px-2 text-xs text-dark-text-primary placeholder:text-dark-text-tertiary focus:border-dark-accent-primary-hover focus:outline-none"
             />
             <button
               type="button"
               data-testid="tag-color-hex-apply"
               onClick={handleApplyHex}
-              className="h-7 rounded-md bg-[#1890FF] px-2.5 text-xs font-medium text-white transition-opacity hover:opacity-90"
+              className="h-7 rounded-md bg-dark-accent-primary px-2.5 text-xs font-medium text-white transition-opacity hover:opacity-90"
             >
               确定
             </button>

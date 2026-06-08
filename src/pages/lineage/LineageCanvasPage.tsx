@@ -549,14 +549,14 @@ function NodeDetailCard({
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, y: 8, scale: 0.95 }}
       transition={{ duration: 0.2 }}
-      className="absolute top-16 left-4 z-20 w-72 bg-white rounded-lg border border-[#e8ecf1] shadow-lg p-4"
+      className="absolute top-16 left-4 z-20 w-72 bg-dark-elevated rounded-lg border border-dark-border shadow-lg p-4"
     >
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded-full" style={{ backgroundColor: borderColor }} />
-          <span className="text-[14px] font-semibold text-[#2d3748]">{node.name}</span>
+          <span className="text-[14px] font-semibold text-dark-text-primary">{node.name}</span>
         </div>
-        <button onClick={onClose} className="text-[#9ba4b3] hover:text-[#4a5568] transition-colors">
+        <button onClick={onClose} className="text-dark-text-tertiary hover:text-dark-text-secondary transition-colors">
           <X size={14} />
         </button>
       </div>
@@ -567,18 +567,18 @@ function NodeDetailCard({
         >
           {node.level1}
         </span>
-        <span className="text-[11px] text-[#9ba4b3] font-mono">{node.id}</span>
+        <span className="text-[11px] text-dark-text-tertiary font-mono">{node.id}</span>
       </div>
 
       {/* 入向关系 */}
       {incoming.length > 0 && (
         <div className="mb-3">
-          <h4 className="text-[11px] font-medium text-[#9ba4b3] mb-1.5 uppercase tracking-wider">被依赖</h4>
+          <h4 className="text-[11px] font-medium text-dark-text-tertiary mb-1.5 uppercase tracking-wider">被依赖</h4>
           <div className="space-y-1">
             {incoming.map((rel) => (
               <div key={rel.id} className="flex items-center gap-1.5 text-[12px]">
-                <GitBranch size={10} className="text-[#9ba4b3]" />
-                <span className="text-[#4a5568] truncate">{rel.source}</span>
+                <GitBranch size={10} className="text-dark-text-tertiary" />
+                <span className="text-dark-text-secondary truncate">{rel.source}</span>
                 <span
                   className="shrink-0 px-1 py-0.5 rounded text-[9px] font-medium"
                   style={{
@@ -597,12 +597,12 @@ function NodeDetailCard({
       {/* 出向关系 */}
       {outgoing.length > 0 && (
         <div>
-          <h4 className="text-[11px] font-medium text-[#9ba4b3] mb-1.5 uppercase tracking-wider">依赖于</h4>
+          <h4 className="text-[11px] font-medium text-dark-text-tertiary mb-1.5 uppercase tracking-wider">依赖于</h4>
           <div className="space-y-1">
             {outgoing.map((rel) => (
               <div key={rel.id} className="flex items-center gap-1.5 text-[12px]">
-                <ArrowRight size={10} className="text-[#9ba4b3]" />
-                <span className="text-[#4a5568] truncate">{rel.target}</span>
+                <ArrowRight size={10} className="text-dark-text-tertiary" />
+                <span className="text-dark-text-secondary truncate">{rel.target}</span>
                 <span
                   className="shrink-0 px-1 py-0.5 rounded text-[9px] font-medium"
                   style={{
@@ -618,7 +618,7 @@ function NodeDetailCard({
         </div>
       )}
 
-      <div className="mt-3 pt-2 border-t border-[#e8ecf1] text-[11px] text-[#9ba4b3]">
+      <div className="mt-3 pt-2 border-t border-dark-border text-[11px] text-dark-text-tertiary">
         共 {incoming.length + outgoing.length} 条关系
       </div>
     </motion.div>
@@ -816,7 +816,7 @@ export default function LineageCanvasPage() {
       className="flex flex-col h-[calc(100dvh-48px-24px-24px)]"
     >
       {/* ── Page Header ── */}
-      <div className="flex items-start justify-between mb-5 pb-4 border-b border-[#e8ecf1] shrink-0">
+      <div className="flex items-start justify-between mb-5 pb-4 border-b border-dark-border shrink-0">
         <div>
           <Button
             variant="outline"
@@ -827,16 +827,16 @@ export default function LineageCanvasPage() {
             <ChevronLeft size={14} className="mr-1" />
             返回
           </Button>
-          <h1 className="text-[28px] font-semibold text-[#1a202c] leading-tight">
+          <h1 className="text-[28px] font-semibold text-dark-text-primary leading-tight">
             配置链接关系（血缘画布）
           </h1>
-          <p className="text-[13px] text-[#6b7789] mt-1">
+          <p className="text-[13px] text-dark-text-secondary mt-1">
             维护指标间的血缘关系，支持画布可视化与影响分析
           </p>
         </div>
         <div className="flex items-center gap-2">
           <Button
-            className="h-9 px-4 text-[14px] bg-[#3478f6] hover:bg-[#1d5ee0] text-white"
+            className="h-9 px-4 text-[14px] bg-dark-accent-primary hover:bg-dark-accent-primary-active text-white"
             onClick={() => {
               setCreateForm({ sourceId: '', targetId: '', relationType: '', correlation: '', confidence: 70, description: '' });
               setSourceSearch('');
@@ -872,11 +872,11 @@ export default function LineageCanvasPage() {
       </div>
 
       {/* ── 主内容区: 左右分栏 ── */}
-      <div className="flex flex-1 overflow-hidden rounded-lg border border-[#e8ecf1]">
+      <div className="flex flex-1 overflow-hidden rounded-lg border border-dark-border">
         {/* 左侧面板 */}
-        <div className="w-80 flex flex-col bg-[#f8f9fb] border-r border-[#e8ecf1]">
+        <div className="w-80 flex flex-col bg-dark-page border-r border-dark-border">
           {/* 搜索过滤区 */}
-          <div className="p-4 bg-white border-b border-[#e8ecf1] shrink-0">
+          <div className="p-4 bg-dark-elevated border-b border-dark-border shrink-0">
             <SearchInput
               placeholder="搜索关系或指标名称"
               value={searchQuery}
@@ -891,8 +891,8 @@ export default function LineageCanvasPage() {
                   className={cn(
                     'px-2 py-1 rounded text-[11px] font-medium transition-colors',
                     filterType === type
-                      ? 'bg-[#3478f6] text-white'
-                      : 'bg-[#f8f9fb] text-[#6b7789] hover:bg-[#e8ecf1]'
+                      ? 'bg-dark-accent-primary text-white'
+                      : 'bg-dark-page text-dark-text-secondary hover:bg-dark-tree-hover-bg'
                   )}
                 >
                   {type === '全部' ? '全部' : type}
@@ -904,9 +904,9 @@ export default function LineageCanvasPage() {
           {/* 关系列表 */}
           <div className="flex-1 overflow-y-auto p-3">
             {filteredRelations.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-12 text-[#9ba4b3]">
-                <FolderTree size={36} className="text-[#c4cad4] mb-2" />
-                <span className="text-[14px] text-[#6b7789]">暂无关系数据</span>
+              <div className="flex flex-col items-center justify-center py-12 text-dark-text-tertiary">
+                <FolderTree size={36} className="text-dark-text-tertiary mb-2" />
+                <span className="text-[14px] text-dark-text-secondary">暂无关系数据</span>
               </div>
             ) : (
               <div className="space-y-2">
@@ -918,11 +918,11 @@ export default function LineageCanvasPage() {
                     transition={{ duration: 0.2, delay: index * 0.05 }}
                     onClick={() => setSelectedRelationId(rel.id === selectedRelationId ? null : rel.id)}
                     className={cn(
-                      'bg-white rounded-md p-3 cursor-pointer transition-all',
+                      'bg-dark-elevated rounded-md p-3 cursor-pointer transition-all',
                       'border-l-[3px]',
                       selectedRelationId === rel.id
-                        ? 'bg-[#eef4ff] border-[#bcd3ff] shadow-sm'
-                        : 'hover:bg-[#f8f9fb] hover:shadow-sm'
+                        ? 'bg-dark-accent-primary/10 border-dark-accent-primary/30 shadow-sm'
+                        : 'hover:bg-dark-page hover:shadow-sm'
                     )}
                     style={{ borderLeftColor: relationTypeColors[rel.type] }}
                   >
@@ -940,28 +940,28 @@ export default function LineageCanvasPage() {
                         className={cn(
                           'text-[10px] font-semibold px-1.5 py-0.5 rounded',
                           rel.confidence >= 80
-                            ? 'bg-[#ecfdf5] text-[#059669]'
+                            ? 'bg-success-500/10 text-success-600'
                             : rel.confidence >= 50
-                            ? 'bg-[#fffbeb] text-[#d97706]'
-                            : 'bg-[#fef2f2] text-[#dc2626]'
+                            ? 'bg-warning-500/10 text-warning-600'
+                            : 'bg-error-500/10 text-error-600'
                         )}
                       >
                         {rel.confidence}%
                       </span>
                     </div>
                     <div className="flex items-center gap-2 text-[13px]">
-                      <span className="font-medium text-[#2d3748] truncate">{rel.source}</span>
-                      <ArrowRight size={14} className="text-[#c4cad4] shrink-0" />
-                      <span className="font-medium text-[#2d3748] truncate">{rel.target}</span>
+                      <span className="font-medium text-dark-text-primary truncate">{rel.source}</span>
+                      <ArrowRight size={14} className="text-dark-text-tertiary shrink-0" />
+                      <span className="font-medium text-dark-text-primary truncate">{rel.target}</span>
                     </div>
                     {rel.description && (
-                      <p className="text-[11px] text-[#9ba4b3] mt-1 truncate">{rel.description}</p>
+                      <p className="text-[11px] text-dark-text-tertiary mt-1 truncate">{rel.description}</p>
                     )}
                     <div className="flex items-center gap-1 mt-2">
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="h-6 px-1.5 text-[11px] text-[#6b7789]"
+                        className="h-6 px-1.5 text-[11px] text-dark-text-secondary"
                         onClick={(e) => {
                           e.stopPropagation();
                           setCreateForm({
@@ -983,7 +983,7 @@ export default function LineageCanvasPage() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="h-6 px-1.5 text-[11px] text-[#ef4444] hover:text-[#dc2626]"
+                        className="h-6 px-1.5 text-[11px] text-error-500 hover:text-error-600"
                         onClick={(e) => {
                           e.stopPropagation();
                           handleDeleteRelation(rel.id);
@@ -1000,13 +1000,13 @@ export default function LineageCanvasPage() {
           </div>
 
           {/* 统计摘要 */}
-          <div className="p-3 bg-white border-t border-[#e8ecf1] shrink-0">
-            <div className="text-[12px] text-[#6b7789] font-medium">
+          <div className="p-3 bg-dark-elevated border-t border-dark-border shrink-0">
+            <div className="text-[12px] text-dark-text-secondary font-medium">
               共 {relations.length} 条关系
             </div>
             <div className="flex flex-wrap gap-x-3 gap-y-1 mt-1.5">
               {Object.entries(stats).map(([type, count]) => (
-                <span key={type} className="text-[11px] text-[#9ba4b3]">
+                <span key={type} className="text-[11px] text-dark-text-tertiary">
                   <span
                     className="inline-block w-2 h-2 rounded-full mr-1"
                     style={{ backgroundColor: relationTypeColors[type as RelationType] }}
@@ -1019,9 +1019,9 @@ export default function LineageCanvasPage() {
         </div>
 
         {/* 右侧面板: 画布 */}
-        <div className="flex-1 relative bg-white overflow-hidden">
+        <div className="flex-1 relative bg-dark-elevated overflow-hidden">
           {/* 画布控制栏 */}
-          <div className="absolute top-0 left-0 right-0 h-11 px-4 flex items-center justify-between bg-white/80 backdrop-blur border-b border-[#e8ecf1] z-10">
+          <div className="absolute top-0 left-0 right-0 h-11 px-4 flex items-center justify-between bg-dark-elevated/80 backdrop-blur border-b border-dark-border z-10">
             <div className="flex items-center gap-1">
               <Button
                 variant="ghost"
@@ -1031,7 +1031,7 @@ export default function LineageCanvasPage() {
               >
                 <Minus size={14} />
               </Button>
-              <span className="text-[12px] text-[#6b7789] w-12 text-center">
+              <span className="text-[12px] text-dark-text-secondary w-12 text-center">
                 {Math.round(zoom * 100)}%
               </span>
               <Button
@@ -1052,7 +1052,7 @@ export default function LineageCanvasPage() {
                 <Maximize size={14} />
               </Button>
             </div>
-            <div className="text-[12px] text-[#9ba4b3]">
+            <div className="text-[12px] text-dark-text-tertiary">
               拖拽空白处平移 · 滚轮缩放 · 点击节点查看详情
             </div>
           </div>
@@ -1093,22 +1093,22 @@ export default function LineageCanvasPage() {
           </AnimatePresence>
 
           {/* 图例 */}
-          <div className="absolute bottom-4 right-4 bg-white/90 backdrop-blur rounded-lg p-3 shadow-sm border border-[#e8ecf1] z-10">
-            <div className="text-[11px] font-medium text-[#6b7789] mb-2">图例</div>
+          <div className="absolute bottom-4 right-4 bg-dark-elevated/90 backdrop-blur rounded-lg p-3 shadow-sm border border-dark-border z-10">
+            <div className="text-[11px] font-medium text-dark-text-secondary mb-2">图例</div>
             <div className="space-y-1.5">
               {relationTypeOptions.map((opt) => (
                 <div key={opt.value} className="flex items-center gap-2">
                   <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: opt.color }} />
-                  <span className="text-[11px] text-[#4a5568]">{opt.label}</span>
+                  <span className="text-[11px] text-dark-text-secondary">{opt.label}</span>
                 </div>
               ))}
-              <div className="border-t border-[#e8ecf1] pt-1.5 mt-1.5 space-y-1">
+              <div className="border-t border-dark-border pt-1.5 mt-1.5 space-y-1">
                 {Object.entries(roleLabels).map(([role, label]) => {
                   const { borderColor: color } = getNodeStyle(role);
                   return (
                     <div key={role} className="flex items-center gap-2">
                       <div className="w-3 h-3 rounded-sm border" style={{ borderColor: color, backgroundColor: `${color}15` }} />
-                      <span className="text-[11px] text-[#4a5568]">{label}</span>
+                      <span className="text-[11px] text-dark-text-secondary">{label}</span>
                     </div>
                   );
                 })}
@@ -1127,8 +1127,8 @@ export default function LineageCanvasPage() {
           <div className="space-y-5 mt-2">
             {/* 源对象 */}
             <div className="relative">
-              <Label className="text-[14px] font-medium text-[#2d3748]">
-                源对象 <span className="text-[#ef4444]">*</span>
+              <Label className="text-[14px] font-medium text-dark-text-primary">
+                源对象 <span className="text-error-500">*</span>
               </Label>
               {!selectedSource ? (
                 <div className="mt-1.5">
@@ -1147,7 +1147,7 @@ export default function LineageCanvasPage() {
                         initial={{ opacity: 0, y: -4 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -4 }}
-                        className="absolute z-20 w-full mt-1 bg-white border border-[#e8ecf1] rounded-md shadow-lg overflow-hidden"
+                        className="absolute z-20 w-full mt-1 bg-dark-elevated border border-dark-border rounded-md shadow-lg overflow-hidden"
                       >
                         {filteredSourceIndicators.map((ind) => (
                           <button
@@ -1157,10 +1157,10 @@ export default function LineageCanvasPage() {
                               setShowSourceResults(false);
                               setSourceSearch(ind.name);
                             }}
-                            className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-[#f8f9fb] border-b border-[#e8ecf1] last:border-0 text-left transition-colors"
+                            className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-dark-page border-b border-dark-border last:border-0 text-left transition-colors"
                           >
-                            <span className="text-[11px] text-[#9ba4b3] font-mono">{ind.id}</span>
-                            <span className="text-[13px] text-[#2d3748]">{ind.name}</span>
+                            <span className="text-[11px] text-dark-text-tertiary font-mono">{ind.id}</span>
+                            <span className="text-[13px] text-dark-text-primary">{ind.name}</span>
                             <StatusBadge text={ind.level1} type="default" className="text-[10px]" />
                           </button>
                         ))}
@@ -1169,15 +1169,15 @@ export default function LineageCanvasPage() {
                   </AnimatePresence>
                 </div>
               ) : (
-                <div className="mt-1.5 p-3 border border-[#e8ecf1] rounded-md flex items-center justify-between bg-[#f8f9fb]">
+                <div className="mt-1.5 p-3 border border-dark-border rounded-md flex items-center justify-between bg-dark-page">
                   <div className="flex items-center gap-2">
                     <div
                       className="w-2 h-8 rounded-full"
                       style={{ backgroundColor: getNodeStyle(selectedSource.role).borderColor }}
                     />
                     <div>
-                      <span className="text-[11px] text-[#9ba4b3] font-mono">{selectedSource.id}</span>
-                      <div className="text-[13px] text-[#2d3748] font-medium">{selectedSource.name}</div>
+                      <span className="text-[11px] text-dark-text-tertiary font-mono">{selectedSource.id}</span>
+                      <div className="text-[13px] text-dark-text-primary font-medium">{selectedSource.name}</div>
                     </div>
                   </div>
                   <Button
@@ -1197,8 +1197,8 @@ export default function LineageCanvasPage() {
 
             {/* 目标对象 */}
             <div className="relative">
-              <Label className="text-[14px] font-medium text-[#2d3748]">
-                目标对象 <span className="text-[#ef4444]">*</span>
+              <Label className="text-[14px] font-medium text-dark-text-primary">
+                目标对象 <span className="text-error-500">*</span>
               </Label>
               {!selectedTarget ? (
                 <div className="mt-1.5">
@@ -1217,7 +1217,7 @@ export default function LineageCanvasPage() {
                         initial={{ opacity: 0, y: -4 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -4 }}
-                        className="absolute z-20 w-full mt-1 bg-white border border-[#e8ecf1] rounded-md shadow-lg overflow-hidden"
+                        className="absolute z-20 w-full mt-1 bg-dark-elevated border border-dark-border rounded-md shadow-lg overflow-hidden"
                       >
                         {filteredTargetIndicators.map((ind) => (
                           <button
@@ -1227,10 +1227,10 @@ export default function LineageCanvasPage() {
                               setShowTargetResults(false);
                               setTargetSearch(ind.name);
                             }}
-                            className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-[#f8f9fb] border-b border-[#e8ecf1] last:border-0 text-left transition-colors"
+                            className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-dark-page border-b border-dark-border last:border-0 text-left transition-colors"
                           >
-                            <span className="text-[11px] text-[#9ba4b3] font-mono">{ind.id}</span>
-                            <span className="text-[13px] text-[#2d3748]">{ind.name}</span>
+                            <span className="text-[11px] text-dark-text-tertiary font-mono">{ind.id}</span>
+                            <span className="text-[13px] text-dark-text-primary">{ind.name}</span>
                             <StatusBadge text={ind.level1} type="default" className="text-[10px]" />
                           </button>
                         ))}
@@ -1239,15 +1239,15 @@ export default function LineageCanvasPage() {
                   </AnimatePresence>
                 </div>
               ) : (
-                <div className="mt-1.5 p-3 border border-[#e8ecf1] rounded-md flex items-center justify-between bg-[#f8f9fb]">
+                <div className="mt-1.5 p-3 border border-dark-border rounded-md flex items-center justify-between bg-dark-page">
                   <div className="flex items-center gap-2">
                     <div
                       className="w-2 h-8 rounded-full"
                       style={{ backgroundColor: getNodeStyle(selectedTarget.role).borderColor }}
                     />
                     <div>
-                      <span className="text-[11px] text-[#9ba4b3] font-mono">{selectedTarget.id}</span>
-                      <div className="text-[13px] text-[#2d3748] font-medium">{selectedTarget.name}</div>
+                      <span className="text-[11px] text-dark-text-tertiary font-mono">{selectedTarget.id}</span>
+                      <div className="text-[13px] text-dark-text-primary font-medium">{selectedTarget.name}</div>
                     </div>
                   </div>
                   <Button
@@ -1267,8 +1267,8 @@ export default function LineageCanvasPage() {
 
             {/* 关系类型 */}
             <div>
-              <Label className="text-[14px] font-medium text-[#2d3748]">
-                关系类型 <span className="text-[#ef4444]">*</span>
+              <Label className="text-[14px] font-medium text-dark-text-primary">
+                关系类型 <span className="text-error-500">*</span>
               </Label>
               <Select
                 value={createForm.relationType}
@@ -1283,7 +1283,7 @@ export default function LineageCanvasPage() {
                       <div className="flex items-center gap-2">
                         <div className="w-2 h-2 rounded-full" style={{ backgroundColor: opt.color }} />
                         <span>{opt.label}</span>
-                        <span className="text-[#9ba4b3]">— {opt.desc}</span>
+                        <span className="text-dark-text-tertiary">— {opt.desc}</span>
                       </div>
                     </SelectItem>
                   ))}
@@ -1293,8 +1293,8 @@ export default function LineageCanvasPage() {
 
             {/* 正/负相关 */}
             <div>
-              <Label className="text-[14px] font-medium text-[#2d3748]">
-                设置正/负相关 <span className="text-[#9ba4b3] font-normal">（可选）</span>
+              <Label className="text-[14px] font-medium text-dark-text-primary">
+                设置正/负相关 <span className="text-dark-text-tertiary font-normal">（可选）</span>
               </Label>
               <div className="mt-1.5 flex gap-3">
                 <button
@@ -1303,8 +1303,8 @@ export default function LineageCanvasPage() {
                   className={cn(
                     'flex-1 flex items-center justify-center gap-2 h-9 rounded-md border-2 text-[13px] font-medium transition-all',
                     createForm.correlation === 'positive'
-                      ? 'border-[#10b981] bg-[#ecfdf5] text-[#059669]'
-                      : 'border-[#e8ecf1] bg-white text-[#4a5568] hover:border-[#c4cad4]'
+                      ? 'border-success-500 bg-success-500/10 text-success-600'
+                      : 'border-dark-border bg-dark-elevated text-dark-text-secondary hover:border-dark-border-hover'
                   )}
                 >
                   <TrendingUp size={16} />
@@ -1316,15 +1316,15 @@ export default function LineageCanvasPage() {
                   className={cn(
                     'flex-1 flex items-center justify-center gap-2 h-9 rounded-md border-2 text-[13px] font-medium transition-all',
                     createForm.correlation === 'negative'
-                      ? 'border-[#ef4444] bg-[#fef2f2] text-[#dc2626]'
-                      : 'border-[#e8ecf1] bg-white text-[#4a5568] hover:border-[#c4cad4]'
+                      ? 'border-error-500 bg-error-500/10 text-error-600'
+                      : 'border-dark-border bg-dark-elevated text-dark-text-secondary hover:border-dark-border-hover'
                   )}
                 >
                   <TrendingDown size={16} />
                   负相关
                 </button>
               </div>
-              <p className="text-[12px] text-[#9ba4b3] mt-1">
+              <p className="text-[12px] text-dark-text-tertiary mt-1">
                 正相关：源对象增长带动目标对象增长；负相关：源对象增长导致目标对象下降
               </p>
             </div>
@@ -1332,7 +1332,7 @@ export default function LineageCanvasPage() {
             {/* 置信度 */}
             <div>
               <div className="flex items-center justify-between mb-2">
-                <Label className="text-[14px] font-medium text-[#2d3748]">置信度</Label>
+                <Label className="text-[14px] font-medium text-dark-text-primary">置信度</Label>
                 <div className="flex items-center gap-2">
                   <Input
                     type="number"
@@ -1347,7 +1347,7 @@ export default function LineageCanvasPage() {
                     }
                     className="w-16 h-7 text-[13px] text-right"
                   />
-                  <span className="text-[13px] text-[#6b7789]">%</span>
+                  <span className="text-[13px] text-dark-text-secondary">%</span>
                 </div>
               </div>
               <Slider
@@ -1360,14 +1360,14 @@ export default function LineageCanvasPage() {
                 step={1}
                 className="w-full"
               />
-              <p className="text-[12px] text-[#9ba4b3] mt-1">
+              <p className="text-[12px] text-dark-text-tertiary mt-1">
                 表示关系成立的可信程度，用于血缘分析时排序或过滤
               </p>
             </div>
 
             {/* 描述 */}
             <div>
-              <Label className="text-[14px] font-medium text-[#2d3748]">描述（可选）</Label>
+              <Label className="text-[14px] font-medium text-dark-text-primary">描述（可选）</Label>
               <Textarea
                 value={createForm.description}
                 onChange={(e) => setCreateForm((p) => ({ ...p, description: e.target.value }))}
@@ -1375,7 +1375,7 @@ export default function LineageCanvasPage() {
                 maxLength={500}
                 className="mt-1.5 min-h-[80px]"
               />
-              <p className="text-[11px] text-[#9ba4b3] mt-1 text-right">
+              <p className="text-[11px] text-dark-text-tertiary mt-1 text-right">
                 {createForm.description.length}/500
               </p>
             </div>
@@ -1399,7 +1399,7 @@ export default function LineageCanvasPage() {
               血缘预览
             </Button>
             <Button
-              className="bg-[#3478f6] hover:bg-[#1d5ee0] text-white"
+              className="bg-dark-accent-primary hover:bg-dark-accent-primary-active text-white"
               onClick={handleCreateRelation}
             >
               确认
@@ -1413,14 +1413,14 @@ export default function LineageCanvasPage() {
         <DialogContent className="sm:max-w-[900px] sm:h-[600px] flex flex-col">
           <DialogHeader>
             <DialogTitle className="text-[18px] flex items-center gap-2">
-              <Eye size={18} className="text-[#3478f6]" />
+              <Eye size={18} className="text-dark-accent-primary" />
               血缘影响预览
             </DialogTitle>
           </DialogHeader>
           <div className="flex-1 flex overflow-hidden mt-2">
             {/* 左侧影响路径 */}
-            <div className="w-[40%] border-r border-[#e8ecf1] pr-4 overflow-y-auto">
-              <h4 className="text-[13px] font-medium text-[#6b7789] mb-3">影响路径</h4>
+            <div className="w-[40%] border-r border-dark-border pr-4 overflow-y-auto">
+              <h4 className="text-[13px] font-medium text-dark-text-secondary mb-3">影响路径</h4>
               <div className="space-y-3">
                 {relations.slice(0, 6).map((rel, index) => (
                   <motion.div
@@ -1431,16 +1431,16 @@ export default function LineageCanvasPage() {
                     className="flex items-center gap-2 text-[12px]"
                   >
                     <div className="flex flex-col items-center">
-                      <div className="w-6 h-6 rounded-full bg-[#eef4ff] flex items-center justify-center text-[#3478f6] text-[10px] font-bold">
+                      <div className="w-6 h-6 rounded-full bg-dark-accent-primary/10 flex items-center justify-center text-dark-accent-primary text-[10px] font-bold">
                         {index + 1}
                       </div>
-                      {index < 5 && <div className="w-[1px] h-6 bg-[#e8ecf1]" />}
+                      {index < 5 && <div className="w-[1px] h-6 bg-dark-card-l3" />}
                     </div>
-                    <div className="flex-1 p-2.5 bg-[#f8f9fb] rounded-md">
+                    <div className="flex-1 p-2.5 bg-dark-page rounded-md">
                       <div className="flex items-center gap-1">
-                        <span className="font-medium text-[#2d3748] truncate">{rel.source}</span>
-                        <ArrowRight size={10} className="text-[#c4cad4] shrink-0" />
-                        <span className="font-medium text-[#2d3748] truncate">{rel.target}</span>
+                        <span className="font-medium text-dark-text-primary truncate">{rel.source}</span>
+                        <ArrowRight size={10} className="text-dark-text-tertiary shrink-0" />
+                        <span className="font-medium text-dark-text-primary truncate">{rel.target}</span>
                       </div>
                       <div className="flex items-center gap-2 mt-1">
                         <span
@@ -1454,11 +1454,11 @@ export default function LineageCanvasPage() {
                         </span>
                         <span className={cn(
                           'text-[10px]',
-                          index < 3 ? 'text-[#f59e0b]' : 'text-[#10b981]'
+                          index < 3 ? 'text-warning-500' : 'text-success-500'
                         )}>
                           {index < 3 ? '直接影响' : '间接影响'}
                         </span>
-                        <span className="text-[10px] text-[#9ba4b3]">
+                        <span className="text-[10px] text-dark-text-tertiary">
                           深度 {index + 1}
                         </span>
                       </div>
@@ -1468,19 +1468,19 @@ export default function LineageCanvasPage() {
               </div>
 
               {/* 影响摘要 */}
-              <div className="mt-4 p-3 rounded-md bg-[#f8f9fb] border border-[#e8ecf1]">
+              <div className="mt-4 p-3 rounded-md bg-dark-page border border-dark-border">
                 <div className="flex items-start gap-2">
-                  <Info size={14} className="text-[#3b82f6] shrink-0 mt-0.5" />
-                  <div className="text-[12px] text-[#6b7789]">
-                    <p>共影响 <strong className="text-[#2d3748]">{nodes.length}</strong> 个指标节点</p>
-                    <p className="mt-0.5">其中直接影响 <strong className="text-[#f59e0b]">3</strong> 个，间接影响 <strong className="text-[#10b981]">3</strong> 个</p>
+                  <Info size={14} className="text-info-500 shrink-0 mt-0.5" />
+                  <div className="text-[12px] text-dark-text-secondary">
+                    <p>共影响 <strong className="text-dark-text-primary">{nodes.length}</strong> 个指标节点</p>
+                    <p className="mt-0.5">其中直接影响 <strong className="text-warning-500">3</strong> 个，间接影响 <strong className="text-success-500">3</strong> 个</p>
                   </div>
                 </div>
               </div>
             </div>
 
             {/* 右侧简化画布 */}
-            <div className="flex-1 relative bg-[#f8f9fb] rounded-md overflow-hidden ml-4">
+            <div className="flex-1 relative bg-dark-page rounded-md overflow-hidden ml-4">
               <svg width="100%" height="100%" className="absolute inset-0">
                 <defs>
                   <pattern id="previewGrid" width="20" height="20" patternUnits="userSpaceOnUse">
@@ -1562,7 +1562,7 @@ export default function LineageCanvasPage() {
                   })}
                 </g>
               </svg>
-              <div className="absolute bottom-2 right-2 text-[10px] text-[#9ba4b3] bg-white/80 px-2 py-1 rounded">
+              <div className="absolute bottom-2 right-2 text-[10px] text-dark-text-tertiary bg-dark-elevated/80 px-2 py-1 rounded">
                 简化预览视图
               </div>
             </div>
@@ -1572,7 +1572,7 @@ export default function LineageCanvasPage() {
               关闭
             </Button>
             <Button
-              className="bg-[#3478f6] hover:bg-[#1d5ee0] text-white"
+              className="bg-dark-accent-primary hover:bg-dark-accent-primary-active text-white"
               onClick={() => {
                 setShowPreviewModal(false);
                 toast.success('已发布到图谱');

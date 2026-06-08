@@ -33,8 +33,8 @@ describe('Sidebar', () => {
 
       const link = screen.getByText('指标管理').closest('a');
       expect(link).toHaveClass('active');
-      // 业务部门的 active 样式包含 bg-[#eef4ff]
-      expect(link).toHaveClass('bg-[#eef4ff]');
+      // 业务部门的 active 样式包含 bg-dark-accent-primary/10
+      expect(link).toHaveClass('bg-dark-accent-primary/10');
     });
 
     it('当路由为旧路径 /indicator/create 时，没有业务部门菜单项被错误高亮', () => {
@@ -47,7 +47,7 @@ describe('Sidebar', () => {
       // 更直接：检查业务部门下的所有链接都不带 active 背景色
       const indicatorLink = screen.getByText('指标管理').closest('a');
       expect(indicatorLink).not.toHaveClass('active');
-      expect(indicatorLink).not.toHaveClass('bg-[#eef4ff]');
+      expect(indicatorLink).not.toHaveClass('bg-dark-accent-primary/10');
     });
 
     it('当路由为旧路径 /indicator/edit/1 时，没有业务部门菜单项被错误高亮', () => {
@@ -55,7 +55,7 @@ describe('Sidebar', () => {
 
       const indicatorLink = screen.getByText('指标管理').closest('a');
       expect(indicatorLink).not.toHaveClass('active');
-      expect(indicatorLink).not.toHaveClass('bg-[#eef4ff]');
+      expect(indicatorLink).not.toHaveClass('bg-dark-accent-primary/10');
     });
   });
 });

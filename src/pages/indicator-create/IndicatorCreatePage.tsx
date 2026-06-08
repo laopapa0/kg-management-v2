@@ -104,19 +104,19 @@ function StepIndicator({ currentStep }: { currentStep: number }) {
             {index > 0 && (
               <div className={cn(
                 'w-8 h-[2px]',
-                isCompleted || isCurrent ? 'bg-[#10b981]' : 'bg-[#c4cad4]'
+                isCompleted || isCurrent ? 'bg-success-500' : 'bg-dark-text-tertiary'
               )} />
             )}
             <div className={cn(
               'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[13px] font-medium transition-colors',
-              isCompleted && 'bg-[#ecfdf5] text-[#059669]',
-              isCurrent && 'bg-[#eef4ff] text-[#3478f6]',
-              !isCompleted && !isCurrent && 'text-[#9ba4b3]'
+              isCompleted && 'bg-success-500/10 text-success-600',
+              isCurrent && 'bg-dark-accent-primary/10 text-dark-accent-primary',
+              !isCompleted && !isCurrent && 'text-dark-text-tertiary'
             )}>
               {isCompleted ? (
                 <CheckCircle size={14} />
               ) : (
-                <Circle size={14} className={cn(isCurrent ? 'text-[#3478f6]' : 'text-[#c4cad4]')} />
+                <Circle size={14} className={cn(isCurrent ? 'text-dark-accent-primary' : 'text-dark-text-tertiary')} />
               )}
               <span>{stepNum}. {label}</span>
             </div>
@@ -269,10 +269,10 @@ export default function IndicatorCreatePage() {
             <ChevronLeft size={14} className="mr-1" />
             返回
           </Button>
-          <h1 className="text-[28px] font-semibold text-[#1a202c] leading-tight">
+          <h1 className="text-[28px] font-semibold text-dark-text-primary leading-tight">
             新增对象实例（指标）
           </h1>
-          <p className="text-[13px] text-[#6b7789] mt-1">
+          <p className="text-[13px] text-dark-text-secondary mt-1">
             基于大屏指标创建图谱对象实例，完成基础信息、度量映射与维度映射配置
           </p>
         </div>
@@ -281,10 +281,10 @@ export default function IndicatorCreatePage() {
 
       {/* ── Section 2: 选择大屏指标 ── */}
       <motion.div {...fadeIn} className="mb-6">
-        <div className="bg-white rounded-lg border border-[#e8ecf1] shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
-          <div className="px-5 py-4 border-b border-[#e8ecf1]">
-            <h3 className="text-[16px] font-medium text-[#2d3748]">
-              <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-[#eef4ff] text-[#3478f6] text-[12px] font-semibold mr-2">1</span>
+        <div className="bg-dark-elevated rounded-lg border border-dark-border shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
+          <div className="px-5 py-4 border-b border-dark-border">
+            <h3 className="text-[16px] font-medium text-dark-text-primary">
+              <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-dark-accent-primary/10 text-dark-accent-primary text-[12px] font-semibold mr-2">1</span>
               选择大屏指标
             </h3>
           </div>
@@ -293,7 +293,7 @@ export default function IndicatorCreatePage() {
               {/* 大屏来源 */}
               <div className="grid grid-cols-2 gap-6">
                 <div>
-                  <Label className="text-[14px] font-medium text-[#2d3748]">
+                  <Label className="text-[14px] font-medium text-dark-text-primary">
                     大屏来源
                   </Label>
                   <Select
@@ -313,8 +313,8 @@ export default function IndicatorCreatePage() {
 
                 {/* 指标搜索 */}
                 <div ref={searchRef} className="relative">
-                  <Label className="text-[14px] font-medium text-[#2d3748]">
-                    指标搜索 <span className="text-[#ef4444]">*</span>
+                  <Label className="text-[14px] font-medium text-dark-text-primary">
+                    指标搜索 <span className="text-error-500">*</span>
                   </Label>
                   <div className="mt-1.5">
                     <SearchInput
@@ -333,16 +333,16 @@ export default function IndicatorCreatePage() {
                         initial={{ opacity: 0, y: -4 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -4 }}
-                        className="absolute z-20 w-full mt-1 bg-white border border-[#e8ecf1] rounded-md shadow-lg overflow-hidden"
+                        className="absolute z-20 w-full mt-1 bg-dark-elevated border border-dark-border rounded-md shadow-lg overflow-hidden"
                       >
                         {filteredIndicators.map((ind) => (
                           <button
                             key={ind.code}
                             onClick={() => handleSelectIndicator(ind)}
-                            className="w-full flex items-center gap-3 px-4 py-3 hover:bg-[#f8f9fb] border-b border-[#e8ecf1] last:border-0 text-left transition-colors"
+                            className="w-full flex items-center gap-3 px-4 py-3 hover:bg-dark-page border-b border-dark-border last:border-0 text-left transition-colors"
                           >
-                            <span className="text-[12px] text-[#9ba4b3] font-mono">{ind.code}</span>
-                            <span className="text-[14px] text-[#2d3748] font-medium">{ind.name}</span>
+                            <span className="text-[12px] text-dark-text-tertiary font-mono">{ind.code}</span>
+                            <span className="text-[14px] text-dark-text-primary font-medium">{ind.name}</span>
                             <StatusBadge text={ind.level1} type="primary" />
                           </button>
                         ))}
@@ -360,17 +360,17 @@ export default function IndicatorCreatePage() {
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.95 }}
                     transition={{ duration: 0.25 }}
-                    className="bg-[#eef4ff] border border-[#bcd3ff] rounded-lg p-4 flex items-center justify-between"
+                    className="bg-dark-accent-primary/10 border border-dark-accent-primary/30 rounded-lg p-4 flex items-center justify-between"
                   >
                     <div>
-                      <span className="text-[12px] text-[#3478f6] font-mono">{selectedIndicator.code}</span>
-                      <h4 className="text-[16px] font-medium text-[#154bc4] mt-0.5">{selectedIndicator.name}</h4>
+                      <span className="text-[12px] text-dark-accent-primary font-mono">{selectedIndicator.code}</span>
+                      <h4 className="text-[16px] font-medium text-dark-accent-primary-active mt-0.5">{selectedIndicator.name}</h4>
                       <StatusBadge text={selectedIndicator.level1} type="primary" className="mt-1" />
                     </div>
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="h-8 w-8 p-0 text-[#9ba4b3] hover:text-[#ef4444]"
+                      className="h-8 w-8 p-0 text-dark-text-tertiary hover:text-error-500"
                       onClick={handleClearIndicator}
                     >
                       <X size={16} />
@@ -380,7 +380,7 @@ export default function IndicatorCreatePage() {
               </AnimatePresence>
 
               {errors.indicatorCode && (
-                <p className="text-[12px] text-[#ef4444] mt-1">{errors.indicatorCode}</p>
+                <p className="text-[12px] text-error-500 mt-1">{errors.indicatorCode}</p>
               )}
             </div>
           </div>
@@ -397,13 +397,13 @@ export default function IndicatorCreatePage() {
             transition={{ duration: 0.3 }}
             className="mb-6"
           >
-            <div className="bg-white rounded-lg border border-[#e8ecf1] shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
-              <div className="px-5 py-4 border-b border-[#e8ecf1]">
-                <h3 className="text-[16px] font-medium text-[#2d3748]">
-                  <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-[#eef4ff] text-[#3478f6] text-[12px] font-semibold mr-2">2</span>
+            <div className="bg-dark-elevated rounded-lg border border-dark-border shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
+              <div className="px-5 py-4 border-b border-dark-border">
+                <h3 className="text-[16px] font-medium text-dark-text-primary">
+                  <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-dark-accent-primary/10 text-dark-accent-primary text-[12px] font-semibold mr-2">2</span>
                   基础信息映射
                 </h3>
-                <p className="text-[13px] text-[#6b7789] mt-1">
+                <p className="text-[13px] text-dark-text-secondary mt-1">
                   以下信息已从大屏指标自动带出，可根据需要编辑调整
                 </p>
               </div>
@@ -415,33 +415,33 @@ export default function IndicatorCreatePage() {
               >
                 {/* 左列 */}
                 <motion.div variants={staggerItem}>
-                  <Label className="text-[14px] font-medium text-[#2d3748]">
-                    指标名称 <span className="text-[#ef4444]">*</span>
+                  <Label className="text-[14px] font-medium text-dark-text-primary">
+                    指标名称 <span className="text-error-500">*</span>
                   </Label>
                   <Input
                     value={formData.indicatorName}
                     onChange={(e) => updateField('indicatorName', e.target.value)}
-                    className={cn('mt-1.5 h-9', errors.indicatorName && 'border-[#ef4444] ring-2 ring-[#fef2f2]')}
+                    className={cn('mt-1.5 h-9', errors.indicatorName && 'border-error-500 ring-2 ring-[#fef2f2]')}
                   />
                   {errors.indicatorName && (
-                    <p className="text-[12px] text-[#ef4444] mt-1">{errors.indicatorName}</p>
+                    <p className="text-[12px] text-error-500 mt-1">{errors.indicatorName}</p>
                   )}
                 </motion.div>
 
                 <motion.div variants={staggerItem}>
-                  <Label className="text-[14px] font-medium text-[#2d3748]">指标编码</Label>
+                  <Label className="text-[14px] font-medium text-dark-text-primary">指标编码</Label>
                   <Input
                     value={formData.indicatorCode}
                     disabled
-                    className="mt-1.5 h-9 bg-[#f1f3f6] text-[#9ba4b3] cursor-not-allowed"
+                    className="mt-1.5 h-9 bg-dark-card-l2 text-dark-text-tertiary cursor-not-allowed"
                   />
                 </motion.div>
 
                 <motion.div variants={staggerItem} className="col-span-2">
-                  <Label className="text-[14px] font-medium text-[#2d3748]">
-                    对象类型属性 <span className="text-[#ef4444]">*</span>
+                  <Label className="text-[14px] font-medium text-dark-text-primary">
+                    对象类型属性 <span className="text-error-500">*</span>
                   </Label>
-                  <div className={cn('mt-1.5 rounded-lg border border-[#e8ecf1] p-3', (errors.level1 || errors.level2 || errors.granularity) && 'border-[#ef4444] ring-2 ring-[#fef2f2]')}>
+                  <div className={cn('mt-1.5 rounded-lg border border-dark-border p-3', (errors.level1 || errors.level2 || errors.granularity) && 'border-error-500 ring-2 ring-[#fef2f2]')}>
                     <ObjectTypePropertyPanel
                       fieldKeys={['level1', 'level2', 'granularity']}
                       values={{
@@ -458,7 +458,7 @@ export default function IndicatorCreatePage() {
                     />
                   </div>
                   {(errors.level1 || errors.level2 || errors.granularity) && (
-                    <p className="text-[12px] text-[#ef4444] mt-1">
+                    <p className="text-[12px] text-error-500 mt-1">
                       {errors.level1 || errors.level2 || errors.granularity}
                     </p>
                   )}
@@ -466,7 +466,7 @@ export default function IndicatorCreatePage() {
 
                 {/* 业务口径 - 跨两列 */}
                 <motion.div variants={staggerItem} className="col-span-2">
-                  <Label className="text-[14px] font-medium text-[#2d3748]">业务口径</Label>
+                  <Label className="text-[14px] font-medium text-dark-text-primary">业务口径</Label>
                   <Textarea
                     value={formData.businessCaliber}
                     onChange={(e) => updateField('businessCaliber', e.target.value)}
@@ -476,7 +476,7 @@ export default function IndicatorCreatePage() {
                 </motion.div>
 
                 <motion.div variants={staggerItem}>
-                  <Label className="text-[14px] font-medium text-[#2d3748]">计算方式</Label>
+                  <Label className="text-[14px] font-medium text-dark-text-primary">计算方式</Label>
                   <Select
                     value={formData.calcMethod}
                     onValueChange={(v) => updateField('calcMethod', v)}
@@ -493,7 +493,7 @@ export default function IndicatorCreatePage() {
                 </motion.div>
 
                 <motion.div variants={staggerItem}>
-                  <Label className="text-[14px] font-medium text-[#2d3748]">计量单位</Label>
+                  <Label className="text-[14px] font-medium text-dark-text-primary">计量单位</Label>
                   <Select
                     value={formData.unit}
                     onValueChange={(v) => updateField('unit', v)}
@@ -510,7 +510,7 @@ export default function IndicatorCreatePage() {
                 </motion.div>
 
                 <motion.div variants={staggerItem}>
-                  <Label className="text-[14px] font-medium text-[#2d3748]">更新频率</Label>
+                  <Label className="text-[14px] font-medium text-dark-text-primary">更新频率</Label>
                   <Select
                     value={formData.frequency}
                     onValueChange={(v) => updateField('frequency', v)}
@@ -541,45 +541,45 @@ export default function IndicatorCreatePage() {
             transition={{ duration: 0.3, delay: 0.05 }}
             className="mb-6"
           >
-            <div className="bg-white rounded-lg border border-[#e8ecf1] shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
-              <div className="px-5 py-4 border-b border-[#e8ecf1] flex items-center justify-between">
-                <h3 className="text-[16px] font-medium text-[#2d3748]">详细描述（可选）</h3>
+            <div className="bg-dark-elevated rounded-lg border border-dark-border shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
+              <div className="px-5 py-4 border-b border-dark-border flex items-center justify-between">
+                <h3 className="text-[16px] font-medium text-dark-text-primary">详细描述（可选）</h3>
                 <StatusBadge text="可选" type="default" />
               </div>
               <div className="p-5 space-y-4">
                 <div>
-                  <Label className="text-[14px] font-medium text-[#2d3748]">适用范围</Label>
+                  <Label className="text-[14px] font-medium text-dark-text-primary">适用范围</Label>
                   <Textarea
                     value={formData.descriptionScope}
                     onChange={(e) => updateField('descriptionScope', e.target.value)}
                     placeholder="描述该指标适用的业务范围、部门、产品线..."
                     className="mt-1.5 min-h-[80px]"
                   />
-                  <p className="text-[12px] text-[#9ba4b3] mt-1">
+                  <p className="text-[12px] text-dark-text-tertiary mt-1">
                     示例：适用于全网5G业务发展监控，涵盖个人用户及家庭用户
                   </p>
                 </div>
                 <div>
-                  <Label className="text-[14px] font-medium text-[#2d3748]">核心特征</Label>
+                  <Label className="text-[14px] font-medium text-dark-text-primary">核心特征</Label>
                   <Textarea
                     value={formData.descriptionFeatures}
                     onChange={(e) => updateField('descriptionFeatures', e.target.value)}
                     placeholder="描述该指标的核心特征、关键影响因素..."
                     className="mt-1.5 min-h-[80px]"
                   />
-                  <p className="text-[12px] text-[#9ba4b3] mt-1">
+                  <p className="text-[12px] text-dark-text-tertiary mt-1">
                     示例：反映5G网络用户渗透程度，受终端价格、网络覆盖、套餐资费等因素影响
                   </p>
                 </div>
                 <div>
-                  <Label className="text-[14px] font-medium text-[#2d3748]">业务含义</Label>
+                  <Label className="text-[14px] font-medium text-dark-text-primary">业务含义</Label>
                   <Textarea
                     value={formData.descriptionMeaning}
                     onChange={(e) => updateField('descriptionMeaning', e.target.value)}
                     placeholder="描述该指标的业务含义、决策参考价值..."
                     className="mt-1.5 min-h-[80px]"
                   />
-                  <p className="text-[12px] text-[#9ba4b3] mt-1">
+                  <p className="text-[12px] text-dark-text-tertiary mt-1">
                     示例：衡量5G业务普及程度的核心指标，用于评估市场发展策略效果
                   </p>
                 </div>
@@ -599,20 +599,20 @@ export default function IndicatorCreatePage() {
             transition={{ duration: 0.3, delay: 0.08 }}
             className="mb-6"
           >
-            <div className="bg-white rounded-lg border border-[#e8ecf1] shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
-              <div className="px-5 py-4 border-b border-[#e8ecf1]">
-                <h3 className="text-[16px] font-medium text-[#2d3748]">
-                  <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-[#eef4ff] text-[#3478f6] text-[12px] font-semibold mr-2">2.5</span>
+            <div className="bg-dark-elevated rounded-lg border border-dark-border shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
+              <div className="px-5 py-4 border-b border-dark-border">
+                <h3 className="text-[16px] font-medium text-dark-text-primary">
+                  <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-dark-accent-primary/10 text-dark-accent-primary text-[12px] font-semibold mr-2">2.5</span>
                   数据源映射
                 </h3>
-                <p className="text-[13px] text-[#6b7789] mt-1">
+                <p className="text-[13px] text-dark-text-secondary mt-1">
                   绑定真实数据库表，后续自动同步数据，无需手动导入
                 </p>
               </div>
               <div className="p-5 grid grid-cols-2 gap-6">
                 {/* 数据源选择 */}
                 <div>
-                  <Label className="text-[14px] font-medium text-[#2d3748]">数据源选择</Label>
+                  <Label className="text-[14px] font-medium text-dark-text-primary">数据源选择</Label>
                   <Select>
                     <SelectTrigger className="mt-1.5 h-9">
                       <SelectValue placeholder="请选择数据源" />
@@ -624,13 +624,13 @@ export default function IndicatorCreatePage() {
                       <SelectItem value="clickhouse_rt">ClickHouse 实时库</SelectItem>
                     </SelectContent>
                   </Select>
-                  <p className="text-[12px] text-[#9ba4b3] mt-1">
+                  <p className="text-[12px] text-dark-text-tertiary mt-1">
                     还没有已配置的数据源？请先到平台维护中新增数据源
                   </p>
                 </div>
                 {/* 数据表选择 */}
                 <div>
-                  <Label className="text-[14px] font-medium text-[#2d3748]">数据表选择</Label>
+                  <Label className="text-[14px] font-medium text-dark-text-primary">数据表选择</Label>
                   <Select>
                     <SelectTrigger className="mt-1.5 h-9">
                       <SelectValue placeholder="请先选择数据源" />
@@ -640,7 +640,7 @@ export default function IndicatorCreatePage() {
                       <SelectItem value="dws_5g_user_monthly">dws_5g_user_monthly</SelectItem>
                     </SelectContent>
                   </Select>
-                  <p className="text-[12px] text-[#9ba4b3] mt-1">
+                  <p className="text-[12px] text-dark-text-tertiary mt-1">
                     完成数据源选择后，将基于当前数据库读取真实表结构
                   </p>
                 </div>
@@ -660,23 +660,23 @@ export default function IndicatorCreatePage() {
             transition={{ duration: 0.3, delay: 0.1 }}
             className="mb-6"
           >
-            <div className="bg-white rounded-lg border border-[#e8ecf1] shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
-              <div className="px-5 py-4 border-b border-[#e8ecf1] flex items-center justify-between">
-                <h3 className="text-[16px] font-medium text-[#2d3748]">度量映射（可选）</h3>
+            <div className="bg-dark-elevated rounded-lg border border-dark-border shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
+              <div className="px-5 py-4 border-b border-dark-border flex items-center justify-between">
+                <h3 className="text-[16px] font-medium text-dark-text-primary">度量映射（可选）</h3>
                 <div className="flex items-center gap-2">
-                  <span className="text-[12px] text-[#9ba4b3]">定义指标计算方式</span>
+                  <span className="text-[12px] text-dark-text-tertiary">定义指标计算方式</span>
                   <StatusBadge text="可选" type="default" />
                 </div>
               </div>
               <div className="p-5 grid grid-cols-2 gap-6">
                 {/* 左卡片：指标间计算关系 */}
-                <div className="border border-[#e8ecf1] rounded-lg p-4">
-                  <h4 className="text-[15px] font-medium text-[#2d3748] mb-1">指标间计算关系（可选填）</h4>
-                  <p className="text-[12px] text-[#9ba4b3] mb-4">
+                <div className="border border-dark-border rounded-lg p-4">
+                  <h4 className="text-[15px] font-medium text-dark-text-primary mb-1">指标间计算关系（可选填）</h4>
+                  <p className="text-[12px] text-dark-text-tertiary mb-4">
                     该指标通过图谱中已有指标计算得出
                   </p>
                   <div>
-                    <Label className="text-[14px] font-medium text-[#2d3748]">聚合函数</Label>
+                    <Label className="text-[14px] font-medium text-dark-text-primary">聚合函数</Label>
                     <Select
                       value={formData.aggregateFunction}
                       onValueChange={(v) => updateField('aggregateFunction', v)}
@@ -692,11 +692,11 @@ export default function IndicatorCreatePage() {
                     </Select>
                   </div>
                   <div className="mt-4">
-                    <Label className="text-[14px] font-medium text-[#2d3748] flex items-center gap-1">
+                    <Label className="text-[14px] font-medium text-dark-text-primary flex items-center gap-1">
                       自定义表达式
                       <span className="relative group">
-                        <HelpCircle size={14} className="text-[#9ba4b3] cursor-help" />
-                        <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block w-48 p-2 bg-[#1a202c] text-white text-[12px] rounded-md z-50">
+                        <HelpCircle size={14} className="text-dark-text-tertiary cursor-help" />
+                        <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block w-48 p-2 bg-dark-text-primary text-white text-[12px] rounded-md z-50">
                           支持 SQL 风格表达式，可引用其他指标
                         </span>
                       </span>
@@ -711,26 +711,26 @@ export default function IndicatorCreatePage() {
                 </div>
 
                 {/* 右卡片：大数据溯源 */}
-                <div className="border border-[#e8ecf1] rounded-lg p-4">
-                  <h4 className="text-[15px] font-medium text-[#2d3748] mb-1">大数据溯源（可选填）</h4>
-                  <p className="text-[12px] text-[#9ba4b3] mb-4">
+                <div className="border border-dark-border rounded-lg p-4">
+                  <h4 className="text-[15px] font-medium text-dark-text-primary mb-1">大数据溯源（可选填）</h4>
+                  <p className="text-[12px] text-dark-text-tertiary mb-4">
                     该指标独立存在，直接从大数据表通过 SQL 查询得出
                   </p>
                   <div>
-                    <Label className="text-[14px] font-medium text-[#2d3748]">数据源表名</Label>
+                    <Label className="text-[14px] font-medium text-dark-text-primary">数据源表名</Label>
                     <Input
                       placeholder="如: dwd_5g_user_indicator"
                       className="mt-1.5 h-9 font-mono text-[13px]"
                     />
-                    <p className="text-[12px] text-[#9ba4b3] mt-1">示例: dwd_5g_user_indicator</p>
+                    <p className="text-[12px] text-dark-text-tertiary mt-1">示例: dwd_5g_user_indicator</p>
                   </div>
                   <div className="mt-4">
-                    <Label className="text-[14px] font-medium text-[#2d3748]">SQL 语句</Label>
+                    <Label className="text-[14px] font-medium text-dark-text-primary">SQL 语句</Label>
                     <Textarea
                       placeholder="SELECT COUNT(DISTINCT user_id) / total_users AS penetration_rate FROM dwd_5g_user WHERE month = '2024-05'"
                       className="mt-1.5 font-mono text-[13px] min-h-[100px]"
                     />
-                    <p className="text-[12px] text-[#9ba4b3] mt-1">为 LLM 提供指标溯源信息，帮助 AI 理解指标来源</p>
+                    <p className="text-[12px] text-dark-text-tertiary mt-1">为 LLM 提供指标溯源信息，帮助 AI 理解指标来源</p>
                   </div>
                 </div>
               </div>
@@ -749,16 +749,16 @@ export default function IndicatorCreatePage() {
             transition={{ duration: 0.3, delay: 0.15 }}
             className="mb-6"
           >
-            <div className="bg-white rounded-lg border border-[#e8ecf1] shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
-              <div className="px-5 py-4 border-b border-[#e8ecf1] flex items-center justify-between">
-                <h3 className="text-[16px] font-medium text-[#2d3748]">维度映射（可选）</h3>
+            <div className="bg-dark-elevated rounded-lg border border-dark-border shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
+              <div className="px-5 py-4 border-b border-dark-border flex items-center justify-between">
+                <h3 className="text-[16px] font-medium text-dark-text-primary">维度映射（可选）</h3>
                 <div className="flex items-center gap-2">
-                  <span className="text-[12px] text-[#9ba4b3]">定义按什么维度拆分指标</span>
+                  <span className="text-[12px] text-dark-text-tertiary">定义按什么维度拆分指标</span>
                   <StatusBadge text="可选" type="default" />
                 </div>
               </div>
               <div className="p-5">
-                <Label className="text-[14px] font-medium text-[#2d3748]">维度字段多选</Label>
+                <Label className="text-[14px] font-medium text-dark-text-primary">维度字段多选</Label>
                 <div className="mt-2 flex flex-wrap gap-2">
                   {dimensionOptions.map((dim) => {
                     const isSelected = (formData.dimensions || []).includes(dim);
@@ -770,8 +770,8 @@ export default function IndicatorCreatePage() {
                         className={cn(
                           'px-3 py-1.5 rounded-md text-[13px] font-medium border transition-colors',
                           isSelected
-                            ? 'bg-[#eef4ff] border-[#3478f6] text-[#3478f6]'
-                            : 'bg-white border-[#dde1e8] text-[#4a5568] hover:border-[#9ba4b3]'
+                            ? 'bg-dark-accent-primary/10 border-dark-accent-primary text-dark-accent-primary'
+                            : 'bg-dark-elevated border-dark-border-hover text-dark-text-secondary hover:border-dark-text-tertiary'
                         )}
                       >
                         {isSelected && <CheckCircle size={12} className="inline mr-1" />}
@@ -790,7 +790,7 @@ export default function IndicatorCreatePage() {
                       exit={{ opacity: 0, height: 0 }}
                       className="mt-4"
                     >
-                      <Label className="text-[13px] text-[#6b7789]">已选维度</Label>
+                      <Label className="text-[13px] text-dark-text-secondary">已选维度</Label>
                       <div className="mt-2 flex flex-wrap gap-2">
                         {(formData.dimensions || []).map((dim) => (
                           <motion.span
@@ -798,12 +798,12 @@ export default function IndicatorCreatePage() {
                             initial={{ opacity: 0, scale: 0.8 }}
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.8 }}
-                            className="inline-flex items-center gap-1 px-2.5 py-1 bg-[#eef4ff] text-[#3478f6] text-[12px] font-medium rounded"
+                            className="inline-flex items-center gap-1 px-2.5 py-1 bg-dark-accent-primary/10 text-dark-accent-primary text-[12px] font-medium rounded"
                           >
                             {dim}
                             <button
                               onClick={() => handleDimensionToggle(dim)}
-                              className="ml-0.5 hover:text-[#dc2626] transition-colors"
+                              className="ml-0.5 hover:text-error-600 transition-colors"
                             >
                               <X size={12} />
                             </button>
@@ -814,23 +814,23 @@ export default function IndicatorCreatePage() {
                   )}
                 </AnimatePresence>
 
-                <p className="text-[12px] text-[#9ba4b3] mt-4">
+                <p className="text-[12px] text-dark-text-tertiary mt-4">
                   支持多维度组合分析，后续可扩展引用知识库中的业务维度定义
                 </p>
 
                 {/* 业务知识关联（预留） */}
-                <div className="mt-6 pt-6 border-t border-[#e8ecf1]">
-                  <h4 className="text-[15px] font-medium text-[#2d3748] mb-1">业务知识关联（预留）</h4>
-                  <p className="text-[12px] text-[#9ba4b3] mb-4">
+                <div className="mt-6 pt-6 border-t border-dark-border">
+                  <h4 className="text-[15px] font-medium text-dark-text-primary mb-1">业务知识关联（预留）</h4>
+                  <p className="text-[12px] text-dark-text-tertiary mb-4">
                     后续将支持关联业务知识库条目，描述指标的业务口径含义（如套餐指标 = WiFi指标 + 宽带指标 + 流量指标）
                   </p>
                   <div className="grid grid-cols-2 gap-6 opacity-50">
                     <div>
-                      <Label className="text-[14px] font-medium text-[#2d3748]">知识库条目搜索</Label>
+                      <Label className="text-[14px] font-medium text-dark-text-primary">知识库条目搜索</Label>
                       <Input disabled placeholder="功能开发中" className="mt-1.5 h-9" />
                     </div>
                     <div>
-                      <Label className="text-[14px] font-medium text-[#2d3748]">知识库条目多选</Label>
+                      <Label className="text-[14px] font-medium text-dark-text-primary">知识库条目多选</Label>
                       <Input disabled placeholder="功能开发中" className="mt-1.5 h-9" />
                     </div>
                   </div>
@@ -848,7 +848,7 @@ export default function IndicatorCreatePage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: 0.2 }}
-            className="fixed bottom-0 left-0 right-0 bg-white border-t border-[#e8ecf1] px-6 py-4 z-30 flex items-center justify-between"
+            className="fixed bottom-0 left-0 right-0 bg-dark-elevated border-t border-dark-border px-6 py-4 z-30 flex items-center justify-between"
             style={{ marginLeft: 240 }}
           >
             <Button
@@ -867,7 +867,7 @@ export default function IndicatorCreatePage() {
                 取消
               </Button>
               <Button
-                className="h-10 px-6 text-[14px] bg-[#3478f6] hover:bg-[#1d5ee0] text-white"
+                className="h-10 px-6 text-[14px] bg-dark-accent-primary hover:bg-dark-accent-primary-active text-white"
                 onClick={handleSubmit}
               >
                 提交 NOC 审核
@@ -883,7 +883,7 @@ export default function IndicatorCreatePage() {
         <DialogContent className="sm:max-w-[480px]">
           <DialogHeader>
             <DialogTitle className="text-[18px]">确认提交审核？</DialogTitle>
-            <DialogDescription className="text-[14px] text-[#6b7789] mt-2">
+            <DialogDescription className="text-[14px] text-dark-text-secondary mt-2">
               提交后，NOC 将对该指标进行审核。审核期间不可修改。是否继续？
             </DialogDescription>
           </DialogHeader>
@@ -892,7 +892,7 @@ export default function IndicatorCreatePage() {
               取消
             </Button>
             <Button
-              className="bg-[#3478f6] hover:bg-[#1d5ee0] text-white"
+              className="bg-dark-accent-primary hover:bg-dark-accent-primary-active text-white"
               onClick={handleConfirmSubmit}
             >
               确认提交

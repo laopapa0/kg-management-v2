@@ -2,11 +2,16 @@ import { describe, it, expect } from 'vitest';
 import fs from 'node:fs';
 import path from 'node:path';
 
-function parseCssVariables(css: string): Record<string, string> {
+function parseCssVariables(css: string, selector: string): Record<string, string> {
   const vars: Record<string, string> = {};
+  const startIdx = css.indexOf(selector);
+  if (startIdx === -1) return vars;
+  const blockStart = css.indexOf('{', startIdx);
+  const blockEnd = css.indexOf('}', blockStart);
+  const block = css.slice(blockStart + 1, blockEnd);
   const regex = /(--dark-[\w-]+):\s*([^;]+);/g;
   let match;
-  while ((match = regex.exec(css)) !== null) {
+  while ((match = regex.exec(block)) !== null) {
     vars[match[1]] = match[2].trim();
   }
   return vars;
@@ -15,7 +20,7 @@ function parseCssVariables(css: string): Record<string, string> {
 describe('dark-theme.css variable values', () => {
   const cssPath = path.resolve(__dirname, 'dark-theme.css');
   const css = fs.readFileSync(cssPath, 'utf-8');
-  const vars = parseCssVariables(css);
+  const vars = parseCssVariables(css, '[data-theme="dark"]');
 
   it('--dark-bg-page 为 #0F141F', () => {
     expect(vars['--dark-bg-page']).toBe('#0F141F');

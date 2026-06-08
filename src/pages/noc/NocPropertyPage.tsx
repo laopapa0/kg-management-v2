@@ -294,7 +294,7 @@ export default function NocPropertyPage() {
       width: 'w-10',
       align: 'center',
       render: (record) => (
-        <button onClick={() => toggleExpand(record.id)} className="text-[#9ba4b3] hover:text-[#6b7789] transition-colors">
+        <button onClick={() => toggleExpand(record.id)} className="text-dark-text-tertiary hover:text-dark-text-secondary transition-colors">
           {expandedId === record.id ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
         </button>
       ),
@@ -307,7 +307,7 @@ export default function NocPropertyPage() {
       width: 'w-24',
       align: 'center',
       render: (record) => (
-        <span className="inline-flex items-center px-2 py-0.5 rounded text-[12px] font-medium bg-[#f1f3f6] text-[#4a5568]">
+        <span className="inline-flex items-center px-2 py-0.5 rounded text-[12px] font-medium bg-dark-card-l2 text-dark-text-secondary">
           {record.type}
         </span>
       ),
@@ -318,11 +318,11 @@ export default function NocPropertyPage() {
       width: 'w-24',
       align: 'center',
       render: (record) => record.isPrimary ? (
-        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[12px] font-medium bg-[#ecfdf5] text-[#059669]">
+        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[12px] font-medium bg-success-500/10 text-success-600">
           <KeyRound size={10} /> 是
         </span>
       ) : (
-        <span className="text-[#9ba4b3] text-[12px]">—</span>
+        <span className="text-dark-text-tertiary text-[12px]">—</span>
       ),
     },
     {
@@ -331,11 +331,11 @@ export default function NocPropertyPage() {
       width: 'w-24',
       align: 'center',
       render: (record) => record.isTitle ? (
-        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[12px] font-medium bg-[#eef4ff] text-[#3478f6]">
+        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[12px] font-medium bg-dark-accent-primary/10 text-dark-accent-primary">
           <Type size={10} /> 是
         </span>
       ) : (
-        <span className="text-[#9ba4b3] text-[12px]">—</span>
+        <span className="text-dark-text-tertiary text-[12px]">—</span>
       ),
     },
     { key: 'description', title: '描述' },
@@ -347,7 +347,7 @@ export default function NocPropertyPage() {
       render: (record) => (
         <span className={cn(
           'inline-flex items-center justify-center w-7 h-7 rounded-full text-[12px] font-medium',
-          record.referencedCount >= 10 ? 'bg-[#f3f0ff] text-[#7c5cfc]' : 'bg-[#f1f3f6] text-[#6b7789]'
+          record.referencedCount >= 10 ? 'bg-[var(--accent-noc)]/10 text-[var(--accent-noc)]' : 'bg-dark-card-l2 text-dark-text-secondary'
         )}>
           {record.referencedCount}
         </span>
@@ -362,7 +362,7 @@ export default function NocPropertyPage() {
           <Button variant="ghost" size="sm" className="h-7 px-2 text-[12px]" onClick={() => openEdit(record)}>
             <Pencil size={12} className="mr-1" />编辑
           </Button>
-          <Button variant="ghost" size="sm" className="h-7 px-2 text-[12px] text-[#ef4444] hover:text-[#dc2626]" onClick={() => openDelete(record)}>
+          <Button variant="ghost" size="sm" className="h-7 px-2 text-[12px] text-error-500 hover:text-error-600" onClick={() => openDelete(record)}>
             <Trash2 size={12} className="mr-1" />删除
           </Button>
         </div>
@@ -382,7 +382,7 @@ export default function NocPropertyPage() {
       render: (record) => (
         <span className={cn(
           'inline-flex items-center px-2 py-0.5 rounded text-[12px] font-medium',
-          record.isRequired ? 'bg-[#fef2f2] text-[#ef4444]' : 'bg-[#f1f3f6] text-[#9ba4b3]'
+          record.isRequired ? 'bg-error-500/10 text-error-500' : 'bg-dark-card-l2 text-dark-text-tertiary'
         )}>
           {record.isRequired ? '必挂' : '可选'}
         </span>
@@ -394,7 +394,7 @@ export default function NocPropertyPage() {
       title: '操作',
       width: 'w-24',
       render: () => (
-        <Button variant="ghost" size="sm" className="h-7 px-2 text-[12px] text-[#ef4444] hover:text-[#dc2626]">
+        <Button variant="ghost" size="sm" className="h-7 px-2 text-[12px] text-error-500 hover:text-error-600">
           解除关联
         </Button>
       ),
@@ -407,18 +407,18 @@ export default function NocPropertyPage() {
       <div className="flex items-center justify-between mb-5">
         <div>
           <h1 className="text-display">属性管理</h1>
-          <p className="text-small text-[#6b7789] mt-1">维护指标对象的属性定义，管理属性中英文名称、数据类型与映射关系</p>
+          <p className="text-small text-dark-text-secondary mt-1">维护指标对象的属性定义，管理属性中英文名称、数据类型与映射关系</p>
         </div>
         <div className="flex items-center gap-2">
-          <Button className="h-9 bg-[#7c5cfc] hover:bg-[#6b4ce0] text-white" onClick={openAdd}>
+          <Button className="h-9 bg-[var(--accent-noc)] hover:bg-[var(--accent-noc)] text-white" onClick={openAdd}>
             <Plus size={16} className="mr-1" />
             新增属性
           </Button>
-          <Button variant="outline" className="h-9 border-[#dde1e8] text-[#4a5568]">
+          <Button variant="outline" className="h-9 border-dark-border-hover text-dark-text-secondary">
             <Upload size={16} className="mr-1" />
             批量导入
           </Button>
-          <Button variant="outline" className="h-9 border-[#dde1e8] text-[#4a5568]">
+          <Button variant="outline" className="h-9 border-dark-border-hover text-dark-text-secondary">
             <Download size={16} className="mr-1" />
             导出
           </Button>
@@ -426,7 +426,7 @@ export default function NocPropertyPage() {
       </div>
 
       {/* 搜索过滤工具栏 */}
-      <div className="bg-white rounded-lg border border-[#e8ecf1] p-4 mb-4">
+      <div className="bg-dark-elevated rounded-lg border border-dark-border p-4 mb-4">
         <div className="flex items-center gap-3 flex-wrap">
           <SearchInput
             placeholder="搜索属性名称或编码"
@@ -435,7 +435,7 @@ export default function NocPropertyPage() {
             width="w-[280px]"
           />
           <div className="flex items-center gap-2">
-            <Label className="text-[12px] text-[#6b7789] whitespace-nowrap">字段类型</Label>
+            <Label className="text-[12px] text-dark-text-secondary whitespace-nowrap">字段类型</Label>
             <Select value={typeFilter} onValueChange={setTypeFilter}>
               <SelectTrigger className="h-9 w-32 text-[13px]">
                 <SelectValue />
@@ -446,7 +446,7 @@ export default function NocPropertyPage() {
             </Select>
           </div>
           <div className="flex items-center gap-2">
-            <Label className="text-[12px] text-[#6b7789] whitespace-nowrap">主键</Label>
+            <Label className="text-[12px] text-dark-text-secondary whitespace-nowrap">主键</Label>
             <Select value={primaryFilter} onValueChange={setPrimaryFilter}>
               <SelectTrigger className="h-9 w-28 text-[13px]">
                 <SelectValue />
@@ -459,7 +459,7 @@ export default function NocPropertyPage() {
             </Select>
           </div>
           <div className="flex items-center gap-2">
-            <Label className="text-[12px] text-[#6b7789] whitespace-nowrap">标题键</Label>
+            <Label className="text-[12px] text-dark-text-secondary whitespace-nowrap">标题键</Label>
             <Select value={titleFilter} onValueChange={setTitleFilter}>
               <SelectTrigger className="h-9 w-28 text-[13px]">
                 <SelectValue />
@@ -472,7 +472,7 @@ export default function NocPropertyPage() {
             </Select>
           </div>
           <div className="ml-auto">
-            <Button variant="ghost" size="sm" className="h-8 text-[12px] text-[#6b7789]" onClick={resetFilters}>
+            <Button variant="ghost" size="sm" className="h-8 text-[12px] text-dark-text-secondary" onClick={resetFilters}>
               <X size={12} className="mr-1" />重置过滤
             </Button>
           </div>
@@ -480,7 +480,7 @@ export default function NocPropertyPage() {
       </div>
 
       {/* 属性字典表格 */}
-      <div className="bg-white rounded-lg border border-[#e8ecf1]">
+      <div className="bg-dark-elevated rounded-lg border border-dark-border">
         <div className="p-5">
           <DataTable
             columns={mainColumns}
@@ -504,19 +504,19 @@ export default function NocPropertyPage() {
               animate={{ height: 'auto', opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
               transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] }}
-              className="overflow-hidden border-t border-[#e8ecf1] bg-[#f8f9fb]"
+              className="overflow-hidden border-t border-dark-border bg-dark-page"
             >
               <div className="p-5">
                 <div className="flex items-center gap-2 mb-3">
-                  <ChevronDown size={14} className="text-[#7c5cfc]" />
-                  <h3 className="text-[14px] font-medium text-[#2d3748]">
+                  <ChevronDown size={14} className="text-[var(--accent-noc)]" />
+                  <h3 className="text-[14px] font-medium text-dark-text-primary">
                     「{paginatedData.find((p) => p.id === expandedId)?.name}」被引用的对象类型
                   </h3>
-                  <span className="text-[12px] text-[#9ba4b3]">
+                  <span className="text-[12px] text-dark-text-tertiary">
                     (共 {getReferences(expandedId).length} 个)
                   </span>
                 </div>
-                <div className="bg-white rounded-lg border border-[#e8ecf1] overflow-hidden">
+                <div className="bg-dark-elevated rounded-lg border border-dark-border overflow-hidden">
                   <DataTable columns={refColumns} data={getReferences(expandedId)} rowKey="objectType" />
                 </div>
               </div>
@@ -534,10 +534,10 @@ export default function NocPropertyPage() {
           <div className="grid grid-cols-2 gap-x-6 gap-y-4 pt-2">
             <div>
               <Label>属性编码</Label>
-              <Input value={editingProp?.code || ''} disabled className="mt-1 bg-[#f1f3f6] text-[#9ba4b3]" placeholder="系统自动生成" />
+              <Input value={editingProp?.code || ''} disabled className="mt-1 bg-dark-card-l2 text-dark-text-tertiary" placeholder="系统自动生成" />
             </div>
             <div>
-              <Label>属性名称 <span className="text-[#ef4444]">*</span></Label>
+              <Label>属性名称 <span className="text-error-500">*</span></Label>
               <Input
                 value={propForm.name}
                 onChange={(e) => setPropForm({ ...propForm, name: e.target.value })}
@@ -546,7 +546,7 @@ export default function NocPropertyPage() {
               />
             </div>
             <div>
-              <Label>字段类型 <span className="text-[#ef4444]">*</span></Label>
+              <Label>字段类型 <span className="text-error-500">*</span></Label>
               <Select value={propForm.type} onValueChange={(v) => setPropForm({ ...propForm, type: v })}>
                 <SelectTrigger className="mt-1"><SelectValue placeholder="请选择" /></SelectTrigger>
                 <SelectContent>
@@ -570,7 +570,7 @@ export default function NocPropertyPage() {
                   checked={propForm.isPrimary}
                   onCheckedChange={(v) => setPropForm({ ...propForm, isPrimary: v })}
                 />
-                <span className={cn('text-[13px] font-medium', propForm.isPrimary ? 'text-[#059669]' : 'text-[#9ba4b3]')}>
+                <span className={cn('text-[13px] font-medium', propForm.isPrimary ? 'text-success-600' : 'text-dark-text-tertiary')}>
                   {propForm.isPrimary ? '✓ 是主键' : '否'}
                 </span>
               </div>
@@ -580,7 +580,7 @@ export default function NocPropertyPage() {
                   checked={propForm.isTitle}
                   onCheckedChange={(v) => setPropForm({ ...propForm, isTitle: v })}
                 />
-                <span className={cn('text-[13px] font-medium', propForm.isTitle ? 'text-[#3478f6]' : 'text-[#9ba4b3]')}>
+                <span className={cn('text-[13px] font-medium', propForm.isTitle ? 'text-dark-accent-primary' : 'text-dark-text-tertiary')}>
                   {propForm.isTitle ? '✓ 是标题键' : '否'}
                 </span>
               </div>
@@ -606,13 +606,13 @@ export default function NocPropertyPage() {
               />
             </div>
           </div>
-          <p className="text-[12px] text-[#9ba4b3] mt-3">
+          <p className="text-[12px] text-dark-text-tertiary mt-3">
             属性的修改将同步影响所有引用该属性的对象类型
           </p>
           <DialogFooter className="mt-4">
             <Button variant="outline" onClick={() => setPropModalOpen(false)}>取消</Button>
             <Button
-              className="bg-[#7c5cfc] hover:bg-[#6b4ce0] text-white"
+              className="bg-[var(--accent-noc)] hover:bg-[var(--accent-noc)] text-white"
               onClick={saveProperty}
               disabled={!propForm.name || !propForm.type}
             >
@@ -627,15 +627,15 @@ export default function NocPropertyPage() {
         <DialogContent className="max-w-[440px]">
           <DialogHeader>
             <DialogTitle className="text-h3 flex items-center gap-2">
-              <AlertTriangle size={18} className="text-[#f59e0b]" />
+              <AlertTriangle size={18} className="text-warning-500" />
               确认删除
             </DialogTitle>
-            <DialogDescription className="text-[13px] text-[#6b7789] pt-2">
+            <DialogDescription className="text-[13px] text-dark-text-secondary pt-2">
               {deletingProp && (
                 <>
-                  确定要删除属性「<span className="font-medium text-[#2d3748]">{deletingProp.name}</span>」吗？
+                  确定要删除属性「<span className="font-medium text-dark-text-primary">{deletingProp.name}</span>」吗？
                   {deletingProp.referencedCount > 0 && (
-                    <span className="block mt-2 text-[#ef4444]">
+                    <span className="block mt-2 text-error-500">
                       该属性被 {deletingProp.referencedCount} 个对象类型引用，删除将影响这些对象类型。
                     </span>
                   )}
@@ -645,7 +645,7 @@ export default function NocPropertyPage() {
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>取消</Button>
-            <Button className="bg-[#ef4444] hover:bg-[#dc2626] text-white" onClick={confirmDelete}>
+            <Button className="bg-error-500 hover:bg-error-600 text-white" onClick={confirmDelete}>
               确认删除
             </Button>
           </DialogFooter>

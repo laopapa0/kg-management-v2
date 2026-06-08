@@ -58,7 +58,7 @@ function TreeNodeView({
   if (node.nodeType === 'group') {
     return (
       <div>
-        <div className="text-[11px] text-[#9ba4b3] mb-1">{node.name}</div>
+        <div className="text-[11px] text-dark-text-tertiary mb-1">{node.name}</div>
         <div className="pl-2 space-y-0.5">
           {node.children.map((child) => (
             <TreeNodeView
@@ -81,8 +81,8 @@ function TreeNodeView({
       className={cn(
         'w-full text-left text-[13px] px-2 py-1 rounded transition-colors cursor-pointer',
         isSelected
-          ? 'bg-[#eef2ff] text-[#4f46e5] font-medium'
-          : 'text-[#1a202c] hover:bg-[#f8fafc]'
+          ? 'bg-[var(--accent-noc)]/10 text-[var(--accent-noc)] font-medium'
+          : 'text-dark-text-primary hover:bg-dark-page'
       )}
     >
       {node.name}
@@ -124,7 +124,7 @@ export default function ObjectTypePropertyPanel({
     <div className="flex gap-3">
       {/* 左侧：字段树 */}
       <div className="w-[180px] shrink-0">
-        <div className="text-[13px] font-medium text-[#1a202c] mb-2">对象类型属性</div>
+        <div className="text-[13px] font-medium text-dark-text-primary mb-2">对象类型属性</div>
         <div className="space-y-2">
           {tree.map((group) => (
             <TreeNodeView
@@ -141,7 +141,7 @@ export default function ObjectTypePropertyPanel({
       <div className="flex-1 min-w-0">
         {selectedField && enumOptions && enumOptions.length > 0 ? (
           <div>
-            <div className="text-[11px] text-[#9ba4b3] mb-1.5">
+            <div className="text-[11px] text-dark-text-tertiary mb-1.5">
               {fieldNameMap.get(selectedField) ?? selectedField}
             </div>
             <Select
@@ -151,7 +151,7 @@ export default function ObjectTypePropertyPanel({
               <SelectTrigger
                 className={cn(
                   'h-9 text-[13px]',
-                  errors?.[selectedField] && 'border-[#ef4444] ring-2 ring-[#fef2f2]'
+                  errors?.[selectedField] && 'border-error-500 ring-2 ring-[#fef2f2]'
                 )}
               >
                 <SelectValue placeholder={`请选择${fieldNameMap.get(selectedField) ?? ''}`} />
@@ -165,13 +165,13 @@ export default function ObjectTypePropertyPanel({
               </SelectContent>
             </Select>
             {errors?.[selectedField] && (
-              <p className="text-[12px] text-[#ef4444] mt-1">{errors[selectedField]}</p>
+              <p className="text-[12px] text-error-500 mt-1">{errors[selectedField]}</p>
             )}
           </div>
         ) : selectedField ? (
-          <div className="text-[13px] text-[#9ba4b3]">该字段暂无可选枚举值</div>
+          <div className="text-[13px] text-dark-text-tertiary">该字段暂无可选枚举值</div>
         ) : (
-          <div className="text-[13px] text-[#9ba4b3] pt-4">请从左侧选择一个字段</div>
+          <div className="text-[13px] text-dark-text-tertiary pt-4">请从左侧选择一个字段</div>
         )}
       </div>
     </div>

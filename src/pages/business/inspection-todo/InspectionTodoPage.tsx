@@ -86,9 +86,9 @@ export default function InspectionTodoPage() {
   }, [load, searchKeyword, statusFilter, timeFilter, refreshKey]);
 
 const STATUS_BADGE_CONFIG: Record<string, { text: string; className: string }> = {
-  pending: { text: '待评价', className: 'bg-[#f8f9fb] text-[#9ba4b3]' },
-  saved: { text: '已保存', className: 'bg-[#fffbeb] text-[#d97706]' },
-  submitted: { text: '已提交', className: 'bg-[#ecfdf5] text-[#059669]' },
+  pending: { text: '待评价', className: 'bg-dark-page text-dark-text-tertiary' },
+  saved: { text: '已保存', className: 'bg-warning-500/10 text-warning-600' },
+  submitted: { text: '已提交', className: 'bg-success-500/10 text-success-600' },
 };
 
 function getStatusBadge(status: string) {
@@ -105,13 +105,13 @@ function FilterButtonGroup<T extends string>({
   onChange: (value: T) => void;
 }) {
   return (
-    <div className="flex items-center gap-1 bg-[#f8f9fb] rounded-lg p-1">
+    <div className="flex items-center gap-1 bg-dark-page rounded-lg p-1">
       {options.map((opt) => (
         <button
           key={opt.value}
           onClick={() => onChange(opt.value)}
           className={`px-3 py-1.5 text-[13px] rounded-md font-medium transition-colors
-            ${value === opt.value ? 'bg-white text-[#1a202c] shadow-sm' : 'text-[#6b7789] hover:text-[#1a202c]'}`}
+            ${value === opt.value ? 'bg-dark-elevated text-dark-text-primary shadow-sm' : 'text-dark-text-secondary hover:text-dark-text-primary'}`}
         >
           {opt.label}
         </button>
@@ -122,7 +122,7 @@ function FilterButtonGroup<T extends string>({
 
   return (
     <div className="p-6">
-      <h1 className="text-[20px] font-semibold text-[#1a202c] mb-6">巡检待办</h1>
+      <h1 className="text-[20px] font-semibold text-dark-text-primary mb-6">巡检待办</h1>
 
       {/* 筛选栏 */}
       <div className="flex flex-wrap items-center gap-3 mb-4">
@@ -137,29 +137,29 @@ function FilterButtonGroup<T extends string>({
           onChange={setTimeFilter}
         />
         <div className="relative max-w-[280px]">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9ba4b3]" size={16} />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-dark-text-tertiary" size={16} />
           <input
             type="text"
             placeholder="搜索报告名称或巡检周期"
             value={searchKeyword}
             onChange={(e) => setSearchKeyword(e.target.value)}
-            className="w-full pl-9 pr-3 py-2 text-[13px] border border-[#e8ecf1] rounded-lg
-                       focus:outline-none focus:ring-1 focus:ring-[#3b82f6] focus:border-[#3b82f6]
-                       placeholder:text-[#9ba4b3]"
+            className="w-full pl-9 pr-3 py-2 text-[13px] border border-dark-border rounded-lg
+                       focus:outline-none focus:ring-1 focus:ring-dark-accent-primary focus:border-dark-accent-primary
+                       placeholder:text-dark-text-tertiary"
           />
         </div>
       </div>
 
-      <div className="bg-white rounded-lg border border-[#e8ecf1] overflow-hidden">
+      <div className="bg-dark-elevated rounded-lg border border-dark-border overflow-hidden">
         <table className="w-full text-[13px]">
           <thead>
-            <tr className="border-b border-[#e8ecf1] bg-[#f8f9fb]">
-              <th className="px-4 py-3 text-left font-medium text-[#6b7789]">报告名称</th>
-              <th className="px-4 py-3 text-left font-medium text-[#6b7789]">巡检周期</th>
-              <th className="px-4 py-3 text-right font-medium text-[#6b7789]">异常数</th>
-              <th className="px-4 py-3 text-right font-medium text-[#6b7789]">待评价数</th>
-              <th className="px-4 py-3 text-left font-medium text-[#6b7789]">状态</th>
-              <th className="px-4 py-3 text-left font-medium text-[#6b7789]">操作</th>
+            <tr className="border-b border-dark-border bg-dark-page">
+              <th className="px-4 py-3 text-left font-medium text-dark-text-secondary">报告名称</th>
+              <th className="px-4 py-3 text-left font-medium text-dark-text-secondary">巡检周期</th>
+              <th className="px-4 py-3 text-right font-medium text-dark-text-secondary">异常数</th>
+              <th className="px-4 py-3 text-right font-medium text-dark-text-secondary">待评价数</th>
+              <th className="px-4 py-3 text-left font-medium text-dark-text-secondary">状态</th>
+              <th className="px-4 py-3 text-left font-medium text-dark-text-secondary">操作</th>
             </tr>
           </thead>
           <tbody>
@@ -168,11 +168,11 @@ function FilterButtonGroup<T extends string>({
               const badge = getStatusBadge(reviewStatus);
 
               return (
-                <tr key={report.id} className="border-b border-[#f1f3f6] last:border-b-0">
-                  <td className="px-4 py-3 font-medium text-[#1a202c]">{report.name}</td>
-                  <td className="px-4 py-3 text-[#6b7789]">{report.overview.period}</td>
-                  <td className="px-4 py-3 text-right text-[#1a202c]">{report.overview.anomalyStats.total}</td>
-                  <td className="px-4 py-3 text-right text-[#1a202c]">
+                <tr key={report.id} className="border-b border-dark-border last:border-b-0">
+                  <td className="px-4 py-3 font-medium text-dark-text-primary">{report.name}</td>
+                  <td className="px-4 py-3 text-dark-text-secondary">{report.overview.period}</td>
+                  <td className="px-4 py-3 text-right text-dark-text-primary">{report.overview.anomalyStats.total}</td>
+                  <td className="px-4 py-3 text-right text-dark-text-primary">
                     {(report.businessReview?.totalCount ?? 0) - (report.businessReview?.evaluatedCount ?? 0)}
                   </td>
                   <td className="px-4 py-3">
@@ -184,8 +184,8 @@ function FilterButtonGroup<T extends string>({
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => setSelectedReportId(report.id)}
-                        className="text-[12px] px-2.5 py-1 rounded border border-[#e8ecf1] text-[#3b82f6]
-                                   hover:bg-[#f0f7ff] transition-colors"
+                        className="text-[12px] px-2.5 py-1 rounded border border-dark-border text-info-500
+                                   hover:bg-dark-accent-primary/10 transition-colors"
                       >
                         查看详情
                       </button>
@@ -196,8 +196,8 @@ function FilterButtonGroup<T extends string>({
                             submitReportEvaluation(report.id, draft, { clearDraft: clear });
                             setRefreshKey((k) => k + 1);
                           }}
-                          className="text-[12px] px-2.5 py-1 rounded bg-[#3b82f6] text-white
-                                     hover:bg-[#2563eb] transition-colors"
+                          className="text-[12px] px-2.5 py-1 rounded bg-dark-accent-primary text-white
+                                     hover:bg-dark-accent-primary transition-colors"
                         >
                           提交
                         </button>

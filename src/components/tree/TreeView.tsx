@@ -184,7 +184,7 @@ function TreeItem<T extends TreeNode>({
         className={[
           'group relative flex h-9 cursor-pointer items-center gap-1 py-2 px-3',
           'transition-colors', DURATION_CLASS.fast, 'ease-out',
-          isSelected ? 'bg-dark-tree-selected' : isHovered ? 'bg-white/[0.04]' : '',
+          isSelected ? 'bg-dark-tree-selected' : isHovered ? 'bg-dark-elevated/[0.04]' : '',
           isDropInside ? 'bg-dark-drop-highlight' : '',
         ].join(' ')}
         style={{ paddingLeft: `${depth * 20 + 12}px` }}
@@ -230,7 +230,7 @@ function TreeItem<T extends TreeNode>({
                 data-testid="tree-indent-guide"
                 className={[
                   'absolute top-0 bottom-0 w-px transition-opacity', DURATION_CLASS.fast,
-                  'bg-white/[0.06] group-hover:bg-white/[0.15]',
+                  'bg-dark-elevated/[0.06] group-hover:bg-dark-elevated/[0.15]',
                   showGuides ? 'opacity-100' : 'opacity-0',
                 ].join(' ')}
                 style={{ left: `${(i + 1) * 20 - 10}px` }}

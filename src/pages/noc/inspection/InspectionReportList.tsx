@@ -29,9 +29,9 @@ type ViewFilter = 'all' | 'current' | 'archived';
 
 function BusinessReviewBadge({ review }: { review: BusinessReview }) {
   const config: Record<string, { text: string; className: string }> = {
-    pending: { text: '待评价', className: 'bg-[#f8f9fb] text-[#9ba4b3]' },
-    saved: { text: '评价中', className: 'bg-[#fffbeb] text-[#d97706]' },
-    submitted: { text: '已反馈', className: 'bg-[#eef4ff] text-[#3478f6]' },
+    pending: { text: '待评价', className: 'bg-dark-page text-dark-text-tertiary' },
+    saved: { text: '评价中', className: 'bg-warning-500/10 text-warning-600' },
+    submitted: { text: '已反馈', className: 'bg-dark-accent-primary/10 text-dark-accent-primary' },
   };
   const { text, className } = config[review.status] || config.pending;
   return (
@@ -105,10 +105,10 @@ export default function InspectionReportList({
   return (
     <div className="space-y-4">
       {/* 筛选栏 */}
-      <div className="bg-white rounded-lg border border-[#e8ecf1] shadow-[0_1px_3px_rgba(0,0,0,0.06)] p-4 space-y-3">
+      <div className="bg-dark-elevated rounded-lg border border-dark-border shadow-[0_1px_3px_rgba(0,0,0,0.06)] p-4 space-y-3">
         {/* 视图筛选 */}
-        <div className="flex items-center gap-3 pb-3 border-b border-[#f1f3f6]">
-          <span className="text-[13px] text-[#6b7789] shrink-0">报告视图：</span>
+        <div className="flex items-center gap-3 pb-3 border-b border-dark-border">
+          <span className="text-[13px] text-dark-text-secondary shrink-0">报告视图：</span>
           <div className="flex gap-1.5">
             {[
               { value: 'all' as ViewFilter, label: '全部报告' },
@@ -120,8 +120,8 @@ export default function InspectionReportList({
                 onClick={() => setViewFilter(btn.value)}
                 className={`px-3 py-1.5 rounded text-[13px] transition-colors ${
                   viewFilter === btn.value
-                    ? 'bg-[#3478f6] text-white'
-                    : 'bg-[#f8f9fb] text-[#4a5568] hover:bg-[#eef4ff]'
+                    ? 'bg-dark-accent-primary text-white'
+                    : 'bg-dark-page text-dark-text-secondary hover:bg-dark-accent-primary/10'
                 }`}
               >
                 {btn.label}
@@ -132,7 +132,7 @@ export default function InspectionReportList({
 
         {/* 周期筛选 */}
         <div className="flex items-center gap-3">
-          <span className="text-[13px] text-[#6b7789] shrink-0">巡检周期：</span>
+          <span className="text-[13px] text-dark-text-secondary shrink-0">巡检周期：</span>
           <div className="flex gap-1.5">
             {periodButtons.map((btn) => (
               <button
@@ -140,8 +140,8 @@ export default function InspectionReportList({
                 onClick={() => setPeriodFilter(btn.value)}
                 className={`px-3 py-1.5 rounded text-[13px] transition-colors ${
                   periodFilter === btn.value
-                    ? 'bg-[#3478f6] text-white'
-                    : 'bg-[#f8f9fb] text-[#4a5568] hover:bg-[#eef4ff]'
+                    ? 'bg-dark-accent-primary text-white'
+                    : 'bg-dark-page text-dark-text-secondary hover:bg-dark-accent-primary/10'
                 }`}
               >
                 {btn.label}
@@ -157,21 +157,21 @@ export default function InspectionReportList({
               type="date"
               value={customStart}
               onChange={(e) => setCustomStart(e.target.value)}
-              className="text-[13px] border border-[#e8ecf1] rounded px-2 py-1.5 text-[#4a5568] focus:outline-none focus:border-[#3478f6]"
+              className="text-[13px] border border-dark-border rounded px-2 py-1.5 text-dark-text-secondary focus:outline-none focus:border-dark-accent-primary"
             />
-            <span className="text-[13px] text-[#9ba4b3]">至</span>
+            <span className="text-[13px] text-dark-text-tertiary">至</span>
             <input
               type="date"
               value={customEnd}
               onChange={(e) => setCustomEnd(e.target.value)}
-              className="text-[13px] border border-[#e8ecf1] rounded px-2 py-1.5 text-[#4a5568] focus:outline-none focus:border-[#3478f6]"
+              className="text-[13px] border border-dark-border rounded px-2 py-1.5 text-dark-text-secondary focus:outline-none focus:border-dark-accent-primary"
             />
           </div>
         )}
 
         {/* 状态筛选 */}
         <div className="flex items-center gap-3">
-          <span className="text-[13px] text-[#6b7789] shrink-0">报告状态：</span>
+          <span className="text-[13px] text-dark-text-secondary shrink-0">报告状态：</span>
           <div className="flex gap-1.5">
             {statusButtons.map((btn) => (
               <button
@@ -179,8 +179,8 @@ export default function InspectionReportList({
                 onClick={() => setStatusFilter(btn.value)}
                 className={`px-3 py-1.5 rounded text-[13px] transition-colors ${
                   statusFilter === btn.value
-                    ? 'bg-[#3478f6] text-white'
-                    : 'bg-[#f8f9fb] text-[#4a5568] hover:bg-[#eef4ff]'
+                    ? 'bg-dark-accent-primary text-white'
+                    : 'bg-dark-page text-dark-text-secondary hover:bg-dark-accent-primary/10'
                 }`}
               >
                 {btn.label}
@@ -192,10 +192,10 @@ export default function InspectionReportList({
 
       {/* 报告卡片列表 */}
       {filteredReports.length === 0 ? (
-        <div className="bg-white rounded-lg border border-[#e8ecf1] shadow-[0_1px_3px_rgba(0,0,0,0.06)] p-10 text-center">
-          <FileText size={32} className="mx-auto text-[#9ba4b3] mb-3" />
-          <div className="text-[15px] text-[#6b7789] mb-1">未找到匹配的报告</div>
-          <div className="text-[13px] text-[#9ba4b3]">请调整筛选条件后重试</div>
+        <div className="bg-dark-elevated rounded-lg border border-dark-border shadow-[0_1px_3px_rgba(0,0,0,0.06)] p-10 text-center">
+          <FileText size={32} className="mx-auto text-dark-text-tertiary mb-3" />
+          <div className="text-[15px] text-dark-text-secondary mb-1">未找到匹配的报告</div>
+          <div className="text-[13px] text-dark-text-tertiary">请调整筛选条件后重试</div>
         </div>
       ) : (
         <div className="grid grid-cols-3 gap-4">
@@ -209,11 +209,11 @@ export default function InspectionReportList({
               <div
                 key={report.id}
                 data-testid="report-card"
-                className="bg-white rounded-lg border border-[#e8ecf1] shadow-[0_1px_3px_rgba(0,0,0,0.06)] p-4 flex flex-col"
+                className="bg-dark-elevated rounded-lg border border-dark-border shadow-[0_1px_3px_rgba(0,0,0,0.06)] p-4 flex flex-col"
               >
                 {/* 头部：计划名称 + 状态 */}
                 <div className="flex items-start justify-between mb-3">
-                  <h3 className="text-[14px] font-medium text-[#1a202c] leading-tight pr-2">
+                  <h3 className="text-[14px] font-medium text-dark-text-primary leading-tight pr-2">
                     {planName}
                   </h3>
                   <div className="flex flex-col items-end gap-1" data-testid="report-status">
@@ -227,7 +227,7 @@ export default function InspectionReportList({
                 </div>
 
                 {/* 巡检时间 */}
-                <div className="text-[12px] text-[#9ba4b3] mb-3">
+                <div className="text-[12px] text-dark-text-tertiary mb-3">
                   {new Date(report.createdAt).toLocaleString('zh-CN', {
                     year: 'numeric',
                     month: '2-digit',
@@ -240,18 +240,18 @@ export default function InspectionReportList({
                 {/* 指标数 + 异常数 + 评价进度 */}
                 <div className="flex gap-4 mb-4">
                   <div>
-                    <div className="text-[11px] text-[#9ba4b3]">覆盖指标</div>
-                    <div className="text-[18px] font-semibold text-[#1a202c]">
+                    <div className="text-[11px] text-dark-text-tertiary">覆盖指标</div>
+                    <div className="text-[18px] font-semibold text-dark-text-primary">
                       {execution?.indicatorCount ?? 0}
                     </div>
                   </div>
                   <div>
-                    <div className="text-[11px] text-[#9ba4b3]">异常数</div>
+                    <div className="text-[11px] text-dark-text-tertiary">异常数</div>
                     <div
                       className={`text-[18px] font-semibold ${
                         (execution?.anomalyCount ?? 0) > 0
-                          ? 'text-[#dc2626]'
-                          : 'text-[#1a202c]'
+                          ? 'text-error-600'
+                          : 'text-dark-text-primary'
                       }`}
                     >
                       {execution?.anomalyCount ?? 0}
@@ -259,8 +259,8 @@ export default function InspectionReportList({
                   </div>
                   {report.businessReview && (
                     <div>
-                      <div className="text-[11px] text-[#9ba4b3]">评价进度</div>
-                      <div className="text-[18px] font-semibold text-[#1a202c]">
+                      <div className="text-[11px] text-dark-text-tertiary">评价进度</div>
+                      <div className="text-[18px] font-semibold text-dark-text-primary">
                         {report.businessReview.evaluatedCount}/{report.businessReview.totalCount}
                       </div>
                     </div>
@@ -268,16 +268,16 @@ export default function InspectionReportList({
                 </div>
 
                 {/* 操作栏 */}
-                <div className="mt-auto pt-3 border-t border-[#f1f3f6] flex items-center gap-2">
+                <div className="mt-auto pt-3 border-t border-dark-border flex items-center gap-2">
                   {isArchived && (
-                    <span className="text-[12px] text-[#9ba4b3] px-2 py-1 bg-[#f8f9fb] rounded">
+                    <span className="text-[12px] text-dark-text-tertiary px-2 py-1 bg-dark-page rounded">
                       已归档
                     </span>
                   )}
                   <Button
                     variant="outline"
                     size="sm"
-                    className="text-[12px] h-7 px-2 border-[#e8ecf1] text-[#3478f6] hover:bg-[#eef4ff]"
+                    className="text-[12px] h-7 px-2 border-dark-border text-dark-accent-primary hover:bg-dark-accent-primary/10"
                     onClick={() => onViewDetail(report.id)}
                   >
                     <Eye size={13} className="mr-1" />
@@ -288,7 +288,7 @@ export default function InspectionReportList({
                       <Button
                         variant="outline"
                         size="sm"
-                        className="text-[12px] h-7 px-2 border-[#e8ecf1] text-[#6b7789] hover:bg-[#f8f9fb]"
+                        className="text-[12px] h-7 px-2 border-dark-border text-dark-text-secondary hover:bg-dark-page"
                         disabled
                       >
                         <Download size={13} className="mr-1" />
@@ -297,7 +297,7 @@ export default function InspectionReportList({
                       <Button
                         variant="outline"
                         size="sm"
-                        className="text-[12px] h-7 px-2 border-[#e8ecf1] text-[#6b7789] hover:text-[#f59e0b] hover:bg-[#fffbeb]"
+                        className="text-[12px] h-7 px-2 border-dark-border text-dark-text-secondary hover:text-warning-500 hover:bg-warning-500/10"
                         onClick={() => onArchive(report.id)}
                       >
                         <Archive size={13} className="mr-1" />

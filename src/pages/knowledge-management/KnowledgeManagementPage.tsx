@@ -48,8 +48,8 @@ export default function KnowledgeManagementPage() {
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-[20px] font-semibold text-[#1a202c]">知识管理</h1>
-        <p className="text-[13px] text-[#6b7789] mt-1">
+        <h1 className="text-[20px] font-semibold text-dark-text-primary">知识管理</h1>
+        <p className="text-[13px] text-dark-text-secondary mt-1">
           管理知识库与审核业务部门上传的文档
         </p>
       </div>

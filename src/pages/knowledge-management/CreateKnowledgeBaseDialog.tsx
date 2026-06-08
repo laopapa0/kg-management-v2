@@ -78,7 +78,7 @@ export default function CreateKnowledgeBaseDialog({
               rows={3}
             />
           </div>
-          <div className="text-[12px] text-[#9ba4b3]">
+          <div className="text-[12px] text-dark-text-tertiary">
             类型: 专业知识库
           </div>
         </div>

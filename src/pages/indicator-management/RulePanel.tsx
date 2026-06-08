@@ -279,7 +279,7 @@ export default function RulePanel() {
                         className={[
                           'inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-[10px] font-semibold',
                           count > 0
-                            ? 'bg-[#3B82F6]/15 text-[#4DA6FF]'
+                            ? 'bg-dark-accent-primary/15 text-dark-accent-primary'
                             : 'bg-dark-card-l2 text-dark-text-tertiary',
                         ].join(' ')}
                       >

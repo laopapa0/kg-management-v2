@@ -172,10 +172,10 @@ export default function PlatformGraphPage() {
   const currentVersion = versions.find(v => v.status === 'current');
 
   const statsCards = useMemo(() => [
-    { label: '当前版本', value: currentVersion?.version || '—', icon: GitBranch, color: 'bg-[#eef4ff]', iconColor: 'text-[#3478f6]' },
-    { label: '历史版本数', value: String(versions.filter(v => v.status === 'historical').length), icon: History, color: 'bg-[#eff6ff]', iconColor: 'text-[#3b82f6]' },
-    { label: '节点总数', value: String(currentVersion?.nodeCount?.toLocaleString() || '—'), icon: Box, color: 'bg-[#ecfdf5]', iconColor: 'text-[#10b981]' },
-    { label: '关系总数', value: String(currentVersion?.relationCount?.toLocaleString() || '—'), icon: Link, color: 'bg-[#fffbeb]', iconColor: 'text-[#f59e0b]' },
+    { label: '当前版本', value: currentVersion?.version || '—', icon: GitBranch, color: 'bg-dark-accent-primary/10', iconColor: 'text-dark-accent-primary' },
+    { label: '历史版本数', value: String(versions.filter(v => v.status === 'historical').length), icon: History, color: 'bg-info-500/10', iconColor: 'text-info-500' },
+    { label: '节点总数', value: String(currentVersion?.nodeCount?.toLocaleString() || '—'), icon: Box, color: 'bg-success-500/10', iconColor: 'text-success-500' },
+    { label: '关系总数', value: String(currentVersion?.relationCount?.toLocaleString() || '—'), icon: Link, color: 'bg-warning-500/10', iconColor: 'text-warning-500' },
   ], [currentVersion, versions]);
 
   const handleStartImport = useCallback(() => {
@@ -255,7 +255,7 @@ export default function PlatformGraphPage() {
 
   const versionColumns: Column<Version>[] = useMemo(() => [
     { key: 'version', title: '版本号', width: 'w-20', render: (r: Version) => (
-      <span className={cn('text-[14px] font-medium', r.status === 'current' ? 'text-[#3478f6]' : 'text-[#4a5568]')}>{r.version}</span>
+      <span className={cn('text-[14px] font-medium', r.status === 'current' ? 'text-dark-accent-primary' : 'text-dark-text-secondary')}>{r.version}</span>
     )},
     { key: 'name', title: '版本名称', width: 'w-24' },
     { key: 'createdAt', title: '创建时间', width: 'w-36' },
@@ -273,7 +273,7 @@ export default function PlatformGraphPage() {
           <Button variant="ghost" size="sm" className="h-7 px-2 text-[12px]" onClick={() => setVersionDetail(r)}>查看</Button>
           <Button variant="ghost" size="sm" className="h-7 px-2 text-[12px]" onClick={() => setCompareVersions({ open: true, vA: r.version, vB: 'v2.3.1' })}>对比</Button>
           {r.status !== 'current' && (
-            <Button variant="ghost" size="sm" className="h-7 px-2 text-[12px] text-[#f59e0b] hover:text-[#d97706]" onClick={() => setRollbackConfirm({ open: true, version: r })}>回滚</Button>
+            <Button variant="ghost" size="sm" className="h-7 px-2 text-[12px] text-warning-500 hover:text-warning-600" onClick={() => setRollbackConfirm({ open: true, version: r })}>回滚</Button>
           )}
         </div>
       ),
@@ -293,7 +293,7 @@ export default function PlatformGraphPage() {
         const status = statusBadgeMap[r.status];
         return (
           <div className="flex items-center justify-center gap-1.5">
-            <span className={cn('w-2 h-2 rounded-full', r.status === 'connected' ? 'bg-[#10b981]' : r.status === 'failed' ? 'bg-[#ef4444]' : 'bg-[#c4cad4]')} />
+            <span className={cn('w-2 h-2 rounded-full', r.status === 'connected' ? 'bg-success-500' : r.status === 'failed' ? 'bg-error-500' : 'bg-dark-text-tertiary')} />
             <StatusBadge text={status.text} type={status.type} />
           </div>
         );
@@ -310,7 +310,7 @@ export default function PlatformGraphPage() {
         <div className="flex items-center justify-center gap-1">
           <Button variant="ghost" size="sm" className="h-7 px-2 text-[12px]" onClick={() => openDsEdit(r)}>编辑</Button>
           <Button variant="ghost" size="sm" className="h-7 px-2 text-[12px]" onClick={handleTestConnection}>测试</Button>
-          <Button variant="ghost" size="sm" className="h-7 px-2 text-[12px] text-[#3478f6]" onClick={() => openMappingDrawer(r)}>表结构映射</Button>
+          <Button variant="ghost" size="sm" className="h-7 px-2 text-[12px] text-dark-accent-primary" onClick={() => openMappingDrawer(r)}>表结构映射</Button>
         </div>
       ),
     },
@@ -327,27 +327,27 @@ export default function PlatformGraphPage() {
       <div className="flex justify-between items-start mb-5">
         <div>
           <h1 className="text-display">图谱管理 / 数据源管理</h1>
-          <p className="text-small text-[#6b7789] mt-1">图谱导入导出、版本管理与数据源连接配置</p>
+          <p className="text-small text-dark-text-secondary mt-1">图谱导入导出、版本管理与数据源连接配置</p>
         </div>
         {activeTab === 'graph' && (
           <div className="flex gap-2">
-            <Button className="bg-[#3478f6] hover:bg-[#1d5ee0] h-9">
+            <Button className="bg-dark-accent-primary hover:bg-dark-accent-primary-active h-9">
               <Upload size={16} className="mr-1" />导入图谱
             </Button>
-            <Button variant="outline" className="h-9 border-[#dde1e8]">
+            <Button variant="outline" className="h-9 border-dark-border-hover">
               <Download size={16} className="mr-1" />导出图谱
             </Button>
-            <Button variant="outline" className="h-9 border-[#dde1e8]">
+            <Button variant="outline" className="h-9 border-dark-border-hover">
               <GitBranch size={16} className="mr-1" />创建版本
             </Button>
           </div>
         )}
         {activeTab === 'datasource' && (
           <div className="flex gap-2">
-            <Button onClick={openDsCreate} className="bg-[#3478f6] hover:bg-[#1d5ee0] h-9">
+            <Button onClick={openDsCreate} className="bg-dark-accent-primary hover:bg-dark-accent-primary-active h-9">
               <Plus size={16} className="mr-1" />新增数据源
             </Button>
-            <Button variant="outline" className="h-9 border-[#dde1e8]">
+            <Button variant="outline" className="h-9 border-dark-border-hover">
               <RefreshCw size={16} className="mr-1" />测试全部连接
             </Button>
           </div>
@@ -356,11 +356,11 @@ export default function PlatformGraphPage() {
 
       {/* ── Tabs ── */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="mb-4 bg-white border border-[#e8ecf1]">
-          <TabsTrigger value="graph" className="data-[state=active]:text-[#3478f6] data-[state=active]:border-b-2 data-[state=active]:border-[#3478f6]">
+        <TabsList className="mb-4 bg-dark-elevated border border-dark-border">
+          <TabsTrigger value="graph" className="data-[state=active]:text-dark-accent-primary data-[state=active]:border-b-2 data-[state=active]:border-dark-accent-primary">
             <GitBranch size={14} className="mr-1" />图谱管理
           </TabsTrigger>
-          <TabsTrigger value="datasource" className="data-[state=active]:text-[#3478f6] data-[state=active]:border-b-2 data-[state=active]:border-[#3478f6]">
+          <TabsTrigger value="datasource" className="data-[state=active]:text-dark-accent-primary data-[state=active]:border-b-2 data-[state=active]:border-dark-accent-primary">
             <Database size={14} className="mr-1" />数据源管理
           </TabsTrigger>
         </TabsList>
@@ -375,56 +375,56 @@ export default function PlatformGraphPage() {
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.08, duration: 0.3 }}
-                className="bg-white rounded-lg border border-[#e8ecf1] shadow-[0_1px_3px_rgba(0,0,0,0.06)] p-4 flex items-center gap-3"
+                className="bg-dark-elevated rounded-lg border border-dark-border shadow-[0_1px_3px_rgba(0,0,0,0.06)] p-4 flex items-center gap-3"
               >
                 <div className={cn('w-10 h-10 rounded-lg flex items-center justify-center', card.color)}>
                   <card.icon size={20} className={card.iconColor} />
                 </div>
                 <div>
-                  <p className="text-[12px] text-[#6b7789]">{card.label}</p>
-                  <p className="text-[18px] font-semibold text-[#1a202c]">{card.value}</p>
+                  <p className="text-[12px] text-dark-text-secondary">{card.label}</p>
+                  <p className="text-[18px] font-semibold text-dark-text-primary">{card.value}</p>
                 </div>
               </motion.div>
             ))}
           </div>
 
           {/* 图谱导入 */}
-          <div className="bg-white rounded-lg border border-[#e8ecf1] shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
-            <div className="px-5 py-4 border-b border-[#e8ecf1]">
+          <div className="bg-dark-elevated rounded-lg border border-dark-border shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
+            <div className="px-5 py-4 border-b border-dark-border">
               <h2 className="text-h2">图谱导入</h2>
-              <p className="text-[12px] text-[#9ba4b3] mt-0.5">用于批量初始化或迁移图谱数据</p>
+              <p className="text-[12px] text-dark-text-tertiary mt-0.5">用于批量初始化或迁移图谱数据</p>
             </div>
             <div className="p-5">
               {!uploadedFile ? (
                 <div
                   className={cn(
-                    'border-2 border-dashed border-[#dde1e8] rounded-xl p-8 text-center transition-all',
-                    'hover:border-[#8eb8ff] hover:bg-[#eef4ff]/30 cursor-pointer'
+                    'border-2 border-dashed border-dark-border-hover rounded-xl p-8 text-center transition-all',
+                    'hover:border-dark-accent-primary-hover hover:bg-dark-accent-primary/10/30 cursor-pointer'
                   )}
                   onClick={() => setUploadedFile('graph_data_v2.3.0.json')}
                 >
-                  <Upload size={48} className="text-[#c4cad4] mx-auto mb-3" />
-                  <p className="text-[14px] text-[#4a5568] font-medium">点击或拖拽文件到此处上传</p>
-                  <p className="text-[12px] text-[#9ba4b3] mt-1">支持 CSV (.csv) / JSON (.json) / 图数据库 Dump (.dump, .cypher)</p>
-                  <p className="text-[12px] text-[#9ba4b3]">单个文件最大 100MB</p>
+                  <Upload size={48} className="text-dark-text-tertiary mx-auto mb-3" />
+                  <p className="text-[14px] text-dark-text-secondary font-medium">点击或拖拽文件到此处上传</p>
+                  <p className="text-[12px] text-dark-text-tertiary mt-1">支持 CSV (.csv) / JSON (.json) / 图数据库 Dump (.dump, .cypher)</p>
+                  <p className="text-[12px] text-dark-text-tertiary">单个文件最大 100MB</p>
                 </div>
               ) : (
                 <div className="space-y-4">
-                  <div className="flex items-center gap-3 p-3 bg-[#f8f9fb] rounded-lg">
-                    <div className="w-10 h-10 rounded-lg bg-[#eef4ff] flex items-center justify-center">
-                      <Database size={20} className="text-[#3478f6]" />
+                  <div className="flex items-center gap-3 p-3 bg-dark-page rounded-lg">
+                    <div className="w-10 h-10 rounded-lg bg-dark-accent-primary/10 flex items-center justify-center">
+                      <Database size={20} className="text-dark-accent-primary" />
                     </div>
                     <div className="flex-1">
-                      <p className="text-[14px] font-medium text-[#2d3748]">{uploadedFile}</p>
-                      <p className="text-[12px] text-[#9ba4b3]">JSON 格式 · 2.4 MB</p>
+                      <p className="text-[14px] font-medium text-dark-text-primary">{uploadedFile}</p>
+                      <p className="text-[12px] text-dark-text-tertiary">JSON 格式 · 2.4 MB</p>
                     </div>
                     <Button variant="outline" size="sm" className="h-8 text-[12px]">预览数据</Button>
-                    <button onClick={() => setUploadedFile(null)} className="text-[#9ba4b3] hover:text-[#ef4444]"><X size={16} /></button>
+                    <button onClick={() => setUploadedFile(null)} className="text-dark-text-tertiary hover:text-error-500"><X size={16} /></button>
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <label className="text-[14px] font-medium text-[#2d3748]">导入模式</label>
+                      <label className="text-[14px] font-medium text-dark-text-primary">导入模式</label>
                       <div className="flex gap-3">
                         {['full', 'incremental', 'append'].map(m => (
                           <button
@@ -432,7 +432,7 @@ export default function PlatformGraphPage() {
                             onClick={() => setImportMode(m)}
                             className={cn(
                               'px-3 py-1.5 rounded-md text-[13px] border transition-colors',
-                              importMode === m ? 'bg-[#eef4ff] border-[#3478f6] text-[#3478f6]' : 'border-[#dde1e8] text-[#4a5568] hover:border-[#9ba4b3]'
+                              importMode === m ? 'bg-dark-accent-primary/10 border-dark-accent-primary text-dark-accent-primary' : 'border-dark-border-hover text-dark-text-secondary hover:border-dark-text-tertiary'
                             )}
                           >
                             {m === 'full' ? '全量覆盖' : m === 'incremental' ? '增量更新' : '仅新增'}
@@ -441,7 +441,7 @@ export default function PlatformGraphPage() {
                       </div>
                     </div>
                     <div className="space-y-2">
-                      <label className="text-[14px] font-medium text-[#2d3748]">冲突处理</label>
+                      <label className="text-[14px] font-medium text-dark-text-primary">冲突处理</label>
                       <div className="flex gap-3">
                         {['skip', 'overwrite', 'merge'].map(m => (
                           <button
@@ -449,7 +449,7 @@ export default function PlatformGraphPage() {
                             onClick={() => setConflictMode(m)}
                             className={cn(
                               'px-3 py-1.5 rounded-md text-[13px] border transition-colors',
-                              conflictMode === m ? 'bg-[#eef4ff] border-[#3478f6] text-[#3478f6]' : 'border-[#dde1e8] text-[#4a5568] hover:border-[#9ba4b3]'
+                              conflictMode === m ? 'bg-dark-accent-primary/10 border-dark-accent-primary text-dark-accent-primary' : 'border-dark-border-hover text-dark-text-secondary hover:border-dark-text-tertiary'
                             )}
                           >
                             {m === 'skip' ? '跳过' : m === 'overwrite' ? '覆盖' : '合并'}
@@ -462,11 +462,11 @@ export default function PlatformGraphPage() {
                   {importing ? (
                     <div className="space-y-2">
                       <div className="flex items-center justify-between text-[13px]">
-                        <span className="text-[#4a5568]">正在导入...</span>
-                        <span className="text-[#3478f6] font-medium">{importProgress}%</span>
+                        <span className="text-dark-text-secondary">正在导入...</span>
+                        <span className="text-dark-accent-primary font-medium">{importProgress}%</span>
                       </div>
                       <Progress value={importProgress} className="h-2" />
-                      <p className="text-[12px] text-[#9ba4b3]">
+                      <p className="text-[12px] text-dark-text-tertiary">
                         {importProgress < 30 && '正在解析文件...'}
                         {importProgress >= 30 && importProgress < 60 && '检测到 1,247 个节点, 3,856 条关系'}
                         {importProgress >= 60 && importProgress < 100 && `正在导入节点 (${Math.floor(importProgress * 12.47)}/1247)...`}
@@ -475,8 +475,8 @@ export default function PlatformGraphPage() {
                     </div>
                   ) : (
                     <div className="flex gap-2">
-                      <Button onClick={handleStartImport} className="bg-[#3478f6] hover:bg-[#1d5ee0] h-9">开始导入</Button>
-                      <Button variant="outline" onClick={() => setUploadedFile(null)} className="h-9 border-[#dde1e8]">取消</Button>
+                      <Button onClick={handleStartImport} className="bg-dark-accent-primary hover:bg-dark-accent-primary-active h-9">开始导入</Button>
+                      <Button variant="outline" onClick={() => setUploadedFile(null)} className="h-9 border-dark-border-hover">取消</Button>
                     </div>
                   )}
                 </div>
@@ -485,10 +485,10 @@ export default function PlatformGraphPage() {
           </div>
 
           {/* 版本管理 */}
-          <div className="bg-white rounded-lg border border-[#e8ecf1] shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
-            <div className="px-5 py-4 border-b border-[#e8ecf1]">
+          <div className="bg-dark-elevated rounded-lg border border-dark-border shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
+            <div className="px-5 py-4 border-b border-dark-border">
               <h2 className="text-h2">版本管理</h2>
-              <p className="text-[12px] text-[#9ba4b3] mt-0.5">用于追溯历史状态，支持回滚</p>
+              <p className="text-[12px] text-dark-text-tertiary mt-0.5">用于追溯历史状态，支持回滚</p>
             </div>
             <div className="p-5">
               <DataTable
@@ -508,7 +508,7 @@ export default function PlatformGraphPage() {
 
         {/* ═════════ Tab 2: 数据源管理 ═════════ */}
         <TabsContent value="datasource">
-          <div className="bg-white rounded-lg border border-[#e8ecf1] shadow-[0_1px_3px_rgba(0,0,0,0.06)] p-5">
+          <div className="bg-dark-elevated rounded-lg border border-dark-border shadow-[0_1px_3px_rgba(0,0,0,0.06)] p-5">
             <DataTable
               columns={dsColumns}
               data={dataSources}
@@ -539,9 +539,9 @@ export default function PlatformGraphPage() {
                   { label: '创建时间', value: versionDetail.createdAt },
                   { label: '创建人', value: versionDetail.creator },
                 ].map(item => (
-                  <div key={item.label} className="bg-[#f8f9fb] rounded-lg p-3">
-                    <p className="text-[11px] text-[#9ba4b3] mb-1">{item.label}</p>
-                    <p className="text-[13px] font-medium text-[#2d3748]">{item.value}</p>
+                  <div key={item.label} className="bg-dark-page rounded-lg p-3">
+                    <p className="text-[11px] text-dark-text-tertiary mb-1">{item.label}</p>
+                    <p className="text-[13px] font-medium text-dark-text-primary">{item.value}</p>
                   </div>
                 ))}
               </div>
@@ -554,14 +554,14 @@ export default function PlatformGraphPage() {
                   { label: '规则数', value: 42 },
                 ].map(item => (
                   <div key={item.label} className="text-center">
-                    <p className="text-[18px] font-semibold text-[#1a202c]">{typeof item.value === 'number' ? item.value.toLocaleString() : item.value}</p>
-                    <p className="text-[11px] text-[#9ba4b3]">{item.label}</p>
+                    <p className="text-[18px] font-semibold text-dark-text-primary">{typeof item.value === 'number' ? item.value.toLocaleString() : item.value}</p>
+                    <p className="text-[11px] text-dark-text-tertiary">{item.label}</p>
                   </div>
                 ))}
               </div>
-              <div className="border-t border-[#e8ecf1] pt-3">
-                <p className="text-[14px] font-medium text-[#2d3748] mb-2">变更摘要</p>
-                <p className="text-[13px] text-[#4a5568]">{versionDetail.changeSummary}</p>
+              <div className="border-t border-dark-border pt-3">
+                <p className="text-[14px] font-medium text-dark-text-primary mb-2">变更摘要</p>
+                <p className="text-[13px] text-dark-text-secondary">{versionDetail.changeSummary}</p>
               </div>
             </div>
           )}
@@ -582,7 +582,7 @@ export default function PlatformGraphPage() {
                   {versions.map(v => <SelectItem key={v.id} value={v.version}>{v.version}</SelectItem>)}
                 </SelectContent>
               </Select>
-              <ArrowRightLeft size={16} className="text-[#9ba4b3]" />
+              <ArrowRightLeft size={16} className="text-dark-text-tertiary" />
               <Select value={compareVersions.vB} onValueChange={v => setCompareVersions(prev => ({ ...prev, vB: v }))}>
                 <SelectTrigger className="w-[180px] h-9"><SelectValue /></SelectTrigger>
                 <SelectContent>
@@ -592,28 +592,28 @@ export default function PlatformGraphPage() {
             </div>
             <div className="border rounded-lg overflow-hidden">
               <table className="w-full text-[13px]">
-                <thead className="bg-[#f1f3f6]">
-                  <tr className="border-b border-[#e8ecf1]">
-                    <th className="px-3 py-2 text-left font-medium text-[#4a5568]">变更类型</th>
-                    <th className="px-3 py-2 text-left font-medium text-[#4a5568]">名称</th>
-                    <th className="px-3 py-2 text-left font-medium text-[#4a5568]">编码</th>
-                    <th className="px-3 py-2 text-center font-medium text-[#4a5568]">{compareVersions.vA}</th>
-                    <th className="px-3 py-2 text-center font-medium text-[#4a5568]">{compareVersions.vB}</th>
+                <thead className="bg-dark-card-l2">
+                  <tr className="border-b border-dark-border">
+                    <th className="px-3 py-2 text-left font-medium text-dark-text-secondary">变更类型</th>
+                    <th className="px-3 py-2 text-left font-medium text-dark-text-secondary">名称</th>
+                    <th className="px-3 py-2 text-left font-medium text-dark-text-secondary">编码</th>
+                    <th className="px-3 py-2 text-center font-medium text-dark-text-secondary">{compareVersions.vA}</th>
+                    <th className="px-3 py-2 text-center font-medium text-dark-text-secondary">{compareVersions.vB}</th>
                   </tr>
                 </thead>
                 <tbody>
                   {[
-                    { type: '新增', typeColor: 'text-[#10b981]', name: '5G用户增长率', code: 'IND-1248', a: '—', b: '新增' },
-                    { type: '新增', typeColor: 'text-[#10b981]', name: '宽带续约率', code: 'IND-1249', a: '—', b: '新增' },
-                    { type: '修改', typeColor: 'text-[#f59e0b]', name: 'ARPU值', code: 'IND-0356', a: '128.5', b: '135.2' },
-                    { type: '不变', typeColor: 'text-[#6b7789]', name: '用户总数', code: 'IND-0001', a: '存在', b: '存在' },
+                    { type: '新增', typeColor: 'text-success-500', name: '5G用户增长率', code: 'IND-1248', a: '—', b: '新增' },
+                    { type: '新增', typeColor: 'text-success-500', name: '宽带续约率', code: 'IND-1249', a: '—', b: '新增' },
+                    { type: '修改', typeColor: 'text-warning-500', name: 'ARPU值', code: 'IND-0356', a: '128.5', b: '135.2' },
+                    { type: '不变', typeColor: 'text-dark-text-secondary', name: '用户总数', code: 'IND-0001', a: '存在', b: '存在' },
                   ].map((row, i) => (
-                    <tr key={i} className="border-b border-[#e8ecf1]">
+                    <tr key={i} className="border-b border-dark-border">
                       <td className={cn('px-3 py-2 font-medium', row.typeColor)}>{row.type}</td>
-                      <td className="px-3 py-2 text-[#4a5568]">{row.name}</td>
-                      <td className="px-3 py-2 font-mono text-[#6b7789]">{row.code}</td>
-                      <td className="px-3 py-2 text-center text-[#4a5568]">{row.a}</td>
-                      <td className="px-3 py-2 text-center text-[#4a5568]">{row.b}</td>
+                      <td className="px-3 py-2 text-dark-text-secondary">{row.name}</td>
+                      <td className="px-3 py-2 font-mono text-dark-text-secondary">{row.code}</td>
+                      <td className="px-3 py-2 text-center text-dark-text-secondary">{row.a}</td>
+                      <td className="px-3 py-2 text-center text-dark-text-secondary">{row.b}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -629,11 +629,11 @@ export default function PlatformGraphPage() {
           <DialogHeader>
             <DialogTitle className="text-h2">确认回滚？</DialogTitle>
           </DialogHeader>
-          <p className="text-[14px] text-[#4a5568] py-4">
+          <p className="text-[14px] text-dark-text-secondary py-4">
             将从 <strong>{currentVersion?.version}</strong> 回滚到 <strong>{rollbackConfirm.version?.version}</strong>。当前版本的数据将被备份。此操作不可撤销。是否继续？
           </p>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setRollbackConfirm({ open: false, version: null })} className="border-[#dde1e8]">取消</Button>
+            <Button variant="outline" onClick={() => setRollbackConfirm({ open: false, version: null })} className="border-dark-border-hover">取消</Button>
             <Button variant="destructive" onClick={handleRollback}>确认回滚</Button>
           </DialogFooter>
         </DialogContent>
@@ -647,32 +647,32 @@ export default function PlatformGraphPage() {
           </DialogHeader>
           <div className="grid grid-cols-2 gap-4 py-4">
             <div className="space-y-1.5">
-              <label className="text-[14px] font-medium text-[#2d3748]">数据源编码</label>
+              <label className="text-[14px] font-medium text-dark-text-primary">数据源编码</label>
               <input
                 type="text"
                 value={dsForm.code || ''}
                 onChange={e => setDsForm(prev => ({ ...prev, code: e.target.value }))}
                 disabled={!!editingDsId}
                 className={cn(
-                  'h-9 w-full px-3 rounded-md border border-[#dde1e8] text-[14px] text-[#4a5568]',
-                  'focus:outline-none focus:border-[#5a96ff] focus:ring-2 focus:ring-[#d9e6ff]',
-                  'disabled:bg-[#f1f3f6] disabled:text-[#9ba4b3]'
+                  'h-9 w-full px-3 rounded-md border border-dark-border-hover text-[14px] text-dark-text-secondary',
+                  'focus:outline-none focus:border-dark-accent-primary-hover focus:ring-2 focus:ring-dark-accent-primary/20',
+                  'disabled:bg-dark-card-l2 disabled:text-dark-text-tertiary'
                 )}
                 placeholder="如 DS-001"
               />
             </div>
             <div className="space-y-1.5">
-              <label className="text-[14px] font-medium text-[#2d3748]">数据源名称 <span className="text-[#ef4444]">*</span></label>
+              <label className="text-[14px] font-medium text-dark-text-primary">数据源名称 <span className="text-error-500">*</span></label>
               <input
                 type="text"
                 value={dsForm.name || ''}
                 onChange={e => setDsForm(prev => ({ ...prev, name: e.target.value }))}
-                className="h-9 w-full px-3 rounded-md border border-[#dde1e8] text-[14px] text-[#4a5568] focus:outline-none focus:border-[#5a96ff] focus:ring-2 focus:ring-[#d9e6ff]"
+                className="h-9 w-full px-3 rounded-md border border-dark-border-hover text-[14px] text-dark-text-secondary focus:outline-none focus:border-dark-accent-primary-hover focus:ring-2 focus:ring-dark-accent-primary/20"
                 placeholder="如 经营数据仓库"
               />
             </div>
             <div className="space-y-1.5">
-              <label className="text-[14px] font-medium text-[#2d3748]">数据库类型</label>
+              <label className="text-[14px] font-medium text-dark-text-primary">数据库类型</label>
               <Select
                 value={dsForm.dbType || 'MySQL'}
                 onValueChange={v => setDsForm(prev => ({ ...prev, dbType: v, port: defaultPorts[v] || 3306 }))}
@@ -684,78 +684,78 @@ export default function PlatformGraphPage() {
               </Select>
             </div>
             <div className="space-y-1.5">
-              <label className="text-[14px] font-medium text-[#2d3748]">主机地址</label>
+              <label className="text-[14px] font-medium text-dark-text-primary">主机地址</label>
               <input
                 type="text"
                 value={dsForm.host || ''}
                 onChange={e => setDsForm(prev => ({ ...prev, host: e.target.value }))}
-                className="h-9 w-full px-3 rounded-md border border-[#dde1e8] text-[14px] text-[#4a5568] focus:outline-none focus:border-[#5a96ff] focus:ring-2 focus:ring-[#d9e6ff]"
+                className="h-9 w-full px-3 rounded-md border border-dark-border-hover text-[14px] text-dark-text-secondary focus:outline-none focus:border-dark-accent-primary-hover focus:ring-2 focus:ring-dark-accent-primary/20"
                 placeholder="如 10.0.1.100"
               />
             </div>
             <div className="space-y-1.5">
-              <label className="text-[14px] font-medium text-[#2d3748]">端口</label>
+              <label className="text-[14px] font-medium text-dark-text-primary">端口</label>
               <input
                 type="number"
                 value={dsForm.port || ''}
                 onChange={e => setDsForm(prev => ({ ...prev, port: Number(e.target.value) }))}
-                className="h-9 w-full px-3 rounded-md border border-[#dde1e8] text-[14px] text-[#4a5568] focus:outline-none focus:border-[#5a96ff] focus:ring-2 focus:ring-[#d9e6ff]"
+                className="h-9 w-full px-3 rounded-md border border-dark-border-hover text-[14px] text-dark-text-secondary focus:outline-none focus:border-dark-accent-primary-hover focus:ring-2 focus:ring-dark-accent-primary/20"
               />
             </div>
             <div className="space-y-1.5">
-              <label className="text-[14px] font-medium text-[#2d3748]">数据库名</label>
+              <label className="text-[14px] font-medium text-dark-text-primary">数据库名</label>
               <input
                 type="text"
                 value={dsForm.dbName || ''}
                 onChange={e => setDsForm(prev => ({ ...prev, dbName: e.target.value }))}
-                className="h-9 w-full px-3 rounded-md border border-[#dde1e8] text-[14px] text-[#4a5568] focus:outline-none focus:border-[#5a96ff] focus:ring-2 focus:ring-[#d9e6ff]"
+                className="h-9 w-full px-3 rounded-md border border-dark-border-hover text-[14px] text-dark-text-secondary focus:outline-none focus:border-dark-accent-primary-hover focus:ring-2 focus:ring-dark-accent-primary/20"
               />
             </div>
             <div className="space-y-1.5">
-              <label className="text-[14px] font-medium text-[#2d3748]">用户名</label>
+              <label className="text-[14px] font-medium text-dark-text-primary">用户名</label>
               <input
                 type="text"
                 value={dsForm.username || ''}
                 onChange={e => setDsForm(prev => ({ ...prev, username: e.target.value }))}
-                className="h-9 w-full px-3 rounded-md border border-[#dde1e8] text-[14px] text-[#4a5568] focus:outline-none focus:border-[#5a96ff] focus:ring-2 focus:ring-[#d9e6ff]"
+                className="h-9 w-full px-3 rounded-md border border-dark-border-hover text-[14px] text-dark-text-secondary focus:outline-none focus:border-dark-accent-primary-hover focus:ring-2 focus:ring-dark-accent-primary/20"
               />
             </div>
             <div className="space-y-1.5">
-              <label className="text-[14px] font-medium text-[#2d3748]">密码</label>
+              <label className="text-[14px] font-medium text-dark-text-primary">密码</label>
               <input
                 type="password"
                 placeholder="••••••••"
-                className="h-9 w-full px-3 rounded-md border border-[#dde1e8] text-[14px] text-[#4a5568] focus:outline-none focus:border-[#5a96ff] focus:ring-2 focus:ring-[#d9e6ff]"
+                className="h-9 w-full px-3 rounded-md border border-dark-border-hover text-[14px] text-dark-text-secondary focus:outline-none focus:border-dark-accent-primary-hover focus:ring-2 focus:ring-dark-accent-primary/20"
               />
             </div>
             <div className="col-span-2 space-y-1.5">
-              <label className="text-[14px] font-medium text-[#2d3748]">连接参数</label>
+              <label className="text-[14px] font-medium text-dark-text-primary">连接参数</label>
               <textarea
-                className="w-full min-h-[50px] px-3 py-2 rounded-md border border-[#dde1e8] text-[14px] font-mono text-[#4a5568] focus:outline-none focus:border-[#5a96ff] focus:ring-2 focus:ring-[#d9e6ff] resize-y"
+                className="w-full min-h-[50px] px-3 py-2 rounded-md border border-dark-border-hover text-[14px] font-mono text-dark-text-secondary focus:outline-none focus:border-dark-accent-primary-hover focus:ring-2 focus:ring-dark-accent-primary/20 resize-y"
                 placeholder="如 charset=utf8&timeout=30"
               />
             </div>
             <div className="col-span-2 space-y-1.5">
-              <label className="text-[14px] font-medium text-[#2d3748]">描述</label>
+              <label className="text-[14px] font-medium text-dark-text-primary">描述</label>
               <textarea
-                className="w-full min-h-[50px] px-3 py-2 rounded-md border border-[#dde1e8] text-[14px] text-[#4a5568] focus:outline-none focus:border-[#5a96ff] focus:ring-2 focus:ring-[#d9e6ff] resize-y"
+                className="w-full min-h-[50px] px-3 py-2 rounded-md border border-dark-border-hover text-[14px] text-dark-text-secondary focus:outline-none focus:border-dark-accent-primary-hover focus:ring-2 focus:ring-dark-accent-primary/20 resize-y"
               />
             </div>
           </div>
 
           {testResult && (
-            <div className={cn('flex items-center gap-2 px-4 py-2 rounded-lg mb-2', testResult.success ? 'bg-[#ecfdf5]' : 'bg-[#fef2f2]')}>
-              {testResult.success ? <CheckCircle size={16} className="text-[#10b981]" /> : <XCircle size={16} className="text-[#ef4444]" />}
-              <span className={cn('text-[13px]', testResult.success ? 'text-[#059669]' : 'text-[#dc2626]')}>{testResult.message}</span>
+            <div className={cn('flex items-center gap-2 px-4 py-2 rounded-lg mb-2', testResult.success ? 'bg-success-500/10' : 'bg-error-500/10')}>
+              {testResult.success ? <CheckCircle size={16} className="text-success-500" /> : <XCircle size={16} className="text-error-500" />}
+              <span className={cn('text-[13px]', testResult.success ? 'text-success-600' : 'text-error-600')}>{testResult.message}</span>
             </div>
           )}
 
           <DialogFooter className="gap-2">
-            <Button variant="outline" onClick={handleTestConnection} className="border-[#dde1e8]">
+            <Button variant="outline" onClick={handleTestConnection} className="border-dark-border-hover">
               <RefreshCw size={14} className="mr-1" />测试连接
             </Button>
-            <Button variant="outline" onClick={() => setDsModalOpen(false)} className="border-[#dde1e8]">取消</Button>
-            <Button onClick={handleDsSave} className="bg-[#3478f6] hover:bg-[#1d5ee0]">保存</Button>
+            <Button variant="outline" onClick={() => setDsModalOpen(false)} className="border-dark-border-hover">取消</Button>
+            <Button onClick={handleDsSave} className="bg-dark-accent-primary hover:bg-dark-accent-primary-active">保存</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -769,11 +769,11 @@ export default function PlatformGraphPage() {
           {selectedDs && (
             <div className="space-y-4 py-2">
               {/* 数据源信息 */}
-              <div className="flex items-center gap-3 bg-[#f8f9fb] rounded-lg p-3">
-                <Database size={20} className="text-[#3478f6]" />
-                <span className="text-[14px] font-medium text-[#2d3748]">{selectedDs.name}</span>
-                <span className="text-[12px] bg-[#eef4ff] text-[#3478f6] px-2 py-0.5 rounded">{selectedDs.dbType}</span>
-                <span className="text-[12px] text-[#9ba4b3]">{selectedDs.host}:{selectedDs.port}/{selectedDs.dbName}</span>
+              <div className="flex items-center gap-3 bg-dark-page rounded-lg p-3">
+                <Database size={20} className="text-dark-accent-primary" />
+                <span className="text-[14px] font-medium text-dark-text-primary">{selectedDs.name}</span>
+                <span className="text-[12px] bg-dark-accent-primary/10 text-dark-accent-primary px-2 py-0.5 rounded">{selectedDs.dbType}</span>
+                <span className="text-[12px] text-dark-text-tertiary">{selectedDs.host}:{selectedDs.port}/{selectedDs.dbName}</span>
                 <div className="ml-auto">
                   <Select value={selectedTable} onValueChange={setSelectedTable}>
                     <SelectTrigger className="w-[220px] h-8 text-[13px]"><SelectValue /></SelectTrigger>
@@ -787,17 +787,17 @@ export default function PlatformGraphPage() {
               {/* 三列映射布局 */}
               <div className="grid grid-cols-[1fr_1.4fr_1fr] gap-3">
                 {/* 左列：源表字段 */}
-                <div className="border border-[#e8ecf1] rounded-lg overflow-hidden">
-                  <div className="bg-[#f1f3f6] px-3 py-2 border-b border-[#e8ecf1]">
-                    <p className="text-[13px] font-medium text-[#2d3748]">源表字段</p>
+                <div className="border border-dark-border rounded-lg overflow-hidden">
+                  <div className="bg-dark-card-l2 px-3 py-2 border-b border-dark-border">
+                    <p className="text-[13px] font-medium text-dark-text-primary">源表字段</p>
                   </div>
                   <div className="divide-y divide-[#e8ecf1] max-h-[400px] overflow-y-auto">
                     {sourceTableFields.map(f => (
-                      <div key={f.name} className="px-3 py-2 hover:bg-[#f8f9fb] cursor-grab active:cursor-grabbing">
-                        <p className="text-[13px] font-medium text-[#4a5568]">{f.name}</p>
+                      <div key={f.name} className="px-3 py-2 hover:bg-dark-page cursor-grab active:cursor-grabbing">
+                        <p className="text-[13px] font-medium text-dark-text-secondary">{f.name}</p>
                         <div className="flex items-center gap-2">
-                          <span className="text-[11px] text-[#9ba4b3]">{f.type}</span>
-                          <span className="text-[11px] text-[#c4cad4]">{f.comment}</span>
+                          <span className="text-[11px] text-dark-text-tertiary">{f.type}</span>
+                          <span className="text-[11px] text-dark-text-tertiary">{f.comment}</span>
                         </div>
                       </div>
                     ))}
@@ -805,14 +805,14 @@ export default function PlatformGraphPage() {
                 </div>
 
                 {/* 中列：映射配置 */}
-                <div className="border border-[#e8ecf1] rounded-lg overflow-hidden">
-                  <div className="bg-[#f1f3f6] px-3 py-2 border-b border-[#e8ecf1] flex items-center justify-between">
-                    <p className="text-[13px] font-medium text-[#2d3748]">映射配置</p>
-                    <span className="text-[11px] text-[#9ba4b3]">{mappings.length} 条映射</span>
+                <div className="border border-dark-border rounded-lg overflow-hidden">
+                  <div className="bg-dark-card-l2 px-3 py-2 border-b border-dark-border flex items-center justify-between">
+                    <p className="text-[13px] font-medium text-dark-text-primary">映射配置</p>
+                    <span className="text-[11px] text-dark-text-tertiary">{mappings.length} 条映射</span>
                   </div>
                   {mappings.length === 0 ? (
-                    <div className="p-8 text-center text-[#9ba4b3]">
-                      <ArrowRightLeft size={24} className="mx-auto mb-2 text-[#c4cad4]" />
+                    <div className="p-8 text-center text-dark-text-tertiary">
+                      <ArrowRightLeft size={24} className="mx-auto mb-2 text-dark-text-tertiary" />
                       <p className="text-[13px]">从左侧拖拽字段到此处开始映射</p>
                     </div>
                   ) : (
@@ -820,20 +820,20 @@ export default function PlatformGraphPage() {
                       {mappings.map((m, i) => (
                         <div key={i} className="px-3 py-2 flex items-center gap-2">
                           <div className="flex-1 min-w-0">
-                            <p className="text-[12px] font-medium text-[#4a5568] truncate">{m.sourceField}</p>
+                            <p className="text-[12px] font-medium text-dark-text-secondary truncate">{m.sourceField}</p>
                           </div>
                           <span className={cn(
                             'text-[10px] px-1.5 py-0.5 rounded shrink-0',
-                            m.mappingType === '直接映射' ? 'bg-[#ecfdf5] text-[#059669]' :
-                            m.mappingType === '条件映射' ? 'bg-[#fffbeb] text-[#d97706]' :
-                            'bg-[#eef4ff] text-[#3478f6]'
+                            m.mappingType === '直接映射' ? 'bg-success-500/10 text-success-600' :
+                            m.mappingType === '条件映射' ? 'bg-warning-500/10 text-warning-600' :
+                            'bg-dark-accent-primary/10 text-dark-accent-primary'
                           )}>{m.mappingType}</span>
-                          <ChevronRight size={12} className="text-[#c4cad4] shrink-0" />
+                          <ChevronRight size={12} className="text-dark-text-tertiary shrink-0" />
                           <div className="flex-1 min-w-0">
-                            <p className="text-[12px] text-[#4a5568] truncate">{m.target}</p>
+                            <p className="text-[12px] text-dark-text-secondary truncate">{m.target}</p>
                           </div>
                           <button
-                            className="text-[#c4cad4] hover:text-[#ef4444] shrink-0"
+                            className="text-dark-text-tertiary hover:text-error-500 shrink-0"
                             onClick={() => setMappings(prev => prev.filter((_, idx) => idx !== i))}
                           >
                             <X size={12} />
@@ -845,8 +845,8 @@ export default function PlatformGraphPage() {
                 </div>
 
                 {/* 右列：图谱属性 */}
-                <div className="border border-[#e8ecf1] rounded-lg overflow-hidden">
-                  <div className="bg-[#f1f3f6] border-b border-[#e8ecf1]">
+                <div className="border border-dark-border rounded-lg overflow-hidden">
+                  <div className="bg-dark-card-l2 border-b border-dark-border">
                     <div className="flex">
                       {(['fields', 'properties'] as const).map(tab => (
                         <button
@@ -854,7 +854,7 @@ export default function PlatformGraphPage() {
                           onClick={() => setMappingTab(tab)}
                           className={cn(
                             'flex-1 px-2 py-2 text-[12px] font-medium transition-colors',
-                            mappingTab === tab ? 'text-[#3478f6] bg-white' : 'text-[#9ba4b3] hover:text-[#4a5568]'
+                            mappingTab === tab ? 'text-dark-accent-primary bg-dark-elevated' : 'text-dark-text-tertiary hover:text-dark-text-secondary'
                           )}
                         >
                           {tab === 'fields' ? '图谱属性' : '对象类型字段'}
@@ -864,9 +864,9 @@ export default function PlatformGraphPage() {
                   </div>
                   <div className="divide-y divide-[#e8ecf1] max-h-[370px] overflow-y-auto">
                     {graphProperties.map(p => (
-                      <div key={p.name} className="px-3 py-2 hover:bg-[#f8f9fb] cursor-grab active:cursor-grabbing">
-                        <p className="text-[13px] font-medium text-[#4a5568]">{p.name}</p>
-                        <span className="text-[11px] text-[#9ba4b3]">{p.type}</span>
+                      <div key={p.name} className="px-3 py-2 hover:bg-dark-page cursor-grab active:cursor-grabbing">
+                        <p className="text-[13px] font-medium text-dark-text-secondary">{p.name}</p>
+                        <span className="text-[11px] text-dark-text-tertiary">{p.type}</span>
                       </div>
                     ))}
                   </div>
@@ -875,9 +875,9 @@ export default function PlatformGraphPage() {
 
               {/* 底部操作 */}
               <DialogFooter>
-                <Button variant="outline" onClick={() => setMappingDrawerOpen(false)} className="border-[#dde1e8]">取消</Button>
-                <Button variant="outline" className="border-[#dde1e8]">测试映射</Button>
-                <Button onClick={() => setMappingDrawerOpen(false)} className="bg-[#3478f6] hover:bg-[#1d5ee0]">保存映射配置</Button>
+                <Button variant="outline" onClick={() => setMappingDrawerOpen(false)} className="border-dark-border-hover">取消</Button>
+                <Button variant="outline" className="border-dark-border-hover">测试映射</Button>
+                <Button onClick={() => setMappingDrawerOpen(false)} className="bg-dark-accent-primary hover:bg-dark-accent-primary-active">保存映射配置</Button>
               </DialogFooter>
             </div>
           )}

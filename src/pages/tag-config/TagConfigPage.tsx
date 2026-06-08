@@ -183,24 +183,24 @@ export default function TagConfigPage() {
         <div>
           <button
             onClick={() => navigate('/')}
-            className="inline-flex items-center h-7 px-3 rounded-md border border-[#dde1e8] bg-white text-[13px] text-[#4a5568] hover:bg-[#f8f9fb] transition-colors mb-3"
+            className="inline-flex items-center h-7 px-3 rounded-md border border-dark-border-hover bg-dark-elevated text-[13px] text-dark-text-secondary hover:bg-dark-page transition-colors mb-3"
           >
             <ArrowLeft size={14} className="mr-1" />
             返回
           </button>
-          <h1 className="text-[22px] font-semibold text-[#1a202c] leading-tight tracking-tight">
+          <h1 className="text-[22px] font-semibold text-dark-text-primary leading-tight tracking-tight">
             配置标签（标签选择器）
           </h1>
-          <p className="text-[13px] text-[#6b7789] mt-1">
+          <p className="text-[13px] text-dark-text-secondary mt-1">
             为指标对象配置分类标签，支持指标级标签的选择与新建申请
           </p>
         </div>
       </div>
 
       {/* ─── Section 2: Indicator Selector ─── */}
-      <div className="bg-white rounded-lg border border-[#e8ecf1] shadow-[0_1px_3px_rgba(0,0,0,0.06)] mb-6">
-        <div className="px-5 py-4 border-b border-[#e8ecf1]">
-          <h3 className="text-[16px] font-medium text-[#2d3748]">选择指标</h3>
+      <div className="bg-dark-elevated rounded-lg border border-dark-border shadow-[0_1px_3px_rgba(0,0,0,0.06)] mb-6">
+        <div className="px-5 py-4 border-b border-dark-border">
+          <h3 className="text-[16px] font-medium text-dark-text-primary">选择指标</h3>
         </div>
         <div className="p-5">
           <div className="relative">
@@ -220,7 +220,7 @@ export default function TagConfigPage() {
                   initial={{ opacity: 0, y: -4 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -4 }}
-                  className="absolute z-10 mt-1 w-full bg-white rounded-lg border border-[#e8ecf1] shadow-lg max-h-60 overflow-auto"
+                  className="absolute z-10 mt-1 w-full bg-dark-elevated rounded-lg border border-dark-border shadow-lg max-h-60 overflow-auto"
                 >
                   {filteredIndicators.map((ind) => (
                     <button
@@ -230,14 +230,14 @@ export default function TagConfigPage() {
                         setIndicatorSearch('');
                         setShowIndicatorDropdown(false);
                       }}
-                      className="w-full text-left px-4 py-2.5 hover:bg-[#f8f9fb] transition-colors border-b border-[#e8ecf1] last:border-0"
+                      className="w-full text-left px-4 py-2.5 hover:bg-dark-page transition-colors border-b border-dark-border last:border-0"
                     >
-                      <div className="text-[14px] text-[#2d3748] font-medium">{ind.name}</div>
-                      <div className="text-[12px] text-[#9ba4b3]">{ind.code}</div>
+                      <div className="text-[14px] text-dark-text-primary font-medium">{ind.name}</div>
+                      <div className="text-[12px] text-dark-text-tertiary">{ind.code}</div>
                     </button>
                   ))}
                   {filteredIndicators.length === 0 && (
-                    <div className="px-4 py-6 text-center text-[13px] text-[#9ba4b3]">
+                    <div className="px-4 py-6 text-center text-[13px] text-dark-text-tertiary">
                       未找到匹配的指标
                     </div>
                   )}
@@ -254,23 +254,23 @@ export default function TagConfigPage() {
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.95 }}
                 transition={{ duration: 0.25 }}
-                className="mt-4 p-4 rounded-lg bg-[#eef4ff] border border-[#bcd3ff] relative"
+                className="mt-4 p-4 rounded-lg bg-dark-accent-primary/10 border border-dark-accent-primary/30 relative"
               >
                 <button
                   onClick={() => setSelectedIndicator(null)}
-                  className="absolute top-2 right-2 text-[#9ba4b3] hover:text-[#4a5568] transition-colors"
+                  className="absolute top-2 right-2 text-dark-text-tertiary hover:text-dark-text-secondary transition-colors"
                 >
                   <X size={16} />
                 </button>
                 <div className="flex items-center gap-2">
-                  <span className="text-[15px] font-medium text-[#1a202c]">
+                  <span className="text-[15px] font-medium text-dark-text-primary">
                     {selectedIndicator.name}
                   </span>
-                  <span className="text-[12px] text-[#6b7789]">{selectedIndicator.code}</span>
+                  <span className="text-[12px] text-dark-text-secondary">{selectedIndicator.code}</span>
                 </div>
                 {selectedIndicator.existingTags.length > 0 && (
                   <div className="flex items-center gap-2 mt-2">
-                    <span className="text-[12px] text-[#6b7789]">已有标签:</span>
+                    <span className="text-[12px] text-dark-text-secondary">已有标签:</span>
                     <div className="flex gap-1 flex-wrap">
                       {selectedIndicator.existingTags.map((t) => {
                         const style = getTagStyle(t);
@@ -298,11 +298,11 @@ export default function TagConfigPage() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.15 }}
-        className="bg-white rounded-lg border border-[#e8ecf1] shadow-[0_1px_3px_rgba(0,0,0,0.06)]"
+        className="bg-dark-elevated rounded-lg border border-dark-border shadow-[0_1px_3px_rgba(0,0,0,0.06)]"
       >
-        <div className="px-5 py-4 border-b border-[#e8ecf1]">
-          <h3 className="text-[16px] font-medium text-[#2d3748]">指标级标签</h3>
-          <p className="text-[13px] text-[#6b7789] mt-0.5">
+        <div className="px-5 py-4 border-b border-dark-border">
+          <h3 className="text-[16px] font-medium text-dark-text-primary">指标级标签</h3>
+          <p className="text-[13px] text-dark-text-secondary mt-0.5">
             作为标签打在对象类型上，用于指标分类和快速检索
           </p>
         </div>
@@ -321,7 +321,7 @@ export default function TagConfigPage() {
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="absolute z-10 mt-1 w-full bg-white rounded-lg border border-[#e8ecf1] shadow-lg"
+                className="absolute z-10 mt-1 w-full bg-dark-elevated rounded-lg border border-dark-border shadow-lg"
               >
                 <button
                   onClick={() => {
@@ -329,7 +329,7 @@ export default function TagConfigPage() {
                     setShowNewTagDialog(true);
                     setTagSearch('');
                   }}
-                  className="w-full text-left px-4 py-2.5 hover:bg-[#f8f9fb] transition-colors flex items-center text-[14px] text-[#3478f6]"
+                  className="w-full text-left px-4 py-2.5 hover:bg-dark-page transition-colors flex items-center text-[14px] text-dark-accent-primary"
                 >
                   <Plus size={16} className="mr-2" />
                   新建标签 &quot;{tagSearch}&quot;
@@ -342,7 +342,7 @@ export default function TagConfigPage() {
           {Object.entries(tagSearch ? filteredTagCategories : tagLibrary).map(
             ([category, tags]) => (
               <div key={category} className="mb-4">
-                <h4 className="text-[12px] font-medium text-[#9ba4b3] uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                <h4 className="text-[12px] font-medium text-dark-text-tertiary uppercase tracking-wider mb-2 flex items-center gap-1.5">
                   <Tag size={12} />
                   {category}
                 </h4>
@@ -377,8 +377,8 @@ export default function TagConfigPage() {
           )}
 
           {/* Selected Tags Display */}
-          <div className="mt-5 p-4 bg-[#f8f9fb] rounded-md">
-            <h4 className="text-[13px] font-medium text-[#4a5568] mb-2">
+          <div className="mt-5 p-4 bg-dark-page rounded-md">
+            <h4 className="text-[13px] font-medium text-dark-text-secondary mb-2">
               已选标签 ({selectedIndicatorTags.length})
             </h4>
             {selectedIndicatorTags.length > 0 ? (
@@ -403,7 +403,7 @@ export default function TagConfigPage() {
                 })}
               </div>
             ) : (
-              <p className="text-[13px] text-[#9ba4b3]">
+              <p className="text-[13px] text-dark-text-tertiary">
                 暂未选择标签，请从上方选择
               </p>
             )}
@@ -416,27 +416,27 @@ export default function TagConfigPage() {
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.3 }}
-        className="fixed bottom-0 left-0 right-0 bg-white border-t border-[#e8ecf1] px-6 py-4 flex justify-between items-center z-40"
+        className="fixed bottom-0 left-0 right-0 bg-dark-elevated border-t border-dark-border px-6 py-4 flex justify-between items-center z-40"
         style={{ marginLeft: 240 }}
       >
         <button
           onClick={() => {
             setSelectedIndicatorTags([]);
           }}
-          className="h-9 px-4 rounded-md border border-[#dde1e8] bg-white text-[14px] text-[#4a5568] hover:bg-[#f8f9fb] transition-colors"
+          className="h-9 px-4 rounded-md border border-dark-border-hover bg-dark-elevated text-[14px] text-dark-text-secondary hover:bg-dark-page transition-colors"
         >
           重置
         </button>
         <div className="flex gap-3">
           <button
             onClick={() => navigate('/')}
-            className="h-9 px-4 rounded-md border border-[#dde1e8] bg-white text-[14px] text-[#4a5568] hover:bg-[#f8f9fb] transition-colors"
+            className="h-9 px-4 rounded-md border border-dark-border-hover bg-dark-elevated text-[14px] text-dark-text-secondary hover:bg-dark-page transition-colors"
           >
             取消
           </button>
           <button
             onClick={() => setShowPublishDialog(true)}
-            className="h-11 px-6 rounded-md bg-[#3478f6] text-white text-[14px] font-medium hover:bg-[#1d5ee0] transition-colors shadow-sm"
+            className="h-11 px-6 rounded-md bg-dark-accent-primary text-white text-[14px] font-medium hover:bg-dark-accent-primary-active transition-colors shadow-sm"
           >
             确认发布到图谱
           </button>
@@ -447,13 +447,13 @@ export default function TagConfigPage() {
       <Dialog open={showNewTagDialog} onOpenChange={setShowNewTagDialog}>
         <DialogContent className="sm:max-w-[480px]">
           <DialogHeader>
-            <DialogTitle className="text-[18px] font-semibold text-[#1a202c]">
+            <DialogTitle className="text-[18px] font-semibold text-dark-text-primary">
               申请新建标签
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-2">
             <div>
-              <label className="block text-[14px] font-medium text-[#2d3748] mb-1.5">
+              <label className="block text-[14px] font-medium text-dark-text-primary mb-1.5">
                 标签名称
               </label>
               <input
@@ -461,15 +461,15 @@ export default function TagConfigPage() {
                 value={newTagName}
                 onChange={(e) => setNewTagName(e.target.value)}
                 placeholder="输入标签名称"
-                className="h-9 w-full px-3 rounded-md border border-[#dde1e8] text-[14px] text-[#4a5568] placeholder:text-[#9ba4b3] focus:outline-none focus:border-[#5a96ff] focus:ring-2 focus:ring-[#d9e6ff] transition-all"
+                className="h-9 w-full px-3 rounded-md border border-dark-border-hover text-[14px] text-dark-text-secondary placeholder:text-dark-text-tertiary focus:outline-none focus:border-dark-accent-primary-hover focus:ring-2 focus:ring-dark-accent-primary/20 transition-all"
               />
             </div>
             <div>
-              <label className="block text-[14px] font-medium text-[#2d3748] mb-1.5">
+              <label className="block text-[14px] font-medium text-dark-text-primary mb-1.5">
                 标签分类
               </label>
               <Select value={newTagCategory} onValueChange={setNewTagCategory}>
-                <SelectTrigger className="h-9 w-full border-[#dde1e8] focus:ring-[#d9e6ff] focus:border-[#5a96ff]">
+                <SelectTrigger className="h-9 w-full border-dark-border-hover focus:ring-[#d9e6ff] focus:border-dark-accent-primary-hover">
                   <SelectValue placeholder="请选择分类" />
                 </SelectTrigger>
                 <SelectContent>
@@ -483,30 +483,30 @@ export default function TagConfigPage() {
               </Select>
             </div>
             <div>
-              <label className="block text-[14px] font-medium text-[#2d3748] mb-1.5">
+              <label className="block text-[14px] font-medium text-dark-text-primary mb-1.5">
                 命名规范说明
               </label>
               <Textarea
                 placeholder="说明标签命名理由..."
                 value={newTagNamingExp}
                 onChange={(e) => setNewTagNamingExp(e.target.value)}
-                className="min-h-[80px] border-[#dde1e8] focus:ring-[#d9e6ff] focus:border-[#5a96ff]"
+                className="min-h-[80px] border-dark-border-hover focus:ring-[#d9e6ff] focus:border-dark-accent-primary-hover"
               />
             </div>
             <div>
-              <label className="block text-[14px] font-medium text-[#2d3748] mb-1.5">
+              <label className="block text-[14px] font-medium text-dark-text-primary mb-1.5">
                 申请理由
               </label>
               <Textarea
                 placeholder="说明为什么需要这个新标签..."
                 value={newTagReason}
                 onChange={(e) => setNewTagReason(e.target.value)}
-                className="min-h-[80px] border-[#dde1e8] focus:ring-[#d9e6ff] focus:border-[#5a96ff]"
+                className="min-h-[80px] border-dark-border-hover focus:ring-[#d9e6ff] focus:border-dark-accent-primary-hover"
               />
             </div>
-            <div className="flex items-start gap-2 p-3 rounded-md bg-[#fffbeb]">
-              <AlertTriangle size={16} className="text-[#f59e0b] shrink-0 mt-0.5" />
-              <p className="text-[12px] text-[#d97706]">
+            <div className="flex items-start gap-2 p-3 rounded-md bg-warning-500/10">
+              <AlertTriangle size={16} className="text-warning-500 shrink-0 mt-0.5" />
+              <p className="text-[12px] text-warning-600">
                 新建标签需 NOC 审核通过后方可使用
               </p>
             </div>
@@ -514,13 +514,13 @@ export default function TagConfigPage() {
           <DialogFooter className="gap-2">
             <button
               onClick={() => setShowNewTagDialog(false)}
-              className="h-9 px-4 rounded-md border border-[#dde1e8] bg-white text-[14px] text-[#4a5568] hover:bg-[#f8f9fb] transition-colors"
+              className="h-9 px-4 rounded-md border border-dark-border-hover bg-dark-elevated text-[14px] text-dark-text-secondary hover:bg-dark-page transition-colors"
             >
               取消
             </button>
             <button
               onClick={handleNewTagSubmit}
-              className="h-9 px-4 rounded-md bg-[#3478f6] text-white text-[14px] font-medium hover:bg-[#1d5ee0] transition-colors"
+              className="h-9 px-4 rounded-md bg-dark-accent-primary text-white text-[14px] font-medium hover:bg-dark-accent-primary-active transition-colors"
             >
               提交申请
             </button>
@@ -532,39 +532,39 @@ export default function TagConfigPage() {
       <Dialog open={showPublishDialog} onOpenChange={setShowPublishDialog}>
         <DialogContent className="sm:max-w-[480px]">
           <DialogHeader>
-            <DialogTitle className="text-[18px] font-semibold text-[#1a202c]">
+            <DialogTitle className="text-[18px] font-semibold text-dark-text-primary">
               确认发布标签配置？
             </DialogTitle>
           </DialogHeader>
           <div className="py-4">
-            <div className="p-4 rounded-lg bg-[#f8f9fb] space-y-2">
+            <div className="p-4 rounded-lg bg-dark-page space-y-2">
               <div className="flex justify-between text-[14px]">
-                <span className="text-[#6b7789]">选中指标</span>
-                <span className="font-medium text-[#2d3748]">
+                <span className="text-dark-text-secondary">选中指标</span>
+                <span className="font-medium text-dark-text-primary">
                   {selectedIndicator?.name ?? '-'}
                 </span>
               </div>
               <div className="flex justify-between text-[14px]">
-                <span className="text-[#6b7789]">指标级标签数</span>
-                <span className="font-medium text-[#2d3748]">
+                <span className="text-dark-text-secondary">指标级标签数</span>
+                <span className="font-medium text-dark-text-primary">
                   {selectedIndicatorTags.length} 个
                 </span>
               </div>
             </div>
-            <p className="text-[13px] text-[#6b7789] mt-3">
+            <p className="text-[13px] text-dark-text-secondary mt-3">
               发布后将更新图谱中的标签信息
             </p>
           </div>
           <DialogFooter className="gap-2">
             <button
               onClick={() => setShowPublishDialog(false)}
-              className="h-9 px-4 rounded-md border border-[#dde1e8] bg-white text-[14px] text-[#4a5568] hover:bg-[#f8f9fb] transition-colors"
+              className="h-9 px-4 rounded-md border border-dark-border-hover bg-dark-elevated text-[14px] text-dark-text-secondary hover:bg-dark-page transition-colors"
             >
               取消
             </button>
             <button
               onClick={handlePublish}
-              className="h-9 px-4 rounded-md bg-[#3478f6] text-white text-[14px] font-medium hover:bg-[#1d5ee0] transition-colors"
+              className="h-9 px-4 rounded-md bg-dark-accent-primary text-white text-[14px] font-medium hover:bg-dark-accent-primary-active transition-colors"
             >
               确认发布
             </button>

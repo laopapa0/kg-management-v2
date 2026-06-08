@@ -63,13 +63,13 @@ function TreeNodeItem({
 
   return (
     <div>
-      <div className="flex items-center gap-1.5 py-1.5 hover:bg-[#f8f9fb] rounded-md px-1">
+      <div className="flex items-center gap-1.5 py-1.5 hover:bg-dark-page rounded-md px-1">
         {!isLeaf && (
           <button
             type="button"
             aria-label={isExpanded ? '折叠' : '展开'}
             onClick={() => onToggleExpand(node.id)}
-            className="text-[#9ba4b3] hover:text-[#4a5568] p-0.5"
+            className="text-dark-text-tertiary hover:text-dark-text-secondary p-0.5"
           >
             {isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
           </button>
@@ -85,7 +85,7 @@ function TreeNodeItem({
         />
         <label
           htmlFor={`rule-node-${node.id}`}
-          className="text-[13px] text-[#1a202c] cursor-pointer select-none flex-1"
+          className="text-[13px] text-dark-text-primary cursor-pointer select-none flex-1"
         >
           {node.name}
         </label>
@@ -165,16 +165,16 @@ export default function RuleFilterPanel({ selectedRuleIds, onChange }: RuleFilte
 
   return (
     <div className="space-y-3">
-      <h4 className="text-[14px] font-medium text-[#1a202c]">异常规则排除</h4>
+      <h4 className="text-[14px] font-medium text-dark-text-primary">异常规则排除</h4>
 
       <div className="flex gap-3">
         {/* 左侧：规则树 */}
-        <div className="flex-1 rounded-md border border-[#e8ecf1] bg-white p-3">
+        <div className="flex-1 rounded-md border border-dark-border bg-dark-elevated p-3">
           <Input
             placeholder="搜索规则名称"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="h-8 text-[13px] border-[#e8ecf1] mb-3"
+            className="h-8 text-[13px] border-dark-border mb-3"
           />
           <div className="max-h-[280px] overflow-y-auto">
             {filteredTree.map((node) => (
@@ -188,15 +188,15 @@ export default function RuleFilterPanel({ selectedRuleIds, onChange }: RuleFilte
               />
             ))}
             {filteredTree.length === 0 && (
-              <p className="text-[13px] text-[#9ba4b3] text-center py-4">无匹配规则</p>
+              <p className="text-[13px] text-dark-text-tertiary text-center py-4">无匹配规则</p>
             )}
           </div>
         </div>
 
         {/* 右侧：已选列表 */}
-        <div className="flex-1 rounded-md border border-[#e8ecf1] bg-white p-3">
+        <div className="flex-1 rounded-md border border-dark-border bg-dark-elevated p-3">
           <div className="flex items-center justify-between mb-3">
-            <span className="text-[13px] text-[#6b7789]">
+            <span className="text-[13px] text-dark-text-secondary">
               已排除 {selectedRuleIds.length} 条规则
             </span>
             {selectedRuleIds.length > 0 && (
@@ -204,7 +204,7 @@ export default function RuleFilterPanel({ selectedRuleIds, onChange }: RuleFilte
                 variant="ghost"
                 size="sm"
                 onClick={handleClearAll}
-                className="h-7 text-[12px] text-[#dc2626] hover:text-[#dc2626] hover:bg-red-50"
+                className="h-7 text-[12px] text-error-600 hover:text-error-600 hover:bg-red-50"
               >
                 一键清空
               </Button>
@@ -213,21 +213,21 @@ export default function RuleFilterPanel({ selectedRuleIds, onChange }: RuleFilte
 
           <div className="max-h-[280px] overflow-y-auto space-y-2">
             {selectedRuleIds.length === 0 ? (
-              <p className="text-[13px] text-[#9ba4b3] text-center py-4">暂未排除任何规则</p>
+              <p className="text-[13px] text-dark-text-tertiary text-center py-4">暂未排除任何规则</p>
             ) : (
               selectedRuleIds.map((id) => {
                 const path = getNodePath(ruleTreeData, id);
                 return (
                   <div
                     key={id}
-                    className="flex items-center justify-between gap-2 rounded-md bg-[#f8f9fb] px-3 py-2"
+                    className="flex items-center justify-between gap-2 rounded-md bg-dark-page px-3 py-2"
                   >
-                    <span className="text-[12px] text-[#1a202c] truncate">{path || id}</span>
+                    <span className="text-[12px] text-dark-text-primary truncate">{path || id}</span>
                     <button
                       type="button"
                       onClick={() => handleRemove(id)}
                       aria-label={`移除 ${path || id}`}
-                      className="text-[#9ba4b3] hover:text-[#dc2626] shrink-0 p-0.5"
+                      className="text-dark-text-tertiary hover:text-error-600 shrink-0 p-0.5"
                     >
                       <X size={14} />
                     </button>

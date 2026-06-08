@@ -46,16 +46,16 @@ export default function SearchInput({
 
   return (
     <form onSubmit={handleSubmit} className={cn('relative', width, className)}>
-      <Search size={15} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[#9ba4b3] pointer-events-none" />
+      <Search size={15} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-dark-text-tertiary pointer-events-none" />
       <input
         type="text"
         value={currentValue}
         onChange={handleChange}
         placeholder={placeholder}
         className={cn(
-          'h-9 w-full pl-9 pr-8 rounded-md border border-[#dde1e8] bg-[#f8f9fb] text-[14px] text-[#4a5568]',
-          'placeholder:text-[#9ba4b3]',
-          'focus:outline-none focus:border-[#5a96ff] focus:ring-2 focus:ring-[#d9e6ff]',
+          'h-9 w-full pl-9 pr-8 rounded-md border border-dark-border-hover bg-dark-page text-[14px] text-dark-text-secondary',
+          'placeholder:text-dark-text-tertiary',
+          'focus:outline-none focus:border-dark-accent-primary-hover focus:ring-2 focus:ring-dark-accent-primary/20',
           'transition-all duration-150'
         )}
       />
@@ -63,7 +63,7 @@ export default function SearchInput({
         <button
           type="button"
           onClick={handleClear}
-          className="absolute right-2 top-1/2 -translate-y-1/2 text-[#9ba4b3] hover:text-[#6b7789] transition-colors"
+          className="absolute right-2 top-1/2 -translate-y-1/2 text-dark-text-tertiary hover:text-dark-text-secondary transition-colors"
         >
           <X size={14} />
         </button>

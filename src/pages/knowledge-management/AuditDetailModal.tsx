@@ -69,42 +69,42 @@ function DocInfoPanel({ doc }: { doc: KnowledgeDocument }) {
 
   return (
     <div className="space-y-5">
-      <h3 className="text-[13px] font-semibold text-[#1a202c] flex items-center gap-1.5">
-        <FileText className="w-4 h-4 text-[#6b7789]" />
+      <h3 className="text-[13px] font-semibold text-dark-text-primary flex items-center gap-1.5">
+        <FileText className="w-4 h-4 text-dark-text-secondary" />
         文档信息
       </h3>
       <div className="space-y-3">
         {infoItems.map((item) => (
           <div key={item.label} className="flex items-start gap-2">
-            <item.icon className="w-3.5 h-3.5 text-[#6b7789] mt-0.5 shrink-0" />
+            <item.icon className="w-3.5 h-3.5 text-dark-text-secondary mt-0.5 shrink-0" />
             <div>
-              <div className="text-[11px] text-[#6b7789]">{item.label}</div>
-              <div className="text-[12px] text-[#1a202c]">{item.value}</div>
+              <div className="text-[11px] text-dark-text-secondary">{item.label}</div>
+              <div className="text-[12px] text-dark-text-primary">{item.value}</div>
             </div>
           </div>
         ))}
       </div>
-      <div className="border-t border-[#e8ecf1] pt-4">
-        <h3 className="text-[13px] font-semibold text-[#1a202c] flex items-center gap-1.5 mb-3">
-          <Settings2 className="w-4 h-4 text-[#6b7789]" />
+      <div className="border-t border-dark-border pt-4">
+        <h3 className="text-[13px] font-semibold text-dark-text-primary flex items-center gap-1.5 mb-3">
+          <Settings2 className="w-4 h-4 text-dark-text-secondary" />
           分段参数
         </h3>
         <div className="space-y-2">
           <div className="flex justify-between text-[12px]">
-            <span className="text-[#6b7789]">标识符</span>
-            <span className="text-[#1a202c] font-mono">{seg.delimiter}</span>
+            <span className="text-dark-text-secondary">标识符</span>
+            <span className="text-dark-text-primary font-mono">{seg.delimiter}</span>
           </div>
           <div className="flex justify-between text-[12px]">
-            <span className="text-[#6b7789]">最大长度</span>
-            <span className="text-[#1a202c]">{seg.maxLength}</span>
+            <span className="text-dark-text-secondary">最大长度</span>
+            <span className="text-dark-text-primary">{seg.maxLength}</span>
           </div>
           <div className="flex justify-between text-[12px]">
-            <span className="text-[#6b7789]">重叠长度</span>
-            <span className="text-[#1a202c]">{seg.overlapLength}</span>
+            <span className="text-dark-text-secondary">重叠长度</span>
+            <span className="text-dark-text-primary">{seg.overlapLength}</span>
           </div>
           <div className="flex justify-between text-[12px]">
-            <span className="text-[#6b7789]">预处理</span>
-            <span className="text-[#1a202c]">
+            <span className="text-dark-text-secondary">预处理</span>
+            <span className="text-dark-text-primary">
               {preprocessRules.length > 0 ? preprocessRules.join('、') : '无'}
             </span>
           </div>
@@ -135,16 +135,16 @@ function ChunkPreviewPanel({ chunks }: { chunks: DocumentChunk[] }) {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-[13px] font-semibold text-[#1a202c] flex items-center gap-1.5">
-          <Layers className="w-4 h-4 text-[#6b7789]" />
+        <h3 className="text-[13px] font-semibold text-dark-text-primary flex items-center gap-1.5">
+          <Layers className="w-4 h-4 text-dark-text-secondary" />
           预览块
         </h3>
-        <span className="text-[11px] text-[#6b7789]">
+        <span className="text-[11px] text-dark-text-secondary">
           共 {chunks.length} 个分块{displayChunks.length < chunks.length ? `，展示前 ${displayChunks.length} 个` : ''}
         </span>
       </div>
       {displayChunks.length === 0 && (
-        <div className="text-center text-[#6b7789] text-[13px] py-8">
+        <div className="text-center text-dark-text-secondary text-[13px] py-8">
           暂无预览块数据
         </div>
       )}
@@ -158,23 +158,23 @@ function ChunkPreviewPanel({ chunks }: { chunks: DocumentChunk[] }) {
           return (
             <div
               key={chunk.id}
-              className="border border-[#e8ecf1] rounded-lg p-3 bg-[#fafbfc]"
+              className="border border-dark-border rounded-lg p-3 bg-dark-page"
             >
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[11px] font-medium text-[#6b7789]">
+                <span className="text-[11px] font-medium text-dark-text-secondary">
                   分块 #{index + 1}
                 </span>
-                <span className="text-[11px] text-[#6b7789]">
+                <span className="text-[11px] text-dark-text-secondary">
                   {chunk.charCount} 字符
                 </span>
               </div>
-              <p className="text-[12px] text-[#1a202c] leading-relaxed whitespace-pre-wrap">
+              <p className="text-[12px] text-dark-text-primary leading-relaxed whitespace-pre-wrap">
                 {previewText}
               </p>
               {chunk.content.length > 100 && (
                 <button
                   onClick={() => toggleExpand(chunk.id)}
-                  className="mt-2 text-[11px] text-[#3478f6] hover:text-[#2868e0] flex items-center gap-0.5"
+                  className="mt-2 text-[11px] text-dark-accent-primary hover:text-dark-accent-primary flex items-center gap-0.5"
                 >
                   {isExpanded ? (
                     <>
@@ -194,7 +194,7 @@ function ChunkPreviewPanel({ chunks }: { chunks: DocumentChunk[] }) {
         })}
       </div>
       {hasMore && (
-        <div className="text-center text-[11px] text-[#6b7789] py-2">
+        <div className="text-center text-[11px] text-dark-text-secondary py-2">
           还有 {chunks.length - 20} 个分块未展示
         </div>
       )}
@@ -244,7 +244,7 @@ function AuditActionPanel({
 
   return (
     <div className="space-y-5">
-      <h3 className="text-[13px] font-semibold text-[#1a202c]">相似度检测</h3>
+      <h3 className="text-[13px] font-semibold text-dark-text-primary">相似度检测</h3>
 
       {highSimilarity.length > 0 && (
         <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 flex items-start gap-2">
@@ -262,9 +262,9 @@ function AuditActionPanel({
 
       <div className="space-y-3">
         {results.map((result) => (
-          <div key={result.docId} className="border border-[#e8ecf1] rounded-lg p-3">
+          <div key={result.docId} className="border border-dark-border rounded-lg p-3">
             <div className="flex items-center justify-between mb-1.5">
-              <span className="text-[12px] font-medium text-[#1a202c] truncate max-w-[140px]">
+              <span className="text-[12px] font-medium text-dark-text-primary truncate max-w-[140px]">
                 {result.docName}
               </span>
               <span
@@ -277,12 +277,12 @@ function AuditActionPanel({
                 {result.similarity}%
               </span>
             </div>
-            <div className="text-[11px] text-[#6b7789] mb-2">
+            <div className="text-[11px] text-dark-text-secondary mb-2">
               {result.knowledgeBaseName}
             </div>
             <button
               onClick={() => setCompareDoc({ docName: result.docName, similarity: result.similarity })}
-              className="text-[11px] text-[#3478f6] hover:text-[#2868e0]"
+              className="text-[11px] text-dark-accent-primary hover:text-dark-accent-primary"
             >
               查看对比
             </button>
@@ -292,30 +292,30 @@ function AuditActionPanel({
 
       {/* 查看对比内联展示 */}
       {compareDoc && (
-        <div className="border border-[#e8ecf1] rounded-lg p-3 bg-[#fafbfc]">
+        <div className="border border-dark-border rounded-lg p-3 bg-dark-page">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-[12px] font-medium text-[#1a202c]">文档对比</span>
+            <span className="text-[12px] font-medium text-dark-text-primary">文档对比</span>
             <button
               onClick={() => setCompareDoc(null)}
-              className="text-[11px] text-[#6b7789] hover:text-[#1a202c]"
+              className="text-[11px] text-dark-text-secondary hover:text-dark-text-primary"
             >
               关闭
             </button>
           </div>
-          <div className="text-[11px] text-[#6b7789] mb-2">
+          <div className="text-[11px] text-dark-text-secondary mb-2">
             当前文档：{doc.name}
             <br />
             对比文档：{compareDoc.docName}（相似度 {compareDoc.similarity}%）
           </div>
-          <div className="bg-white rounded border border-[#e8ecf1] p-3 text-[12px] text-[#6b7789] text-center">
+          <div className="bg-dark-elevated rounded border border-dark-border p-3 text-[12px] text-dark-text-secondary text-center">
             Demo 级别：文本对比功能将在后续版本实现
           </div>
         </div>
       )}
 
       {/* 审核操作区域 */}
-      <div className="border-t border-[#e8ecf1] pt-4">
-        <h3 className="text-[13px] font-semibold text-[#1a202c] mb-3">审核操作</h3>
+      <div className="border-t border-dark-border pt-4">
+        <h3 className="text-[13px] font-semibold text-dark-text-primary mb-3">审核操作</h3>
 
         {mode === 'idle' && (
           <div className="flex gap-2">
@@ -338,7 +338,7 @@ function AuditActionPanel({
 
         {mode === 'confirm-approve' && (
           <div className="space-y-3">
-            <p className="text-[12px] text-[#1a202c]">
+            <p className="text-[12px] text-dark-text-primary">
               确认通过并嵌入《{doc.name}》到《{kb?.name || doc.targetKnowledgeBaseId}》？
             </p>
             <div className="flex gap-2">
@@ -361,7 +361,7 @@ function AuditActionPanel({
         {mode === 'reject-form' && (
           <div className="space-y-3">
             <div>
-              <label className="text-[12px] text-[#6b7789] block mb-1.5">
+              <label className="text-[12px] text-dark-text-secondary block mb-1.5">
                 审核不通过原因 <span className="text-red-500">*</span>
               </label>
               <textarea
@@ -371,7 +371,7 @@ function AuditActionPanel({
                   setRejectError('');
                 }}
                 placeholder="请填写至少 5 个字的审核意见"
-                className="w-full text-[12px] border border-[#e8ecf1] rounded-lg p-2.5 min-h-[80px] resize-none focus:outline-none focus:ring-1 focus:ring-[#3478f6]"
+                className="w-full text-[12px] border border-dark-border rounded-lg p-2.5 min-h-[80px] resize-none focus:outline-none focus:ring-1 focus:ring-[#3478f6]"
               />
               {rejectError && (
                 <p className="text-[11px] text-red-600 mt-1">{rejectError}</p>
@@ -409,17 +409,17 @@ export default function AuditDetailModal({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-[90vw] w-[90vw] h-[85vh] p-0 flex flex-col gap-0 overflow-hidden">
-        <DialogHeader className="px-6 py-4 border-b border-[#e8ecf1] shrink-0">
+        <DialogHeader className="px-6 py-4 border-b border-dark-border shrink-0">
           <DialogTitle className="text-[15px] font-semibold">
             审核详情 — {doc.name}
           </DialogTitle>
         </DialogHeader>
 
         <div className="flex-1 flex overflow-hidden">
-          <div className="w-[30%] border-r border-[#e8ecf1] p-5 overflow-auto">
+          <div className="w-[30%] border-r border-dark-border p-5 overflow-auto">
             <DocInfoPanel doc={doc} />
           </div>
-          <div className="flex-1 border-r border-[#e8ecf1] p-5 overflow-auto">
+          <div className="flex-1 border-r border-dark-border p-5 overflow-auto">
             <ChunkPreviewPanel chunks={doc.chunks} />
           </div>
           <div className="w-[30%] p-5 overflow-auto">

@@ -166,7 +166,7 @@ export default function PlatformLinkTypePage() {
           <IconRenderer
             name={r.direction === '有向' ? 'ArrowRight' : 'ArrowLeftRight'}
             size={14}
-            className="text-[#4a5568]"
+            className="text-dark-text-secondary"
           />
           <span className="text-[13px]">{r.direction}</span>
         </div>
@@ -179,10 +179,10 @@ export default function PlatformLinkTypePage() {
       render: (r: LinkTypeDef) => (
         <div className="flex items-center gap-2">
           <span
-            className="w-4 h-4 rounded-full border border-[#e8ecf1] shrink-0"
+            className="w-4 h-4 rounded-full border border-dark-border shrink-0"
             style={{ backgroundColor: r.color }}
           />
-          <code className="text-[12px] font-mono text-[#4a5568]">{r.color}</code>
+          <code className="text-[12px] font-mono text-dark-text-secondary">{r.color}</code>
         </div>
       ),
     },
@@ -193,8 +193,8 @@ export default function PlatformLinkTypePage() {
       align: 'center',
       render: (r: LinkTypeDef) => (
         <div className="flex items-center justify-center gap-1.5">
-          <IconRenderer name={r.icon} size={18} className="text-[#4a5568]" />
-          <span className="text-[12px] text-[#6b7789]">{r.icon}</span>
+          <IconRenderer name={r.icon} size={18} className="text-dark-text-secondary" />
+          <span className="text-[12px] text-dark-text-secondary">{r.icon}</span>
         </div>
       ),
     },
@@ -214,7 +214,7 @@ export default function PlatformLinkTypePage() {
           <Button
             variant="ghost"
             size="sm"
-            className="h-7 px-2 text-[13px] text-[#ef4444] hover:text-[#dc2626]"
+            className="h-7 px-2 text-[13px] text-error-500 hover:text-error-600"
             onClick={() => setDeleteConfirm(r.id)}
           >
             <Trash2 size={13} className="mr-1" />删除
@@ -235,23 +235,23 @@ export default function PlatformLinkTypePage() {
       <div className="flex justify-between items-start mb-5">
         <div>
           <h1 className="text-display">链接类型管理</h1>
-          <p className="text-small text-[#6b7789] mt-1">定义边的关系语义与展示风格</p>
+          <p className="text-small text-dark-text-secondary mt-1">定义边的关系语义与展示风格</p>
         </div>
         <div className="flex gap-2">
-          <Button onClick={openCreate} className="bg-[#3478f6] hover:bg-[#1d5ee0] h-9">
+          <Button onClick={openCreate} className="bg-dark-accent-primary hover:bg-dark-accent-primary-active h-9">
             <Plus size={16} className="mr-1" />新增链接类型
           </Button>
-          <Button variant="outline" className="h-9 border-[#dde1e8]">
+          <Button variant="outline" className="h-9 border-dark-border-hover">
             <Upload size={16} className="mr-1" />批量导入
           </Button>
-          <Button variant="outline" className="h-9 border-[#dde1e8]">
+          <Button variant="outline" className="h-9 border-dark-border-hover">
             <Download size={16} className="mr-1" />导出
           </Button>
         </div>
       </div>
 
       {/* ── 搜索过滤工具栏 ── */}
-      <div className="bg-white rounded-lg border border-[#e8ecf1] shadow-[0_1px_3px_rgba(0,0,0,0.06)] px-5 py-4 mb-4">
+      <div className="bg-dark-elevated rounded-lg border border-dark-border shadow-[0_1px_3px_rgba(0,0,0,0.06)] px-5 py-4 mb-4">
         <div className="flex items-center gap-3 flex-wrap">
           <SearchInput
             placeholder="搜索类型名称或编码"
@@ -284,7 +284,7 @@ export default function PlatformLinkTypePage() {
       </div>
 
       {/* ── 链接类型表格 ── */}
-      <div className="bg-white rounded-lg border border-[#e8ecf1] shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
+      <div className="bg-dark-elevated rounded-lg border border-dark-border shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
         <DataTable
           columns={columns}
           data={filteredData}
@@ -306,42 +306,42 @@ export default function PlatformLinkTypePage() {
           </DialogHeader>
           <div className="grid grid-cols-2 gap-4 py-4">
             <div className="space-y-1.5">
-              <label className="text-[14px] font-medium text-[#2d3748]">类型编码</label>
+              <label className="text-[14px] font-medium text-dark-text-primary">类型编码</label>
               <input
                 type="text"
                 value={form.code || ''}
                 onChange={e => updateForm('code', e.target.value)}
                 disabled={!!editingId}
                 className={cn(
-                  'h-9 w-full px-3 rounded-md border border-[#dde1e8] text-[14px] text-[#4a5568]',
-                  'focus:outline-none focus:border-[#5a96ff] focus:ring-2 focus:ring-[#d9e6ff]',
-                  'disabled:bg-[#f1f3f6] disabled:text-[#9ba4b3]'
+                  'h-9 w-full px-3 rounded-md border border-dark-border-hover text-[14px] text-dark-text-secondary',
+                  'focus:outline-none focus:border-dark-accent-primary-hover focus:ring-2 focus:ring-dark-accent-primary/20',
+                  'disabled:bg-dark-card-l2 disabled:text-dark-text-tertiary'
                 )}
                 placeholder="如 LKT-001"
               />
             </div>
             <div className="space-y-1.5">
-              <label className="text-[14px] font-medium text-[#2d3748]">类型名称 <span className="text-[#ef4444]">*</span></label>
+              <label className="text-[14px] font-medium text-dark-text-primary">类型名称 <span className="text-error-500">*</span></label>
               <input
                 type="text"
                 value={form.name || ''}
                 onChange={e => updateForm('name', e.target.value)}
-                className="h-9 w-full px-3 rounded-md border border-[#dde1e8] text-[14px] text-[#4a5568] focus:outline-none focus:border-[#5a96ff] focus:ring-2 focus:ring-[#d9e6ff]"
+                className="h-9 w-full px-3 rounded-md border border-dark-border-hover text-[14px] text-dark-text-secondary focus:outline-none focus:border-dark-accent-primary-hover focus:ring-2 focus:ring-dark-accent-primary/20"
                 placeholder="如 DEPENDS_ON"
               />
             </div>
             <div className="space-y-1.5">
-              <label className="text-[14px] font-medium text-[#2d3748]">显示名称 <span className="text-[#ef4444]">*</span></label>
+              <label className="text-[14px] font-medium text-dark-text-primary">显示名称 <span className="text-error-500">*</span></label>
               <input
                 type="text"
                 value={form.displayName || ''}
                 onChange={e => updateForm('displayName', e.target.value)}
-                className="h-9 w-full px-3 rounded-md border border-[#dde1e8] text-[14px] text-[#4a5568] focus:outline-none focus:border-[#5a96ff] focus:ring-2 focus:ring-[#d9e6ff]"
+                className="h-9 w-full px-3 rounded-md border border-dark-border-hover text-[14px] text-dark-text-secondary focus:outline-none focus:border-dark-accent-primary-hover focus:ring-2 focus:ring-dark-accent-primary/20"
                 placeholder="中文显示名称"
               />
             </div>
             <div className="space-y-1.5">
-              <label className="text-[14px] font-medium text-[#2d3748]">方向性</label>
+              <label className="text-[14px] font-medium text-dark-text-primary">方向性</label>
               <RadioGroup
                 value={form.direction || '有向'}
                 onValueChange={v => updateForm('direction', v)}
@@ -349,17 +349,17 @@ export default function PlatformLinkTypePage() {
               >
                 <div className="flex items-center gap-2">
                   <RadioGroupItem value="有向" id="dir-directed" />
-                  <label htmlFor="dir-directed" className="text-[14px] text-[#4a5568] cursor-pointer">有向</label>
+                  <label htmlFor="dir-directed" className="text-[14px] text-dark-text-secondary cursor-pointer">有向</label>
                 </div>
                 <div className="flex items-center gap-2">
                   <RadioGroupItem value="无向" id="dir-undirected" />
-                  <label htmlFor="dir-undirected" className="text-[14px] text-[#4a5568] cursor-pointer">无向</label>
+                  <label htmlFor="dir-undirected" className="text-[14px] text-dark-text-secondary cursor-pointer">无向</label>
                 </div>
               </RadioGroup>
             </div>
             {/* 颜色选择器 */}
             <div className="col-span-2 space-y-2">
-              <label className="text-[14px] font-medium text-[#2d3748]">颜色</label>
+              <label className="text-[14px] font-medium text-dark-text-primary">颜色</label>
               <div className="flex items-center gap-4">
                 <div className="flex gap-2 flex-wrap">
                   {presetColors.map(c => (
@@ -367,7 +367,7 @@ export default function PlatformLinkTypePage() {
                       key={c}
                       className={cn(
                         'w-8 h-8 rounded-md border-2 transition-all',
-                        form.color === c ? 'border-[#2d3748] scale-110' : 'border-transparent hover:scale-105'
+                        form.color === c ? 'border-dark-text-primary scale-110' : 'border-transparent hover:scale-105'
                       )}
                       style={{ backgroundColor: c }}
                       onClick={() => updateForm('color', c)}
@@ -376,14 +376,14 @@ export default function PlatformLinkTypePage() {
                 </div>
                 <div className="flex items-center gap-2 ml-auto">
                   <span
-                    className="w-6 h-6 rounded border border-[#e8ecf1]"
+                    className="w-6 h-6 rounded border border-dark-border"
                     style={{ backgroundColor: form.color || '#3478f6' }}
                   />
                   <input
                     type="text"
                     value={form.color || ''}
                     onChange={e => updateForm('color', e.target.value)}
-                    className="h-9 w-[100px] px-2 rounded-md border border-[#dde1e8] text-[13px] font-mono text-[#4a5568] focus:outline-none focus:border-[#5a96ff] focus:ring-2 focus:ring-[#d9e6ff]"
+                    className="h-9 w-[100px] px-2 rounded-md border border-dark-border-hover text-[13px] font-mono text-dark-text-secondary focus:outline-none focus:border-dark-accent-primary-hover focus:ring-2 focus:ring-dark-accent-primary/20"
                     placeholder="#3478f6"
                   />
                 </div>
@@ -391,11 +391,11 @@ export default function PlatformLinkTypePage() {
             </div>
             {/* 图标选择器 */}
             <div className="col-span-2 space-y-2">
-              <label className="text-[14px] font-medium text-[#2d3748]">图标</label>
+              <label className="text-[14px] font-medium text-dark-text-primary">图标</label>
               <div className="relative">
                 <button
                   onClick={() => setIconPickerOpen(!iconPickerOpen)}
-                  className="flex items-center gap-2 h-9 px-3 rounded-md border border-[#dde1e8] text-[14px] text-[#4a5568] hover:border-[#5a96ff] transition-colors w-[200px]"
+                  className="flex items-center gap-2 h-9 px-3 rounded-md border border-dark-border-hover text-[14px] text-dark-text-secondary hover:border-dark-accent-primary-hover transition-colors w-[200px]"
                 >
                   <IconRenderer name={form.icon || 'Link'} size={16} />
                   <span>{form.icon || 'Link'}</span>
@@ -406,19 +406,19 @@ export default function PlatformLinkTypePage() {
                       initial={{ opacity: 0, y: -4 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -4 }}
-                      className="absolute left-0 top-full mt-1 z-20 bg-white border border-[#e8ecf1] rounded-lg shadow-lg p-3 w-[360px]"
+                      className="absolute left-0 top-full mt-1 z-20 bg-dark-elevated border border-dark-border rounded-lg shadow-lg p-3 w-[360px]"
                     >
                       <div className="relative mb-2">
-                        <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[#9ba4b3]" />
+                        <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-dark-text-tertiary" />
                         <input
                           type="text"
                           value={iconSearch}
                           onChange={e => setIconSearch(e.target.value)}
-                          className="h-8 w-full pl-8 pr-7 rounded-md border border-[#dde1e8] text-[13px] text-[#4a5568] focus:outline-none focus:border-[#5a96ff]"
+                          className="h-8 w-full pl-8 pr-7 rounded-md border border-dark-border-hover text-[13px] text-dark-text-secondary focus:outline-none focus:border-dark-accent-primary-hover"
                           placeholder="搜索图标..."
                         />
                         {iconSearch && (
-                          <button onClick={() => setIconSearch('')} className="absolute right-2 top-1/2 -translate-y-1/2 text-[#9ba4b3]">
+                          <button onClick={() => setIconSearch('')} className="absolute right-2 top-1/2 -translate-y-1/2 text-dark-text-tertiary">
                             <X size={13} />
                           </button>
                         )}
@@ -430,11 +430,11 @@ export default function PlatformLinkTypePage() {
                             onClick={() => { updateForm('icon', name); setIconPickerOpen(false); }}
                             className={cn(
                               'flex flex-col items-center gap-1 p-2 rounded-md transition-colors',
-                              form.icon === name ? 'bg-[#eef4ff] border border-[#3478f6]' : 'hover:bg-[#f8f9fb] border border-transparent'
+                              form.icon === name ? 'bg-dark-accent-primary/10 border border-dark-accent-primary' : 'hover:bg-dark-page border border-transparent'
                             )}
                           >
-                            <IconRenderer name={name} size={20} className="text-[#4a5568]" />
-                            <span className="text-[10px] text-[#6b7789] truncate max-w-full">{name}</span>
+                            <IconRenderer name={name} size={20} className="text-dark-text-secondary" />
+                            <span className="text-[10px] text-dark-text-secondary truncate max-w-full">{name}</span>
                           </button>
                         ))}
                       </div>
@@ -445,7 +445,7 @@ export default function PlatformLinkTypePage() {
             </div>
             {/* 源/目标对象类型 */}
             <div className="col-span-2 space-y-1.5">
-              <label className="text-[14px] font-medium text-[#2d3748]">允许源对象类型</label>
+              <label className="text-[14px] font-medium text-dark-text-primary">允许源对象类型</label>
               <div className="flex flex-wrap gap-2">
                 {objectTypeCategoryOptions.map(opt => (
                   <button
@@ -461,8 +461,8 @@ export default function PlatformLinkTypePage() {
                     className={cn(
                       'px-3 py-1.5 rounded-md text-[13px] border transition-colors',
                       (form.sourceTypes || []).includes(opt)
-                        ? 'bg-[#eef4ff] border-[#3478f6] text-[#3478f6]'
-                        : 'bg-white border-[#dde1e8] text-[#4a5568] hover:border-[#9ba4b3]'
+                        ? 'bg-dark-accent-primary/10 border-dark-accent-primary text-dark-accent-primary'
+                        : 'bg-dark-elevated border-dark-border-hover text-dark-text-secondary hover:border-dark-text-tertiary'
                     )}
                   >
                     {opt}
@@ -471,7 +471,7 @@ export default function PlatformLinkTypePage() {
               </div>
             </div>
             <div className="col-span-2 space-y-1.5">
-              <label className="text-[14px] font-medium text-[#2d3748]">允许目标对象类型</label>
+              <label className="text-[14px] font-medium text-dark-text-primary">允许目标对象类型</label>
               <div className="flex flex-wrap gap-2">
                 {objectTypeCategoryOptions.map(opt => (
                   <button
@@ -487,8 +487,8 @@ export default function PlatformLinkTypePage() {
                     className={cn(
                       'px-3 py-1.5 rounded-md text-[13px] border transition-colors',
                       (form.targetTypes || []).includes(opt)
-                        ? 'bg-[#eef4ff] border-[#3478f6] text-[#3478f6]'
-                        : 'bg-white border-[#dde1e8] text-[#4a5568] hover:border-[#9ba4b3]'
+                        ? 'bg-dark-accent-primary/10 border-dark-accent-primary text-dark-accent-primary'
+                        : 'bg-dark-elevated border-dark-border-hover text-dark-text-secondary hover:border-dark-text-tertiary'
                     )}
                   >
                     {opt}
@@ -497,18 +497,18 @@ export default function PlatformLinkTypePage() {
               </div>
             </div>
             <div className="col-span-2 space-y-1.5">
-              <label className="text-[14px] font-medium text-[#2d3748]">描述</label>
+              <label className="text-[14px] font-medium text-dark-text-primary">描述</label>
               <textarea
                 value={form.description || ''}
                 onChange={e => updateForm('description', e.target.value)}
-                className="w-full min-h-[60px] px-3 py-2 rounded-md border border-[#dde1e8] text-[14px] text-[#4a5568] focus:outline-none focus:border-[#5a96ff] focus:ring-2 focus:ring-[#d9e6ff] resize-y"
+                className="w-full min-h-[60px] px-3 py-2 rounded-md border border-dark-border-hover text-[14px] text-dark-text-secondary focus:outline-none focus:border-dark-accent-primary-hover focus:ring-2 focus:ring-dark-accent-primary/20 resize-y"
                 placeholder="链接类型的业务说明"
               />
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setModalOpen(false)} className="border-[#dde1e8]">取消</Button>
-            <Button onClick={handleSave} className="bg-[#3478f6] hover:bg-[#1d5ee0]">保存</Button>
+            <Button variant="outline" onClick={() => setModalOpen(false)} className="border-dark-border-hover">取消</Button>
+            <Button onClick={handleSave} className="bg-dark-accent-primary hover:bg-dark-accent-primary-active">保存</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -519,11 +519,11 @@ export default function PlatformLinkTypePage() {
           <DialogHeader>
             <DialogTitle className="text-h2">确认删除</DialogTitle>
           </DialogHeader>
-          <p className="text-[14px] text-[#4a5568] py-4">
+          <p className="text-[14px] text-dark-text-secondary py-4">
             删除后不可恢复，是否继续？
           </p>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setDeleteConfirm(null)} className="border-[#dde1e8]">取消</Button>
+            <Button variant="outline" onClick={() => setDeleteConfirm(null)} className="border-dark-border-hover">取消</Button>
             <Button variant="destructive" onClick={() => deleteConfirm && handleDelete(deleteConfirm)}>删除</Button>
           </DialogFooter>
         </DialogContent>

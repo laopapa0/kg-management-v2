@@ -30,18 +30,18 @@ function DocumentRow({ doc, onView, onReEdit }: DocumentRowProps) {
 
   return (
     <tr
-      className="border-b border-[#e8ecf1] last:border-b-0 hover:bg-[#f8f9fb] cursor-pointer"
+      className="border-b border-dark-border last:border-b-0 hover:bg-dark-page cursor-pointer"
       onClick={() => onView(doc)}
       data-testid={`doc-row-${doc.id}`}
     >
-      <td className="px-4 py-3 text-[#1a202c]">{doc.name}</td>
-      <td className="px-4 py-3 text-[#6b7789]">
+      <td className="px-4 py-3 text-dark-text-primary">{doc.name}</td>
+      <td className="px-4 py-3 text-dark-text-secondary">
         {kb?.name || doc.targetKnowledgeBaseId}
       </td>
-      <td className="px-4 py-3 text-[#6b7789]">
+      <td className="px-4 py-3 text-dark-text-secondary">
         {new Date(doc.uploadTime).toLocaleDateString('zh-CN')}
       </td>
-      <td className="px-4 py-3 text-[#6b7789]">
+      <td className="px-4 py-3 text-dark-text-secondary">
         {formatFileSize(doc.fileSize)}
       </td>
       <td className="px-4 py-3">
@@ -54,7 +54,7 @@ function DocumentRow({ doc, onView, onReEdit }: DocumentRowProps) {
       <td className="px-4 py-3">
         <div className="flex items-center gap-3">
           <button
-            className="text-[#3478f6] hover:text-[#2868e0] flex items-center gap-1"
+            className="text-dark-accent-primary hover:text-dark-accent-primary flex items-center gap-1"
             onClick={(e) => {
               e.stopPropagation();
               onView(doc);
@@ -65,7 +65,7 @@ function DocumentRow({ doc, onView, onReEdit }: DocumentRowProps) {
           </button>
           {doc.status === 'rejected' && onReEdit && (
             <button
-              className="text-[#f59e0b] hover:text-[#d97706] flex items-center gap-1"
+              className="text-warning-500 hover:text-warning-600 flex items-center gap-1"
               onClick={(e) => {
                 e.stopPropagation();
                 onReEdit(doc);
@@ -109,10 +109,10 @@ export default function MyDocumentsList() {
 
   return (
     <div>
-      <div className="bg-white rounded-lg border border-[#e8ecf1]">
+      <div className="bg-dark-elevated rounded-lg border border-dark-border">
         <table className="w-full text-[13px]">
           <thead>
-            <tr className="border-b border-[#e8ecf1] text-[#6b7789]">
+            <tr className="border-b border-dark-border text-dark-text-secondary">
               <th className="text-left font-medium px-4 py-3">文档名称</th>
               <th className="text-left font-medium px-4 py-3">目标知识库</th>
               <th className="text-left font-medium px-4 py-3">上传时间</th>
@@ -124,7 +124,7 @@ export default function MyDocumentsList() {
           <tbody>
             {sortedDocs.length === 0 && (
               <tr>
-                <td colSpan={6} className="text-center text-[#6b7789] py-12">
+                <td colSpan={6} className="text-center text-dark-text-secondary py-12">
                   暂无文档，请先上传
                 </td>
               </tr>

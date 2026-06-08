@@ -239,8 +239,8 @@ function TreeNodeRow({
       className={cn(
         'flex items-center h-9 rounded-md cursor-pointer transition-colors duration-100 select-none group',
         selected
-          ? 'bg-[#f3f0ff] text-[#7c5cfc] relative'
-          : 'hover:bg-[#e8ecf1] text-[#4a5568]'
+          ? 'bg-[var(--accent-noc)]/10 text-[var(--accent-noc)] relative'
+          : 'hover:bg-dark-tree-hover-bg text-dark-text-secondary'
       )}
       style={{ margin: '0 6px', paddingLeft: 10 + depth * 16 }}
       onClick={() => {
@@ -249,11 +249,11 @@ function TreeNodeRow({
       }}
     >
       {selected && (
-        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-[#7c5cfc] rounded-r-full" />
+        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-[var(--accent-noc)] rounded-r-full" />
       )}
       {hasChildren ? (
         <span
-          className="mr-1 text-[#9ba4b3] hover:text-[#6b7789]"
+          className="mr-1 text-dark-text-tertiary hover:text-dark-text-secondary"
           onClick={(e) => { e.stopPropagation(); onToggle(); }}
         >
           {expanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
@@ -262,11 +262,11 @@ function TreeNodeRow({
         <span className="w-[14px] mr-1" />
       )}
       {isField ? (
-        <Box size={15} className="mr-2 shrink-0 text-[#7c5cfc]" />
+        <Box size={15} className="mr-2 shrink-0 text-[var(--accent-noc)]" />
       ) : expanded ? (
-        <FolderOpen size={15} className="mr-2 shrink-0 text-[#f59e0b]" />
+        <FolderOpen size={15} className="mr-2 shrink-0 text-warning-500" />
       ) : (
-        <Folder size={15} className="mr-2 shrink-0 text-[#9ba4b3]" />
+        <Folder size={15} className="mr-2 shrink-0 text-dark-text-tertiary" />
       )}
       <span className="text-[13px] truncate">{node.name}</span>
     </div>
@@ -427,8 +427,8 @@ export default function NocObjectTypePage() {
           className={cn(
             'inline-flex items-center px-2 py-0.5 rounded text-[12px] font-medium',
             record.status === '启用'
-              ? 'bg-[#ecfdf5] text-[#059669]'
-              : 'bg-[#fef2f2] text-[#dc2626]'
+              ? 'bg-success-500/10 text-success-600'
+              : 'bg-error-500/10 text-error-600'
           )}
         >
           {record.status}
@@ -444,7 +444,7 @@ export default function NocObjectTypePage() {
           <Button variant="ghost" size="sm" className="h-7 px-2 text-[12px]" onClick={() => openEditEnum(record)}>
             编辑
           </Button>
-          <Button variant="ghost" size="sm" className="h-7 px-2 text-[12px] text-[#ef4444] hover:text-[#dc2626]" onClick={() => deleteEnum(record.id)}>
+          <Button variant="ghost" size="sm" className="h-7 px-2 text-[12px] text-error-500 hover:text-error-600" onClick={() => deleteEnum(record.id)}>
             删除
           </Button>
         </div>
@@ -470,19 +470,19 @@ export default function NocObjectTypePage() {
       <div className="flex items-center justify-between mb-5">
         <div>
           <h1 className="text-display">对象类型管理</h1>
-          <p className="text-small text-[#6b7789] mt-1">维护指标对象类型的字段定义与枚举值，管理指标平表数据</p>
+          <p className="text-small text-dark-text-secondary mt-1">维护指标对象类型的字段定义与枚举值，管理指标平表数据</p>
         </div>
       </div>
 
       {/* 左右分栏 */}
-      <div className="flex-1 flex overflow-hidden rounded-lg border border-[#e8ecf1] bg-white">
+      <div className="flex-1 flex overflow-hidden rounded-lg border border-dark-border bg-dark-elevated">
         {/* 左侧面板 - 字段定义树 */}
         <div
-          className="flex flex-col border-r border-[#e8ecf1] bg-[#f8f9fb]"
+          className="flex flex-col border-r border-dark-border bg-dark-page"
           style={{ width: leftWidth, minWidth: 200, maxWidth: 480 }}
         >
           {/* 树工具栏 */}
-          <div className="p-3 border-b border-[#e8ecf1] bg-white">
+          <div className="p-3 border-b border-dark-border bg-dark-elevated">
             <SearchInput
               placeholder="搜索对象类型字段"
               value={treeSearch}
@@ -491,12 +491,12 @@ export default function NocObjectTypePage() {
               className="mb-2"
             />
             <div className="flex items-center justify-between">
-              <span className="text-[12px] text-[#9ba4b3]">对象类型字段</span>
+              <span className="text-[12px] text-dark-text-tertiary">对象类型字段</span>
               <div className="flex gap-1">
-                <Button variant="ghost" size="sm" className="h-6 px-2 text-[11px] text-[#6b7789]" onClick={expandAll}>
+                <Button variant="ghost" size="sm" className="h-6 px-2 text-[11px] text-dark-text-secondary" onClick={expandAll}>
                   展开全部
                 </Button>
-                <Button variant="ghost" size="sm" className="h-6 px-2 text-[11px] text-[#6b7789]" onClick={collapseAll}>
+                <Button variant="ghost" size="sm" className="h-6 px-2 text-[11px] text-dark-text-secondary" onClick={collapseAll}>
                   收起全部
                 </Button>
               </div>
@@ -516,24 +516,24 @@ export default function NocObjectTypePage() {
         </div>
 
         {/* 分隔条 */}
-        <div className="w-1 bg-[#e8ecf1] shrink-0" />
+        <div className="w-1 bg-dark-card-l3 shrink-0" />
 
         {/* 右侧面板 */}
         <div className="flex-1 overflow-y-auto p-6">
           {!selectedNode ? (
             /* 空状态 */
-            <div className="flex flex-col items-center justify-center h-full text-[#9ba4b3]">
-              <Box size={64} className="text-[#c4cad4] mb-4" />
-              <p className="text-body text-[#6b7789]">请从左侧选择一个对象类型字段</p>
-              <p className="text-[13px] text-[#9ba4b3] mt-1">查看字段枚举值及关联指标</p>
+            <div className="flex flex-col items-center justify-center h-full text-dark-text-tertiary">
+              <Box size={64} className="text-dark-text-tertiary mb-4" />
+              <p className="text-body text-dark-text-secondary">请从左侧选择一个对象类型字段</p>
+              <p className="text-[13px] text-dark-text-tertiary mt-1">查看字段枚举值及关联指标</p>
             </div>
           ) : selectedNode.nodeType === 'group' ? (
             /* 分组节点 - 仅展示指标平表 */
             <div className="space-y-6">
               <h2 className="text-h2">{selectedNode.name}</h2>
-              <div className="bg-white rounded-lg border border-[#e8ecf1]">
-                <div className="flex items-center justify-between px-5 py-4 border-b border-[#e8ecf1]">
-                  <h3 className="text-[14px] font-medium text-[#2d3748]">指标列表</h3>
+              <div className="bg-dark-elevated rounded-lg border border-dark-border">
+                <div className="flex items-center justify-between px-5 py-4 border-b border-dark-border">
+                  <h3 className="text-[14px] font-medium text-dark-text-primary">指标列表</h3>
                   <SearchInput
                     placeholder="搜索指标名称或编码"
                     value={indicatorSearch}
@@ -551,17 +551,17 @@ export default function NocObjectTypePage() {
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <h2 className="text-h2">{selectedNode.name}</h2>
-                <span className="text-[13px] text-[#9ba4b3]">
+                <span className="text-[13px] text-dark-text-tertiary">
                   字段类型：{selectedNode.fieldType === 'enum' ? '枚举' : selectedNode.fieldType === 'boolean' ? '布尔' : '文本'}
                 </span>
               </div>
 
               {/* 上方：枚举值管理（仅枚举类型字段） */}
               {selectedNode.fieldType === 'enum' ? (
-                <div className="bg-white rounded-lg border border-[#e8ecf1]">
-                  <div className="flex items-center justify-between px-5 py-4 border-b border-[#e8ecf1]">
-                    <h3 className="text-[14px] font-medium text-[#2d3748]">枚举值管理</h3>
-                    <Button size="sm" variant="outline" className="h-8 border-[#dde1e8]" onClick={openAddEnum}>
+                <div className="bg-dark-elevated rounded-lg border border-dark-border">
+                  <div className="flex items-center justify-between px-5 py-4 border-b border-dark-border">
+                    <h3 className="text-[14px] font-medium text-dark-text-primary">枚举值管理</h3>
+                    <Button size="sm" variant="outline" className="h-8 border-dark-border-hover" onClick={openAddEnum}>
                       <Plus size={14} className="mr-1" />
                       添加枚举值
                     </Button>
@@ -571,31 +571,31 @@ export default function NocObjectTypePage() {
                       <DataTable columns={enumColumns} data={currentEnums} rowKey="id" />
                     ) : (
                       <div className="text-center py-8">
-                        <AlertCircle size={32} className="text-[#c4cad4] mx-auto mb-2" />
-                        <p className="text-[13px] text-[#6b7789]">暂无枚举值</p>
+                        <AlertCircle size={32} className="text-dark-text-tertiary mx-auto mb-2" />
+                        <p className="text-[13px] text-dark-text-secondary">暂无枚举值</p>
                       </div>
                     )}
                   </div>
                 </div>
               ) : (
-                <div className="bg-white rounded-lg border border-[#e8ecf1] p-6">
-                  <AlertCircle size={24} className="text-[#c4cad4] mb-2" />
-                  <p className="text-[13px] text-[#6b7789]">
+                <div className="bg-dark-elevated rounded-lg border border-dark-border p-6">
+                  <AlertCircle size={24} className="text-dark-text-tertiary mb-2" />
+                  <p className="text-[13px] text-dark-text-secondary">
                     当前字段类型为「{selectedNode.fieldType === 'boolean' ? '布尔' : '文本'}」，无需配置枚举值
                   </p>
                 </div>
               )}
 
               {/* 下方：指标平表列表 */}
-              <div className="bg-white rounded-lg border border-[#e8ecf1]">
-                <div className="flex items-center justify-between px-5 py-4 border-b border-[#e8ecf1]">
+              <div className="bg-dark-elevated rounded-lg border border-dark-border">
+                <div className="flex items-center justify-between px-5 py-4 border-b border-dark-border">
                   <div className="flex items-center gap-3">
-                    <h3 className="text-[14px] font-medium text-[#2d3748]">关联指标</h3>
+                    <h3 className="text-[14px] font-medium text-dark-text-primary">关联指标</h3>
                     {selectedEnumFilter && (
-                      <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] bg-[#f3f0ff] text-[#7c5cfc]">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] bg-[var(--accent-noc)]/10 text-[var(--accent-noc)]">
                         {selectedNode.name} = {selectedEnumFilter}
                         <button
-                          className="ml-1 text-[#7c5cfc] hover:text-[#5a3fd6]"
+                          className="ml-1 text-[var(--accent-noc)] hover:text-[var(--accent-noc)]"
                           onClick={() => setSelectedEnumFilter(null)}
                         >
                           ×
@@ -641,12 +641,12 @@ export default function NocObjectTypePage() {
             <div className="flex items-center gap-3">
               <Label>状态</Label>
               <Switch checked={enumForm.status} onCheckedChange={(v) => setEnumForm({ ...enumForm, status: v })} />
-              <span className="text-[13px] text-[#6b7789]">{enumForm.status ? '启用' : '停用'}</span>
+              <span className="text-[13px] text-dark-text-secondary">{enumForm.status ? '启用' : '停用'}</span>
             </div>
           </div>
           <DialogFooter className="mt-4">
             <Button variant="outline" onClick={() => setEnumModalOpen(false)}>取消</Button>
-            <Button className="bg-[#7c5cfc] hover:bg-[#6b4ce0] text-white" onClick={saveEnum}>保存</Button>
+            <Button className="bg-[var(--accent-noc)] hover:bg-[var(--accent-noc)] text-white" onClick={saveEnum}>保存</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

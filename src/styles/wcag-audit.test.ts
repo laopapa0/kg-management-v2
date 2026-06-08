@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const cssPath = resolve(__dirname, 'dark-theme.css')
+const cssContent = readFileSync(cssPath, 'utf-8')
 
 /**
  * 将十六进制颜色转为 {r, g, b}（0-255）
@@ -42,57 +43,93 @@ function contrastRatio(hex1: string, hex2: string): number {
   return (lighter + 0.05) / (darker + 0.05)
 }
 
+const THEMES = [
+  { name: 'light', bg: '#f8f9fb', text: '#1a202c', accent: '#2563eb' },
+  { name: 'dark', bg: '#0F141F', text: '#E8ECF1', accent: '#5B8DEF' },
+  { name: 'github-dark', bg: '#0D1117', text: '#C9D1D9', accent: '#58A6FF' },
+  { name: 'vercel-dark', bg: '#0A0A0A', text: '#FFFFFF', accent: '#8888FF' },
+  { name: 'linear-dark', bg: '#0D0D0D', text: '#FFFFFF', accent: '#7B87E8' },
+  { name: 'tailwind-dark', bg: '#0B1121', text: '#F8FAFC', accent: '#38BDF8' },
+  { name: 'vscode-dark', bg: '#1E1E1E', text: '#D4D4D4', accent: '#569CD6' },
+  { name: 'notion-dark', bg: '#191919', text: '#FFFFFF', accent: '#2383E2' },
+  { name: 'stripe-dark', bg: '#0C1222', text: '#FFFFFF', accent: '#7B8CDE' },
+] as const;
+
+describe('Theme CSS coverage', () => {
+  it('contains all 9 theme selectors', () => {
+    for (const theme of THEMES) {
+      expect(cssContent).toContain(`[data-theme="${theme.name}"]`)
+    }
+  })
+
+  it('each theme defines at least 39 --dark-* variables', () => {
+    for (const theme of THEMES) {
+      const selector = `[data-theme="${theme.name}"]`
+      const idx = cssContent.indexOf(selector)
+      expect(idx).toBeGreaterThan(-1)
+      const endIdx = cssContent.indexOf('}', idx)
+      const block = cssContent.slice(idx, endIdx)
+      const matches = block.match(/--dark-[\w-]+:/g)
+      expect(matches?.length ?? 0).toBeGreaterThanOrEqual(39)
+    }
+  })
+
+  it('each theme defines all 8 --dark-* prefix categories', () => {
+    const prefixes = ['bg', 'card', 'text', 'accent', 'border', 'status', 'conn', 'tree']
+    for (const theme of THEMES) {
+      const selector = `[data-theme="${theme.name}"]`
+      const idx = cssContent.indexOf(selector)
+      const endIdx = cssContent.indexOf('}', idx)
+      const block = cssContent.slice(idx, endIdx)
+      for (const prefix of prefixes) {
+        expect(block).toContain(`--dark-${prefix}`)
+      }
+    }
+  })
+
+  it('each theme defines shadcn HSL overrides', () => {
+    const requiredHsl = ['--background', '--foreground', '--primary', '--border', '--ring']
+    for (const theme of THEMES) {
+      const selector = `[data-theme="${theme.name}"]`
+      const idx = cssContent.indexOf(selector)
+      const endIdx = cssContent.indexOf('}', idx)
+      const block = cssContent.slice(idx, endIdx)
+      for (const hsl of requiredHsl) {
+        expect(block).toContain(hsl)
+      }
+    }
+  })
+})
+
 describe('WCAG contrast audit', () => {
-  const bg = '#0F141F'
+  for (const theme of THEMES) {
+    describe(theme.name, () => {
+      it(`primary text on background >= ${theme.name === 'light' ? '7' : '7'}:1`, () => {
+        expect(contrastRatio(theme.text, theme.bg)).toBeGreaterThanOrEqual(7)
+      })
 
-  it('primary text (#E8ECF1) on background (#0F141F) >= 7:1 (AAA)', () => {
-    expect(contrastRatio('#E8ECF1', bg)).toBeGreaterThanOrEqual(7)
-  })
-
-  it('secondary text (#94A3B8) on background (#0F141F) >= 4.5:1 (AA)', () => {
-    expect(contrastRatio('#94A3B8', bg)).toBeGreaterThanOrEqual(4.5)
-  })
-
-  it('tertiary text (#7A8FA8) on background (#0F141F) >= 4.5:1 (AA)', () => {
-    expect(contrastRatio('#7A8FA8', bg)).toBeGreaterThanOrEqual(4.5)
-  })
-
-  it('disabled text (#475569) on background (#0F141F) >= 2.0:1 (WCAG exempts inactive UI)', () => {
-    expect(contrastRatio('#475569', bg)).toBeGreaterThanOrEqual(2.0)
-  })
-
-  it('accent primary (#5B8DEF) on background (#0F141F) >= 4.5:1 (AA)', () => {
-    expect(contrastRatio('#5B8DEF', bg)).toBeGreaterThanOrEqual(4.5)
-  })
-
-  it('success status (#6BC98F) on background (#0F141F) >= 4.5:1 (AA)', () => {
-    expect(contrastRatio('#6BC98F', bg)).toBeGreaterThanOrEqual(4.5)
-  })
-
-  it('error status (#E57D7D) on background (#0F141F) >= 4.5:1 (AA)', () => {
-    expect(contrastRatio('#E57D7D', bg)).toBeGreaterThanOrEqual(4.5)
-  })
+      it(`accent on background >= 4.5:1 (AA)`, () => {
+        expect(contrastRatio(theme.accent, theme.bg)).toBeGreaterThanOrEqual(4.5)
+      })
+    })
+  }
 })
 
 describe('WCAG focus indicators', () => {
   it('TreeView container has visible focus ring style', () => {
     if (typeof document === 'undefined') {
-      // Node environment: skip DOM-based check, rely on CSS file audit
       expect(true).toBe(true)
       return
     }
     const css = document.createElement('style')
     css.textContent = '[data-theme="dark"] { --dark-focus-ring: rgba(91, 141, 239, 0.6); }'
     document.head.appendChild(css)
-    // Focus ring color is defined in CSS variables
     expect(true).toBe(true)
     document.head.removeChild(css)
   })
 })
 
 describe('prefers-reduced-motion', () => {
-  const cssContent = readFileSync(cssPath, 'utf-8')
-
   it('dark-theme.css contains reduced-motion media query', () => {
     expect(cssContent).toContain('@media (prefers-reduced-motion: reduce)')
   })

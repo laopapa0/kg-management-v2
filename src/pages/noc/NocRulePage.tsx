@@ -171,20 +171,20 @@ function CatTreeNode({ node, selectedId, expandedIds, onSelect, onToggleExpand }
         onClick={() => { onSelect(node); if (hasChildren) onToggleExpand(node.id); }}
         className={cn(
           'flex items-center h-9 px-2 rounded-md cursor-pointer transition-colors duration-100 select-none',
-          isSelected ? 'bg-[#f3f0ff] text-[#7c5cfc] relative' : 'hover:bg-[#e8ecf1] text-[#4a5568]',
+          isSelected ? 'bg-[var(--accent-noc)]/10 text-[var(--accent-noc)] relative' : 'hover:bg-dark-tree-hover-bg text-dark-text-secondary',
         )}
       >
         {isSelected && (
-          <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-[#7c5cfc] rounded-r-full" />
+          <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-[var(--accent-noc)] rounded-r-full" />
         )}
         {hasChildren ? (
-          <span className="mr-1 text-[#9ba4b3]" onClick={(e) => { e.stopPropagation(); onToggleExpand(node.id); }}>
+          <span className="mr-1 text-dark-text-tertiary" onClick={(e) => { e.stopPropagation(); onToggleExpand(node.id); }}>
             {isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
           </span>
         ) : (
           <span className="w-[14px] mr-1" />
         )}
-        <FolderTree size={14} className={cn('mr-2 shrink-0', isSelected ? 'text-[#7c5cfc]' : 'text-[#9ba4b3]')} />
+        <FolderTree size={14} className={cn('mr-2 shrink-0', isSelected ? 'text-[var(--accent-noc)]' : 'text-dark-text-tertiary')} />
         <span className={cn('text-[13px] truncate', isSelected && 'font-medium')}>{node.name}</span>
       </div>
       {hasChildren && isExpanded && (
@@ -318,11 +318,11 @@ export default function NocRulePage() {
       title: '父规则',
       render: (record: RuleItem) => (
         record.parentRule ? (
-          <span className="text-[12px] text-[#7c5cfc] bg-[#f3f0ff] px-2 py-0.5 rounded">
+          <span className="text-[12px] text-[var(--accent-noc)] bg-[var(--accent-noc)]/10 px-2 py-0.5 rounded">
             ↳ {record.parentRule}
           </span>
         ) : (
-          <span className="text-[12px] text-[#9ba4b3]">—</span>
+          <span className="text-[12px] text-dark-text-tertiary">—</span>
         )
       ),
     },
@@ -334,7 +334,7 @@ export default function NocRulePage() {
         <Switch
           checked={record.status === 'enabled'}
           onCheckedChange={() => {}}
-          className="data-[state=checked]:bg-[#7c5cfc]"
+          className="data-[state=checked]:bg-[var(--accent-noc)]"
         />
       ),
     },
@@ -345,8 +345,8 @@ export default function NocRulePage() {
       width: 'w-[120px]',
       render: (record: RuleItem) => (
         <div className="flex items-center gap-2">
-          <button onClick={() => openEditRuleModal(record)} className="text-[12px] text-[#3478f6] hover:underline">编辑</button>
-          <button className="text-[12px] text-[#ef4444] hover:underline">删除</button>
+          <button onClick={() => openEditRuleModal(record)} className="text-[12px] text-dark-accent-primary hover:underline">编辑</button>
+          <button className="text-[12px] text-error-500 hover:underline">删除</button>
         </div>
       ),
     },
@@ -361,19 +361,19 @@ export default function NocRulePage() {
       {/* ── Page Header ── */}
       <div className="flex items-center justify-between mb-5">
         <div>
-          <h1 className="text-[28px] font-semibold text-[#1a202c] leading-tight tracking-[-0.02em]">业务规则管理</h1>
-          <p className="text-[13px] text-[#6b7789] mt-1">维护业务规则模板与分类体系，定义参数JSON Schema与继承关系</p>
+          <h1 className="text-[28px] font-semibold text-dark-text-primary leading-tight tracking-[-0.02em]">业务规则管理</h1>
+          <p className="text-[13px] text-dark-text-secondary mt-1">维护业务规则模板与分类体系，定义参数JSON Schema与继承关系</p>
         </div>
         <div className="flex items-center gap-3">
-          <Button onClick={openNewRuleModal} className="bg-[#3478f6] hover:bg-[#1d5ee0] h-9 px-4 text-[14px]">
+          <Button onClick={openNewRuleModal} className="bg-dark-accent-primary hover:bg-dark-accent-primary-active h-9 px-4 text-[14px]">
             <Plus size={16} className="mr-1.5" />
             新增规则
           </Button>
-          <Button onClick={handleDetectConflict} variant="outline" className="h-9 px-4 text-[14px] border-[#dde1e8] text-[#4a5568] hover:bg-[#f8f9fb]">
+          <Button onClick={handleDetectConflict} variant="outline" className="h-9 px-4 text-[14px] border-dark-border-hover text-dark-text-secondary hover:bg-dark-page">
             <AlertTriangle size={16} className="mr-1.5" />
             检测冲突
           </Button>
-          <Button onClick={() => setManageCatModalOpen(true)} variant="outline" className="h-9 px-4 text-[14px] border-[#dde1e8] text-[#4a5568] hover:bg-[#f8f9fb]">
+          <Button onClick={() => setManageCatModalOpen(true)} variant="outline" className="h-9 px-4 text-[14px] border-dark-border-hover text-dark-text-secondary hover:bg-dark-page">
             <FolderTree size={16} className="mr-1.5" />
             管理分类
           </Button>
@@ -381,10 +381,10 @@ export default function NocRulePage() {
       </div>
 
       {/* ── 左右分栏 ── */}
-      <div className="flex gap-0 border border-[#e8ecf1] rounded-lg bg-white overflow-hidden" style={{ height: 'calc(100vh - 200px)' }}>
+      <div className="flex gap-0 border border-dark-border rounded-lg bg-dark-elevated overflow-hidden" style={{ height: 'calc(100vh - 200px)' }}>
         {/* 左侧：分类树 */}
-        <div className="w-[240px] min-w-[240px] bg-[#f8f9fb] border-r border-[#e8ecf1] flex flex-col">
-          <div className="p-3 border-b border-[#e8ecf1]">
+        <div className="w-[240px] min-w-[240px] bg-dark-page border-r border-dark-border flex flex-col">
+          <div className="p-3 border-b border-dark-border">
             <SearchInput
               placeholder="搜索分类"
               value={treeSearch}
@@ -405,10 +405,10 @@ export default function NocRulePage() {
             ))}
           </div>
           {selectedCat && (
-            <div className="p-3 border-t border-[#e8ecf1] bg-[#f3f0ff]">
+            <div className="p-3 border-t border-dark-border bg-[var(--accent-noc)]/10">
               <div className="flex items-center justify-between">
-                <span className="text-[12px] text-[#7c5cfc] font-medium">已选分类: {selectedCat.name}</span>
-                <button onClick={() => setSelectedCatId(null)} className="text-[#7c5cfc] hover:text-[#5a3fd6]">
+                <span className="text-[12px] text-[var(--accent-noc)] font-medium">已选分类: {selectedCat.name}</span>
+                <button onClick={() => setSelectedCatId(null)} className="text-[var(--accent-noc)] hover:text-[var(--accent-noc)]">
                   <X size={14} />
                 </button>
               </div>
@@ -419,7 +419,7 @@ export default function NocRulePage() {
         {/* 右侧：规则列表 */}
         <div className="flex-1 flex flex-col overflow-hidden">
           {/* 工具栏 */}
-          <div className="flex items-center justify-between p-4 border-b border-[#e8ecf1]">
+          <div className="flex items-center justify-between p-4 border-b border-dark-border">
             <div className="flex items-center gap-3">
               <SearchInput
                 placeholder="搜索规则名称"
@@ -441,7 +441,7 @@ export default function NocRulePage() {
                 </SelectContent>
               </Select>
             </div>
-            <span className="text-[13px] text-[#6b7789]">共 {filteredRules.length} 条</span>
+            <span className="text-[13px] text-dark-text-secondary">共 {filteredRules.length} 条</span>
           </div>
 
           {/* 表格 */}
@@ -465,14 +465,14 @@ export default function NocRulePage() {
           </DialogHeader>
 
           <Tabs defaultValue="basic" className="mt-2">
-            <TabsList className="w-full bg-[#f8f9fb] h-9">
-              <TabsTrigger value="basic" className="text-[13px] flex-1 data-[state=active]:bg-white">
+            <TabsList className="w-full bg-dark-page h-9">
+              <TabsTrigger value="basic" className="text-[13px] flex-1 data-[state=active]:bg-dark-elevated">
                 <FileText size={14} className="mr-1.5" />基本信息
               </TabsTrigger>
-              <TabsTrigger value="params" className="text-[13px] flex-1 data-[state=active]:bg-white">
+              <TabsTrigger value="params" className="text-[13px] flex-1 data-[state=active]:bg-dark-elevated">
                 <Code2 size={14} className="mr-1.5" />参数定义
               </TabsTrigger>
-              <TabsTrigger value="inherit" className="text-[13px] flex-1 data-[state=active]:bg-white">
+              <TabsTrigger value="inherit" className="text-[13px] flex-1 data-[state=active]:bg-dark-elevated">
                 <GitBranch size={14} className="mr-1.5" />继承关系
               </TabsTrigger>
             </TabsList>
@@ -481,16 +481,16 @@ export default function NocRulePage() {
             <TabsContent value="basic" className="space-y-4 mt-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label className="text-[13px] text-[#4a5568]">规则编码</Label>
+                  <Label className="text-[13px] text-dark-text-secondary">规则编码</Label>
                   <Input
                     defaultValue={editingRule?.code || ''}
                     disabled={!!editingRule}
                     placeholder="自动生成"
-                    className="mt-1 h-9 text-[14px] bg-[#f8f9fb]"
+                    className="mt-1 h-9 text-[14px] bg-dark-page"
                   />
                 </div>
                 <div>
-                  <Label className="text-[13px] text-[#4a5568]">规则名称 <span className="text-[#ef4444]">*</span></Label>
+                  <Label className="text-[13px] text-dark-text-secondary">规则名称 <span className="text-error-500">*</span></Label>
                   <Input
                     value={ruleForm.name}
                     onChange={(e) => setRuleForm(prev => ({ ...prev, name: e.target.value }))}
@@ -501,7 +501,7 @@ export default function NocRulePage() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label className="text-[13px] text-[#4a5568]">所属分类</Label>
+                  <Label className="text-[13px] text-dark-text-secondary">所属分类</Label>
                   <Select value={ruleForm.category} onValueChange={(v) => setRuleForm(prev => ({ ...prev, category: v }))}>
                     <SelectTrigger className="mt-1 h-9 text-[14px]">
                       <SelectValue placeholder="选择分类" />
@@ -518,7 +518,7 @@ export default function NocRulePage() {
                   </Select>
                 </div>
                 <div>
-                  <Label className="text-[13px] text-[#4a5568]">规则类型</Label>
+                  <Label className="text-[13px] text-dark-text-secondary">规则类型</Label>
                   <Select value={ruleForm.type} onValueChange={(v) => setRuleForm(prev => ({ ...prev, type: v }))}>
                     <SelectTrigger className="mt-1 h-9 text-[14px]">
                       <SelectValue placeholder="选择类型" />
@@ -534,7 +534,7 @@ export default function NocRulePage() {
                 </div>
               </div>
               <div>
-                <Label className="text-[13px] text-[#4a5568]">规则逻辑描述</Label>
+                <Label className="text-[13px] text-dark-text-secondary">规则逻辑描述</Label>
                 <Textarea
                   value={ruleForm.description}
                   onChange={(e) => setRuleForm(prev => ({ ...prev, description: e.target.value }))}
@@ -543,9 +543,9 @@ export default function NocRulePage() {
                 />
               </div>
               <div className="flex items-center justify-between">
-                <Label className="text-[13px] text-[#4a5568]">状态</Label>
+                <Label className="text-[13px] text-dark-text-secondary">状态</Label>
                 <div className="flex items-center gap-2">
-                  <span className="text-[13px] text-[#4a5568]">{ruleForm.status ? '启用' : '停用'}</span>
+                  <span className="text-[13px] text-dark-text-secondary">{ruleForm.status ? '启用' : '停用'}</span>
                   <Switch checked={ruleForm.status} onCheckedChange={(v) => setRuleForm(prev => ({ ...prev, status: v }))} />
                 </div>
               </div>
@@ -554,18 +554,18 @@ export default function NocRulePage() {
             {/* Tab 2: 参数定义 */}
             <TabsContent value="params" className="space-y-3 mt-4">
               <div className="flex items-center justify-between">
-                <h3 className="text-[14px] font-medium text-[#4a5568]">参数定义（JSON Schema）</h3>
+                <h3 className="text-[14px] font-medium text-dark-text-secondary">参数定义（JSON Schema）</h3>
                 <div className="flex items-center gap-2">
-                  <Button variant="outline" size="sm" className="h-7 text-[12px] border-[#dde1e8]">
+                  <Button variant="outline" size="sm" className="h-7 text-[12px] border-dark-border-hover">
                     校验 JSON
                   </Button>
-                  <Button variant="ghost" size="sm" className="h-7 text-[12px] text-[#3478f6]">
+                  <Button variant="ghost" size="sm" className="h-7 text-[12px] text-dark-accent-primary">
                     格式化
                   </Button>
                 </div>
               </div>
               <div className="relative">
-                <div className="absolute left-0 top-0 bottom-0 w-10 bg-[#1e293b] rounded-l-md flex flex-col items-center pt-2 text-[#64748b] text-[11px] font-mono select-none">
+                <div className="absolute left-0 top-0 bottom-0 w-10 bg-dark-card-l2 rounded-l-md flex flex-col items-center pt-2 text-dark-text-secondary text-[11px] font-mono select-none">
                   {jsonSchema.split('\n').map((_, i) => (
                     <div key={i} className="leading-5">{i + 1}</div>
                   ))}
@@ -573,7 +573,7 @@ export default function NocRulePage() {
                 <Textarea
                   value={jsonSchema}
                   onChange={(e) => setJsonSchema(e.target.value)}
-                  className="pl-12 text-[13px] font-mono min-h-[200px] bg-[#1e293b] text-[#e2e8f0] border-[#334155] rounded-md leading-5"
+                  className="pl-12 text-[13px] font-mono min-h-[200px] bg-dark-card-l2 text-dark-text-primary border-dark-card-l3 rounded-md leading-5"
                   spellCheck={false}
                 />
               </div>
@@ -582,7 +582,7 @@ export default function NocRulePage() {
             {/* Tab 3: 继承关系 */}
             <TabsContent value="inherit" className="space-y-4 mt-4">
               <div>
-                <Label className="text-[13px] text-[#4a5568]">父规则选择</Label>
+                <Label className="text-[13px] text-dark-text-secondary">父规则选择</Label>
                 <Select value={parentRule} onValueChange={setParentRule}>
                   <SelectTrigger className="mt-1 h-9 text-[14px]">
                     <SelectValue placeholder="选择可继承的父规则（可选）" />
@@ -594,9 +594,9 @@ export default function NocRulePage() {
                   </SelectContent>
                 </Select>
                 {parentRule && (
-                  <div className="mt-3 p-3 bg-[#f8f9fb] rounded-md border border-[#e8ecf1]">
-                    <p className="text-[12px] text-[#6b7789] mb-2">父规则参数预览（只读）</p>
-                    <pre className="text-[12px] font-mono text-[#4a5568] bg-white p-2 rounded border border-[#e8ecf1] overflow-x-auto">
+                  <div className="mt-3 p-3 bg-dark-page rounded-md border border-dark-border">
+                    <p className="text-[12px] text-dark-text-secondary mb-2">父规则参数预览（只读）</p>
+                    <pre className="text-[12px] font-mono text-dark-text-secondary bg-dark-elevated p-2 rounded border border-dark-border overflow-x-auto">
 {`{
   "upperLimit": 95,
   "alertLevel": "重要",
@@ -605,31 +605,31 @@ export default function NocRulePage() {
                     </pre>
                   </div>
                 )}
-                <p className="text-[12px] text-[#9ba4b3] mt-2">子规则将继承父规则的所有参数，可覆盖部分参数值</p>
+                <p className="text-[12px] text-dark-text-tertiary mt-2">子规则将继承父规则的所有参数，可覆盖部分参数值</p>
               </div>
 
               {/* 子规则列表 */}
               {editingRule && ruleListData.some(r => r.parentRule === editingRule.id) && (
                 <div className="mt-4">
-                  <h3 className="text-[14px] font-medium text-[#4a5568] mb-2">继承此规则的子规则</h3>
-                  <div className="border border-[#e8ecf1] rounded-md overflow-hidden">
+                  <h3 className="text-[14px] font-medium text-dark-text-secondary mb-2">继承此规则的子规则</h3>
+                  <div className="border border-dark-border rounded-md overflow-hidden">
                     <table className="w-full">
-                      <thead className="bg-[#f1f3f6]">
-                        <tr className="border-b border-[#e8ecf1]">
-                          <th className="h-8 px-3 text-left text-[12px] font-medium text-[#4a5568]">子规则编码</th>
-                          <th className="h-8 px-3 text-left text-[12px] font-medium text-[#4a5568]">子规则名称</th>
-                          <th className="h-8 px-3 text-left text-[12px] font-medium text-[#4a5568]">覆盖参数</th>
-                          <th className="h-8 px-3 text-left text-[12px] font-medium text-[#4a5568]">操作</th>
+                      <thead className="bg-dark-card-l2">
+                        <tr className="border-b border-dark-border">
+                          <th className="h-8 px-3 text-left text-[12px] font-medium text-dark-text-secondary">子规则编码</th>
+                          <th className="h-8 px-3 text-left text-[12px] font-medium text-dark-text-secondary">子规则名称</th>
+                          <th className="h-8 px-3 text-left text-[12px] font-medium text-dark-text-secondary">覆盖参数</th>
+                          <th className="h-8 px-3 text-left text-[12px] font-medium text-dark-text-secondary">操作</th>
                         </tr>
                       </thead>
                       <tbody>
                         {ruleListData.filter(r => r.parentRule === editingRule.id).map((sub) => (
-                          <tr key={sub.id} className="border-b border-[#e8ecf1] hover:bg-[#f8f9fb]">
-                            <td className="h-9 px-3 text-[13px] text-[#4a5568]">{sub.code}</td>
-                            <td className="h-9 px-3 text-[13px] text-[#4a5568]">{sub.name}</td>
-                            <td className="h-9 px-3 text-[12px] text-[#7c5cfc]">{sub.paramSummary}</td>
+                          <tr key={sub.id} className="border-b border-dark-border hover:bg-dark-page">
+                            <td className="h-9 px-3 text-[13px] text-dark-text-secondary">{sub.code}</td>
+                            <td className="h-9 px-3 text-[13px] text-dark-text-secondary">{sub.name}</td>
+                            <td className="h-9 px-3 text-[12px] text-[var(--accent-noc)]">{sub.paramSummary}</td>
                             <td className="h-9 px-3">
-                              <button className="text-[12px] text-[#3478f6] hover:underline">查看</button>
+                              <button className="text-[12px] text-dark-accent-primary hover:underline">查看</button>
                             </td>
                           </tr>
                         ))}
@@ -641,11 +641,11 @@ export default function NocRulePage() {
             </TabsContent>
           </Tabs>
 
-          <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-[#e8ecf1]">
-            <Button variant="outline" className="h-9 px-4 text-[14px] border-[#dde1e8]" onClick={() => setEditModalOpen(false)}>
+          <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-dark-border">
+            <Button variant="outline" className="h-9 px-4 text-[14px] border-dark-border-hover" onClick={() => setEditModalOpen(false)}>
               取消
             </Button>
-            <Button className="h-9 px-4 text-[14px] bg-[#3478f6] hover:bg-[#1d5ee0]" onClick={() => setEditModalOpen(false)}>
+            <Button className="h-9 px-4 text-[14px] bg-dark-accent-primary hover:bg-dark-accent-primary-active" onClick={() => setEditModalOpen(false)}>
               保存
             </Button>
           </div>
@@ -657,7 +657,7 @@ export default function NocRulePage() {
         <DialogContent className="w-[800px] max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-[18px] font-semibold flex items-center gap-2">
-              <AlertTriangle size={20} className="text-[#f59e0b]" />
+              <AlertTriangle size={20} className="text-warning-500" />
               规则冲突检测结果
             </DialogTitle>
           </DialogHeader>
@@ -671,8 +671,8 @@ export default function NocRulePage() {
                 exit={{ opacity: 0 }}
                 className="flex flex-col items-center justify-center py-16"
               >
-                <div className="w-8 h-8 border-2 border-[#3478f6] border-t-transparent rounded-full animate-spin mb-4" />
-                <p className="text-[14px] text-[#6b7789]">正在检测规则冲突...</p>
+                <div className="w-8 h-8 border-2 border-dark-accent-primary border-t-transparent rounded-full animate-spin mb-4" />
+                <p className="text-[14px] text-dark-text-secondary">正在检测规则冲突...</p>
               </motion.div>
             ) : (
               <motion.div
@@ -682,7 +682,7 @@ export default function NocRulePage() {
                 transition={{ duration: 0.3 }}
                 className="mt-4"
               >
-                <div className="flex items-center gap-4 mb-4 border-b border-[#e8ecf1]">
+                <div className="flex items-center gap-4 mb-4 border-b border-dark-border">
                   {(['pending', 'resolved', 'ignored'] as const).map((tab) => (
                     <button
                       key={tab}
@@ -690,8 +690,8 @@ export default function NocRulePage() {
                       className={cn(
                         'pb-2 text-[14px] font-medium transition-colors border-b-2',
                         conflictTab === tab
-                          ? 'text-[#3478f6] border-[#3478f6]'
-                          : 'text-[#6b7789] border-transparent hover:text-[#4a5568]'
+                          ? 'text-dark-accent-primary border-dark-accent-primary'
+                          : 'text-dark-text-secondary border-transparent hover:text-dark-text-secondary'
                       )}
                     >
                       {tab === 'pending' ? '待处理' : tab === 'resolved' ? '已处理' : '已忽略'}
@@ -708,24 +708,24 @@ export default function NocRulePage() {
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: idx * 0.06 }}
-                        className="border border-[#e8ecf1] rounded-lg p-4 hover:shadow-sm transition-shadow"
+                        className="border border-dark-border rounded-lg p-4 hover:shadow-sm transition-shadow"
                       >
                         <div className="flex items-center justify-between mb-2">
                           <div className="flex items-center gap-3">
-                            <span className="text-[13px] font-medium text-[#4a5568]">{conflict.type}</span>
+                            <span className="text-[13px] font-medium text-dark-text-secondary">{conflict.type}</span>
                             <StatusBadge text={conflict.severity} type={getSeverityType(conflict.severity)} />
                           </div>
                           <div className="flex items-center gap-2">
-                            <button className="text-[12px] text-[#3478f6] hover:underline">查看详情</button>
-                            <button className="text-[12px] text-[#10b981] hover:underline">标记已处理</button>
-                            <button className="text-[12px] text-[#9ba4b3] hover:underline">忽略</button>
+                            <button className="text-[12px] text-dark-accent-primary hover:underline">查看详情</button>
+                            <button className="text-[12px] text-success-500 hover:underline">标记已处理</button>
+                            <button className="text-[12px] text-dark-text-tertiary hover:underline">忽略</button>
                           </div>
                         </div>
-                        <p className="text-[13px] text-[#6b7789] mb-1">{conflict.description}</p>
+                        <p className="text-[13px] text-dark-text-secondary mb-1">{conflict.description}</p>
                         <div className="flex items-center gap-2">
-                          <span className="text-[12px] text-[#9ba4b3]">涉及规则:</span>
+                          <span className="text-[12px] text-dark-text-tertiary">涉及规则:</span>
                           {conflict.rules.map((r) => (
-                            <span key={r} className="text-[12px] px-2 py-0.5 rounded bg-[#eef4ff] text-[#3478f6]">{r}</span>
+                            <span key={r} className="text-[12px] px-2 py-0.5 rounded bg-dark-accent-primary/10 text-dark-accent-primary">{r}</span>
                           ))}
                         </div>
                       </motion.div>
@@ -734,16 +734,16 @@ export default function NocRulePage() {
                 )}
 
                 {conflictTab === 'resolved' && (
-                  <div className="py-12 text-center text-[#9ba4b3]">
-                    <Check size={48} className="mx-auto mb-3 text-[#c4cad4]" />
-                    <p className="text-[14px] text-[#6b7789]">暂无已处理记录</p>
+                  <div className="py-12 text-center text-dark-text-tertiary">
+                    <Check size={48} className="mx-auto mb-3 text-dark-text-tertiary" />
+                    <p className="text-[14px] text-dark-text-secondary">暂无已处理记录</p>
                   </div>
                 )}
 
                 {conflictTab === 'ignored' && (
-                  <div className="py-12 text-center text-[#9ba4b3]">
-                    <X size={48} className="mx-auto mb-3 text-[#c4cad4]" />
-                    <p className="text-[14px] text-[#6b7789]">暂无已忽略记录</p>
+                  <div className="py-12 text-center text-dark-text-tertiary">
+                    <X size={48} className="mx-auto mb-3 text-dark-text-tertiary" />
+                    <p className="text-[14px] text-dark-text-secondary">暂无已忽略记录</p>
                   </div>
                 )}
               </motion.div>
@@ -762,22 +762,22 @@ export default function NocRulePage() {
           <div className="mt-4 space-y-2 max-h-[400px] overflow-y-auto">
             {ruleCategoryTree.map((cat) => (
               <div key={cat.id}>
-                <div className="flex items-center h-10 px-3 bg-[#f8f9fb] rounded-md border border-[#e8ecf1]">
-                  <GripVertical size={14} className="text-[#c4cad4] mr-2 cursor-grab" />
-                  <FolderTree size={14} className="text-[#9ba4b3] mr-2" />
-                  <span className="flex-1 text-[14px] text-[#4a5568]">{cat.name}</span>
+                <div className="flex items-center h-10 px-3 bg-dark-page rounded-md border border-dark-border">
+                  <GripVertical size={14} className="text-dark-text-tertiary mr-2 cursor-grab" />
+                  <FolderTree size={14} className="text-dark-text-tertiary mr-2" />
+                  <span className="flex-1 text-[14px] text-dark-text-secondary">{cat.name}</span>
                   <div className="flex items-center gap-2">
-                    <button className="text-[12px] text-[#3478f6] hover:underline">编辑</button>
-                    <button className="text-[12px] text-[#ef4444] hover:underline">删除</button>
+                    <button className="text-[12px] text-dark-accent-primary hover:underline">编辑</button>
+                    <button className="text-[12px] text-error-500 hover:underline">删除</button>
                   </div>
                 </div>
                 {cat.children && cat.children.map((child) => (
-                  <div key={child.id} className="flex items-center h-9 px-3 ml-6 mt-1 rounded-md border border-[#e8ecf1] hover:bg-[#f8f9fb]">
-                    <GripVertical size={14} className="text-[#c4cad4] mr-2 cursor-grab" />
-                    <span className="flex-1 text-[13px] text-[#4a5568]">{child.name}</span>
+                  <div key={child.id} className="flex items-center h-9 px-3 ml-6 mt-1 rounded-md border border-dark-border hover:bg-dark-page">
+                    <GripVertical size={14} className="text-dark-text-tertiary mr-2 cursor-grab" />
+                    <span className="flex-1 text-[13px] text-dark-text-secondary">{child.name}</span>
                     <div className="flex items-center gap-2">
-                      <button className="text-[12px] text-[#3478f6] hover:underline">编辑</button>
-                      <button className="text-[12px] text-[#ef4444] hover:underline">删除</button>
+                      <button className="text-[12px] text-dark-accent-primary hover:underline">编辑</button>
+                      <button className="text-[12px] text-error-500 hover:underline">删除</button>
                     </div>
                   </div>
                 ))}
@@ -785,16 +785,16 @@ export default function NocRulePage() {
             ))}
           </div>
 
-          <div className="flex items-center justify-between mt-6 pt-4 border-t border-[#e8ecf1]">
-            <Button variant="outline" size="sm" className="h-8 text-[13px] border-[#dde1e8]">
+          <div className="flex items-center justify-between mt-6 pt-4 border-t border-dark-border">
+            <Button variant="outline" size="sm" className="h-8 text-[13px] border-dark-border-hover">
               <Plus size={14} className="mr-1" />
               新增顶级分类
             </Button>
             <div className="flex items-center gap-3">
-              <Button variant="outline" className="h-9 px-4 text-[14px] border-[#dde1e8]" onClick={() => setManageCatModalOpen(false)}>
+              <Button variant="outline" className="h-9 px-4 text-[14px] border-dark-border-hover" onClick={() => setManageCatModalOpen(false)}>
                 取消
               </Button>
-              <Button className="h-9 px-4 text-[14px] bg-[#3478f6] hover:bg-[#1d5ee0]" onClick={() => setManageCatModalOpen(false)}>
+              <Button className="h-9 px-4 text-[14px] bg-dark-accent-primary hover:bg-dark-accent-primary-active" onClick={() => setManageCatModalOpen(false)}>
                 保存排序
               </Button>
             </div>
