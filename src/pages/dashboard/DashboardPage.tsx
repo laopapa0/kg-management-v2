@@ -11,12 +11,13 @@ import {
   Pencil,
   Tag,
   Network,
-  Box,
   ArrowUpRight,
   ArrowDownRight,
   Calendar,
   RefreshCw,
-  ChevronRight,
+  BarChart3,
+  FileText,
+  BookOpen,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -72,13 +73,15 @@ const pendingAudits = [
   { type: '新增', dept: '业务四部', name: '千兆端口利用率', time: '3 小时前', typeColor: 'bg-dark-accent-primary/10 text-dark-accent-primary' },
 ];
 
+/*
+ * 快捷入口：精简为 4 大核心菜单（PRD #57）
+ * - 指标管理、血缘画布、报告管理、知识库管理
+ */
 const quickAccess = [
-  { title: '新增指标', desc: '接入新指标到知识图谱', Icon: Plus, route: '/indicator/create', color: 'text-dark-accent-primary', borderHover: 'hover:border-dark-accent-primary', bgHover: 'hover:bg-dark-accent-primary/10' },
+  { title: '指标管理', desc: '指标挂靠与关联配置', Icon: BarChart3, route: '/indicator-management', color: 'text-dark-accent-primary', borderHover: 'hover:border-dark-accent-primary', bgHover: 'hover:bg-dark-accent-primary/10' },
   { title: '血缘画布', desc: '配置指标间链接关系', Icon: Network, route: '/lineage', color: 'text-dark-accent-primary', borderHover: 'hover:border-dark-accent-primary', bgHover: 'hover:bg-dark-accent-primary/10' },
-  { title: '配置标签', desc: '为指标打标签分类', Icon: Tag, route: '/tag-config', color: 'text-dark-accent-primary', borderHover: 'hover:border-dark-accent-primary', bgHover: 'hover:bg-dark-accent-primary/10' },
-  { title: '审核申请', desc: '处理待审核的指标申请', Icon: ClipboardCheck, route: '/noc/audit', color: 'text-[var(--accent-noc)]', borderHover: 'hover:border-[var(--accent-noc)]', bgHover: 'hover:bg-[var(--accent-noc)]/10' },
-  { title: '对象类型', desc: '管理对象类型定义', Icon: Box, route: '/noc/object-type', color: 'text-[var(--accent-noc)]', borderHover: 'hover:border-[var(--accent-noc)]', bgHover: 'hover:bg-[var(--accent-noc)]/10' },
-  { title: '规则库', desc: '管理业务规则模板', Icon: Shield, route: '/noc/rule', color: 'text-[var(--accent-noc)]', borderHover: 'hover:border-[var(--accent-noc)]', bgHover: 'hover:bg-[var(--accent-noc)]/10' },
+  { title: '报告管理', desc: '报告计划、模板与版本', Icon: FileText, route: '/reports', color: 'text-dark-accent-primary', borderHover: 'hover:border-dark-accent-primary', bgHover: 'hover:bg-dark-accent-primary/10' },
+  { title: '知识库管理', desc: '文档录入与版本维护', Icon: BookOpen, route: '/knowledge-upload', color: 'text-dark-accent-primary', borderHover: 'hover:border-dark-accent-primary', bgHover: 'hover:bg-dark-accent-primary/10' },
 ];
 
 /* ─── 统计卡片 ─── */
@@ -192,13 +195,6 @@ export default function DashboardPage() {
                   <RefreshCw size={13} />
                 </button>
               </div>
-              <button
-                onClick={() => navigate('/noc/audit')}
-                className="text-[13px] text-dark-accent-primary hover:bg-dark-accent-primary/10 px-2 py-1 rounded transition-colors flex items-center gap-0.5"
-              >
-                查看全部
-                <ChevronRight size={14} />
-              </button>
             </div>
 
             {/* 内容区 - 时间线 */}
@@ -255,13 +251,6 @@ export default function DashboardPage() {
                   {pendingAudits.length}
                 </span>
               </div>
-              <button
-                onClick={() => navigate('/noc/audit')}
-                className="text-[13px] text-dark-accent-primary hover:bg-dark-accent-primary/10 px-2 py-1 rounded transition-colors flex items-center gap-0.5"
-              >
-                前往审核
-                <ChevronRight size={14} />
-              </button>
             </div>
 
             {/* 内容区 */}
@@ -275,8 +264,7 @@ export default function DashboardPage() {
                 <motion.div
                   key={index}
                   variants={listItem}
-                  onClick={() => navigate('/noc/audit')}
-                  className="flex items-center gap-3 py-3 hover:bg-dark-page rounded-md px-2 -mx-2 cursor-pointer transition-colors"
+                  className="flex items-center gap-3 py-3 hover:bg-dark-page rounded-md px-2 -mx-2 cursor-default transition-colors"
                 >
                   {/* 类型 Badge */}
                   <span className={cn(
@@ -320,7 +308,7 @@ export default function DashboardPage() {
           variants={listStagger}
           initial="initial"
           animate="animate"
-          className="p-5 grid grid-cols-6 gap-4 max-lg:grid-cols-3 max-sm:grid-cols-2"
+          className="p-5 grid grid-cols-4 gap-4 max-lg:grid-cols-2 max-sm:grid-cols-1"
         >
           {quickAccess.map((item) => (
             <motion.div
