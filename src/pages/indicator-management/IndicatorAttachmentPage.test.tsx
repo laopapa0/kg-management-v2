@@ -822,4 +822,37 @@ describe('IndicatorAttachmentPage', () => {
       vi.useRealTimers()
     })
   })
+
+  describe('command palette integration', () => {
+    it('opens command palette on Cmd+K', async () => {
+      render(<IndicatorAttachmentPage />)
+
+      await act(async () => {
+        window.dispatchEvent(new KeyboardEvent('keydown', { metaKey: true, key: 'k' }))
+      })
+
+      expect(screen.getByPlaceholderText(/搜索指标/i)).toBeInTheDocument()
+    })
+
+    it('opens command palette on Ctrl+K', async () => {
+      render(<IndicatorAttachmentPage />)
+
+      await act(async () => {
+        window.dispatchEvent(new KeyboardEvent('keydown', { ctrlKey: true, key: 'k' }))
+      })
+
+      expect(screen.getByPlaceholderText(/搜索指标/i)).toBeInTheDocument()
+    })
+
+    it('renders command palette search input when opened', async () => {
+      render(<IndicatorAttachmentPage />)
+
+      await act(async () => {
+        window.dispatchEvent(new KeyboardEvent('keydown', { metaKey: true, key: 'k' }))
+      })
+
+      expect(screen.getByPlaceholderText(/搜索指标/i)).toBeInTheDocument()
+      expect(screen.getByText('↑↓ 导航')).toBeInTheDocument()
+    })
+  })
 })

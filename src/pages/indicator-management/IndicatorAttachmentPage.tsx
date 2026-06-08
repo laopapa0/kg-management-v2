@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useMemo } from 'react'
+import { useEffect, useRef, useState, useMemo, useCallback } from 'react'
 import { useShallow } from 'zustand/react/shallow'
 import { Group, Panel, Separator } from 'react-resizable-panels'
 import PanelHeader from '@/components/panel/PanelHeader'
@@ -12,9 +12,11 @@ import PersistentConnectionLayer from '@/components/connection/PersistentConnect
 import PulseRing from '@/components/connection/PulseRing'
 import MiniToast from '@/components/connection/MiniToast'
 import FocusModeOverlay from '@/components/connection/FocusModeOverlay'
+import AttachmentCommandPalette from '@/components/command/AttachmentCommandPalette'
 import { Switch } from '@/components/ui/switch'
 import { useConnectionMode } from '@/hooks/useConnectionMode'
 import { useFocusZone } from '@/hooks/useFocusZone'
+import { useFocusTrap } from '@/hooks/useFocusTrap'
 import { useTargetBounce } from '@/hooks/useTargetBounce'
 import { useConnectionDelete } from '@/hooks/useConnectionDelete'
 import { initializeAttachmentStore, selectPendingIndicators, useAttachmentStore } from '@/stores/attachmentStore'
@@ -40,9 +42,21 @@ function getFocusZoneHint(zone: ReturnType<typeof useFocusZone>): string | null 
 
 export default function IndicatorAttachmentPage() {
   const treePanelRef = useRef<IndicatorTreePanelRef>(null)
+  const pageRef = useRef<HTMLDivElement>(null)
+  const rightColumnRef = useRef<HTMLDivElement>(null)
   const { state, start, setHoverTarget, toggleContinuous, resetMisfireCount } = useConnectionMode()
   const focusZone = useFocusZone()
   const focusZoneHint = useMemo(() => getFocusZoneHint(focusZone), [focusZone])
+
+  // Command palette state
+  const [paletteOpen, setPaletteOpen] = useState(false)
+  const [selectedIndicatorId, setSelectedIndicatorId] = useState<string | null>(null)
+  const [paletteToastTargetId, setPaletteToastTargetId] = useState<string | null>(null)
+  const [gridSearchQuery, setGridSearchQuery] = useState('')
+
+  // Focus traps for connection mode and config mode
+  useFocusTrap(pageRef, { enabled: state.isConnecting })
+  useFocusTrap(rightColumnRef, { enabled: selectedIndicatorId !== null && !state.isConnecting })
 
   // Connection delete + undo
   const { lastDeleted, deleteConnection, undoDelete } = useConnectionDelete()
@@ -94,11 +108,39 @@ export default function IndicatorAttachmentPage() {
 
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
+      // Block global shortcuts during inline editing
+      const target = event.target as HTMLElement
+      if (
+        target.isContentEditable ||
+        target.tagName === 'INPUT' ||
+        target.tagName === 'TEXTAREA'
+      ) {
+        return
+      }
       useAttachmentStore.getState().handleKeyDown(event)
     }
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [])
+
+  // Cmd/Ctrl+K opens command palette
+  useEffect(() => {
+    function handleKeyDown(event: KeyboardEvent) {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
+        event.preventDefault()
+        setPaletteOpen((open) => !open)
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [])
+
+  // Auto-clear palette toast after 2s
+  useEffect(() => {
+    if (!paletteToastTargetId) return
+    const timer = setTimeout(() => setPaletteToastTargetId(null), 2000)
+    return () => clearTimeout(timer)
+  }, [paletteToastTargetId])
 
   // Body cursor follows connection mode
   useEffect(() => {
@@ -239,6 +281,7 @@ export default function IndicatorAttachmentPage() {
 
   const allIndicators = useAttachmentStore(useShallow((s) => s.indicators))
   const pendingIndicators = useAttachmentStore(useShallow(selectPendingIndicators))
+  const setIndicators = useAttachmentStore((s) => s.setIndicators)
 
   const persistentConnections = useMemo(() => {
     const result: { sourceId: string; targetId: string }[] = []
@@ -256,13 +299,74 @@ export default function IndicatorAttachmentPage() {
     return result
   }, [allIndicators])
 
+  const handleSelectIndicator = useCallback(
+    (indicatorId: string) => {
+      const indicator = allIndicators.find((i) => i.id === indicatorId)
+      if (!indicator) return
+      setSelectedIndicatorId(indicatorId)
+      if (
+        !indicator.treeParentId &&
+        indicator.tagIds.length === 0 &&
+        indicator.ruleIds.length === 0
+      ) {
+        // In pending area: scroll to card and highlight
+        const el = document.querySelector(`[data-indicator-id="${indicatorId}"]`)
+        el?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      } else if (indicator.treeParentId) {
+        // In tree: expand ancestors and select
+        treePanelRef.current?.expandAndSelectNode(indicatorId)
+      }
+    },
+    [allIndicators],
+  )
+
+  const handleToggleTag = useCallback(
+    (tagId: string) => {
+      if (!selectedIndicatorId) return
+      setIndicators(
+        allIndicators.map((i) => {
+          if (i.id !== selectedIndicatorId) return i
+          const hasTag = i.tagIds.includes(tagId)
+          return {
+            ...i,
+            tagIds: hasTag ? i.tagIds.filter((id) => id !== tagId) : [...i.tagIds, tagId],
+          }
+        }),
+      )
+      setPaletteToastTargetId(selectedIndicatorId)
+    },
+    [selectedIndicatorId, allIndicators, setIndicators],
+  )
+
+  const handleToggleRule = useCallback(
+    (ruleId: string) => {
+      if (!selectedIndicatorId) return
+      setIndicators(
+        allIndicators.map((i) => {
+          if (i.id !== selectedIndicatorId) return i
+          const hasRule = i.ruleIds.includes(ruleId)
+          return {
+            ...i,
+            ruleIds: hasRule ? i.ruleIds.filter((id) => id !== ruleId) : [...i.ruleIds, ruleId],
+          }
+        }),
+      )
+      setPaletteToastTargetId(selectedIndicatorId)
+    },
+    [selectedIndicatorId, allIndicators, setIndicators],
+  )
+
   const indicatorsWithClick = pendingIndicators.map((ind) => ({
     ...ind,
-    onClick: () => start(ind.id, 'tree'),
+    onClick: () => {
+      setSelectedIndicatorId(ind.id)
+      start(ind.id, 'tree')
+    },
   }))
 
   return (
     <div
+      ref={pageRef}
       data-testid="indicator-attachment-page"
       data-dim-mode={state.isConnecting ? 'true' : undefined}
       className="relative h-full w-full bg-dark-page p-3 text-dark-text-primary"
@@ -334,6 +438,16 @@ export default function IndicatorAttachmentPage() {
                 }}
               />
               <div className="flex items-center gap-2">
+                {indicatorsWithClick.length > 500 && (
+                  <input
+                    type="text"
+                    placeholder="搜索指标..."
+                    value={gridSearchQuery}
+                    onChange={(e) => setGridSearchQuery(e.target.value)}
+                    className="h-7 rounded-md border border-dark-border bg-dark-input-bg px-2 text-xs text-dark-text-primary placeholder:text-dark-text-tertiary outline-none focus:ring-1 focus:ring-dark-focus-ring"
+                    data-testid="grid-search-input"
+                  />
+                )}
                 <span className="text-xs text-dark-text-secondary">连续挂靠</span>
                 <Switch
                   checked={state.isContinuous}
@@ -342,7 +456,10 @@ export default function IndicatorAttachmentPage() {
                 />
               </div>
             </div>
-            <IndicatorGrid indicators={indicatorsWithClick} />
+            <IndicatorGrid
+              indicators={indicatorsWithClick}
+              searchQuery={gridSearchQuery}
+            />
           </div>
         </Panel>
 
@@ -355,7 +472,8 @@ export default function IndicatorAttachmentPage() {
           style={{ minWidth: PANEL_MIN_WIDTH_RIGHT }}
           className="min-h-0"
         >
-          <Group orientation="vertical" className="h-full gap-2">
+          <div ref={rightColumnRef} className="h-full">
+            <Group orientation="vertical" className="h-full gap-2">
             <Panel id="tag-set" defaultSize={50} minSize={10} className="min-h-0">
               <div
                 data-testid="panel-tag-set"
@@ -385,6 +503,7 @@ export default function IndicatorAttachmentPage() {
               </div>
             </Panel>
           </Group>
+          </div>
         </Panel>
       </Group>
 
@@ -451,6 +570,21 @@ export default function IndicatorAttachmentPage() {
             撤销
           </button>
         </div>
+      )}
+
+      {/* Command Palette */}
+      <AttachmentCommandPalette
+        open={paletteOpen}
+        onOpenChange={setPaletteOpen}
+        selectedIndicatorId={selectedIndicatorId}
+        onSelectIndicator={handleSelectIndicator}
+        onToggleTag={handleToggleTag}
+        onToggleRule={handleToggleRule}
+      />
+
+      {/* Palette action toast */}
+      {paletteToastTargetId && (
+        <MiniToast targetId={paletteToastTargetId} message="✓ 已更新关联" />
       )}
 
       {/* Feedback animations */}

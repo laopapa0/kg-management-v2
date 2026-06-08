@@ -42,6 +42,7 @@ import type { DropPosition } from '@/components/tree/treeDragUtils'
 
 export interface IndicatorTreePanelRef {
   openAddDialog: () => void
+  expandAndSelectNode: (indicatorId: string) => void
 }
 
 interface RenderTreeNode extends TreeNode {
@@ -70,6 +71,7 @@ const IndicatorTreePanel = forwardRef<IndicatorTreePanelRef>(function IndicatorT
   const [specialDialogOpen, setSpecialDialogOpen] = useState(false)
   const [deletingNodeId, setDeletingNodeId] = useState<string | null>(null)
   const [highlightedId, setHighlightedId] = useState<string | null>(null)
+  const [expanded, setExpanded] = useState<Set<string>>(() => new Set(initialExpandedIds))
 
   const existingNames = useMemo(() => indicators.map((i) => i.name), [indicators])
 
@@ -87,6 +89,27 @@ const IndicatorTreePanel = forwardRef<IndicatorTreePanelRef>(function IndicatorT
 
   useImperativeHandle(ref, () => ({
     openAddDialog: () => setDialogOpen(true),
+    expandAndSelectNode: (indicatorId: string) => {
+      // Walk up the treeParentId chain to find all ancestors
+      const idsToExpand = new Set<string>()
+      let currentId: string | undefined = indicatorId
+      while (currentId) {
+        const indicator = indicators.find((i) => i.id === currentId)
+        if (!indicator) break
+        if (indicator.treeParentId) {
+          idsToExpand.add(indicator.treeParentId)
+        }
+        currentId = indicator.treeParentId
+      }
+      setExpanded((prev) => {
+        const next = new Set(prev)
+        for (const id of idsToExpand) next.add(id)
+        return next
+      })
+      setSelectedId(indicatorId)
+      setHighlightedId(indicatorId)
+      setTimeout(() => setHighlightedId((current) => (current === indicatorId ? null : current)), 500)
+    },
   }))
 
   const handleAddConfirm = (name: string, parentId?: string) => {
@@ -214,6 +237,8 @@ const IndicatorTreePanel = forwardRef<IndicatorTreePanelRef>(function IndicatorT
       <div className="flex-1 overflow-y-auto px-2 pb-2" data-testid="indicator-tree-panel">
         <TreeView
           nodes={tree as RenderTreeNode[]}
+          expanded={expanded}
+          onExpandedChange={setExpanded}
           selectedId={selectedId}
           onSelect={setSelectedId}
           onEditNode={setEditingId}
