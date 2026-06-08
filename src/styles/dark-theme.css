@@ -91,6 +91,16 @@
   --sidebar-accent-foreground: 220 26% 14%;
   --sidebar-border: 216 20% 92%;
   --sidebar-ring: 219 92% 58%;
+
+  /* Report components */
+  --report-tag-danger: #ef4444;
+  --report-tag-warning: #f59e0b;
+  --report-tag-info: #3b82f6;
+  --report-tag-success: #10b981;
+  --report-tag-purple: #a855f7;
+  --report-alert-bg: rgba(0, 0, 0, 0.03);
+  --report-chart-note-bg: #f1f3f6;
+  --report-chart-note-text: #6b7789;
 }
 
 /* ─── Dark (default) ─── */
@@ -163,6 +173,16 @@
   --sidebar-accent-foreground: 210 20% 93%;
   --sidebar-border: 220 13% 20%;
   --sidebar-ring: 217 91% 65%;
+
+  /* Report components */
+  --report-tag-danger: #ef4444;
+  --report-tag-warning: #f59e0b;
+  --report-tag-info: #3b82f6;
+  --report-tag-success: #10b981;
+  --report-tag-purple: #a855f7;
+  --report-alert-bg: rgba(255, 255, 255, 0.03);
+  --report-chart-note-bg: #1e293b;
+  --report-chart-note-text: #94a3b8;
 }
 
 /* ─── GitHub Dark ─── */
