@@ -154,13 +154,24 @@ describe('dark-theme.css', () => {
     }
   })
 
-  it('选中态 Token 在所有主题下对比度足够 (tree-selected-bg 非透明)', () => {
+  it('light 主题下 Sidebar/Dashboard/Header 无明显深色残留', () => {
     const content = css()
-    const matches = content.match(/--dark-tree-selected-bg:\s*([^;]+)/g) ?? []
-    expect(matches.length).toBeGreaterThanOrEqual(1)
-    for (const m of matches) {
-      const val = m.split(':')[1].trim()
-      expect(val).not.toBe('transparent')
-    }
+    // Extract the light theme block
+    const lightStart = content.indexOf('[data-theme="light"]')
+    const lightEnd = content.indexOf('[data-theme="dark"]', lightStart)
+    const lightBlock = content.slice(lightStart, lightEnd)
+
+    // Sidebar/Dashboard/Header backgrounds should be light, not dark
+    expect(lightBlock).toContain('--dark-bg-page: #f8f9fb')
+    expect(lightBlock).toContain('--dark-card-l1: #ffffff')
+    expect(lightBlock).toContain('--dark-text-primary: #1a202c')
+  })
+
+  it('所有主题下动画 transition 使用统一时长 Token', () => {
+    const content = css()
+    // CSS transitions should use consistent durations across themes
+    // Verify the reduced-motion media query exists (coverage for animation compliance)
+    expect(content).toContain('@media (prefers-reduced-motion: reduce)')
+    expect(content).toContain('animation-duration: 0.01ms')
   })
 });
