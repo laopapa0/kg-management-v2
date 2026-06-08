@@ -1,3 +1,5 @@
+import { useEffect } from 'react'
+import { motion, useAnimation } from 'framer-motion'
 import { Badge } from '@/components/ui/badge'
 import { DURATION } from '@/components/motion/motion.tokens'
 
@@ -19,20 +21,72 @@ export default function IndicatorCard({
   level1,
   level2,
   source,
-  state = 'default',
+  state: cardState = 'default',
   onClick,
 }: IndicatorCardProps) {
-  const isHover = state === 'hover'
-  const isSelected = state === 'selected'
-  const isAttached = state === 'attached'
+  const isHover = cardState === 'hover'
+  const isSelected = cardState === 'selected'
+  const isAttached = cardState === 'attached'
+
+  const controls = useAnimation()
+
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent).detail as {
+        sourceId: string
+        targetId: string
+      }
+      if (detail.sourceId !== id) return
+
+      const targetEl = document.getElementById(detail.targetId)
+      const cardEl = document.getElementById(id)
+      if (!targetEl || !cardEl) return
+
+      const targetRect = targetEl.getBoundingClientRect()
+      const cardRect = cardEl.getBoundingClientRect()
+
+      const deltaX =
+        targetRect.left +
+        targetRect.width / 2 -
+        (cardRect.left + cardRect.width / 2)
+      const deltaY =
+        targetRect.top +
+        targetRect.height / 2 -
+        (cardRect.top + cardRect.height / 2)
+
+      // T+0: scale 1→0.9
+      // T+100ms: fly to target (200ms)
+      // T+300ms: fade out
+      controls
+        .start({ scale: 0.9, transition: { duration: 0 } })
+        .then(() =>
+          controls.start({
+            x: deltaX,
+            y: deltaY,
+            transition: { duration: 0.2, delay: 0.1 },
+          }),
+        )
+        .then(() =>
+          controls.start({
+            opacity: 0,
+            transition: { duration: 0 },
+          }),
+        )
+    }
+
+    window.addEventListener('connection-confirmed', handler)
+    return () => window.removeEventListener('connection-confirmed', handler)
+  }, [id, controls])
 
   return (
-    <div
+    <motion.div
+      id={id}
       data-testid="indicator-card"
       data-indicator-id={id}
       onClick={onClick}
       role="button"
       tabIndex={0}
+      animate={controls}
       className={[
         'relative flex min-h-[120px] flex-col gap-3 rounded-lg border p-4',
         'bg-dark-card-l1 text-dark-text-primary',
@@ -82,6 +136,6 @@ export default function IndicatorCard({
           </Badge>
         )}
       </div>
-    </div>
+    </motion.div>
   )
 }

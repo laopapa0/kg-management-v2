@@ -132,6 +132,32 @@ export function useConnectionMode() {
       return false
     }
 
+    // 数据更新 + 历史快照
+    const store = useAttachmentStore.getState()
+    const nextIndicators = indicators.map((i) => {
+      if (i.id !== state.sourceId) return i
+      if (state.targetType === 'tree') {
+        return { ...i, treeParentId: state.hoverTargetId! }
+      } else if (state.targetType === 'tag') {
+        return { ...i, tagIds: [...i.tagIds, state.hoverTargetId!] }
+      } else if (state.targetType === 'rule') {
+        return { ...i, ruleIds: [...i.ruleIds, state.hoverTargetId!] }
+      }
+      return i
+    })
+    store.setIndicators(nextIndicators)
+
+    // 触发 fly-out 动画
+    window.dispatchEvent(
+      new CustomEvent('connection-confirmed', {
+        detail: {
+          sourceId: state.sourceId,
+          targetId: state.hoverTargetId,
+          targetType: state.targetType,
+        },
+      }),
+    )
+
     if (isContinuousRef.current) {
       setState((prev) => ({ ...prev, hoverTargetId: null, misfireCount: 0 }))
     } else {
@@ -146,7 +172,7 @@ export function useConnectionMode() {
       })
     }
     return true
-  }, [state.hoverTargetId, state.validTargetIds, state.targetType, indicators])
+  }, [state.hoverTargetId, state.validTargetIds, state.targetType, indicators, state.sourceId])
 
   const setHoverTarget = useCallback((id: string | null) => {
     setState((prev) => ({ ...prev, hoverTargetId: id }))

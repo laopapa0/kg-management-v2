@@ -8,6 +8,13 @@ global.ResizeObserver = class ResizeObserver {
   disconnect() {}
 };
 
+// Mock IntersectionObserver for Framer Motion in jsdom
+global.IntersectionObserver = class IntersectionObserver {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+};
+
 // Mock scrollIntoView for Radix UI Select in jsdom
 Element.prototype.scrollIntoView = function () {};
 Element.prototype.scrollTo = function () {};

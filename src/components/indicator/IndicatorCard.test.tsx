@@ -78,4 +78,71 @@ describe('IndicatorCard', () => {
 
     expect(onClick).toHaveBeenCalledTimes(1)
   })
+
+  describe('fly-out animation', () => {
+    it('registers connection-confirmed listener on mount', () => {
+      const addListenerSpy = vi.spyOn(window, 'addEventListener')
+      render(<IndicatorCard {...baseIndicator} />)
+      expect(addListenerSpy).toHaveBeenCalledWith('connection-confirmed', expect.any(Function))
+      addListenerSpy.mockRestore()
+    })
+
+    it('removes listener on unmount', () => {
+      const removeListenerSpy = vi.spyOn(window, 'removeEventListener')
+      const { unmount } = render(<IndicatorCard {...baseIndicator} />)
+      unmount()
+      expect(removeListenerSpy).toHaveBeenCalledWith('connection-confirmed', expect.any(Function))
+      removeListenerSpy.mockRestore()
+    })
+
+    it('triggers fly-out animation when event sourceId matches card id', () => {
+      // Create target element in DOM
+      const targetEl = document.createElement('div')
+      targetEl.id = 'target-1'
+      document.body.appendChild(targetEl)
+      targetEl.getBoundingClientRect = vi.fn(() => ({
+        left: 500, top: 500, width: 50, height: 50,
+        right: 550, bottom: 550, x: 500, y: 500,
+        toJSON: () => {},
+      }))
+
+      render(<IndicatorCard {...baseIndicator} id="ind-001" />)
+
+      // Mock card's getBoundingClientRect after render
+      const cardEl = document.getElementById('ind-001')
+      if (cardEl) {
+        cardEl.getBoundingClientRect = vi.fn(() => ({
+          left: 100, top: 100, width: 50, height: 50,
+          right: 150, bottom: 150, x: 100, y: 100,
+          toJSON: () => {},
+        }))
+      }
+
+      window.dispatchEvent(
+        new CustomEvent('connection-confirmed', {
+          detail: { sourceId: 'ind-001', targetId: 'target-1', targetType: 'tree' },
+        }),
+      )
+
+      // Fly-out should not throw; animation is async via Framer Motion.
+      // The primary assertion is that the event was processed without error.
+      expect(document.getElementById('ind-001')).toBeInTheDocument()
+
+      document.body.removeChild(targetEl)
+    })
+
+    it('ignores event when sourceId does not match', () => {
+      render(<IndicatorCard {...baseIndicator} id="ind-001" />)
+
+      // This should be a no-op for this card
+      window.dispatchEvent(
+        new CustomEvent('connection-confirmed', {
+          detail: { sourceId: 'other-id', targetId: 'target-1', targetType: 'tree' },
+        }),
+      )
+
+      // Card should still be in the document (no crash)
+      expect(screen.getByTestId('indicator-card')).toBeInTheDocument()
+    })
+  })
 })

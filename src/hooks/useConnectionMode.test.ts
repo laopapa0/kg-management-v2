@@ -720,4 +720,162 @@ describe('useConnectionMode', () => {
       expect(result.current.state.validTargetIds.has('rule-2')).toBe(true)
     })
   })
+
+  describe('data update on confirm', () => {
+    it('updates treeParentId when targetType is tree', () => {
+      useAttachmentStore.setState({
+        indicators: [
+          { id: 'ind-real', name: '真实指标', indicatorType: '原子指标', tagIds: [], ruleIds: [], treeParentId: undefined } as any,
+          { id: 'ind-group', name: '分组节点', indicatorType: '虚拟分组', tagIds: [], ruleIds: [], treeParentId: undefined } as any,
+        ],
+        undoStack: [],
+        canUndo: false,
+      })
+
+      const { result } = renderHook(() => useConnectionMode())
+
+      act(() => {
+        result.current.start('ind-real', 'tree')
+        result.current.setHoverTarget('ind-group')
+      })
+
+      act(() => {
+        result.current.confirm()
+      })
+
+      const updated = useAttachmentStore.getState().indicators.find((i) => i.id === 'ind-real')
+      expect(updated?.treeParentId).toBe('ind-group')
+    })
+
+    it('adds targetId to tagIds when targetType is tag', () => {
+      useAttachmentStore.setState({
+        indicators: [
+          { id: 'ind-real', name: '真实指标', indicatorType: '原子指标', tagIds: [], ruleIds: [], treeParentId: undefined } as any,
+        ],
+        tagNodes: [{ id: 'tag-1', name: '标签1' }],
+        undoStack: [],
+        canUndo: false,
+      })
+
+      const { result } = renderHook(() => useConnectionMode())
+
+      act(() => {
+        result.current.start('ind-real', 'tag')
+        result.current.setHoverTarget('tag-1')
+      })
+
+      act(() => {
+        result.current.confirm()
+      })
+
+      const updated = useAttachmentStore.getState().indicators.find((i) => i.id === 'ind-real')
+      expect(updated?.tagIds).toContain('tag-1')
+    })
+
+    it('adds targetId to ruleIds when targetType is rule', () => {
+      useAttachmentStore.setState({
+        indicators: [
+          { id: 'ind-real', name: '真实指标', indicatorType: '原子指标', tagIds: [], ruleIds: [], treeParentId: undefined } as any,
+        ],
+        rules: [{ id: 'rule-1', name: '规则1', type: 'threshold' }],
+        undoStack: [],
+        canUndo: false,
+      })
+
+      const { result } = renderHook(() => useConnectionMode())
+
+      act(() => {
+        result.current.start('ind-real', 'rule')
+        result.current.setHoverTarget('rule-1')
+      })
+
+      act(() => {
+        result.current.confirm()
+      })
+
+      const updated = useAttachmentStore.getState().indicators.find((i) => i.id === 'ind-real')
+      expect(updated?.ruleIds).toContain('rule-1')
+    })
+
+    it('pushes history snapshot on confirm', () => {
+      useAttachmentStore.setState({
+        indicators: [
+          { id: 'ind-real', name: '真实指标', indicatorType: '原子指标', tagIds: [], ruleIds: [], treeParentId: undefined } as any,
+          { id: 'ind-group', name: '分组节点', indicatorType: '虚拟分组', tagIds: [], ruleIds: [], treeParentId: undefined } as any,
+        ],
+        undoStack: [],
+        canUndo: false,
+      })
+
+      const { result } = renderHook(() => useConnectionMode())
+
+      act(() => {
+        result.current.start('ind-real', 'tree')
+        result.current.setHoverTarget('ind-group')
+      })
+
+      act(() => {
+        result.current.confirm()
+      })
+
+      expect(useAttachmentStore.getState().canUndo).toBe(true)
+      expect(useAttachmentStore.getState().undoStack.length).toBeGreaterThan(0)
+    })
+
+    it('dispatches connection-confirmed event on success', () => {
+      useAttachmentStore.setState({
+        indicators: [
+          { id: 'ind-real', name: '真实指标', indicatorType: '原子指标', tagIds: [], ruleIds: [], treeParentId: undefined } as any,
+          { id: 'ind-group', name: '分组节点', indicatorType: '虚拟分组', tagIds: [], ruleIds: [], treeParentId: undefined } as any,
+        ],
+      })
+
+      const eventSpy = vi.fn()
+      window.addEventListener('connection-confirmed', eventSpy)
+
+      const { result } = renderHook(() => useConnectionMode())
+
+      act(() => {
+        result.current.start('ind-real', 'tree')
+        result.current.setHoverTarget('ind-group')
+      })
+
+      act(() => {
+        result.current.confirm()
+      })
+
+      expect(eventSpy).toHaveBeenCalled()
+      const detail = (eventSpy.mock.calls[0][0] as CustomEvent).detail
+      expect(detail.sourceId).toBe('ind-real')
+      expect(detail.targetId).toBe('ind-group')
+      expect(detail.targetType).toBe('tree')
+
+      window.removeEventListener('connection-confirmed', eventSpy)
+    })
+
+    it('does not dispatch event on invalid confirm', () => {
+      useAttachmentStore.setState({
+        indicators: [
+          { id: 'ind-real', name: '真实指标', indicatorType: '原子指标', tagIds: [], ruleIds: [], treeParentId: undefined } as any,
+        ],
+      })
+
+      const eventSpy = vi.fn()
+      window.addEventListener('connection-confirmed', eventSpy)
+
+      const { result } = renderHook(() => useConnectionMode())
+
+      act(() => {
+        result.current.start('ind-real', 'tree')
+      })
+
+      act(() => {
+        result.current.confirm()
+      })
+
+      expect(eventSpy).not.toHaveBeenCalled()
+
+      window.removeEventListener('connection-confirmed', eventSpy)
+    })
+  })
 })
