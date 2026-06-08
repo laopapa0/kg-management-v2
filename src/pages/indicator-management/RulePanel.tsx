@@ -4,7 +4,7 @@ import ParameterDrawer from './ParameterDrawer'
 import TreeView, { type TreeNode } from '@/components/tree/TreeView'
 import EmptyState from '@/components/empty-state/EmptyState'
 import RuleSummaryBadge from '@/components/rule/RuleSummaryBadge'
-import TreeSearchInput from '@/components/search/TreeSearchInput'
+import TreeSearchInput, { type SearchMode } from '@/components/search/TreeSearchInput'
 import AttachedBadge from '@/components/connection/AttachedBadge'
 import BatchDetachMenu from '@/components/connection/BatchDetachMenu'
 import { useAttachmentStore } from '@/stores/attachmentStore'
@@ -64,6 +64,7 @@ export default function RulePanel() {
 
   const [searchTerm, setSearchTerm] = useState('')
   const [debouncedTerm, setDebouncedTerm] = useState('')
+  const [searchMode, setSearchMode] = useState<SearchMode>('highlight')
   const [selectedRuleId, setSelectedRuleId] = useState<string | null>(null)
   const [drawerOpen, setDrawerOpen] = useState(false)
 
@@ -146,6 +147,32 @@ export default function RulePanel() {
     [tree],
   )
 
+  function filterRuleTreeNodes(
+    nodes: RuleTreeNode[],
+    matched: Set<string>,
+    ancestors: Set<string>,
+  ): RuleTreeNode[] {
+    return nodes
+      .map((node) => {
+        const filteredChildren = node.children
+          ? filterRuleTreeNodes(node.children, matched, ancestors)
+          : undefined
+        const isMatch = matched.has(node.id)
+        const isAncestor = ancestors.has(node.id)
+        const hasMatchingChildren = filteredChildren && filteredChildren.length > 0
+        if (isMatch || isAncestor || hasMatchingChildren) {
+          return { ...node, children: filteredChildren }
+        }
+        return null
+      })
+      .filter(Boolean) as RuleTreeNode[]
+  }
+
+  const filteredRootNodes = useMemo(() => {
+    if (searchMode !== 'filter' || !debouncedTerm) return rootNodes
+    return filterRuleTreeNodes(rootNodes, matchedIds, ancestorIds)
+  }, [searchMode, debouncedTerm, rootNodes, matchedIds, ancestorIds])
+
   const isSearchActive = Boolean(debouncedTerm)
   const hasMatches = matchedIds.size > 0
 
@@ -167,6 +194,8 @@ export default function RulePanel() {
         <TreeSearchInput
           value={searchTerm}
           onChange={setSearchTerm}
+          searchMode={searchMode}
+          onModeChange={setSearchMode}
           placeholder="搜索规则..."
           data-testid="rule-search-input"
         />
@@ -180,7 +209,7 @@ export default function RulePanel() {
         />
       ) : (
         <TreeView
-          nodes={rootNodes}
+          nodes={filteredRootNodes}
           expanded={expanded}
           onExpandedChange={setUserExpanded}
           renderNode={(node, { isHovered }) => {
@@ -214,8 +243,8 @@ export default function RulePanel() {
                   data-rule-id={fullRule.id}
                   data-dimmed={isDimmed || undefined}
                   className={[
-                    'flex items-center justify-between gap-2 transition-opacity duration-200',
-                    isDimmed ? 'opacity-[0.35]' : 'opacity-100',
+                    'flex items-center justify-between gap-2 transition-all duration-200',
+                    isDimmed ? 'opacity-[0.35] scale-[0.98] pointer-events-none' : 'opacity-100',
                   ].join(' ')}
                 >
                   <span className="truncate text-sm text-dark-text-primary">

@@ -58,7 +58,7 @@ export default function TagPill({
   const hasColorBackground = !isChecked && Boolean(tag.color)
 
   return (
-    <div className={cn('inline-flex items-center gap-1', dimmed && 'opacity-[0.35]')}>
+    <div className={cn('inline-flex items-center gap-1', dimmed && 'opacity-[0.35] scale-[0.98] pointer-events-none')}>
       <button
         type="button"
         data-testid={`tag-pill-${tag.id}`}

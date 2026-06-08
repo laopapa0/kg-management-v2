@@ -207,6 +207,94 @@ describe('RulePanel', () => {
       vi.useRealTimers()
     })
 
+    it('hides unmatched rules when switched to filter mode', async () => {
+      const user = userEvent.setup()
+      initializeAttachmentStore()
+
+      const state = useAttachmentStore.getState()
+      const targetRule = state.rules.find((r) => r.name.includes('阈值'))
+      expect(targetRule).toBeDefined()
+      const otherRule = state.rules.find((r) => r.name === '合规规则')
+      expect(otherRule).toBeDefined()
+
+      render(<RulePanel />)
+
+      const input = screen.getByTestId('rule-search-input')
+      await user.type(input, '阈值')
+
+      // 等待 debounce + DOM 稳定
+      await waitFor(
+        () => {
+          expect(screen.getByTestId(`rule-row-${targetRule!.id}`)).toBeInTheDocument()
+        },
+        { timeout: 10000 },
+      )
+
+      // 高亮模式下 otherRule 仍存在（只是 dim）
+      expect(screen.getByTestId(`rule-row-${otherRule!.id}`)).toBeInTheDocument()
+
+      // 切换到过滤模式（等待 AnimatePresence 退出动画）
+      await user.click(screen.getByTestId('search-mode-filter'))
+
+      await waitFor(
+        () => {
+          expect(screen.queryByTestId(`rule-row-${otherRule!.id}`)).not.toBeInTheDocument()
+        },
+        { timeout: 5000 },
+      )
+      expect(screen.getByTestId(`rule-row-${targetRule!.id}`)).toBeInTheDocument()
+    })
+
+    it('shows contextual empty state when no rules match in filter mode', async () => {
+      const user = userEvent.setup()
+      initializeAttachmentStore()
+      render(<RulePanel />)
+
+      const input = screen.getByTestId('rule-search-input')
+      await user.type(input, '绝对不存在的规则')
+
+      // 等待 debounce + 空状态出现
+      await waitFor(
+        () => {
+          expect(screen.getByTestId('empty-state-wrapper')).toBeInTheDocument()
+        },
+        { timeout: 3000 },
+      )
+      expect(screen.getByText('未找到匹配规则')).toBeInTheDocument()
+
+      // 切换到过滤模式——仍应显示空状态
+      await user.click(screen.getByTestId('search-mode-filter'))
+
+      expect(screen.getByTestId('empty-state-wrapper')).toBeInTheDocument()
+    })
+
+    it('applies scale and pointer-events-none to dimmed unmatched rules in highlight mode', async () => {
+      vi.useFakeTimers({ shouldAdvanceTime: true })
+      const user = userEvent.setup()
+      initializeAttachmentStore()
+
+      const state = useAttachmentStore.getState()
+      const targetRule = state.rules.find((r) => r.name.includes('阈值'))!
+      const otherRule = state.rules.find((r) => r.name === '合规规则')!
+
+      render(<RulePanel />)
+
+      const input = screen.getByTestId('rule-search-input')
+      await user.type(input, '阈值', { delay: null })
+      act(() => vi.advanceTimersByTime(150))
+
+      const dimmedRow = screen.getByTestId(`rule-row-${otherRule.id}`)
+      expect(dimmedRow).toHaveAttribute('data-dimmed', 'true')
+      expect(dimmedRow).toHaveClass('opacity-[0.35]')
+      expect(dimmedRow).toHaveClass('scale-[0.98]')
+      expect(dimmedRow).toHaveClass('pointer-events-none')
+
+      const targetRow = screen.getByTestId(`rule-row-${targetRule.id}`)
+      expect(targetRow).not.toHaveAttribute('data-dimmed')
+
+      vi.useRealTimers()
+    })
+
     it('clears search when clear button is clicked', async () => {
       vi.useFakeTimers({ shouldAdvanceTime: true })
       const user = userEvent.setup()

@@ -340,6 +340,76 @@ describe('TagSetPanel', () => {
 
       vi.useRealTimers()
     })
+
+    it('applies scale and pointer-events-none to dimmed unmatched tags in highlight mode', async () => {
+      vi.useFakeTimers({ shouldAdvanceTime: true })
+      const user = userEvent.setup()
+      initializeAttachmentStore()
+      render(<TagSetPanel />)
+
+      const input = screen.getByTestId('tree-search-input')
+      await user.type(input, '核心', { delay: null })
+      act(() => vi.advanceTimersByTime(150))
+
+      const dimmedPill = screen.getByTestId('tag-pill-tag-key-monitor')
+      expect(dimmedPill).toHaveAttribute('data-dimmed', 'true')
+
+      const wrapper = dimmedPill.parentElement
+      expect(wrapper).toHaveClass('opacity-[0.35]')
+      expect(wrapper).toHaveClass('scale-[0.98]')
+      expect(wrapper).toHaveClass('pointer-events-none')
+
+      vi.useRealTimers()
+    })
+
+    it('hides unmatched nodes when switched to filter mode', async () => {
+      const user = userEvent.setup()
+      initializeAttachmentStore()
+      render(<TagSetPanel />)
+
+      const input = screen.getByTestId('tree-search-input')
+      await user.type(input, '核心')
+
+      // 等待 debounce 和文本高亮出现
+      await waitFor(() => {
+        expect(screen.getByTestId('tag-pill-highlight')).toBeInTheDocument()
+      })
+
+      // 切换过滤模式
+      await user.click(screen.getByTestId('search-mode-filter'))
+
+      // 等待 DOM 更新
+      await waitFor(() => {
+        expect(screen.queryByTestId('tag-pill-tag-key-monitor')).not.toBeInTheDocument()
+      })
+
+      // 匹配的子标签应仍存在
+      expect(screen.getByTestId('tag-pill-tag-core')).toBeInTheDocument()
+      // 未匹配的根节点应被隐藏
+      expect(screen.queryByTestId('tag-group-tag-root-tech')).not.toBeInTheDocument()
+    })
+
+    it('shows contextual empty state when no tags match in filter mode', async () => {
+      const user = userEvent.setup()
+      initializeAttachmentStore()
+      render(<TagSetPanel />)
+
+      const input = screen.getByTestId('tree-search-input')
+      await user.type(input, '绝对不存在的标签')
+
+      // 等待 debounce（高亮模式下不显示空状态，只是 dim 所有节点）
+      await waitFor(() => {
+        expect(screen.getByTestId('tag-pill-tag-core')).toHaveAttribute('data-dimmed', 'true')
+      })
+
+      // 切换到过滤模式才显示空状态
+      await user.click(screen.getByTestId('search-mode-filter'))
+
+      await waitFor(() => {
+        expect(screen.getByTestId('empty-state-wrapper')).toBeInTheDocument()
+      })
+      expect(screen.getByText('未找到匹配标签')).toBeInTheDocument()
+    })
   })
 
   describe('tag color editing', () => {

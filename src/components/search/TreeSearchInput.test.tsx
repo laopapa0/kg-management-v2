@@ -63,4 +63,55 @@ describe('TreeSearchInput', () => {
     expect(input).toHaveClass('h-9')
     expect(input).toHaveClass('focus:border-[#4DA6FF]')
   })
+
+  describe('search mode toggle', () => {
+    it('renders highlight and filter mode buttons when controlled', () => {
+      render(
+        <TreeSearchInput
+          value=""
+          onChange={() => {}}
+          searchMode="highlight"
+          onModeChange={() => {}}
+        />,
+      )
+      expect(screen.getByTestId('search-mode-highlight')).toBeInTheDocument()
+      expect(screen.getByTestId('search-mode-filter')).toBeInTheDocument()
+    })
+
+    it('does not render mode buttons when not controlled', () => {
+      render(<ControlledInput />)
+      expect(screen.queryByTestId('search-mode-highlight')).not.toBeInTheDocument()
+      expect(screen.queryByTestId('search-mode-filter')).not.toBeInTheDocument()
+    })
+
+    it('calls onModeChange with "filter" when filter button clicked', async () => {
+      const user = userEvent.setup()
+      const onModeChange = vi.fn()
+      render(
+        <TreeSearchInput
+          value=""
+          onChange={() => {}}
+          searchMode="highlight"
+          onModeChange={onModeChange}
+        />,
+      )
+      await user.click(screen.getByTestId('search-mode-filter'))
+      expect(onModeChange).toHaveBeenCalledWith('filter')
+    })
+
+    it('calls onModeChange with "highlight" when highlight button clicked', async () => {
+      const user = userEvent.setup()
+      const onModeChange = vi.fn()
+      render(
+        <TreeSearchInput
+          value=""
+          onChange={() => {}}
+          searchMode="filter"
+          onModeChange={onModeChange}
+        />,
+      )
+      await user.click(screen.getByTestId('search-mode-highlight'))
+      expect(onModeChange).toHaveBeenCalledWith('highlight')
+    })
+  })
 })

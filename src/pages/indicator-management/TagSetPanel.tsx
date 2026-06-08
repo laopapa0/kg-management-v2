@@ -1,5 +1,5 @@
 import { useMemo, useState, useCallback, useEffect } from 'react'
-import { Tags } from 'lucide-react'
+import { Tags, Search } from 'lucide-react'
 import TreeView, { type TreeNode } from '@/components/tree/TreeView'
 import EmptyState from '@/components/empty-state/EmptyState'
 import { useAttachmentStore } from '@/stores/attachmentStore'
@@ -10,7 +10,7 @@ import TagCloud from '@/components/tag/TagCloud'
 import TagPill from '@/components/tag/TagPill'
 import AttachedBadge from '@/components/connection/AttachedBadge'
 import BatchDetachMenu from '@/components/connection/BatchDetachMenu'
-import TreeSearchInput from '@/components/search/TreeSearchInput'
+import TreeSearchInput, { type SearchMode } from '@/components/search/TreeSearchInput'
 import { toggle, computeState, clear } from '@/components/tree/CascadingStateEngine'
 
 interface TagTreeNode extends TreeNode {
@@ -88,6 +88,7 @@ export default function TagSetPanel() {
   const [selection, setSelection] = useState(() => computeState(tagNodes, initialSelectedIds))
   const [searchTerm, setSearchTerm] = useState('')
   const [debouncedTerm, setDebouncedTerm] = useState('')
+  const [searchMode, setSearchMode] = useState<SearchMode>('highlight')
 
   useEffect(() => {
     const timer = setTimeout(() => setDebouncedTerm(searchTerm), 150)
@@ -199,6 +200,16 @@ export default function TagSetPanel() {
     [tree],
   )
 
+  const filteredRootNodes = useMemo(() => {
+    if (searchMode !== 'filter' || !debouncedTerm) return rootNodes
+    return rootNodes.filter(
+      (node) => matchedIds.has(node.id) || ancestorIds.has(node.id),
+    )
+  }, [searchMode, debouncedTerm, rootNodes, matchedIds, ancestorIds])
+
+  const isFilterEmpty =
+    searchMode === 'filter' && debouncedTerm && filteredRootNodes.length === 0
+
   if (tree.length === 0) {
     return (
       <div className="flex-1 overflow-y-auto px-3 pb-2" data-testid="tag-set-panel">
@@ -234,10 +245,25 @@ export default function TagSetPanel() {
             清空
           </button>
         </div>
-        <TreeSearchInput value={searchTerm} onChange={setSearchTerm} />
+        <TreeSearchInput
+          value={searchTerm}
+          onChange={setSearchTerm}
+          searchMode={searchMode}
+          onModeChange={setSearchMode}
+        />
       </div>
-      <TreeView
-        nodes={rootNodes}
+
+      {isFilterEmpty && (
+        <EmptyState
+          icon={<Search className="size-6" />}
+          title="未找到匹配标签"
+          description={`没有标签匹配 "${debouncedTerm}"，请尝试其他关键词`}
+        />
+      )}
+
+      {!isFilterEmpty && (
+        <TreeView
+          nodes={filteredRootNodes}
         expanded={expanded}
         onExpandedChange={setUserExpanded}
         renderNode={(node, { isHovered }) => {
@@ -333,7 +359,11 @@ export default function TagSetPanel() {
         renderChildren={(node) => {
           const fullNode = nodeMap.get(node.id)
           if (!fullNode) return null
-          const childTags = fullNode.children?.length ? fullNode.children : []
+          let childTags = fullNode.children?.length ? fullNode.children : []
+          if (searchMode === 'filter' && debouncedTerm) {
+            childTags = childTags.filter((tag) => matchedIds.has(tag.id))
+          }
+          if (childTags.length === 0) return null
           return (
             <div data-testid={`tag-group-${node.id}`} className="pb-2 pl-6">
               <TagCloud
@@ -349,7 +379,8 @@ export default function TagSetPanel() {
             </div>
           )
         }}
-      />
+        />
+      )}
     </div>
   )
 }
