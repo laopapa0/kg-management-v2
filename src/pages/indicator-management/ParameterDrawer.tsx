@@ -1,5 +1,5 @@
-import { useMemo } from 'react'
-import { X } from 'lucide-react'
+import { useMemo, useRef } from 'react'
+import { X, Save } from 'lucide-react'
 import {
   Drawer,
   DrawerContent,
@@ -13,6 +13,8 @@ import {
   AccordionTrigger,
   AccordionContent,
 } from '@/components/ui/accordion'
+import { Button } from '@/components/ui/button'
+import ParameterFields, { type ParameterFieldsRef } from '@/components/rule/ParameterFields'
 import { useAttachmentStore } from '@/stores/attachmentStore'
 import type { RuleParameter } from '@/models/indicatorAttachmentModel'
 
@@ -67,6 +69,9 @@ export default function ParameterDrawer({
 }: ParameterDrawerProps) {
   const rules = useAttachmentStore((state) => state.rules)
   const ruleParameters = useAttachmentStore((state) => state.ruleParameters)
+  const setRuleParameters = useAttachmentStore((state) => state.setRuleParameters)
+
+  const fieldsRef = useRef<ParameterFieldsRef>(null)
 
   const rule = useMemo(() => rules.find((r) => r.id === ruleId), [rules, ruleId])
 
@@ -134,9 +139,33 @@ export default function ParameterDrawer({
                 <SectionBadge {...sectionCounts.content} />
               </AccordionTrigger>
               <AccordionContent data-testid="section-content-panel">
-                <div className="space-y-3 py-1">
-                  <p className="text-xs text-dark-text-tertiary">核心参数内容区域</p>
-                </div>
+                {rule && (
+                  <ParameterFields
+                    ref={fieldsRef}
+                    ruleType={rule.type}
+                    defaultValues={param}
+                    onSubmit={(data) => {
+                      const next = ruleParameters.map((p) =>
+                        p.ruleId === ruleId && p.indicatorId === (indicatorId ?? '')
+                          ? { ...p, ...data }
+                          : p,
+                      )
+                      // If no existing param, add new one
+                      const exists = ruleParameters.some(
+                        (p) => p.ruleId === ruleId && p.indicatorId === (indicatorId ?? ''),
+                      )
+                      if (!exists) {
+                        next.push({
+                          ruleId,
+                          indicatorId: indicatorId ?? '',
+                          ...data,
+                        } as RuleParameter)
+                      }
+                      setRuleParameters(next as RuleParameter[])
+                      onOpenChange(false)
+                    }}
+                  />
+                )}
               </AccordionContent>
             </AccordionItem>
 
@@ -168,6 +197,29 @@ export default function ParameterDrawer({
               </AccordionContent>
             </AccordionItem>
           </Accordion>
+        </div>
+
+        {/* Footer save button */}
+        <div className="border-t border-dark-border-default p-4">
+          <Button
+            data-testid="drawer-save-btn"
+            className="w-full"
+            onClick={() => {
+              const ok = fieldsRef.current?.submit()
+              if (!ok) {
+                // Scroll to first invalid field
+                setTimeout(() => {
+                  const firstInvalid = document.querySelector(
+                    '[data-testid="parameter-drawer-content"] [aria-invalid="true"]',
+                  )
+                  firstInvalid?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+                }, 50)
+              }
+            }}
+          >
+            <Save className="size-4" />
+            保存参数
+          </Button>
         </div>
       </DrawerContent>
     </Drawer>

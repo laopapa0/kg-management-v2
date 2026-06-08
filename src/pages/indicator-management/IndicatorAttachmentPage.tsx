@@ -59,6 +59,9 @@ export default function IndicatorAttachmentPage() {
       const detail = (e as CustomEvent).detail as { targetId: string }
       setPulseTargetId(detail.targetId)
       // Delay toast until pulse ring dissipates (400ms)
+      if (toastTimerRef.current) {
+        clearTimeout(toastTimerRef.current)
+      }
       toastTimerRef.current = setTimeout(() => setToastTargetId(detail.targetId), 400)
     }
     window.addEventListener('connection-confirmed', handler)

@@ -778,5 +778,48 @@ describe('IndicatorAttachmentPage', () => {
 
       vi.useRealTimers()
     })
+
+    it('cancels previous toast timer when a new connection-confirmed fires within 400ms', () => {
+      vi.useFakeTimers({ shouldAdvanceTime: true })
+      createFeedbackTarget('target-a')
+      createFeedbackTarget('target-b')
+
+      render(<IndicatorAttachmentPage />)
+
+      // First event at t=0 — schedules toast for target-a at t=400
+      act(() => {
+        window.dispatchEvent(
+          new CustomEvent('connection-confirmed', {
+            detail: { sourceId: 'src-1', targetId: 'target-a', targetType: 'tree' },
+          }),
+        )
+      })
+
+      // Second event at t=200 — should cancel first timer
+      act(() => {
+        vi.advanceTimersByTime(200)
+      })
+      act(() => {
+        window.dispatchEvent(
+          new CustomEvent('connection-confirmed', {
+            detail: { sourceId: 'src-1', targetId: 'target-b', targetType: 'tree' },
+          }),
+        )
+      })
+
+      // At t=400: first timer would fire if not cancelled — no toast yet
+      act(() => {
+        vi.advanceTimersByTime(200)
+      })
+      expect(screen.queryByTestId('mini-toast')).not.toBeInTheDocument()
+
+      // At t=600: second timer fires — toast for target-b appears
+      act(() => {
+        vi.advanceTimersByTime(200)
+      })
+      expect(screen.getByTestId('mini-toast')).toBeInTheDocument()
+
+      vi.useRealTimers()
+    })
   })
 })

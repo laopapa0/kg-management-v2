@@ -87,6 +87,33 @@ describe('PulseRing', () => {
     document.body.removeChild(targetEl)
   })
 
+  it('applies stroke-width animation class to both inner and outer ring borders', () => {
+    const targetEl = document.createElement('div')
+    targetEl.classList.add('test-cleanup')
+    targetEl.setAttribute('data-indicator-id', 'target-stroke')
+    targetEl.style.position = 'absolute'
+    targetEl.style.left = '0px'
+    targetEl.style.top = '0px'
+    targetEl.style.width = '10px'
+    targetEl.style.height = '10px'
+    document.body.appendChild(targetEl)
+
+    targetEl.getBoundingClientRect = vi.fn(() => ({
+      x: 0, y: 0, width: 10, height: 10,
+      top: 0, left: 0, right: 10, bottom: 10, toJSON: () => '',
+    }))
+
+    const { container } = render(<PulseRing targetId="target-stroke" />)
+
+    const ring = container.querySelector('[data-testid="pulse-ring"]')
+    const borders = ring!.querySelectorAll('div')
+    expect(borders.length).toBe(2)
+    expect(borders[0]).toHaveClass('animate-pulse-ring-stroke')
+    expect(borders[1]).toHaveClass('animate-pulse-ring-stroke')
+
+    document.body.removeChild(targetEl)
+  })
+
   it('removes from DOM after 400ms', () => {
     const targetEl = document.createElement('div')
     targetEl.classList.add('test-cleanup')

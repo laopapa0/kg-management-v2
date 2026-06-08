@@ -1,6 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, within } from '@testing-library/react'
+import { render, screen, within, fireEvent, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { initializeAttachmentStore, useAttachmentStore } from '@/stores/attachmentStore'
+import { __resetAttachmentStorageCache } from '@/utils/attachmentStorage'
 import ParameterDrawer from './ParameterDrawer'
 
 // vaul uses PointerEvents which are not fully supported in JSDOM
@@ -19,6 +21,9 @@ describe('ParameterDrawer', () => {
   }
 
   beforeEach(() => {
+    localStorage.clear()
+    __resetAttachmentStorageCache()
+    useAttachmentStore.setState(useAttachmentStore.getInitialState())
     vi.clearAllMocks()
   })
 
@@ -94,5 +99,58 @@ describe('ParameterDrawer', () => {
     render(<ParameterDrawer {...defaultProps} />)
     const header = screen.getByTestId('drawer-header')
     expect(header).toBeInTheDocument()
+  })
+
+  describe('with store data', () => {
+    it('renders ParameterFields for threshold rule', () => {
+      initializeAttachmentStore()
+      render(<ParameterDrawer {...defaultProps} />)
+      expect(screen.getByTestId('input-upperLimit')).toBeInTheDocument()
+      expect(screen.getByTestId('input-lowerLimit')).toBeInTheDocument()
+    })
+
+    it('renders ParameterFields for fluctuation rule', () => {
+      initializeAttachmentStore()
+      render(<ParameterDrawer {...defaultProps} ruleId="rule-fluctuation-yoy" />)
+      expect(screen.getByTestId('select-algorithm')).toBeInTheDocument()
+      expect(screen.getByTestId('input-window')).toBeInTheDocument()
+    })
+
+    it('renders ParameterFields for topn rule', () => {
+      initializeAttachmentStore()
+      render(<ParameterDrawer {...defaultProps} ruleId="rule-topn-10" />)
+      expect(screen.getByTestId('input-n')).toBeInTheDocument()
+      expect(screen.getByTestId('select-dimension')).toBeInTheDocument()
+    })
+
+    it('shows save button in drawer footer', () => {
+      initializeAttachmentStore()
+      render(<ParameterDrawer {...defaultProps} />)
+      expect(screen.getByTestId('drawer-save-btn')).toBeInTheDocument()
+    })
+
+    it('updates store and closes drawer on successful save', async () => {
+      const user = userEvent.setup()
+      initializeAttachmentStore()
+      const onOpenChange = vi.fn()
+
+      render(<ParameterDrawer {...defaultProps} onOpenChange={onOpenChange} />)
+
+      const upper = screen.getByTestId('input-upperLimit')
+      fireEvent.change(upper, { target: { value: '200' } })
+
+      const saveBtn = screen.getByTestId('drawer-save-btn')
+      await user.click(saveBtn)
+
+      await waitFor(() => {
+        const state = useAttachmentStore.getState()
+        const param = state.ruleParameters.find(
+          (p) => p.ruleId === defaultProps.ruleId,
+        )
+        expect(param?.upperLimit).toBe(200)
+      })
+
+      expect(onOpenChange).toHaveBeenCalledWith(false)
+    })
   })
 })

@@ -362,6 +362,40 @@ describe('PersistentConnectionLayer', () => {
 
       vi.useRealTimers()
     })
+
+    it('clears exiting timers on unmount to avoid setState after unmount', () => {
+      vi.useFakeTimers({ shouldAdvanceTime: true })
+      const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {})
+      setupConnectionElements()
+      const { unmount } = render(
+        <PersistentConnectionLayer
+          connections={[{ sourceId: 'src-1', targetId: 'tree-1' }]}
+          onDelete={vi.fn()}
+        />,
+      )
+
+      const path = screen.getByTestId('persistent-connection-line')
+      fireEvent.mouseEnter(path)
+      fireEvent.click(screen.getByTestId('delete-connection-button'))
+
+      unmount()
+
+      // Advance past the 200ms fade-out timer
+      act(() => {
+        vi.advanceTimersByTime(300)
+      })
+
+      // Should not log React warning about setState on unmounted component
+      const reactWarnings = consoleError.mock.calls.filter(
+        (call) =>
+          typeof call[0] === 'string' &&
+          (call[0].includes('unmounted') || call[0].includes('memory leak')),
+      )
+      expect(reactWarnings).toHaveLength(0)
+
+      consoleError.mockRestore()
+      vi.useRealTimers()
+    })
   })
 
   describe('inline confirm for rule connections', () => {
