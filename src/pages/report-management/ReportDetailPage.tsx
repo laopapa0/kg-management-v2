@@ -1,8 +1,11 @@
 import { useMemo, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
+import { toast } from 'sonner'
 import { getGeneratedReports, getReportsByPlanId } from '@/utils/generatedReportStorage'
 import { useCommentStore } from '@/stores/commentStore'
 import CommentThread from '@/components/report/CommentThread'
+import KnowledgeGraphChart from '@/components/report/KnowledgeGraphChart'
+import type { KnowledgeGraphNode, KnowledgeGraphEdge } from '@/components/report/KnowledgeGraphChart'
 import type { GeneratedReport, GeneratedReportSection } from '@/models/generatedReportModel'
 
 function sectionTitleMap(sections: GeneratedReportSection[]): Map<string, string> {
@@ -13,11 +16,24 @@ function sectionTitleMap(sections: GeneratedReportSection[]): Map<string, string
   return map
 }
 
+function tryParseKnowledgeGraph(content: string): { nodes: KnowledgeGraphNode[]; edges: KnowledgeGraphEdge[] } | null {
+  try {
+    const data = JSON.parse(content)
+    if (Array.isArray(data.nodes) && Array.isArray(data.edges)) {
+      return data
+    }
+  } catch {
+    // not JSON
+  }
+  return null
+}
+
 export default function ReportDetailPage() {
   const navigate = useNavigate()
   const { reportId } = useParams<{ reportId: string }>()
   const [compareVersionId, setCompareVersionId] = useState<string | null>(null)
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set())
+  const [kgEdgesMap, setKgEdgesMap] = useState<Record<string, KnowledgeGraphEdge[]>>({})
   const allComments = useCommentStore((state) => state.comments)
 
   const report = useMemo(() => {
@@ -68,6 +84,36 @@ export default function ReportDetailPage() {
   function getCommentCount(sectionId: string): number {
     const targetId = `${report!.id}:${report!.version}:${sectionId}`
     return allComments.filter((c) => c.targetId === targetId && c.targetType === 'report-section').length
+  }
+
+  function handleEdgeDelete(sectionId: string, edge: KnowledgeGraphEdge) {
+    const current = kgEdgesMap[sectionId] ?? []
+    setKgEdgesMap((prev) => ({
+      ...prev,
+      [sectionId]: current.filter((e) => !(e.source === edge.source && e.target === edge.target)),
+    }))
+    toast('关联关系已更新，建议重跑报告', {
+      action: {
+        label: '重跑',
+        onClick: () => navigate('/reports/generate'),
+      },
+    })
+  }
+
+  function handleEdgeChange(sectionId: string, oldEdge: KnowledgeGraphEdge, newEdge: KnowledgeGraphEdge) {
+    const current = kgEdgesMap[sectionId] ?? []
+    setKgEdgesMap((prev) => ({
+      ...prev,
+      [sectionId]: current.map((e) =>
+        e.source === oldEdge.source && e.target === oldEdge.target ? newEdge : e,
+      ),
+    }))
+    toast('关联关系已更新，建议重跑报告', {
+      action: {
+        label: '重跑',
+        onClick: () => navigate('/reports/generate'),
+      },
+    })
   }
 
   if (!report) {
@@ -162,6 +208,24 @@ export default function ReportDetailPage() {
             report.sections.map((section) => {
               const count = getCommentCount(section.id)
               const isExpanded = expandedSections.has(section.id)
+              const kgData = tryParseKnowledgeGraph(section.content)
+              if (kgData) {
+                const edges = kgEdgesMap[section.id] ?? kgData.edges
+                return (
+                  <div key={section.id} data-testid={`report-section-${section.id}`} className="mb-4 rounded-md border border-dark-border bg-dark-card-l2 p-3">
+                    <div className="mb-2 flex items-center justify-between">
+                      <h3 className="font-medium text-dark-text-primary">{section.title}</h3>
+                    </div>
+                    <KnowledgeGraphChart
+                      nodes={kgData.nodes}
+                      edges={edges}
+                      editable
+                      onEdgeDelete={(edge) => handleEdgeDelete(section.id, edge)}
+                      onEdgeChange={(oldEdge, newEdge) => handleEdgeChange(section.id, oldEdge, newEdge)}
+                    />
+                  </div>
+                )
+              }
               return (
                 <div key={section.id} data-testid={`report-section-${section.id}`} className="mb-4 rounded-md border border-dark-border bg-dark-card-l2 p-3">
                   <div className="mb-2 flex items-center justify-between">
