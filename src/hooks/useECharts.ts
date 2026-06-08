@@ -6,6 +6,8 @@ export function useECharts(
   option: echarts.EChartsOption,
 ) {
   const instanceRef = useRef<echarts.ECharts | null>(null)
+  const optionRef = useRef(option)
+  optionRef.current = option
 
   useEffect(() => {
     const el = containerRef.current
@@ -13,7 +15,7 @@ export function useECharts(
 
     const instance = echarts.init(el, 'dark')
     instanceRef.current = instance
-    instance.setOption(option)
+    instance.setOption(optionRef.current)
 
     const ro = new ResizeObserver(() => {
       instance.resize()
@@ -25,5 +27,11 @@ export function useECharts(
       instance.dispose()
       instanceRef.current = null
     }
-  }, [containerRef, option])
+  }, [containerRef])
+
+  useEffect(() => {
+    const instance = instanceRef.current
+    if (!instance) return
+    instance.setOption(option, { notMerge: true })
+  }, [option])
 }

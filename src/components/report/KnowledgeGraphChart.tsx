@@ -54,6 +54,7 @@ function buildGraphOption(nodes: KnowledgeGraphNode[], edges: KnowledgeGraphEdge
         value: n.value ?? NODE_SIZE_MAP[n.type],
         symbolSize: NODE_SIZE_MAP[n.type],
         itemStyle: { color: NODE_COLOR_MAP[n.type] },
+        draggable: true,
       })),
       links: edges.map(e => ({
         source: e.source,
