@@ -1,6 +1,9 @@
 import { useEffect, useRef } from 'react'
-import { getElementCenter } from './connectionGeometry'
-import { createOptimizedPathD } from './connectionRenderer'
+import { getElementCenter } from '@/utils/connectionGeometry'
+import { createOptimizedPathD, isInViewport, getViewportRect } from '@/utils/connectionRenderer'
+import ConnectionLine from './ConnectionLine'
+
+const EMPTY_SET: ReadonlySet<string> = Object.freeze(new Set<string>())
 
 interface ConnectionLayerProps {
   sourceId: string | null
@@ -11,7 +14,7 @@ interface ConnectionLayerProps {
 export default function ConnectionLayer({
   sourceId,
   hoverTargetId = null,
-  validTargetIds = new Set(),
+  validTargetIds = EMPTY_SET,
 }: ConnectionLayerProps) {
   const pathRef = useRef<SVGPathElement>(null)
   const mouseRef = useRef({ x: 0, y: 0 })
@@ -30,47 +33,38 @@ export default function ConnectionLayer({
       mouseRef.current.y = e.clientY
     }
 
-    const handleScroll = () => {
-      // Scroll changes element positions, rAF loop will pick up new coordinates
-    }
-
     const updateLine = () => {
-      const sourceEl = document.getElementById(sourceId)
+      const sourceEl = document.querySelector(`[data-indicator-id="${sourceId}"]`) as HTMLElement | null
       if (!sourceEl || !pathRef.current) {
         rafRef.current = requestAnimationFrame(updateLine)
         return
       }
 
       const start = getElementCenter(sourceEl)
+
+      // Viewport clipping: skip rendering when source is completely off-screen
+      const viewport = getViewportRect()
+      if (!isInViewport(start, viewport)) {
+        pathRef.current?.setAttribute('d', '')
+        rafRef.current = requestAnimationFrame(updateLine)
+        return
+      }
+
       const end = mouseRef.current
       pathRef.current.setAttribute('d', createOptimizedPathD(start, end))
       rafRef.current = requestAnimationFrame(updateLine)
     }
 
     window.addEventListener('mousemove', handleMouseMove)
-    window.addEventListener('scroll', handleScroll, { passive: true })
     rafRef.current = requestAnimationFrame(updateLine)
 
     return () => {
       window.removeEventListener('mousemove', handleMouseMove)
-      window.removeEventListener('scroll', handleScroll)
       cancelAnimationFrame(rafRef.current)
     }
   }, [sourceId])
 
   if (!sourceId) return null
-
-  const strokeColor = isInvalidHover
-    ? '#EF4444'
-    : isValidHover
-      ? '#22C55E'
-      : '#64748B'
-
-  const markerId = isInvalidHover
-    ? 'conn-arrow-invalid'
-    : isValidHover
-      ? 'conn-arrow-valid'
-      : 'conn-arrow'
 
   return (
     <svg
@@ -87,7 +81,7 @@ export default function ConnectionLayer({
           refY="3"
           orient="auto"
         >
-          <polygon points="0 0, 8 3, 0 6" fill="#64748B" />
+          <polygon points="0 0, 8 3, 0 6" fill="var(--dark-conn-line-default)" />
         </marker>
         <marker
           id="conn-arrow-invalid"
@@ -97,7 +91,7 @@ export default function ConnectionLayer({
           refY="3"
           orient="auto"
         >
-          <polygon points="0 0, 8 3, 0 6" fill="#EF4444" />
+          <polygon points="0 0, 8 3, 0 6" fill="var(--dark-conn-line-invalid)" />
         </marker>
         <marker
           id="conn-arrow-valid"
@@ -107,21 +101,13 @@ export default function ConnectionLayer({
           refY="3"
           orient="auto"
         >
-          <polygon points="0 0, 8 3, 0 6" fill="#22C55E" />
+          <polygon points="0 0, 8 3, 0 6" fill="var(--dark-conn-line-valid)" />
         </marker>
       </defs>
-      <path
-        ref={pathRef}
-        data-testid="connection-line-path"
-        stroke={strokeColor}
-        strokeWidth={isValidHover ? 3 : 2.5}
-        strokeDasharray="6 4"
-        fill="none"
-        markerEnd={`url(#${markerId})`}
-        className={isInvalidHover ? '' : 'animate-ant-line'}
-        style={{
-          animationDuration: isValidHover ? '0.3s' : '0.5s',
-        }}
+      <ConnectionLine
+        pathRef={pathRef}
+        isValidHover={isValidHover}
+        isInvalidHover={isInvalidHover}
       />
     </svg>
   )

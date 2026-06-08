@@ -131,21 +131,25 @@
   filter: saturate(0.3) brightness(0.6);
   transition: filter 200ms;
   will-change: filter;
+  cursor: not-allowed;
 }
 
 /* Spotlight exclusion: source and valid targets remain vivid */
 [data-dim-mode="true"] .spotlight-exclude {
   filter: none !important;
+  cursor: crosshair;
 }
 
 /* Valid target three-layer hover feedback */
 [data-dim-mode="true"] .spotlight-exclude {
-  transition: outline 150ms ease, background-color 150ms ease, transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  border: 1px solid transparent;
+  transition: border-width 200ms ease, border-color 200ms ease, background-color 200ms ease, transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 [data-dim-mode="true"] .spotlight-exclude:hover {
-  outline: 2px solid #3B82F6;
-  outline-offset: 2px;
+  outline: none;
+  border-width: 2px;
+  border-color: #3B82F6;
   background-color: rgba(59, 130, 246, 0.08) !important;
   transform: scale(1.02);
 }

@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { motion, useAnimation } from 'framer-motion'
 import { Badge } from '@/components/ui/badge'
 import { DURATION } from '@/components/motion/motion.tokens'
@@ -29,6 +29,8 @@ export default function IndicatorCard({
   const isAttached = cardState === 'attached'
 
   const controls = useAnimation()
+  const controlsRef = useRef(controls)
+  controlsRef.current = controls
 
   useEffect(() => {
     const handler = (e: Event) => {
@@ -38,8 +40,8 @@ export default function IndicatorCard({
       }
       if (detail.sourceId !== id) return
 
-      const targetEl = document.getElementById(detail.targetId)
-      const cardEl = document.getElementById(id)
+      const targetEl = document.querySelector(`[data-indicator-id="${detail.targetId}"]`) as HTMLElement | null
+      const cardEl = document.querySelector(`[data-indicator-id="${id}"]`) as HTMLElement | null
       if (!targetEl || !cardEl) return
 
       const targetRect = targetEl.getBoundingClientRect()
@@ -57,17 +59,17 @@ export default function IndicatorCard({
       // T+0: scale 1→0.9
       // T+100ms: fly to target (200ms)
       // T+300ms: fade out
-      controls
+      controlsRef.current
         .start({ scale: 0.9, transition: { duration: 0 } })
         .then(() =>
-          controls.start({
+          controlsRef.current.start({
             x: deltaX,
             y: deltaY,
             transition: { duration: 0.2, delay: 0.1 },
           }),
         )
         .then(() =>
-          controls.start({
+          controlsRef.current.start({
             opacity: 0,
             transition: { duration: 0 },
           }),
@@ -76,7 +78,7 @@ export default function IndicatorCard({
 
     window.addEventListener('connection-confirmed', handler)
     return () => window.removeEventListener('connection-confirmed', handler)
-  }, [id, controls])
+  }, [id])
 
   return (
     <motion.div

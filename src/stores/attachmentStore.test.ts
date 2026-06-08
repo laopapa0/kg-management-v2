@@ -41,6 +41,7 @@ describe('attachmentStore', () => {
   })
 
   it('loads data from attachmentStorage during init()', () => {
+    localStorage.setItem('kgv2-attachment-data-version', '2')
     localStorage.setItem('kgv2-attachment-departments', JSON.stringify(mockStorage.departments))
     localStorage.setItem(
       'kgv2-attachment-indicators-dept-finance',
@@ -129,6 +130,7 @@ describe('attachmentStore', () => {
   })
 
   it('does not auto-inject mock data if storage already has departments', () => {
+    localStorage.setItem('kgv2-attachment-data-version', '2')
     localStorage.setItem('kgv2-attachment-departments', JSON.stringify(mockStorage.departments))
     localStorage.setItem('kgv2-attachment-indicators-dept-finance', JSON.stringify([]))
     localStorage.setItem('kgv2-attachment-tagnodes-dept-finance', JSON.stringify([]))

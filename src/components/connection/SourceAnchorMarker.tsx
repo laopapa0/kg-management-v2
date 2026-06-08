@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { getEdgePosition, type Edge } from './anchorPosition'
+import { getEdgePosition, type Edge } from '@/utils/anchorPosition'
 
 interface SourceAnchorMarkerProps {
   sourceId: string
@@ -14,7 +14,7 @@ export default function SourceAnchorMarker({ sourceId, onClick }: SourceAnchorMa
   const rafRef = useRef<number>(0)
 
   useEffect(() => {
-    const el = document.getElementById(sourceId)
+    const el = document.querySelector(`[data-indicator-id="${sourceId}"]`) as HTMLElement | null
     if (!el) return
 
     setSourceName(el.textContent ?? '')

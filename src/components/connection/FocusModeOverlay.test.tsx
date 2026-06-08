@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { render, screen, cleanup } from '@testing-library/react'
+import { render, screen, cleanup, act } from '@testing-library/react'
 import FocusModeOverlay from './FocusModeOverlay'
 
 describe('FocusModeOverlay', () => {
@@ -21,8 +21,18 @@ describe('FocusModeOverlay', () => {
     removeEventListenerSpy.mockRestore()
   })
 
-  it('does not render when not visible', () => {
-    render(
+  it('does not render when not visible after exit animation', () => {
+    const { rerender } = render(
+      <FocusModeOverlay
+        isVisible={true}
+        sourceId="ind-1"
+        validTargetIds={new Set()}
+        targetType={null}
+      />,
+    )
+    expect(screen.getByTestId('focus-mode-overlay')).toBeInTheDocument()
+
+    rerender(
       <FocusModeOverlay
         isVisible={false}
         sourceId="ind-1"
@@ -30,6 +40,12 @@ describe('FocusModeOverlay', () => {
         targetType={null}
       />,
     )
+    // Should still be in DOM during exit animation
+    expect(screen.queryByTestId('focus-mode-overlay')).toBeInTheDocument()
+
+    act(() => {
+      vi.advanceTimersByTime(200)
+    })
     expect(screen.queryByTestId('focus-mode-overlay')).not.toBeInTheDocument()
   })
 
@@ -73,6 +89,29 @@ describe('FocusModeOverlay', () => {
 
     const svg = screen.getByTestId('focus-mode-overlay')
     expect(svg).toHaveStyle({ transition: 'opacity 250ms cubic-bezier(0.4, 0, 0.2, 1)' })
+  })
+
+  it('has exit opacity transition style', () => {
+    const { rerender } = render(
+      <FocusModeOverlay
+        isVisible={true}
+        sourceId="ind-1"
+        validTargetIds={new Set()}
+        targetType={null}
+      />,
+    )
+
+    rerender(
+      <FocusModeOverlay
+        isVisible={false}
+        sourceId="ind-1"
+        validTargetIds={new Set()}
+        targetType={null}
+      />,
+    )
+
+    const svg = screen.getByTestId('focus-mode-overlay')
+    expect(svg).toHaveStyle({ transition: 'opacity 200ms ease-in' })
   })
 
   it('creates a spotlight hole for the source indicator element', () => {

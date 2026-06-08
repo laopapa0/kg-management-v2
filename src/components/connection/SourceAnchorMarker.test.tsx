@@ -31,7 +31,7 @@ describe('SourceAnchorMarker', () => {
 
   it('renders anchor when source element is not visible', async () => {
     const sourceEl = document.createElement('div')
-    sourceEl.id = 'test-source'
+    sourceEl.setAttribute('data-indicator-id', 'test-source')
     document.body.appendChild(sourceEl)
 
     render(<SourceAnchorMarker sourceId="test-source" onClick={vi.fn()} />)
@@ -51,7 +51,7 @@ describe('SourceAnchorMarker', () => {
 
   it('positions anchor on top edge when source scrolled above viewport', async () => {
     const sourceEl = document.createElement('div')
-    sourceEl.id = 'test-source-top'
+    sourceEl.setAttribute('data-indicator-id', 'test-source-top')
     vi.spyOn(sourceEl, 'getBoundingClientRect').mockReturnValue({
       top: -100, left: 200, right: 250, bottom: -70,
       width: 50, height: 30, x: 200, y: -100, toJSON: () => {},
@@ -80,7 +80,7 @@ describe('SourceAnchorMarker', () => {
     vi.stubGlobal('innerHeight', 768)
 
     const sourceEl = document.createElement('div')
-    sourceEl.id = 'test-source-right'
+    sourceEl.setAttribute('data-indicator-id', 'test-source-right')
     vi.spyOn(sourceEl, 'getBoundingClientRect').mockReturnValue({
       top: 200, left: 1100, right: 1150, bottom: 230,
       width: 50, height: 30, x: 1100, y: 200, toJSON: () => {},
@@ -106,7 +106,7 @@ describe('SourceAnchorMarker', () => {
 
   it('does not render anchor when source element is visible', async () => {
     const sourceEl = document.createElement('div')
-    sourceEl.id = 'test-source-visible'
+    sourceEl.setAttribute('data-indicator-id', 'test-source-visible')
     document.body.appendChild(sourceEl)
 
     render(<SourceAnchorMarker sourceId="test-source-visible" onClick={vi.fn()} />)
@@ -127,7 +127,7 @@ describe('SourceAnchorMarker', () => {
     const user = userEvent.setup()
     const onClick = vi.fn()
     const sourceEl = document.createElement('div')
-    sourceEl.id = 'test-source-click'
+    sourceEl.setAttribute('data-indicator-id', 'test-source-click')
     document.body.appendChild(sourceEl)
 
     render(<SourceAnchorMarker sourceId="test-source-click" onClick={onClick} />)
@@ -149,7 +149,7 @@ describe('SourceAnchorMarker', () => {
 
   it('observes the source element on mount', async () => {
     const sourceEl = document.createElement('div')
-    sourceEl.id = 'test-source-observe'
+    sourceEl.setAttribute('data-indicator-id', 'test-source-observe')
     document.body.appendChild(sourceEl)
 
     render(<SourceAnchorMarker sourceId="test-source-observe" onClick={vi.fn()} />)
@@ -163,7 +163,7 @@ describe('SourceAnchorMarker', () => {
 
   it('disconnects observer on unmount', async () => {
     const sourceEl = document.createElement('div')
-    sourceEl.id = 'test-source-unmount'
+    sourceEl.setAttribute('data-indicator-id', 'test-source-unmount')
     document.body.appendChild(sourceEl)
 
     const { unmount } = render(
@@ -179,7 +179,7 @@ describe('SourceAnchorMarker', () => {
 
   it('displays source name in tooltip when available', async () => {
     const sourceEl = document.createElement('div')
-    sourceEl.id = 'test-source-name'
+    sourceEl.setAttribute('data-indicator-id', 'test-source-name')
     sourceEl.textContent = '指标名称'
     document.body.appendChild(sourceEl)
 

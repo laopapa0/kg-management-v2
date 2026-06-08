@@ -64,7 +64,7 @@ describe('ConnectionLayer', () => {
 
     const path = screen.getByTestId('connection-line-path')
     expect(path.tagName).toBe('path')
-    expect(path).toHaveAttribute('stroke', '#64748B')
+    expect(path).toHaveAttribute('stroke', 'var(--dark-conn-line-default)')
     expect(path).toHaveAttribute('stroke-width', '2.5')
     expect(path).toHaveAttribute('stroke-dasharray', '6 4')
     expect(path).toHaveAttribute('fill', 'none')
@@ -82,7 +82,7 @@ describe('ConnectionLayer', () => {
     )
 
     const path = screen.getByTestId('connection-line-path')
-    expect(path).toHaveAttribute('stroke', '#EF4444')
+    expect(path).toHaveAttribute('stroke', 'var(--dark-conn-line-invalid)')
     expect(path).not.toHaveClass('animate-ant-line')
     expect(path).toHaveAttribute('marker-end', 'url(#conn-arrow-invalid)')
   })
@@ -97,7 +97,7 @@ describe('ConnectionLayer', () => {
     )
 
     const path = screen.getByTestId('connection-line-path')
-    expect(path).toHaveAttribute('stroke', '#22C55E')
+    expect(path).toHaveAttribute('stroke', 'var(--dark-conn-line-valid)')
     expect(path).toHaveClass('animate-ant-line')
     expect(path).toHaveAttribute('marker-end', 'url(#conn-arrow-valid)')
   })
@@ -112,7 +112,7 @@ describe('ConnectionLayer', () => {
     )
 
     const path = screen.getByTestId('connection-line-path')
-    expect(path).toHaveAttribute('stroke', '#EF4444')
+    expect(path).toHaveAttribute('stroke', 'var(--dark-conn-line-invalid)')
     expect(path).toHaveAttribute('marker-end', 'url(#conn-arrow-invalid)')
 
     rerender(
@@ -123,7 +123,7 @@ describe('ConnectionLayer', () => {
       />,
     )
 
-    expect(path).toHaveAttribute('stroke', '#64748B')
+    expect(path).toHaveAttribute('stroke', 'var(--dark-conn-line-default)')
     expect(path).toHaveClass('animate-ant-line')
     expect(path).toHaveAttribute('marker-end', 'url(#conn-arrow)')
   })
@@ -138,7 +138,7 @@ describe('ConnectionLayer', () => {
     )
 
     const path = screen.getByTestId('connection-line-path')
-    expect(path).toHaveAttribute('stroke', '#22C55E')
+    expect(path).toHaveAttribute('stroke', 'var(--dark-conn-line-valid)')
     expect(path).toHaveAttribute('stroke-width', '3')
     expect(path).toHaveClass('animate-ant-line')
   })
@@ -157,21 +157,16 @@ describe('ConnectionLayer', () => {
     expect(path).toHaveStyle({ animationDuration: '0.3s' })
   })
 
-  it('registers mousemove and scroll listeners on mount', () => {
+  it('registers mousemove listener on mount', () => {
     render(<ConnectionLayer sourceId="test-source" />)
 
     const mousemoveCalls = addEventListenerSpy.mock.calls.filter(
       ([type]) => type === 'mousemove',
     )
     expect(mousemoveCalls.length).toBeGreaterThanOrEqual(1)
-
-    const scrollCalls = addEventListenerSpy.mock.calls.filter(
-      ([type, _, opts]) => type === 'scroll' && opts?.passive === true,
-    )
-    expect(scrollCalls.length).toBeGreaterThanOrEqual(1)
   })
 
-  it('removes listeners on unmount', () => {
+  it('removes mousemove listener on unmount', () => {
     const { unmount } = render(<ConnectionLayer sourceId="test-source" />)
     unmount()
 
@@ -179,11 +174,6 @@ describe('ConnectionLayer', () => {
       ([type]) => type === 'mousemove',
     )
     expect(mousemoveRemovals.length).toBeGreaterThanOrEqual(1)
-
-    const scrollRemovals = removeEventListenerSpy.mock.calls.filter(
-      ([type]) => type === 'scroll',
-    )
-    expect(scrollRemovals.length).toBeGreaterThanOrEqual(1)
   })
 
   it('cancels animation frame on unmount', () => {

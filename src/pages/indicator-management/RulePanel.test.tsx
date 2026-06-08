@@ -140,7 +140,7 @@ describe('RulePanel', () => {
       const state = useAttachmentStore.getState()
       const targetRule = state.rules.find((r) => r.name.includes('阈值'))
       expect(targetRule).toBeDefined()
-      const otherRule = state.rules.find((r) => !r.name.includes('阈值'))
+      const otherRule = state.rules.find((r) => r.name === '合规规则')
       expect(otherRule).toBeDefined()
 
       render(<RulePanel />)

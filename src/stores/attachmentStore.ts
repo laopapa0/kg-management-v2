@@ -18,6 +18,7 @@ import {
 } from '@/utils/attachmentStorage'
 import {
   mockDepartments,
+  MOCK_DATA_VERSION,
   generateMockIndicators,
   generateMockTagNodes,
   generateMockRules,
@@ -80,6 +81,8 @@ function createSnapshot(state: Pick<AttachmentState, 'indicators' | 'tagNodes' |
 }
 
 const CLEAR_REDO = { redoStack: [] as DataSnapshot[], canRedo: false } as const
+
+const DATA_VERSION_KEY = 'kgv2-attachment-data-version'
 
 function hasStoredData(): boolean {
   return getDepartments().length > 0
@@ -159,8 +162,10 @@ export const useAttachmentStore = create<AttachmentState>((set, get) => ({
   ...initialState,
 
   init: () => {
-    if (!hasStoredData()) {
+    const storedVersion = localStorage.getItem(DATA_VERSION_KEY)
+    if (!hasStoredData() || storedVersion !== String(MOCK_DATA_VERSION)) {
       injectMockData()
+      localStorage.setItem(DATA_VERSION_KEY, String(MOCK_DATA_VERSION))
     }
     set({ ...loadAllFromStorage(), undoStack: [], redoStack: [], canUndo: false, canRedo: false })
   },

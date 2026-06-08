@@ -305,6 +305,7 @@ describe('useConnectionMode', () => {
       // 创建源指标 DOM 元素
       const sourceEl = document.createElement('div')
       sourceEl.id = 'ind-real'
+      sourceEl.setAttribute('data-indicator-id', 'ind-real')
       sourceEl.tabIndex = 0
       document.body.appendChild(sourceEl)
 

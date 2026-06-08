@@ -113,36 +113,42 @@ export default function FocusModeOverlay({
 }: FocusModeOverlayProps) {
   const svgRef = useRef<SVGSVGElement>(null)
   const [opacity, setOpacity] = useState(0)
+  const [shouldRender, setShouldRender] = useState(isVisible)
   const [exclusionRects, setExclusionRects] = useState<Rect[]>([])
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const exitTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const validTargetIdsRef = useRef(validTargetIds)
+  validTargetIdsRef.current = validTargetIds
 
   const updateRects = useCallback(() => {
     const rects: Rect[] = []
     const sourceRect = getSourceElementRect(sourceId)
     if (sourceRect) rects.push(sourceRect)
-    rects.push(...getTargetRects(targetType, validTargetIds))
+    rects.push(...getTargetRects(targetType, validTargetIdsRef.current))
     setExclusionRects(rects)
-  }, [sourceId, targetType, validTargetIds])
+  }, [sourceId, targetType])
 
   useEffect(() => {
     if (isVisible) {
+      setShouldRender(true)
       timerRef.current = setTimeout(() => setOpacity(1), 0)
       updateRects()
-      updateSpotlightExcludes(sourceId, targetType, validTargetIds)
+      updateSpotlightExcludes(sourceId, targetType, validTargetIdsRef.current)
 
       const handleScroll = () => {
         updateRects()
-        updateSpotlightExcludes(sourceId, targetType, validTargetIds)
+        updateSpotlightExcludes(sourceId, targetType, validTargetIdsRef.current)
       }
       const handleResize = () => {
         updateRects()
-        updateSpotlightExcludes(sourceId, targetType, validTargetIds)
+        updateSpotlightExcludes(sourceId, targetType, validTargetIdsRef.current)
       }
       window.addEventListener('scroll', handleScroll, { passive: true })
       window.addEventListener('resize', handleResize)
 
       return () => {
         if (timerRef.current) clearTimeout(timerRef.current)
+        if (exitTimerRef.current) clearTimeout(exitTimerRef.current)
         clearAllSpotlightExclude()
         window.removeEventListener('scroll', handleScroll)
         window.removeEventListener('resize', handleResize)
@@ -150,10 +156,20 @@ export default function FocusModeOverlay({
     } else {
       setOpacity(0)
       clearAllSpotlightExclude()
+      exitTimerRef.current = setTimeout(() => {
+        setShouldRender(false)
+        exitTimerRef.current = null
+      }, 200)
+      return () => {
+        if (exitTimerRef.current) {
+          clearTimeout(exitTimerRef.current)
+          exitTimerRef.current = null
+        }
+      }
     }
-  }, [isVisible, updateRects, sourceId, targetType, validTargetIds])
+  }, [isVisible, updateRects, sourceId, targetType])
 
-  if (!isVisible) return null
+  if (!shouldRender) return null
 
   return (
     <svg
@@ -163,7 +179,9 @@ export default function FocusModeOverlay({
       style={{
         zIndex: 40,
         opacity,
-        transition: 'opacity 250ms cubic-bezier(0.4, 0, 0.2, 1)',
+        transition: isVisible
+          ? 'opacity 250ms cubic-bezier(0.4, 0, 0.2, 1)'
+          : 'opacity 200ms ease-in',
       }}
     >
       <defs>
@@ -177,7 +195,6 @@ export default function FocusModeOverlay({
               width={r.width}
               height={r.height}
               fill="black"
-              rx="4"
             />
           ))}
         </mask>
@@ -187,7 +204,7 @@ export default function FocusModeOverlay({
         y="0"
         width="100%"
         height="100%"
-        fill="rgba(15, 23, 42, 0.45)"
+        fill="var(--dark-conn-spotlight)"
         mask="url(#focus-spotlight-mask)"
       />
     </svg>

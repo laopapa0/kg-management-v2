@@ -129,7 +129,7 @@ export default function IndicatorAttachmentPage() {
       const ruleEl = target.closest('[data-rule-id]')
       if (ruleEl) hoveredId = ruleEl.getAttribute('data-rule-id')
 
-      if (hoveredId && state.validTargetIds.has(hoveredId)) {
+      if (hoveredId) {
         setHoverTarget(hoveredId)
       } else {
         setHoverTarget(null)
@@ -138,7 +138,7 @@ export default function IndicatorAttachmentPage() {
 
     document.addEventListener('mouseover', handleMouseOver)
     return () => document.removeEventListener('mouseover', handleMouseOver)
-  }, [state.isConnecting, state.validTargetIds, setHoverTarget])
+  }, [state.isConnecting, setHoverTarget])
 
   // Global Space dispatcher in non-connecting mode (capture phase)
   useEffect(() => {
@@ -354,7 +354,7 @@ export default function IndicatorAttachmentPage() {
         <SourceAnchorMarker
           sourceId={state.sourceId}
           onClick={() => {
-            const el = document.getElementById(state.sourceId!)
+            const el = document.querySelector(`[data-indicator-id="${state.sourceId}"]`)
             el?.scrollIntoView({ behavior: 'smooth', block: 'center' })
           }}
         />

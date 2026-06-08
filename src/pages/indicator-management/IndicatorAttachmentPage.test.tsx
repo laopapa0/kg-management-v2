@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { render, screen, within, waitFor, act, fireEvent } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { __resetAttachmentStorageCache } from '@/utils/attachmentStorage'
@@ -471,7 +471,7 @@ describe('IndicatorAttachmentPage', () => {
       })
 
       const path = screen.getByTestId('connection-line-path')
-      expect(path).toHaveAttribute('stroke', '#64748B')
+      expect(path).toHaveAttribute('stroke', 'var(--dark-conn-line-default)')
       expect(path).toHaveAttribute('stroke-dasharray', '6 4')
       expect(path).toHaveClass('animate-ant-line')
     })

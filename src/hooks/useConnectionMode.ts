@@ -111,7 +111,7 @@ export function useConnectionMode() {
     })
     // 焦点返还源指标元素，若不在 DOM 中则 fallback 到 body
     if (sourceIdToFocus) {
-      const el = document.getElementById(sourceIdToFocus)
+      const el = document.querySelector(`[data-indicator-id="${sourceIdToFocus}"]`) as HTMLElement | null
       if (el && typeof el.focus === 'function') {
         el.focus()
       } else {

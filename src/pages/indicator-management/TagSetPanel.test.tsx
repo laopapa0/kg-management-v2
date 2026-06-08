@@ -88,7 +88,9 @@ describe('TagSetPanel', () => {
 
     const state = useAttachmentStore.getState()
     const tagTree = buildTagTree(state.tagNodes)
-    const coloredLeaf = tagTree.find((t) => t.color && !t.children)
+    // find a colored leaf: has color + has parentId + no child nodes reference it
+    const childIds = new Set(state.tagNodes.filter(t => t.parentId).map(t => t.parentId))
+    const coloredLeaf = state.tagNodes.find(t => t.color && t.parentId && !childIds.has(t.id))
     expect(coloredLeaf).toBeDefined()
 
     const pill = screen.getByTestId(`tag-pill-${coloredLeaf!.id}`)
@@ -266,13 +268,13 @@ describe('TagSetPanel', () => {
       render(<TagSetPanel />)
 
       const input = screen.getByTestId('tree-search-input')
-      await user.type(input, '月度', { delay: null })
+      await user.type(input, '核心', { delay: null })
 
       expect(screen.queryByTestId('tag-pill-highlight')).not.toBeInTheDocument()
 
       act(() => vi.advanceTimersByTime(150))
 
-      expect(screen.getByTestId('tag-pill-highlight')).toHaveTextContent('月度')
+      expect(screen.getByTestId('tag-pill-highlight')).toHaveTextContent('核心')
 
       vi.useRealTimers()
     })
@@ -282,26 +284,26 @@ describe('TagSetPanel', () => {
       initializeAttachmentStore()
       render(<TagSetPanel />)
 
-      const coreRootId = 'tag-finance-core'
-      const childId = 'tag-finance-core-monthly'
+      const coreRootId = 'tag-root-mgmt'
+      const childId = 'tag-core'
 
-      // 先收起核心指标组
+      // 先收起管理属性组
       const toggle = screen.getByLabelText(`收起节点 ${coreRootId}`)
       await user.click(toggle)
       await waitFor(() => {
         expect(screen.queryByTestId(`tag-pill-${childId}`)).not.toBeInTheDocument()
       })
 
-      // 搜索“月度”
+      // 搜索"核心"
       const input = screen.getByTestId('tree-search-input')
-      await user.type(input, '月度')
+      await user.type(input, '核心')
       await waitFor(() => {
         expect(screen.getByTestId(`tag-pill-${childId}`)).toBeInTheDocument()
       })
 
       // 未匹配节点应暗淡
-      const costPill = screen.getByTestId('tag-pill-tag-finance-cost')
-      expect(costPill).toHaveAttribute('data-dimmed', 'true')
+      const otherPill = screen.getByTestId('tag-pill-tag-key-monitor')
+      expect(otherPill).toHaveAttribute('data-dimmed', 'true')
     })
 
     it('shows match count badge on parent', async () => {
@@ -311,10 +313,10 @@ describe('TagSetPanel', () => {
       render(<TagSetPanel />)
 
       const input = screen.getByTestId('tree-search-input')
-      await user.type(input, '月度', { delay: null })
+      await user.type(input, '核心', { delay: null })
       act(() => vi.advanceTimersByTime(150))
 
-      const badge = screen.getByTestId('tag-match-count-tag-finance-core')
+      const badge = screen.getByTestId('tag-match-count-tag-root-mgmt')
       expect(badge).toHaveTextContent('1')
 
       vi.useRealTimers()
@@ -327,11 +329,11 @@ describe('TagSetPanel', () => {
       render(<TagSetPanel />)
 
       const input = screen.getByTestId('tree-search-input')
-      await user.type(input, '月度', { delay: null })
+      await user.type(input, '核心', { delay: null })
       act(() => vi.advanceTimersByTime(150))
 
       const highlight = screen.getByTestId('tag-pill-highlight')
-      expect(highlight).toHaveTextContent('月度')
+      expect(highlight).toHaveTextContent('核心')
       expect(highlight).toHaveClass('bg-[#B8860B]/20')
       expect(highlight).toHaveClass('text-[#FFD700]')
       expect(highlight).toHaveClass('font-bold')
