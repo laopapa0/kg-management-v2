@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { Routes, Route } from 'react-router-dom'
+import { MotionProvider } from './components/motion/MotionProvider'
 import Layout from './components/Layout'
 import DashboardPage from './pages/dashboard/DashboardPage'
 import IndicatorCreatePage from './pages/indicator-create/IndicatorCreatePage'
@@ -29,8 +30,9 @@ export default function App() {
   }, [])
 
   return (
-    <Layout>
-      <Routes>
+    <MotionProvider>
+      <Layout>
+        <Routes>
         <Route path="/" element={<DashboardPage />} />
         <Route path="/indicator/create" element={<IndicatorCreatePage />} />
         <Route path="/indicator/edit/:id" element={<IndicatorEditPage />} />
@@ -52,7 +54,8 @@ export default function App() {
         <Route path="/platform/link-type" element={<PlatformLinkTypePage />} />
         <Route path="/platform/property" element={<PlatformPropertyPage />} />
         <Route path="/platform/graph" element={<PlatformGraphPage />} />
-      </Routes>
-    </Layout>
+        </Routes>
+      </Layout>
+    </MotionProvider>
   )
 }

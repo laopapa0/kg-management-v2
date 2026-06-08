@@ -32,4 +32,103 @@ describe('dark-theme.css', () => {
       expect(content).toMatch(new RegExp(`--dark-${prefix}-[\\w-]+:`));
     }
   });
+
+  it('包含 prefers-reduced-motion 媒体查询降级规则', () => {
+    const content = css();
+    expect(content).toContain('@media (prefers-reduced-motion: reduce)');
+  });
+
+  it('reduced-motion 下取消自定义动画', () => {
+    const content = css();
+    const idx = content.indexOf('@media (prefers-reduced-motion: reduce)');
+    expect(idx).toBeGreaterThan(-1);
+    // Extract the full media block by counting braces
+    let depth = 0;
+    let start = -1;
+    for (let i = idx; i < content.length; i++) {
+      if (content[i] === '{') {
+        if (depth === 0) start = i;
+        depth++;
+      } else if (content[i] === '}') {
+        depth--;
+        if (depth === 0) {
+          const block = content.slice(start + 1, i);
+          expect(block).toContain('animation-duration: 0.01ms');
+          expect(block).toContain('animation-iteration-count: 1');
+          return;
+        }
+      }
+    }
+    throw new Error('Failed to parse media block');
+  });
+
+  it('reduced-motion 下保留功能性颜色/透明度过渡', () => {
+    const content = css();
+    const idx = content.indexOf('@media (prefers-reduced-motion: reduce)');
+    expect(idx).toBeGreaterThan(-1);
+    let depth = 0;
+    let start = -1;
+    for (let i = idx; i < content.length; i++) {
+      if (content[i] === '{') {
+        if (depth === 0) start = i;
+        depth++;
+      } else if (content[i] === '}') {
+        depth--;
+        if (depth === 0) {
+          const block = content.slice(start + 1, i);
+          expect(block).toContain('transition-colors');
+          expect(block).toContain('transition-opacity');
+          expect(block).toContain('transition-duration: 100ms');
+          return;
+        }
+      }
+    }
+    throw new Error('Failed to parse media block');
+  });
+
+  it('reduced-motion 下限制 transition-all 为功能性属性', () => {
+    const content = css();
+    const idx = content.indexOf('@media (prefers-reduced-motion: reduce)');
+    expect(idx).toBeGreaterThan(-1);
+    let depth = 0;
+    let start = -1;
+    for (let i = idx; i < content.length; i++) {
+      if (content[i] === '{') {
+        if (depth === 0) start = i;
+        depth++;
+      } else if (content[i] === '}') {
+        depth--;
+        if (depth === 0) {
+          const block = content.slice(start + 1, i);
+          expect(block).toMatch(/transition-property:\s*color/);
+          expect(block).toContain('opacity');
+          return;
+        }
+      }
+    }
+    throw new Error('Failed to parse media block');
+  });
+
+  it('reduced-motion 下取消 transform 过渡', () => {
+    const content = css();
+    const idx = content.indexOf('@media (prefers-reduced-motion: reduce)');
+    expect(idx).toBeGreaterThan(-1);
+    let depth = 0;
+    let start = -1;
+    for (let i = idx; i < content.length; i++) {
+      if (content[i] === '{') {
+        if (depth === 0) start = i;
+        depth++;
+      } else if (content[i] === '}') {
+        depth--;
+        if (depth === 0) {
+          const block = content.slice(start + 1, i);
+          expect(block).toContain('.transition-transform');
+          expect(block).toContain('transition-duration: 0ms');
+          return;
+        }
+      }
+    }
+    throw new Error('Failed to parse media block');
+  });
 });

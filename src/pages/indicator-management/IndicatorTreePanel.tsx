@@ -192,7 +192,37 @@ const IndicatorTreePanel = forwardRef<IndicatorTreePanelRef>(function IndicatorT
     if (!indicator) return
 
     const realIndicators = getDescendantRealIndicators(indicators, deletingNodeId)
-    deleteIndicator(deletingNodeId)
+
+    // Collect all descendant virtual grouping nodes to cascade delete
+    const idsToDelete = new Set<string>([deletingNodeId])
+    let changed = true
+    while (changed) {
+      changed = false
+      for (const i of indicators) {
+        if (
+          !idsToDelete.has(i.id) &&
+          i.indicatorType === '虚拟分组' &&
+          i.treeParentId &&
+          idsToDelete.has(i.treeParentId)
+        ) {
+          idsToDelete.add(i.id)
+          changed = true
+        }
+      }
+    }
+
+    // Remove all virtual grouping nodes in the cascade and clear treeParentId
+    // for real indicators whose parent (virtual group) is being deleted
+    const next = indicators
+      .filter((i) => !idsToDelete.has(i.id))
+      .map((i) => {
+        if (i.treeParentId && idsToDelete.has(i.treeParentId)) {
+          return { ...i, treeParentId: undefined }
+        }
+        return i
+      })
+
+    setIndicators(next)
 
     toast('节点已删除', {
       description: `「${indicator.name}」已删除，${realIndicators.length} 个指标回到「待挂靠」区域`,
