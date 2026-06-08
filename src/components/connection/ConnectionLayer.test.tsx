@@ -44,13 +44,19 @@ describe('ConnectionLayer', () => {
     expect(svg).toHaveClass('fixed', 'inset-0', 'pointer-events-none')
   })
 
-  it('renders arrow marker definition', () => {
+  it('renders reusable arrow marker definitions', () => {
     render(<ConnectionLayer sourceId="test-source" />)
 
-    const marker = document.getElementById('conn-arrow')
-    expect(marker).toBeInTheDocument()
-    expect(marker).toHaveAttribute('markerWidth', '8')
-    expect(marker).toHaveAttribute('markerHeight', '6')
+    const defaultMarker = document.getElementById('conn-arrow')
+    expect(defaultMarker).toBeInTheDocument()
+    expect(defaultMarker).toHaveAttribute('markerWidth', '8')
+    expect(defaultMarker).toHaveAttribute('markerHeight', '6')
+
+    const invalidMarker = document.getElementById('conn-arrow-invalid')
+    expect(invalidMarker).toBeInTheDocument()
+
+    const validMarker = document.getElementById('conn-arrow-valid')
+    expect(validMarker).toBeInTheDocument()
   })
 
   it('renders path with ant-line animation class', () => {
@@ -78,6 +84,7 @@ describe('ConnectionLayer', () => {
     const path = screen.getByTestId('connection-line-path')
     expect(path).toHaveAttribute('stroke', '#EF4444')
     expect(path).not.toHaveClass('animate-ant-line')
+    expect(path).toHaveAttribute('marker-end', 'url(#conn-arrow-invalid)')
   })
 
   it('keeps default color and ant-line when hovering valid target', () => {
@@ -92,9 +99,10 @@ describe('ConnectionLayer', () => {
     const path = screen.getByTestId('connection-line-path')
     expect(path).toHaveAttribute('stroke', '#22C55E')
     expect(path).toHaveClass('animate-ant-line')
+    expect(path).toHaveAttribute('marker-end', 'url(#conn-arrow-valid)')
   })
 
-  it('restores default color when hover target is cleared', () => {
+  it('restores default color and marker when hover target is cleared', () => {
     const { rerender } = render(
       <ConnectionLayer
         sourceId="test-source"
@@ -105,6 +113,7 @@ describe('ConnectionLayer', () => {
 
     const path = screen.getByTestId('connection-line-path')
     expect(path).toHaveAttribute('stroke', '#EF4444')
+    expect(path).toHaveAttribute('marker-end', 'url(#conn-arrow-invalid)')
 
     rerender(
       <ConnectionLayer
@@ -116,6 +125,7 @@ describe('ConnectionLayer', () => {
 
     expect(path).toHaveAttribute('stroke', '#64748B')
     expect(path).toHaveClass('animate-ant-line')
+    expect(path).toHaveAttribute('marker-end', 'url(#conn-arrow)')
   })
 
   it('turns green and thickens stroke when hovering valid target', () => {

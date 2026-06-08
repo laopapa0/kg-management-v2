@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
-import { getElementCenter, createPathD } from './connectionGeometry'
+import { getElementCenter } from './connectionGeometry'
+import { createOptimizedPathD } from './connectionRenderer'
 
 interface ConnectionLayerProps {
   sourceId: string | null
@@ -42,7 +43,7 @@ export default function ConnectionLayer({
 
       const start = getElementCenter(sourceEl)
       const end = mouseRef.current
-      pathRef.current.setAttribute('d', createPathD(start, end))
+      pathRef.current.setAttribute('d', createOptimizedPathD(start, end))
       rafRef.current = requestAnimationFrame(updateLine)
     }
 
@@ -65,6 +66,12 @@ export default function ConnectionLayer({
       ? '#22C55E'
       : '#64748B'
 
+  const markerId = isInvalidHover
+    ? 'conn-arrow-invalid'
+    : isValidHover
+      ? 'conn-arrow-valid'
+      : 'conn-arrow'
+
   return (
     <svg
       data-testid="connection-layer"
@@ -80,10 +87,27 @@ export default function ConnectionLayer({
           refY="3"
           orient="auto"
         >
-          <polygon
-            points="0 0, 8 3, 0 6"
-            fill={strokeColor}
-          />
+          <polygon points="0 0, 8 3, 0 6" fill="#64748B" />
+        </marker>
+        <marker
+          id="conn-arrow-invalid"
+          markerWidth="8"
+          markerHeight="6"
+          refX="8"
+          refY="3"
+          orient="auto"
+        >
+          <polygon points="0 0, 8 3, 0 6" fill="#EF4444" />
+        </marker>
+        <marker
+          id="conn-arrow-valid"
+          markerWidth="8"
+          markerHeight="6"
+          refX="8"
+          refY="3"
+          orient="auto"
+        >
+          <polygon points="0 0, 8 3, 0 6" fill="#22C55E" />
         </marker>
       </defs>
       <path
@@ -93,7 +117,7 @@ export default function ConnectionLayer({
         strokeWidth={isValidHover ? 3 : 2.5}
         strokeDasharray="6 4"
         fill="none"
-        markerEnd="url(#conn-arrow)"
+        markerEnd={`url(#${markerId})`}
         className={isInvalidHover ? '' : 'animate-ant-line'}
         style={{
           animationDuration: isValidHover ? '0.3s' : '0.5s',
