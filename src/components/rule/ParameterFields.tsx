@@ -118,7 +118,7 @@ function InheritanceBadges({
             <TooltipTrigger asChild>
               <span
                 data-testid={`badge-inherited-${fieldName}`}
-                className="inline-flex items-center gap-0.5 rounded px-1.5 py-0.5 text-[10px] font-medium text-[#3B82F6] bg-[#3B82F6]/10 cursor-help"
+                className="inline-flex items-center gap-0.5 rounded px-1.5 py-0.5 text-[10px] font-medium text-dark-status-info-active bg-dark-status-info-active/10 cursor-help"
               >
                 继承
                 <Info className="size-2.5 opacity-70" />
@@ -137,7 +137,7 @@ function InheritanceBadges({
               <TooltipTrigger asChild>
                 <span
                   data-testid={`badge-overridden-${fieldName}`}
-                  className="inline-flex items-center gap-0.5 rounded px-1.5 py-0.5 text-[10px] font-medium text-[#F5A623] bg-[#F5A623]/10 cursor-help"
+                  className="inline-flex items-center gap-0.5 rounded px-1.5 py-0.5 text-[10px] font-medium text-dark-accent-gold bg-dark-accent-gold/10 cursor-help"
                 >
                   已覆盖
                   <Info className="size-2.5 opacity-70" />
@@ -255,7 +255,7 @@ const ParameterFields = forwardRef<ParameterFieldsRef, ParameterFieldsProps>(
                     return (
                       <FormItem className="relative flex-1">
                         {isOverridden && (
-                          <div className="absolute -left-2 top-0 bottom-0 w-0.5 bg-[#F5A623] rounded-l" />
+                          <div className="absolute -left-2 top-0 bottom-0 w-0.5 bg-dark-accent-gold rounded-l" />
                         )}
                         <FormLabel className="text-xs text-dark-text-secondary">
                           上限
@@ -308,7 +308,7 @@ const ParameterFields = forwardRef<ParameterFieldsRef, ParameterFieldsProps>(
                     return (
                       <FormItem className="relative flex-1">
                         {isOverridden && (
-                          <div className="absolute -left-2 top-0 bottom-0 w-0.5 bg-[#F5A623] rounded-l" />
+                          <div className="absolute -left-2 top-0 bottom-0 w-0.5 bg-dark-accent-gold rounded-l" />
                         )}
                         <FormLabel className="text-xs text-dark-text-secondary">
                           下限

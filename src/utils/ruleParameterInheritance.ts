@@ -36,9 +36,10 @@ export function getEffectiveParameter(
 export function getDescendantRuleIds(ruleId: string, rules: Rule[]): string[] {
   const result: string[] = []
   const queue: string[] = [ruleId]
+  let head = 0
 
-  while (queue.length > 0) {
-    const current = queue.shift()!
+  while (head < queue.length) {
+    const current = queue[head++]
     for (const rule of rules) {
       if (rule.parentId === current) {
         result.push(rule.id)

@@ -29,43 +29,45 @@ export default function PersistentConnectionLayer({
   const [confirmingKey, setConfirmingKey] = useState<string | null>(null)
   const [exitingKeys, setExitingKeys] = useState<Set<string>>(new Set())
 
-  useEffect(() => {
+  const connectionsRef = useRef(connections)
+  connectionsRef.current = connections
+  const exitingKeysRef = useRef(exitingKeys)
+  exitingKeysRef.current = exitingKeys
+
+  const updateLines = useCallback(() => {
     const allKeys = new Set([
-      ...connections.map((c) => `${c.sourceId}::${c.targetId}`),
-      ...exitingKeys,
+      ...connectionsRef.current.map((c) => `${c.sourceId}::${c.targetId}`),
+      ...exitingKeysRef.current,
     ])
+    for (const key of allKeys) {
+      const pathEl = pathMapRef.current.get(key)
+      if (!pathEl) continue
 
-    const updateLines = () => {
-      for (const key of allKeys) {
-        const pathEl = pathMapRef.current.get(key)
-        if (!pathEl) continue
+      const [sourceId, targetId] = key.split('::')
+      const sourceEl = document.querySelector(`[data-indicator-id="${sourceId}"]`) as HTMLElement | null
+      const targetEl = findTargetElement(targetId)
 
-        const [sourceId, targetId] = key.split('::')
-        const sourceEl = document.querySelector(`[data-indicator-id="${sourceId}"]`) as HTMLElement | null
-        const targetEl = findTargetElement(targetId)
-
-        if (sourceEl && targetEl) {
-          const start = getElementCenter(sourceEl)
-          const end = getElementCenter(targetEl)
-          pathEl.setAttribute('d', createOptimizedPathD(start, end))
-          coordsMapRef.current.set(key, { start, end })
-        }
+      if (sourceEl && targetEl) {
+        const start = getElementCenter(sourceEl)
+        const end = getElementCenter(targetEl)
+        pathEl.setAttribute('d', createOptimizedPathD(start, end))
+        coordsMapRef.current.set(key, { start, end })
       }
     }
+  }, [])
 
+  useEffect(() => {
     updateLines()
+  }, [connections, exitingKeys, updateLines])
 
-    const handleScroll = () => updateLines()
-    const handleResize = () => updateLines()
-
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    window.addEventListener('resize', handleResize)
-
+  useEffect(() => {
+    window.addEventListener('scroll', updateLines, { passive: true })
+    window.addEventListener('resize', updateLines)
     return () => {
-      window.removeEventListener('scroll', handleScroll)
-      window.removeEventListener('resize', handleResize)
+      window.removeEventListener('scroll', updateLines)
+      window.removeEventListener('resize', updateLines)
     }
-  }, [connections, exitingKeys])
+  }, [updateLines])
 
   const activeKey = confirmingKey ?? hoveredKey
 

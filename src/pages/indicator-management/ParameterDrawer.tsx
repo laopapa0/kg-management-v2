@@ -34,8 +34,6 @@ const CONTENT_FIELDS: Record<string, string[]> = {
 }
 
 const INTERACTION_FIELDS = ['isInherited', 'overriddenFields']
-// Appearance section fields (reserved for future display settings)
-const APPEARANCE_FIELDS: string[] = ['showBadge', 'highlightColor']
 
 function countConfigured(
   fields: string[],
@@ -91,12 +89,10 @@ export default function ParameterDrawer({
   const contentFields = rule ? (CONTENT_FIELDS[rule.type] ?? []) : []
   const contentCount = countConfigured(contentFields, param)
   const interactionCount = countConfigured(INTERACTION_FIELDS, param)
-  const appearanceCount = countConfigured(APPEARANCE_FIELDS, param)
 
   const sectionCounts = {
     content: contentCount,
     interaction: interactionCount,
-    appearance: appearanceCount,
   }
 
   return (
@@ -182,7 +178,7 @@ export default function ParameterDrawer({
                 <span className="text-[11px] font-semibold uppercase tracking-[0.5px] text-dark-text-secondary">
                   Appearance
                 </span>
-                <SectionBadge {...sectionCounts.appearance} />
+                {/* Appearance section — reserved for future display settings */}
               </AccordionTrigger>
               <AccordionContent data-testid="section-appearance-panel">
                 <div className="space-y-3 py-1">
