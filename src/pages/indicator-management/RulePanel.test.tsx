@@ -1,9 +1,18 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { render, screen, within, act, waitFor } from '@testing-library/react'
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
+import { render, screen, within, act, waitFor, cleanup } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { __resetAttachmentStorageCache } from '@/utils/attachmentStorage'
 import { useAttachmentStore, initializeAttachmentStore } from '@/stores/attachmentStore'
 import RulePanel from './RulePanel'
+
+// Mock AnimatePresence to skip exit animations in jsdom
+vi.mock('framer-motion', async () => {
+  const actual = await vi.importActual('framer-motion')
+  return {
+    ...actual,
+    AnimatePresence: ({ children }: { children: React.ReactNode }) => children,
+  }
+})
 
 // vaul uses PointerEvents which are not fully supported in JSDOM
 if (!Element.prototype.setPointerCapture) {
@@ -19,6 +28,11 @@ describe('RulePanel', () => {
     __resetAttachmentStorageCache()
     useAttachmentStore.setState(useAttachmentStore.getInitialState())
     vi.useRealTimers()
+    vi.clearAllTimers()
+  })
+
+  afterEach(() => {
+    cleanup()
   })
 
   it('renders rule tree from store rules', () => {
@@ -212,37 +226,36 @@ describe('RulePanel', () => {
       initializeAttachmentStore()
 
       const state = useAttachmentStore.getState()
-      const targetRule = state.rules.find((r) => r.name.includes('阈值'))
-      expect(targetRule).toBeDefined()
-      const otherRule = state.rules.find((r) => r.name === '合规规则')
-      expect(otherRule).toBeDefined()
+      const targetRule = state.rules.find((r) => r.name.includes('阈值'))!
+      const otherRule = state.rules.find((r) => r.name === '合规规则')!
 
       render(<RulePanel />)
 
       const input = screen.getByTestId('rule-search-input')
       await user.type(input, '阈值')
 
-      // 等待 debounce + DOM 稳定
+      // 等待 debounce
       await waitFor(
         () => {
-          expect(screen.getByTestId(`rule-row-${targetRule!.id}`)).toBeInTheDocument()
-        },
-        { timeout: 10000 },
-      )
-
-      // 高亮模式下 otherRule 仍存在（只是 dim）
-      expect(screen.getByTestId(`rule-row-${otherRule!.id}`)).toBeInTheDocument()
-
-      // 切换到过滤模式（等待 AnimatePresence 退出动画）
-      await user.click(screen.getByTestId('search-mode-filter'))
-
-      await waitFor(
-        () => {
-          expect(screen.queryByTestId(`rule-row-${otherRule!.id}`)).not.toBeInTheDocument()
+          expect(screen.getByTestId(`rule-row-${targetRule.id}`)).toBeInTheDocument()
         },
         { timeout: 5000 },
       )
-      expect(screen.getByTestId(`rule-row-${targetRule!.id}`)).toBeInTheDocument()
+
+      // 高亮模式下 otherRule 仍存在（只是 dim）
+      expect(screen.getByTestId(`rule-row-${otherRule.id}`)).toBeInTheDocument()
+
+      // 切换到过滤模式
+      await user.click(screen.getByTestId('search-mode-filter'))
+
+      // 等待 DOM 更新
+      await waitFor(
+        () => {
+          expect(screen.queryByTestId(`rule-row-${otherRule.id}`)).not.toBeInTheDocument()
+        },
+        { timeout: 5000 },
+      )
+      expect(screen.getByTestId(`rule-row-${targetRule.id}`)).toBeInTheDocument()
     })
 
     it('shows contextual empty state when no rules match in filter mode', async () => {
