@@ -90,7 +90,7 @@ describe('ConnectionLayer', () => {
     )
 
     const path = screen.getByTestId('connection-line-path')
-    expect(path).toHaveAttribute('stroke', '#64748B')
+    expect(path).toHaveAttribute('stroke', '#22C55E')
     expect(path).toHaveClass('animate-ant-line')
   })
 
@@ -116,6 +116,35 @@ describe('ConnectionLayer', () => {
 
     expect(path).toHaveAttribute('stroke', '#64748B')
     expect(path).toHaveClass('animate-ant-line')
+  })
+
+  it('turns green and thickens stroke when hovering valid target', () => {
+    render(
+      <ConnectionLayer
+        sourceId="test-source"
+        hoverTargetId="valid-1"
+        validTargetIds={new Set(['valid-1'])}
+      />,
+    )
+
+    const path = screen.getByTestId('connection-line-path')
+    expect(path).toHaveAttribute('stroke', '#22C55E')
+    expect(path).toHaveAttribute('stroke-width', '3')
+    expect(path).toHaveClass('animate-ant-line')
+  })
+
+  it('keeps ant-line class but speeds up animation on valid hover', () => {
+    render(
+      <ConnectionLayer
+        sourceId="test-source"
+        hoverTargetId="valid-1"
+        validTargetIds={new Set(['valid-1'])}
+      />,
+    )
+
+    const path = screen.getByTestId('connection-line-path')
+    expect(path).toHaveClass('animate-ant-line')
+    expect(path).toHaveStyle({ animationDuration: '0.3s' })
   })
 
   it('registers mousemove and scroll listeners on mount', () => {

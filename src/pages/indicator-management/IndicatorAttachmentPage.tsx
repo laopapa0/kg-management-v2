@@ -35,7 +35,7 @@ function getFocusZoneHint(zone: ReturnType<typeof useFocusZone>): string | null 
 
 export default function IndicatorAttachmentPage() {
   const treePanelRef = useRef<IndicatorTreePanelRef>(null)
-  const { state, start, toggleContinuous, resetMisfireCount } = useConnectionMode()
+  const { state, start, setHoverTarget, toggleContinuous, resetMisfireCount } = useConnectionMode()
   const focusZone = useFocusZone()
   const focusZoneHint = useMemo(() => getFocusZoneHint(focusZone), [focusZone])
 
@@ -111,6 +111,34 @@ export default function IndicatorAttachmentPage() {
       }
     }
   }, [])
+
+  // Global hover target detection in connection mode
+  useEffect(() => {
+    if (!state.isConnecting) return
+
+    const handleMouseOver = (e: MouseEvent) => {
+      const target = e.target as HTMLElement
+      let hoveredId: string | null = null
+
+      const nodeEl = target.closest('[data-node-id]')
+      if (nodeEl) hoveredId = nodeEl.getAttribute('data-node-id')
+
+      const tagEl = target.closest('[data-tag-id]')
+      if (tagEl) hoveredId = tagEl.getAttribute('data-tag-id')
+
+      const ruleEl = target.closest('[data-rule-id]')
+      if (ruleEl) hoveredId = ruleEl.getAttribute('data-rule-id')
+
+      if (hoveredId && state.validTargetIds.has(hoveredId)) {
+        setHoverTarget(hoveredId)
+      } else {
+        setHoverTarget(null)
+      }
+    }
+
+    document.addEventListener('mouseover', handleMouseOver)
+    return () => document.removeEventListener('mouseover', handleMouseOver)
+  }, [state.isConnecting, state.validTargetIds, setHoverTarget])
 
   // Global Space dispatcher in non-connecting mode (capture phase)
   useEffect(() => {

@@ -16,6 +16,11 @@ export default function ConnectionLayer({
   const mouseRef = useRef({ x: 0, y: 0 })
   const rafRef = useRef<number>(0)
 
+  const isInvalidHover =
+    hoverTargetId !== null && !validTargetIds.has(hoverTargetId)
+  const isValidHover =
+    hoverTargetId !== null && validTargetIds.has(hoverTargetId)
+
   useEffect(() => {
     if (!sourceId) return
 
@@ -54,6 +59,12 @@ export default function ConnectionLayer({
 
   if (!sourceId) return null
 
+  const strokeColor = isInvalidHover
+    ? '#EF4444'
+    : isValidHover
+      ? '#22C55E'
+      : '#64748B'
+
   return (
     <svg
       data-testid="connection-layer"
@@ -69,26 +80,24 @@ export default function ConnectionLayer({
           refY="3"
           orient="auto"
         >
-          <polygon points="0 0, 8 3, 0 6" fill="#64748B" />
+          <polygon
+            points="0 0, 8 3, 0 6"
+            fill={strokeColor}
+          />
         </marker>
       </defs>
       <path
         ref={pathRef}
         data-testid="connection-line-path"
-        stroke={
-          hoverTargetId !== null && !validTargetIds.has(hoverTargetId)
-            ? '#EF4444'
-            : '#64748B'
-        }
-        strokeWidth={2.5}
+        stroke={strokeColor}
+        strokeWidth={isValidHover ? 3 : 2.5}
         strokeDasharray="6 4"
         fill="none"
         markerEnd="url(#conn-arrow)"
-        className={
-          hoverTargetId !== null && !validTargetIds.has(hoverTargetId)
-            ? ''
-            : 'animate-ant-line'
-        }
+        className={isInvalidHover ? '' : 'animate-ant-line'}
+        style={{
+          animationDuration: isValidHover ? '0.3s' : '0.5s',
+        }}
       />
     </svg>
   )
