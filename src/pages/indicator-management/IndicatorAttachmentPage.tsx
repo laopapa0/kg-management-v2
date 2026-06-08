@@ -494,7 +494,7 @@ export default function IndicatorAttachmentPage() {
                     // TODO: #25 标签集添加节点
                   }}
                 />
-                <TagSetPanel />
+                <TagSetPanel selectedIndicatorId={selectedIndicatorId} />
               </div>
             </Panel>
 
@@ -507,7 +507,7 @@ export default function IndicatorAttachmentPage() {
                 className="flex h-full flex-col rounded-lg border border-dark-border bg-dark-card-l1"
               >
                 <PanelHeader title="规则" />
-                <RulePanel />
+                <RulePanel selectedIndicatorId={selectedIndicatorId} />
               </div>
             </Panel>
           </Group>

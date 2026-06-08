@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from 'react'
+import { useMemo, useState, useEffect, useCallback } from 'react'
 import { Scale, Search, Settings } from 'lucide-react'
 import ParameterDrawer from './ParameterDrawer'
 import TreeView, { type TreeNode } from '@/components/tree/TreeView'
@@ -56,7 +56,7 @@ function computeSearchResult(tree: Rule[], term: string): SearchResult {
   return { matchedIds, ancestorIds }
 }
 
-export default function RulePanel() {
+export default function RulePanel({ selectedIndicatorId }: { selectedIndicatorId?: string | null }) {
   const rules = useAttachmentStore((state) => state.rules)
   const setRules = useAttachmentStore((state) => state.setRules)
   const indicators = useAttachmentStore((state) => state.indicators)
@@ -178,6 +178,33 @@ export default function RulePanel() {
   const isSearchActive = Boolean(debouncedTerm)
   const hasMatches = matchedIds.size > 0
 
+  const selectedIndicator = useMemo(
+    () => (selectedIndicatorId ? indicators.find((i) => i.id === selectedIndicatorId) : null),
+    [indicators, selectedIndicatorId],
+  )
+
+  const selectedRuleIds = useMemo(
+    () => new Set(selectedIndicator?.ruleIds ?? []),
+    [selectedIndicator],
+  )
+
+  const toggleRuleForIndicator = useCallback(
+    (ruleId: string) => {
+      if (!selectedIndicator) return
+      const hasRule = selectedIndicator.ruleIds.includes(ruleId)
+      const nextRuleIds = hasRule
+        ? selectedIndicator.ruleIds.filter((id) => id !== ruleId)
+        : [...selectedIndicator.ruleIds, ruleId]
+      const next = indicators.map((i) =>
+        i.id === selectedIndicator.id ? { ...i, ruleIds: nextRuleIds } : i,
+      )
+      setRules(rules) // keep rules unchanged; only indicators change
+      const store = useAttachmentStore.getState()
+      store.setIndicators(next)
+    },
+    [selectedIndicator, indicators, setRules, rules],
+  )
+
   if (tree.length === 0) {
     return (
       <div className="flex-1 overflow-y-auto px-2 pb-2" data-testid="rule-panel">
@@ -261,6 +288,15 @@ export default function RulePanel() {
                   ].join(' ')}
                 >
                   <div className="flex items-center gap-2">
+                    {selectedIndicatorId && (
+                      <input
+                        type="checkbox"
+                        data-testid={`rule-config-checkbox-${fullRule.id}`}
+                        checked={selectedRuleIds.has(fullRule.id)}
+                        onChange={() => toggleRuleForIndicator(fullRule.id)}
+                        className="size-4 cursor-pointer accent-dark-accent-primary"
+                      />
+                    )}
                     <Switch
                       data-testid={`rule-toggle-${fullRule.id}`}
                       checked={fullRule.enabled ?? true}
@@ -287,6 +323,19 @@ export default function RulePanel() {
                     >
                       <Settings className="size-3.5" />
                     </button>
+                    {selectedIndicatorId && selectedRuleIds.has(fullRule.id) && (
+                      <button
+                        type="button"
+                        data-testid={`rule-config-settings-${fullRule.id}`}
+                        onClick={() => {
+                          setSelectedRuleId(fullRule.id)
+                          setDrawerOpen(true)
+                        }}
+                        className="rounded px-2 py-0.5 text-xs font-medium text-dark-accent-primary border border-dark-accent-primary/30 hover:bg-dark-accent-primary/10"
+                      >
+                        设置
+                      </button>
+                    )}
                     <RuleSummaryBadge rule={fullRule} parameters={params} />
                     {isHovered && count > 0 ? (
                       <AttachedBadge

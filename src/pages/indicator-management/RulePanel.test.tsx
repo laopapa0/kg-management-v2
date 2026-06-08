@@ -3,6 +3,7 @@ import { render, screen, within, act, waitFor, cleanup } from '@testing-library/
 import userEvent from '@testing-library/user-event'
 import { __resetAttachmentStorageCache } from '@/utils/attachmentStorage'
 import { useAttachmentStore, initializeAttachmentStore } from '@/stores/attachmentStore'
+import type { Rule, IndicatorAttachment } from '@/models/indicatorAttachmentModel'
 import RulePanel from './RulePanel'
 
 // Mock AnimatePresence to skip exit animations in jsdom
@@ -384,5 +385,48 @@ describe('RulePanel', () => {
         expect(screen.queryByTestId('parameter-drawer-content')).not.toBeInTheDocument()
       })
     })
+  })
+})
+
+describe('RulePanel config mode', () => {
+  let configIndicatorId: string
+
+  beforeEach(() => {
+    localStorage.clear()
+    __resetAttachmentStorageCache()
+    initializeAttachmentStore()
+    const state = useAttachmentStore.getState()
+    configIndicatorId = state.indicators[0]?.id ?? 'ind-0'
+  })
+
+  it('shows checkbox before each rule when selectedIndicatorId is provided', () => {
+    render(<RulePanel selectedIndicatorId={configIndicatorId} />)
+    const checkboxes = screen.getAllByRole('checkbox')
+    expect(checkboxes.length).toBeGreaterThan(0)
+  })
+
+  it('checkbox is checked when indicator has the rule in ruleIds', () => {
+    const state = useAttachmentStore.getState()
+    const targetRule = state.rules.find((r: Rule) => r.name.includes('阈值'))!
+    state.setIndicators(
+      state.indicators.map((i: IndicatorAttachment) =>
+        i.id === configIndicatorId ? { ...i, ruleIds: [targetRule.id] } : i,
+      ),
+    )
+    render(<RulePanel selectedIndicatorId={configIndicatorId} />)
+    const checkbox = screen.getByTestId(`rule-config-checkbox-${targetRule.id}`)
+    expect(checkbox).toBeChecked()
+  })
+
+  it('shows settings button for checked rules in config mode', () => {
+    const state = useAttachmentStore.getState()
+    const targetRule = state.rules.find((r: Rule) => r.name.includes('阈值'))!
+    state.setIndicators(
+      state.indicators.map((i: IndicatorAttachment) =>
+        i.id === configIndicatorId ? { ...i, ruleIds: [targetRule.id] } : i,
+      ),
+    )
+    render(<RulePanel selectedIndicatorId={configIndicatorId} />)
+    expect(screen.getByTestId(`rule-config-settings-${targetRule.id}`)).toBeInTheDocument()
   })
 })
