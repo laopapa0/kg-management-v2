@@ -8,6 +8,7 @@ import IndicatorManagementPage from './pages/indicator-management/IndicatorManag
 import LineageCanvasPage from './pages/lineage/LineageCanvasPage'
 import KnowledgeUploadPage from './pages/knowledge-upload/KnowledgeUploadPage'
 import ReportManagementPage from './pages/report-management/ReportManagementPage'
+import ReportTemplatesPage from './pages/report-management/ReportTemplatesPage'
 import { mockReportPlans } from '@/models/reportModel'
 import { getReportPlans, saveReportPlans } from '@/utils/reportStorage'
 
@@ -30,6 +31,7 @@ export default function App() {
           <Route path="/indicator-management" element={<IndicatorManagementPage />} />
           <Route path="/lineage" element={<LineageCanvasPage />} />
           <Route path="/reports" element={<ReportManagementPage />} />
+          <Route path="/reports/templates" element={<ReportTemplatesPage />} />
           <Route path="/knowledge-upload" element={<KnowledgeUploadPage />} />
 
           {/* [LEGACY] /indicator/create */}
