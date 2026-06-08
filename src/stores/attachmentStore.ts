@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import type { IndicatorAttachment, TagNode, Rule, RuleParameter } from '@/models/indicatorAttachmentModel'
 import { createMinimalIndicatorAttachment } from '@/models/indicatorAttachmentModel'
 import type { Department, AttachmentUiState } from '@/utils/attachmentStorage'
+import { cascadeParentChange } from '@/utils/ruleParameterInheritance'
 import {
   getDepartments,
   saveDepartments,
@@ -55,6 +56,11 @@ export interface AttachmentState {
   setTagNodes: (data: TagNode[]) => void
   setRules: (data: Rule[]) => void
   setRuleParameters: (data: RuleParameter[]) => void
+  updateRuleParameter: (
+    ruleId: string,
+    indicatorId: string,
+    data: Record<string, unknown>,
+  ) => { nextParams: RuleParameter[]; affectedCount: number }
   setConnectionMode: (mode: boolean) => void
   setUiState: (ui: AttachmentUiState) => void
   pushHistory: () => void
@@ -223,6 +229,39 @@ export const useAttachmentStore = create<AttachmentState>((set, get) => ({
     get().pushHistory()
     set({ ruleParameters: data, ...CLEAR_REDO })
     saveRuleParameters(data)
+  },
+
+  updateRuleParameter: (ruleId, indicatorId, data) => {
+    get().pushHistory()
+    const current = get().ruleParameters
+    const rules = get().rules
+    const existingIdx = current.findIndex(
+      (p) => p.ruleId === ruleId && p.indicatorId === indicatorId,
+    )
+
+    let next: RuleParameter[]
+    const merged: RuleParameter = {
+      ...(existingIdx >= 0 ? current[existingIdx] : { ruleId, indicatorId: indicatorId ?? '' }),
+      ...data,
+    } as RuleParameter
+
+    if (existingIdx >= 0) {
+      next = current.map((p, i) => (i === existingIdx ? merged : p))
+    } else {
+      next = [...current, merged]
+    }
+
+    const { nextParams, affectedCount } = cascadeParentChange(
+      ruleId,
+      rules,
+      next,
+      merged,
+    )
+
+    set({ ruleParameters: nextParams, ...CLEAR_REDO })
+    saveRuleParameters(nextParams)
+
+    return { nextParams, affectedCount }
   },
 
   setConnectionMode: (mode) => {

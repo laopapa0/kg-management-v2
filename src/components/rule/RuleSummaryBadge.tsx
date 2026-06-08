@@ -1,9 +1,11 @@
+import { useState, useEffect } from 'react'
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
   TooltipProvider,
 } from '@/components/ui/tooltip'
+import { cn } from '@/lib/utils'
 import type { Rule, RuleParameter } from '@/models/indicatorAttachmentModel'
 
 export interface RuleSummaryBadgeProps {
@@ -94,6 +96,13 @@ function formatTooltipContent(rule: Rule, params: RuleParameter[]): string {
 export default function RuleSummaryBadge({ rule, parameters = [] }: RuleSummaryBadgeProps) {
   const summary = getSummaryText(rule, parameters)
   const level = parameters[0]?.level
+  const [isUpdating, setIsUpdating] = useState(false)
+
+  useEffect(() => {
+    setIsUpdating(true)
+    const timer = setTimeout(() => setIsUpdating(false), 200)
+    return () => clearTimeout(timer)
+  }, [parameters, summary])
 
   if (!summary) {
     return (
@@ -114,13 +123,14 @@ export default function RuleSummaryBadge({ rule, parameters = [] }: RuleSummaryB
         <TooltipTrigger asChild>
           <span
             data-testid={`rule-summary-${rule.id}`}
-            className={[
+            className={cn(
               'inline-block cursor-help rounded-md px-2.5 py-[3px] text-[11px] font-medium leading-none',
-              'border transition-colors duration-200',
+              'border transition-opacity duration-200',
+              isUpdating ? 'opacity-50' : 'opacity-100',
               colors
                 ? `${colors.bg} ${colors.text} ${colors.border}`
                 : 'bg-dark-card-l2 text-dark-text-secondary border-dark-border',
-            ].join(' ')}
+            )}
           >
             {summary}
           </span>

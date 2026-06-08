@@ -209,4 +209,71 @@ describe('ParameterFields', () => {
 
     expect(onSubmit).not.toHaveBeenCalled()
   })
+
+  describe('inheritance', () => {
+    it('shows inherited badge when value equals inherited value', () => {
+      render(
+        <ParameterFields
+          ruleType="threshold"
+          defaultValues={{ upperLimit: 100, lowerLimit: 0 }}
+          inheritedValues={{ upperLimit: 100, lowerLimit: 0 }}
+          onSubmit={vi.fn()}
+        />,
+      )
+      expect(screen.getByTestId('badge-inherited-upperLimit')).toBeInTheDocument()
+    })
+
+    it('shows overridden badge when value differs from inherited', () => {
+      render(
+        <ParameterFields
+          ruleType="threshold"
+          defaultValues={{ upperLimit: 150, lowerLimit: 0 }}
+          inheritedValues={{ upperLimit: 100, lowerLimit: 0 }}
+          onSubmit={vi.fn()}
+        />,
+      )
+      expect(screen.getByTestId('badge-overridden-upperLimit')).toBeInTheDocument()
+    })
+
+    it('restores field to inherited value when clicking restore', async () => {
+      const user = userEvent.setup()
+      render(
+        <ParameterFields
+          ruleType="threshold"
+          defaultValues={{ upperLimit: 150, lowerLimit: 0 }}
+          inheritedValues={{ upperLimit: 100, lowerLimit: 0 }}
+          onSubmit={vi.fn()}
+        />,
+      )
+      const restoreBtn = screen.getByTestId('restore-upperLimit')
+      await user.click(restoreBtn)
+      expect(screen.getByTestId('input-upperLimit')).toHaveValue(100)
+      expect(screen.queryByTestId('badge-overridden-upperLimit')).not.toBeInTheDocument()
+      expect(screen.getByTestId('badge-inherited-upperLimit')).toBeInTheDocument()
+    })
+
+    it('submits overriddenFields when values differ from inherited', async () => {
+      const onSubmit = vi.fn()
+      const ref = createRef<ParameterFieldsRef>()
+      render(
+        <ParameterFields
+          ref={ref}
+          ruleType="threshold"
+          defaultValues={{ upperLimit: 150, lowerLimit: 0, unit: '%' }}
+          inheritedValues={{ upperLimit: 100, lowerLimit: 0, unit: '%' }}
+          onSubmit={onSubmit}
+        />,
+      )
+
+      ref.current?.submit()
+
+      await waitFor(() => {
+        expect(onSubmit).toHaveBeenCalledTimes(1)
+      })
+
+      const submitted = onSubmit.mock.calls[0][0]
+      expect(submitted.overriddenFields).toContain('upperLimit')
+      expect(submitted.overriddenFields).not.toContain('unit')
+    })
+  })
 })

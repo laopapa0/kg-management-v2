@@ -1,5 +1,6 @@
 import { useMemo, useRef } from 'react'
 import { X, Save } from 'lucide-react'
+import { toast } from 'sonner'
 import {
   Drawer,
   DrawerContent,
@@ -17,6 +18,7 @@ import { Button } from '@/components/ui/button'
 import ParameterFields, { type ParameterFieldsRef } from '@/components/rule/ParameterFields'
 import { useAttachmentStore } from '@/stores/attachmentStore'
 import type { RuleParameter } from '@/models/indicatorAttachmentModel'
+import { getEffectiveParameter } from '@/utils/ruleParameterInheritance'
 
 export interface ParameterDrawerProps {
   ruleId: string
@@ -69,7 +71,7 @@ export default function ParameterDrawer({
 }: ParameterDrawerProps) {
   const rules = useAttachmentStore((state) => state.rules)
   const ruleParameters = useAttachmentStore((state) => state.ruleParameters)
-  const setRuleParameters = useAttachmentStore((state) => state.setRuleParameters)
+  const updateRuleParameter = useAttachmentStore((state) => state.updateRuleParameter)
 
   const fieldsRef = useRef<ParameterFieldsRef>(null)
 
@@ -80,6 +82,10 @@ export default function ParameterDrawer({
       (p) => p.ruleId === ruleId && p.indicatorId === (indicatorId ?? ''),
     )
   }, [ruleParameters, ruleId, indicatorId])
+
+  const inheritedParam = useMemo(() => {
+    return getEffectiveParameter(ruleId, rules, ruleParameters)
+  }, [ruleId, rules, ruleParameters])
 
   const contentFields = rule ? (CONTENT_FIELDS[rule.type] ?? []) : []
   const contentCount = countConfigured(contentFields, param)
@@ -144,24 +150,16 @@ export default function ParameterDrawer({
                     ref={fieldsRef}
                     ruleType={rule.type}
                     defaultValues={param}
+                    inheritedValues={inheritedParam}
                     onSubmit={(data) => {
-                      const next = ruleParameters.map((p) =>
-                        p.ruleId === ruleId && p.indicatorId === (indicatorId ?? '')
-                          ? { ...p, ...data }
-                          : p,
+                      const { affectedCount } = updateRuleParameter(
+                        ruleId,
+                        indicatorId ?? '',
+                        data,
                       )
-                      // If no existing param, add new one
-                      const exists = ruleParameters.some(
-                        (p) => p.ruleId === ruleId && p.indicatorId === (indicatorId ?? ''),
-                      )
-                      if (!exists) {
-                        next.push({
-                          ruleId,
-                          indicatorId: indicatorId ?? '',
-                          ...data,
-                        } as RuleParameter)
+                      if (affectedCount > 5) {
+                        toast.success(`已更新 ${affectedCount} 个子规则的参数`)
                       }
-                      setRuleParameters(next as RuleParameter[])
                       onOpenChange(false)
                     }}
                   />
