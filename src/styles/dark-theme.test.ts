@@ -131,4 +131,36 @@ describe('dark-theme.css', () => {
     }
     throw new Error('Failed to parse media block');
   });
+
+  it('定义 9 套主题的 data-theme 选择器', () => {
+    const content = css()
+    const themes = ['dark', 'light', 'github-dark', 'vercel-dark', 'linear-dark', 'tailwind-dark', 'vscode-dark', 'notion-dark', 'stripe-dark']
+    for (const theme of themes) {
+      expect(content).toMatch(new RegExp(`\\[data-theme=["']${theme}["']\\]`))
+    }
+  })
+
+  it('辅助 Token 完整: status-bg / shadow / scrollbar / overlay 共 10 个', () => {
+    const content = css()
+    const auxTokens = [
+      '--dark-status-success-bg', '--dark-status-warning-bg',
+      '--dark-status-danger-bg', '--dark-status-info-bg',
+      '--dark-shadow-elevated', '--dark-shadow-modal',
+      '--dark-scrollbar-track', '--dark-scrollbar-thumb',
+      '--dark-overlay-strong', '--dark-overlay-weak',
+    ]
+    for (const token of auxTokens) {
+      expect(content).toContain(`${token}:`)
+    }
+  })
+
+  it('选中态 Token 在所有主题下对比度足够 (tree-selected-bg 非透明)', () => {
+    const content = css()
+    const matches = content.match(/--dark-tree-selected-bg:\s*([^;]+)/g) ?? []
+    expect(matches.length).toBeGreaterThanOrEqual(1)
+    for (const m of matches) {
+      const val = m.split(':')[1].trim()
+      expect(val).not.toBe('transparent')
+    }
+  })
 });
