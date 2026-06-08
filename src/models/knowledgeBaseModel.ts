@@ -63,6 +63,10 @@ export interface KnowledgeDocument {
   chunks: DocumentChunk[];
   /** 审核历史记录（支持多次审核） */
   auditRecords?: AuditRecord[];
+  /** 版本号，默认 1 */
+  version?: number;
+  /** 相似度评分 (0-100)，新版本导入时记录 */
+  similarityScore?: number;
 }
 
 /** 默认分段参数 */

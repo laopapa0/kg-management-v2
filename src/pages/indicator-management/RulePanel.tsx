@@ -7,6 +7,7 @@ import RuleSummaryBadge from '@/components/rule/RuleSummaryBadge'
 import TreeSearchInput, { type SearchMode } from '@/components/search/TreeSearchInput'
 import AttachedBadge from '@/components/connection/AttachedBadge'
 import BatchDetachMenu from '@/components/connection/BatchDetachMenu'
+import { Switch } from '@/components/ui/switch'
 import { useAttachmentStore } from '@/stores/attachmentStore'
 import type { Rule, RuleParameter } from '@/models/indicatorAttachmentModel'
 import { buildRuleTree } from '@/models/indicatorAttachmentModel'
@@ -57,6 +58,7 @@ function computeSearchResult(tree: Rule[], term: string): SearchResult {
 
 export default function RulePanel() {
   const rules = useAttachmentStore((state) => state.rules)
+  const setRules = useAttachmentStore((state) => state.setRules)
   const indicators = useAttachmentStore((state) => state.indicators)
   const ruleParameters = useAttachmentStore((state) => state.ruleParameters)
 
@@ -219,10 +221,18 @@ export default function RulePanel() {
             const count = attachedCountByRule.get(fullRule.id) ?? 0
             const params = parametersByRule.get(fullRule.id) ?? []
             const attachedList = attachedIndicatorsByRule.get(fullRule.id) ?? []
+            const isDisabled = fullRule.enabled === false
             const isDimmed =
               isSearchActive &&
               !matchedIds.has(fullRule.id) &&
               !ancestorIds.has(fullRule.id)
+
+            const handleToggleEnabled = () => {
+              const next = rules.map((r) =>
+                r.id === fullRule.id ? { ...r, enabled: !(r.enabled ?? true) } : r,
+              )
+              setRules(next)
+            }
 
             return (
               <BatchDetachMenu
@@ -242,14 +252,28 @@ export default function RulePanel() {
                   data-testid={`rule-row-${fullRule.id}`}
                   data-rule-id={fullRule.id}
                   data-dimmed={isDimmed || undefined}
+                  data-disabled={isDisabled || undefined}
                   className={[
                     'flex items-center justify-between gap-2 transition-all duration-200',
-                    isDimmed ? 'opacity-[0.35] scale-[0.98] pointer-events-none' : 'opacity-100',
+                    isDimmed ? 'opacity-[0.35] scale-[0.98] pointer-events-none' : '',
+                    isDisabled && !isDimmed ? 'opacity-40' : '',
+                    !isDimmed && !isDisabled ? 'opacity-100' : '',
                   ].join(' ')}
                 >
-                  <span className="truncate text-sm text-dark-text-primary">
-                    {fullRule.name}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <Switch
+                      data-testid={`rule-toggle-${fullRule.id}`}
+                      checked={fullRule.enabled ?? true}
+                      onCheckedChange={handleToggleEnabled}
+                      onClick={(e) => e.stopPropagation()}
+                    />
+                    <span className="truncate text-sm text-dark-text-primary">
+                      {fullRule.name}
+                    </span>
+                    {isDisabled && (
+                      <span className="text-xs text-dark-text-tertiary">停用</span>
+                    )}
+                  </div>
                   <div className="flex shrink-0 items-center gap-1.5">
                     <button
                       type="button"

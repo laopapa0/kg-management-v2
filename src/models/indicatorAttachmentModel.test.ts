@@ -286,6 +286,44 @@ describe('TagNode + Rule + RuleParameter models', () => {
   });
 
   // ─── Rule 字段定义 ───
+  it('Rule enabled 字段为可选布尔值', () => {
+    const ruleWithEnabled: Rule = {
+      id: 'RULE-1',
+      name: '营收波动检测',
+      type: 'fluctuation',
+      enabled: true,
+    };
+    expect(ruleWithEnabled.enabled).toBe(true);
+
+    const ruleWithout: Rule = {
+      id: 'RULE-2',
+      name: '营收波动检测',
+      type: 'fluctuation',
+    };
+    expect(ruleWithout.enabled).toBeUndefined();
+  });
+
+  it('Rule 可以显式设置 enabled 为 false', () => {
+    const rule: Rule = {
+      id: 'RULE-2',
+      name: '停用规则',
+      type: 'threshold',
+      enabled: false,
+    };
+
+    expect(rule.enabled).toBe(false);
+  });
+
+  it('Rule schema 接受 enabled 字段', () => {
+    const result = ruleSchema.safeParse({
+      id: 'RULE-3',
+      name: '测试规则',
+      type: 'threshold',
+      enabled: true,
+    });
+    expect(result.success).toBe(true);
+  });
+
   it('Rule 包含 id / name / type / parentId? / parameters? / children? 字段', () => {
     const rule: Rule = {
       id: 'RULE-1',

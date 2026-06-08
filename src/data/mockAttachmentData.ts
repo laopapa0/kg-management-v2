@@ -3452,19 +3452,19 @@ export function generateMockTagNodes(_departmentId: string): TagNode[] {
 
 export function generateMockRules(): Rule[] {
   return [
-    { id: 'rule-abnormal', name: '异常规则', type: 'threshold' as const },
-    { id: 'rule-threshold', name: '阈值上下限', type: 'threshold' as const, parentId: 'rule-abnormal' },
-    { id: 'rule-threshold-p1', name: 'P1 级阈值告警', type: 'threshold' as const, parentId: 'rule-abnormal' },
-    { id: 'rule-threshold-p2', name: 'P2 级阈值告警', type: 'threshold' as const, parentId: 'rule-abnormal' },
-    { id: 'rule-topn', name: 'TOPN 监控', type: 'topn' as const, parentId: 'rule-abnormal' },
-    { id: 'rule-topn-10', name: 'TOP-10 降序监控', type: 'topn' as const, parentId: 'rule-abnormal' },
-    { id: 'rule-anomaly-algo', name: '异常算法', type: 'fluctuation' as const, parentId: 'rule-abnormal' },
-    { id: 'rule-fluctuation', name: '波动算法', type: 'fluctuation' as const, parentId: 'rule-abnormal' },
-    { id: 'rule-fluctuation-yoy', name: '同比波动检测', type: 'fluctuation' as const, parentId: 'rule-abnormal' },
-    { id: 'rule-fluctuation-mom', name: '环比波动检测', type: 'fluctuation' as const, parentId: 'rule-abnormal' },
-    { id: 'rule-pearson', name: '皮尔逊算法', type: 'fluctuation' as const, parentId: 'rule-abnormal' },
-    { id: 'rule-quality', name: '质量规则', type: 'threshold' as const },
-    { id: 'rule-compliance', name: '合规规则', type: 'threshold' as const },
+    { id: 'rule-abnormal', name: '异常规则', type: 'threshold' as const, enabled: true },
+    { id: 'rule-threshold', name: '阈值上下限', type: 'threshold' as const, parentId: 'rule-abnormal', enabled: true },
+    { id: 'rule-threshold-p1', name: 'P1 级阈值告警', type: 'threshold' as const, parentId: 'rule-abnormal', enabled: true },
+    { id: 'rule-threshold-p2', name: 'P2 级阈值告警', type: 'threshold' as const, parentId: 'rule-abnormal', enabled: true },
+    { id: 'rule-topn', name: 'TOPN 监控', type: 'topn' as const, parentId: 'rule-abnormal', enabled: true },
+    { id: 'rule-topn-10', name: 'TOP-10 降序监控', type: 'topn' as const, parentId: 'rule-abnormal', enabled: true },
+    { id: 'rule-anomaly-algo', name: '异常算法', type: 'fluctuation' as const, parentId: 'rule-abnormal', enabled: true },
+    { id: 'rule-fluctuation', name: '波动算法', type: 'fluctuation' as const, parentId: 'rule-abnormal', enabled: true },
+    { id: 'rule-fluctuation-yoy', name: '同比波动检测', type: 'fluctuation' as const, parentId: 'rule-abnormal', enabled: false },
+    { id: 'rule-fluctuation-mom', name: '环比波动检测', type: 'fluctuation' as const, parentId: 'rule-abnormal', enabled: true },
+    { id: 'rule-pearson', name: '皮尔逊算法', type: 'fluctuation' as const, parentId: 'rule-abnormal', enabled: true },
+    { id: 'rule-quality', name: '质量规则', type: 'threshold' as const, enabled: true },
+    { id: 'rule-compliance', name: '合规规则', type: 'threshold' as const, enabled: true },
   ]
 }
 

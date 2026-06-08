@@ -152,6 +152,7 @@ export interface Rule {
   id: string;
   name: string;
   type: RuleType;
+  enabled?: boolean;
   parentId?: string;
   parameters?: RuleParameter[];
   children?: Rule[];
@@ -162,6 +163,7 @@ export const ruleSchema: z.ZodType<Rule> = z.lazy(() =>
     id: z.string(),
     name: z.string(),
     type: RuleTypeEnum,
+    enabled: z.boolean().optional(),
     parentId: z.string().optional(),
     parameters: z.array(ruleParameterSchema).optional(),
     children: z.array(ruleSchema).optional(),

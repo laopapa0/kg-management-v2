@@ -11,6 +11,8 @@ import type { Rule, RuleParameter } from '@/models/indicatorAttachmentModel'
 export interface RuleSummaryBadgeProps {
   rule: Rule
   parameters?: RuleParameter[]
+  showLevel?: boolean
+  showAlgorithm?: boolean
 }
 
 const LEVEL_COLORS: Record<
@@ -23,26 +25,27 @@ const LEVEL_COLORS: Record<
   P4: { bg: 'bg-blue-900/30', text: 'text-blue-300', border: 'border-blue-800/40' },
 }
 
-function formatThresholdSummary(param: RuleParameter): string | null {
-  const level = param.level ?? ''
+function formatThresholdSummary(param: RuleParameter, showLevel: boolean): string | null {
   const unit = param.unit ?? ''
+  const levelSuffix = showLevel && param.level ? ` · ${param.level}` : ''
   if (param.upperLimit !== undefined && param.lowerLimit !== undefined) {
-    return `阈值: ${param.lowerLimit}~${param.upperLimit}${unit} · ${level}`
+    return `阈值: ${param.lowerLimit}~${param.upperLimit}${unit}${levelSuffix}`
   }
   if (param.upperLimit !== undefined) {
-    return `阈值: ≤${param.upperLimit}${unit} · ${level}`
+    return `阈值: ≤${param.upperLimit}${unit}${levelSuffix}`
   }
   if (param.lowerLimit !== undefined) {
-    return `阈值: ≥${param.lowerLimit}${unit} · ${level}`
+    return `阈值: ≥${param.lowerLimit}${unit}${levelSuffix}`
   }
   return null
 }
 
-function formatFluctuationSummary(param: RuleParameter): string | null {
-  if (param.algorithm && param.window) {
-    return `波动: ${param.algorithm} · ${param.window}`
-  }
-  return null
+function formatFluctuationSummary(param: RuleParameter, showAlgorithm: boolean): string | null {
+  const parts: string[] = []
+  if (showAlgorithm && param.algorithm) parts.push(param.algorithm)
+  if (param.window) parts.push(param.window)
+  if (parts.length === 0) return null
+  return `波动: ${parts.join(' · ')}`
 }
 
 function formatTopnSummary(param: RuleParameter): string | null {
@@ -52,14 +55,20 @@ function formatTopnSummary(param: RuleParameter): string | null {
   return null
 }
 
-export function getSummaryText(rule: Rule, params: RuleParameter[]): string | null {
+export function getSummaryText(
+  rule: Rule,
+  params: RuleParameter[],
+  opts?: { showLevel?: boolean; showAlgorithm?: boolean },
+): string | null {
+  const showLevel = opts?.showLevel ?? true
+  const showAlgorithm = opts?.showAlgorithm ?? true
   const param = params[0]
   if (!param) return null
   switch (rule.type) {
     case 'threshold':
-      return formatThresholdSummary(param)
+      return formatThresholdSummary(param, showLevel)
     case 'fluctuation':
-      return formatFluctuationSummary(param)
+      return formatFluctuationSummary(param, showAlgorithm)
     case 'topn':
       return formatTopnSummary(param)
     default:
@@ -93,8 +102,8 @@ function formatTooltipContent(rule: Rule, params: RuleParameter[]): string {
   return lines.join('\n')
 }
 
-export default function RuleSummaryBadge({ rule, parameters = [] }: RuleSummaryBadgeProps) {
-  const summary = getSummaryText(rule, parameters)
+export default function RuleSummaryBadge({ rule, parameters = [], showLevel = true, showAlgorithm = true }: RuleSummaryBadgeProps) {
+  const summary = getSummaryText(rule, parameters, { showLevel, showAlgorithm })
   const level = parameters[0]?.level
   const [isUpdating, setIsUpdating] = useState(false)
 
