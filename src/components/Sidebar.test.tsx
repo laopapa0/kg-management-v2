@@ -12,13 +12,43 @@ function renderWithRouter(initialEntries: string[] = ['/']) {
 }
 
 describe('Sidebar', () => {
-  describe('业务部门菜单', () => {
-    it('应显示「指标管理」菜单项，不显示「新增指标」和「变更指标」', () => {
+  describe('精简后菜单结构', () => {
+    it('只显示 5 项核心菜单：首页、指标管理、血缘画布、报告管理、知识库管理', () => {
       renderWithRouter();
 
-      expect(screen.getByText('指标管理')).toBeInTheDocument();
-      expect(screen.queryByText('新增指标')).not.toBeInTheDocument();
-      expect(screen.queryByText('变更指标')).not.toBeInTheDocument();
+      const expectedItems = ['首页', '指标管理', '血缘画布', '报告管理', '知识库管理'];
+      for (const label of expectedItems) {
+        expect(screen.getByText(label)).toBeInTheDocument();
+      }
+    });
+
+    it('不显示 NOC 管理和平台维护分组', () => {
+      renderWithRouter();
+
+      expect(screen.queryByText('NOC 管理')).not.toBeInTheDocument();
+      expect(screen.queryByText('平台维护')).not.toBeInTheDocument();
+    });
+
+    it('不显示旧菜单项（配置标签、配置规则、巡检待办、知识上传、审核待办、巡检管理等）', () => {
+      renderWithRouter();
+
+      const legacyItems = [
+        '配置标签',
+        '配置规则',
+        '巡检待办',
+        '知识上传',
+        '审核待办',
+        '巡检管理',
+        '对象类型',
+        '链接关系',
+        '属性管理',
+        '标签管理',
+        '规则管理',
+        '图谱管理',
+      ];
+      for (const label of legacyItems) {
+        expect(screen.queryByText(label)).not.toBeInTheDocument();
+      }
     });
 
     it('「指标管理」的链接指向 /indicator-management', () => {
@@ -33,29 +63,7 @@ describe('Sidebar', () => {
 
       const link = screen.getByText('指标管理').closest('a');
       expect(link).toHaveClass('active');
-      // 业务部门的 active 样式包含 bg-dark-accent-primary/10
       expect(link).toHaveClass('bg-dark-accent-primary/10');
-    });
-
-    it('当路由为旧路径 /indicator/create 时，没有业务部门菜单项被错误高亮', () => {
-      renderWithRouter(['/indicator/create']);
-
-      const businessLinks = screen
-        .getAllByRole('link')
-        .filter((el) => el.closest('div')?.textContent?.includes('业务部门'));
-
-      // 更直接：检查业务部门下的所有链接都不带 active 背景色
-      const indicatorLink = screen.getByText('指标管理').closest('a');
-      expect(indicatorLink).not.toHaveClass('active');
-      expect(indicatorLink).not.toHaveClass('bg-dark-accent-primary/10');
-    });
-
-    it('当路由为旧路径 /indicator/edit/1 时，没有业务部门菜单项被错误高亮', () => {
-      renderWithRouter(['/indicator/edit/1']);
-
-      const indicatorLink = screen.getByText('指标管理').closest('a');
-      expect(indicatorLink).not.toHaveClass('active');
-      expect(indicatorLink).not.toHaveClass('bg-dark-accent-primary/10');
     });
   });
 });

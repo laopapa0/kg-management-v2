@@ -27,23 +27,14 @@ describe('App routing', () => {
     expect(screen.getByText('规则')).toBeInTheDocument()
   })
 
-  it('still renders IndicatorCreatePage at /indicator/create', () => {
+  it('renders ReportManagementPage placeholder at /reports', () => {
     render(
-      <MemoryRouter initialEntries={['/indicator/create']}>
+      <MemoryRouter initialEntries={['/reports']}>
         <App />
       </MemoryRouter>
     )
 
-    expect(screen.getByText(/新增对象实例（指标）/i)).toBeInTheDocument()
-  })
-
-  it('still renders IndicatorEditPage at /indicator/edit/:id', () => {
-    render(
-      <MemoryRouter initialEntries={['/indicator/edit/123']}>
-        <App />
-      </MemoryRouter>
-    )
-
-    expect(screen.getByText(/变更对象实例（指标）/i)).toBeInTheDocument()
+    expect(screen.getByTestId('report-management-page')).toBeInTheDocument()
+    expect(screen.getByText(/四大核心菜单之一/i)).toBeInTheDocument()
   })
 })
