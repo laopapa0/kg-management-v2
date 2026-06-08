@@ -122,7 +122,7 @@ describe('MyDocumentsList', () => {
 
   it('shows version number next to document name', () => {
     renderList();
-    expect(screen.getByText('v1')).toBeInTheDocument();
+    expect(screen.getAllByText('v1')).toHaveLength(3);
   });
 
   it('shows formatted file sizes', () => {
