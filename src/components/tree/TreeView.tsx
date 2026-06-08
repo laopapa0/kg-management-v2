@@ -16,6 +16,7 @@ import {
 } from '@dnd-kit/core'
 import { DURATION, EASING, getTransition, DRAG_GHOST, DURATION_CLASS } from '@/components/motion/motion.tokens'
 import { getDropPosition, type DropPosition } from './treeDragUtils'
+import { useTreeKeyboard } from './useTreeKeyboard'
 
 export interface TreeNode {
   id: string
@@ -174,6 +175,9 @@ function TreeItem<T extends TreeNode>({
         data-selected={isSelected}
         data-hovered={isHovered}
         data-dnd-droppable={onDragNode ? 'true' : undefined}
+        role="treeitem"
+        aria-selected={isSelected}
+        aria-expanded={hasChildren ? isExpanded : undefined}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         onClick={handleRowClick}
@@ -484,8 +488,26 @@ export default function TreeView<T extends TreeNode>({
     ? flattenNodes(nodes).find((n) => n.id === activeDragId)
     : null
 
+  const { handleKeyDown } = useTreeKeyboard({
+    nodes,
+    expanded,
+    selectedId,
+    onSelect: handleSelect,
+    onToggle: handleToggle,
+    onExpandedChange,
+    onEditNode,
+    onDeleteNode,
+  })
+
   const treeContent = (
-    <div data-testid="tree-view" data-initial="false" className="flex flex-col">
+    <div
+      data-testid="tree-view"
+      data-initial="false"
+      className="flex flex-col"
+      role="tree"
+      tabIndex={0}
+      onKeyDown={handleKeyDown}
+    >
       <AnimatePresence>
         {nodes.map((node) => (
           <motion.div

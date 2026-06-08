@@ -399,6 +399,388 @@ describe('TreeView', () => {
     })
   })
 
+  describe('keyboard navigation', () => {
+    it('ArrowDown moves selection to next visible node', async () => {
+      const user = userEvent.setup()
+      const onSelect = vi.fn()
+      render(
+        <TreeView
+          nodes={mockNodes}
+          renderNode={renderNode}
+          initialExpanded={['root-1']}
+          selectedId="root-1"
+          onSelect={onSelect}
+        />,
+      )
+
+      const treeView = screen.getByTestId('tree-view')
+      treeView.focus()
+
+      await user.keyboard('{ArrowDown}')
+
+      expect(onSelect).toHaveBeenCalledWith('child-1-1')
+    })
+
+    it('ArrowUp moves selection to previous visible node', async () => {
+      const user = userEvent.setup()
+      const onSelect = vi.fn()
+      render(
+        <TreeView
+          nodes={mockNodes}
+          renderNode={renderNode}
+          initialExpanded={['root-1']}
+          selectedId="child-1-1"
+          onSelect={onSelect}
+        />,
+      )
+
+      const treeView = screen.getByTestId('tree-view')
+      treeView.focus()
+
+      await user.keyboard('{ArrowUp}')
+
+      expect(onSelect).toHaveBeenCalledWith('root-1')
+    })
+
+    it('ArrowDown stops at last visible node', async () => {
+      const user = userEvent.setup()
+      const onSelect = vi.fn()
+      render(
+        <TreeView
+          nodes={mockNodes}
+          renderNode={renderNode}
+          selectedId="root-2"
+          onSelect={onSelect}
+        />,
+      )
+
+      const treeView = screen.getByTestId('tree-view')
+      treeView.focus()
+
+      await user.keyboard('{ArrowDown}')
+
+      expect(onSelect).toHaveBeenCalledWith('root-2')
+      expect(onSelect).toHaveBeenCalledTimes(1)
+    })
+
+    it('ArrowUp stops at first visible node', async () => {
+      const user = userEvent.setup()
+      const onSelect = vi.fn()
+      render(
+        <TreeView
+          nodes={mockNodes}
+          renderNode={renderNode}
+          selectedId="root-1"
+          onSelect={onSelect}
+        />,
+      )
+
+      const treeView = screen.getByTestId('tree-view')
+      treeView.focus()
+
+      await user.keyboard('{ArrowUp}')
+
+      expect(onSelect).toHaveBeenCalledWith('root-1')
+      expect(onSelect).toHaveBeenCalledTimes(1)
+    })
+
+    it('ArrowDown skips collapsed children', async () => {
+      const user = userEvent.setup()
+      const onSelect = vi.fn()
+      render(
+        <TreeView
+          nodes={mockNodes}
+          renderNode={renderNode}
+          selectedId="root-1"
+          onSelect={onSelect}
+        />,
+      )
+
+      const treeView = screen.getByTestId('tree-view')
+      treeView.focus()
+
+      await user.keyboard('{ArrowDown}')
+
+      expect(onSelect).toHaveBeenCalledWith('root-2')
+    })
+
+    it('selects first visible node when ArrowDown with no current selection', async () => {
+      const user = userEvent.setup()
+      const onSelect = vi.fn()
+      render(
+        <TreeView
+          nodes={mockNodes}
+          renderNode={renderNode}
+          onSelect={onSelect}
+        />,
+      )
+
+      const treeView = screen.getByTestId('tree-view')
+      treeView.focus()
+
+      await user.keyboard('{ArrowDown}')
+
+      expect(onSelect).toHaveBeenCalledWith('root-1')
+    })
+
+    it('ArrowRight expands collapsed node with children', async () => {
+      const user = userEvent.setup()
+      const onExpandedChange = vi.fn()
+      render(
+        <TreeView
+          nodes={mockNodes}
+          renderNode={renderNode}
+          selectedId="root-1"
+          onExpandedChange={onExpandedChange}
+        />,
+      )
+
+      const treeView = screen.getByTestId('tree-view')
+      treeView.focus()
+
+      await user.keyboard('{ArrowRight}')
+
+      expect(onExpandedChange).toHaveBeenCalledTimes(1)
+      const expanded = onExpandedChange.mock.calls[0][0] as Set<string>
+      expect(expanded.has('root-1')).toBe(true)
+    })
+
+    it('ArrowRight moves focus to first child when node is already expanded', async () => {
+      const user = userEvent.setup()
+      const onSelect = vi.fn()
+      render(
+        <TreeView
+          nodes={mockNodes}
+          renderNode={renderNode}
+          selectedId="root-1"
+          initialExpanded={['root-1']}
+          onSelect={onSelect}
+        />,
+      )
+
+      const treeView = screen.getByTestId('tree-view')
+      treeView.focus()
+
+      await user.keyboard('{ArrowRight}')
+
+      expect(onSelect).toHaveBeenCalledWith('child-1-1')
+    })
+
+    it('ArrowLeft collapses expanded node', async () => {
+      const user = userEvent.setup()
+      const onExpandedChange = vi.fn()
+      render(
+        <TreeView
+          nodes={mockNodes}
+          renderNode={renderNode}
+          selectedId="root-1"
+          initialExpanded={['root-1']}
+          onExpandedChange={onExpandedChange}
+        />,
+      )
+
+      const treeView = screen.getByTestId('tree-view')
+      treeView.focus()
+
+      await user.keyboard('{ArrowLeft}')
+
+      expect(onExpandedChange).toHaveBeenCalledTimes(1)
+      const collapsed = onExpandedChange.mock.calls[0][0] as Set<string>
+      expect(collapsed.has('root-1')).toBe(false)
+    })
+
+    it('ArrowLeft moves focus to parent when node is collapsed or leaf', async () => {
+      const user = userEvent.setup()
+      const onSelect = vi.fn()
+      render(
+        <TreeView
+          nodes={mockNodes}
+          renderNode={renderNode}
+          selectedId="child-1-1"
+          initialExpanded={['root-1']}
+          onSelect={onSelect}
+        />,
+      )
+
+      const treeView = screen.getByTestId('tree-view')
+      treeView.focus()
+
+      await user.keyboard('{ArrowLeft}')
+
+      expect(onSelect).toHaveBeenCalledWith('root-1')
+    })
+
+    it('Home jumps to first visible node', async () => {
+      const user = userEvent.setup()
+      const onSelect = vi.fn()
+      render(
+        <TreeView
+          nodes={mockNodes}
+          renderNode={renderNode}
+          selectedId="root-2"
+          initialExpanded={['root-1']}
+          onSelect={onSelect}
+        />,
+      )
+
+      const treeView = screen.getByTestId('tree-view')
+      treeView.focus()
+
+      await user.keyboard('{Home}')
+
+      expect(onSelect).toHaveBeenCalledWith('root-1')
+    })
+
+    it('End jumps to last visible node', async () => {
+      const user = userEvent.setup()
+      const onSelect = vi.fn()
+      render(
+        <TreeView
+          nodes={mockNodes}
+          renderNode={renderNode}
+          selectedId="root-1"
+          initialExpanded={['root-1']}
+          onSelect={onSelect}
+        />,
+      )
+
+      const treeView = screen.getByTestId('tree-view')
+      treeView.focus()
+
+      await user.keyboard('{End}')
+
+      expect(onSelect).toHaveBeenCalledWith('root-2')
+    })
+
+    it('asterisk expands all siblings with children at current level', async () => {
+      const user = userEvent.setup()
+      const onExpandedChange = vi.fn()
+      render(
+        <TreeView
+          nodes={mockNodes}
+          renderNode={renderNode}
+          selectedId="child-1-1"
+          initialExpanded={['root-1']}
+          onExpandedChange={onExpandedChange}
+        />,
+      )
+
+      const treeView = screen.getByTestId('tree-view')
+      treeView.focus()
+
+      await user.keyboard('{*}')
+
+      expect(onExpandedChange).toHaveBeenCalledTimes(1)
+      const expanded = onExpandedChange.mock.calls[0][0] as Set<string>
+      expect(expanded.has('child-1-2')).toBe(true)
+    })
+
+    it('F2 triggers onEditNode for selected node', async () => {
+      const user = userEvent.setup()
+      const onEditNode = vi.fn()
+      render(
+        <TreeView
+          nodes={mockNodes}
+          renderNode={renderNode}
+          selectedId="root-1"
+          onEditNode={onEditNode}
+        />,
+      )
+
+      const treeView = screen.getByTestId('tree-view')
+      treeView.focus()
+
+      await user.keyboard('{F2}')
+
+      expect(onEditNode).toHaveBeenCalledWith('root-1')
+    })
+
+    it('Delete triggers onDeleteNode for selected node', async () => {
+      const user = userEvent.setup()
+      const onDeleteNode = vi.fn()
+      render(
+        <TreeView
+          nodes={mockNodes}
+          renderNode={renderNode}
+          selectedId="root-1"
+          onDeleteNode={onDeleteNode}
+        />,
+      )
+
+      const treeView = screen.getByTestId('tree-view')
+      treeView.focus()
+
+      await user.keyboard('{Delete}')
+
+      expect(onDeleteNode).toHaveBeenCalledWith('root-1')
+    })
+
+    it('tree container has role="tree"', () => {
+      render(<TreeView nodes={mockNodes} renderNode={renderNode} />)
+
+      expect(screen.getByTestId('tree-view')).toHaveAttribute('role', 'tree')
+    })
+
+    it('each row has role="treeitem"', () => {
+      render(<TreeView nodes={mockNodes} renderNode={renderNode} initialExpanded={['root-1']} />)
+
+      const rows = screen.getAllByTestId('tree-node-row')
+      rows.forEach((row) => {
+        expect(row).toHaveAttribute('role', 'treeitem')
+      })
+    })
+
+    it('selected node has aria-selected="true"', () => {
+      render(<TreeView nodes={mockNodes} renderNode={renderNode} selectedId="root-1" />)
+
+      const rows = screen.getAllByTestId('tree-node-row')
+      expect(rows[0]).toHaveAttribute('aria-selected', 'true')
+      expect(rows[1]).toHaveAttribute('aria-selected', 'false')
+    })
+
+    it('expanded branch node has aria-expanded="true"', () => {
+      render(<TreeView nodes={mockNodes} renderNode={renderNode} initialExpanded={['root-1']} />)
+
+      const row = screen.getAllByTestId('tree-node-row')[0]
+      expect(row).toHaveAttribute('aria-expanded', 'true')
+    })
+
+    it('collapsed branch node has aria-expanded="false"', () => {
+      render(<TreeView nodes={mockNodes} renderNode={renderNode} />)
+
+      const row = screen.getAllByTestId('tree-node-row')[0]
+      expect(row).toHaveAttribute('aria-expanded', 'false')
+    })
+
+    it('leaf node does not have aria-expanded', () => {
+      render(<TreeView nodes={mockNodes} renderNode={renderNode} />)
+
+      const rows = screen.getAllByTestId('tree-node-row')
+      const leafRow = rows.find((r) => r.getAttribute('data-node-id') === 'root-2')
+      expect(leafRow).not.toHaveAttribute('aria-expanded')
+    })
+
+    it('does not intercept Ctrl+Z, allowing global undo handler', async () => {
+      const user = userEvent.setup()
+      const onSelect = vi.fn()
+      render(
+        <TreeView
+          nodes={mockNodes}
+          renderNode={renderNode}
+          selectedId="root-1"
+          onSelect={onSelect}
+        />,
+      )
+
+      const treeView = screen.getByTestId('tree-view')
+      treeView.focus()
+
+      await user.keyboard('{Control>}z{/Control}')
+
+      expect(onSelect).not.toHaveBeenCalled()
+    })
+  })
+
   describe('drag and drop', () => {
     it('shows drag handle on hover when onDragNode is provided', async () => {
       const user = userEvent.setup()
