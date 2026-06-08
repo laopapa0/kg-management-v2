@@ -16,6 +16,7 @@ import { Switch } from '@/components/ui/switch'
 import { useConnectionMode } from '@/hooks/useConnectionMode'
 import { useFocusZone } from '@/hooks/useFocusZone'
 import { useTargetBounce } from '@/hooks/useTargetBounce'
+import { useConnectionDelete } from '@/hooks/useConnectionDelete'
 import { initializeAttachmentStore, selectPendingIndicators, useAttachmentStore } from '@/stores/attachmentStore'
 
 const PANEL_MIN_WIDTH_LEFT = 240
@@ -42,6 +43,9 @@ export default function IndicatorAttachmentPage() {
   const { state, start, setHoverTarget, toggleContinuous, resetMisfireCount } = useConnectionMode()
   const focusZone = useFocusZone()
   const focusZoneHint = useMemo(() => getFocusZoneHint(focusZone), [focusZone])
+
+  // Connection delete + undo
+  const { lastDeleted, deleteConnection, undoDelete } = useConnectionDelete()
 
   // Feedback state for successful attachment
   const [pulseTargetId, setPulseTargetId] = useState<string | null>(null)
@@ -392,7 +396,10 @@ export default function IndicatorAttachmentPage() {
       />
 
       {/* Persistent solid connection lines */}
-      <PersistentConnectionLayer connections={persistentConnections} />
+      <PersistentConnectionLayer
+        connections={persistentConnections}
+        onDelete={deleteConnection}
+      />
 
       {/* SVG connection layer (active dashed line during connection mode) */}
       {state.isConnecting && state.sourceId && (
@@ -412,6 +419,23 @@ export default function IndicatorAttachmentPage() {
             el?.scrollIntoView({ behavior: 'smooth', block: 'center' })
           }}
         />
+      )}
+
+      {/* Undo toast for deleted connections */}
+      {lastDeleted && (
+        <div
+          data-testid="undo-toast"
+          className="fixed bottom-4 left-1/2 z-50 flex -translate-x-1/2 items-center gap-3 rounded-full bg-dark-card-l2/95 px-4 py-2 text-sm text-dark-text-primary shadow-lg backdrop-blur-sm border border-dark-border"
+        >
+          <span>已删除挂靠</span>
+          <button
+            data-testid="undo-toast-button"
+            onClick={undoDelete}
+            className="rounded-md bg-dark-accent-primary px-2.5 py-0.5 text-xs font-medium text-white hover:bg-dark-accent-primary-hover transition-colors"
+          >
+            撤销
+          </button>
+        </div>
       )}
 
       {/* Feedback animations */}

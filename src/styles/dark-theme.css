@@ -152,6 +152,16 @@
   animation: pulse-ring-scale 400ms ease-out forwards;
 }
 
+/* Scale-in animation for delete connection button */
+@keyframes scale-in {
+  from { transform: scale(0); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.animate-scale-in {
+  animation: scale-in 150ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
 /* Focus mode dimming: non-target panels are desaturated and darkened */
 [data-dim-mode="true"] [data-focus-zone] {
   filter: saturate(0.3) brightness(0.6);

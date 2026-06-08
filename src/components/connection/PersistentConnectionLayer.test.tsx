@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { render, screen, cleanup } from '@testing-library/react'
+import { render, screen, cleanup, fireEvent } from '@testing-library/react'
 import PersistentConnectionLayer from './PersistentConnectionLayer'
 
 describe('PersistentConnectionLayer', () => {
@@ -200,5 +200,120 @@ describe('PersistentConnectionLayer', () => {
 
     document.body.removeChild(sourceEl)
     document.body.removeChild(targetEl)
+  })
+
+  describe('hover interaction', () => {
+    function setupConnectionElements() {
+      const sourceEl = document.createElement('div')
+      sourceEl.classList.add('test-cleanup')
+      sourceEl.setAttribute('data-indicator-id', 'src-1')
+      sourceEl.style.position = 'absolute'
+      sourceEl.style.left = '0px'
+      sourceEl.style.top = '0px'
+      sourceEl.style.width = '10px'
+      sourceEl.style.height = '10px'
+      document.body.appendChild(sourceEl)
+
+      sourceEl.getBoundingClientRect = vi.fn(() => ({
+        x: 0, y: 0, width: 10, height: 10,
+        top: 0, left: 0, right: 10, bottom: 10, toJSON: () => '',
+      }))
+
+      const targetEl = document.createElement('div')
+      targetEl.classList.add('test-cleanup')
+      targetEl.setAttribute('data-node-id', 'tree-1')
+      targetEl.style.position = 'absolute'
+      targetEl.style.left = '100px'
+      targetEl.style.top = '100px'
+      targetEl.style.width = '10px'
+      targetEl.style.height = '10px'
+      document.body.appendChild(targetEl)
+
+      targetEl.getBoundingClientRect = vi.fn(() => ({
+        x: 100, y: 100, width: 10, height: 10,
+        top: 100, left: 100, right: 110, bottom: 110, toJSON: () => '',
+      }))
+
+      return { sourceEl, targetEl }
+    }
+
+    it('highlights path on hover with color #7B8CDE and stroke-width 2.5', () => {
+      setupConnectionElements()
+      render(<PersistentConnectionLayer connections={[{ sourceId: 'src-1', targetId: 'tree-1' }]} />)
+
+      const path = screen.getByTestId('persistent-connection-line')
+      expect(path).toHaveAttribute('stroke', 'var(--dark-conn-line-valid)')
+      expect(path).toHaveAttribute('stroke-width', '2')
+
+      fireEvent.mouseEnter(path)
+
+      expect(path).toHaveAttribute('stroke', '#7B8CDE')
+      expect(path).toHaveAttribute('stroke-width', '2.5')
+    })
+
+    it('restores path style on mouse leave', () => {
+      setupConnectionElements()
+      render(<PersistentConnectionLayer connections={[{ sourceId: 'src-1', targetId: 'tree-1' }]} />)
+
+      const path = screen.getByTestId('persistent-connection-line')
+
+      fireEvent.mouseEnter(path)
+      expect(path).toHaveAttribute('stroke', '#7B8CDE')
+
+      fireEvent.mouseLeave(path)
+      expect(path).toHaveAttribute('stroke', 'var(--dark-conn-line-valid)')
+      expect(path).toHaveAttribute('stroke-width', '2')
+    })
+
+    it('shows delete button at midpoint on hover', () => {
+      setupConnectionElements()
+      render(<PersistentConnectionLayer connections={[{ sourceId: 'src-1', targetId: 'tree-1' }]} />)
+
+      const path = screen.getByTestId('persistent-connection-line')
+      fireEvent.mouseEnter(path)
+
+      const button = screen.getByTestId('delete-connection-button')
+      expect(button).toBeInTheDocument()
+      // midpoint of (5,5) and (105,105) is (55,55); button is centered: left=45, top=45
+      expect(button).toHaveStyle({ left: '45px', top: '45px' })
+    })
+
+    it('hides delete button on mouse leave', () => {
+      setupConnectionElements()
+      render(<PersistentConnectionLayer connections={[{ sourceId: 'src-1', targetId: 'tree-1' }]} />)
+
+      const path = screen.getByTestId('persistent-connection-line')
+      fireEvent.mouseEnter(path)
+      expect(screen.getByTestId('delete-connection-button')).toBeInTheDocument()
+
+      fireEvent.mouseLeave(path)
+      expect(screen.queryByTestId('delete-connection-button')).not.toBeInTheDocument()
+    })
+
+    it('calls onDelete with connection when delete button is clicked', () => {
+      const onDelete = vi.fn()
+      setupConnectionElements()
+      render(
+        <PersistentConnectionLayer
+          connections={[{ sourceId: 'src-1', targetId: 'tree-1' }]}
+          onDelete={onDelete}
+        />,
+      )
+
+      const path = screen.getByTestId('persistent-connection-line')
+      fireEvent.mouseEnter(path)
+
+      fireEvent.click(screen.getByTestId('delete-connection-button'))
+      expect(onDelete).toHaveBeenCalledTimes(1)
+      expect(onDelete).toHaveBeenCalledWith({ sourceId: 'src-1', targetId: 'tree-1' })
+    })
+
+    it('path has pointer-events stroke for hover detection', () => {
+      setupConnectionElements()
+      render(<PersistentConnectionLayer connections={[{ sourceId: 'src-1', targetId: 'tree-1' }]} />)
+
+      const path = screen.getByTestId('persistent-connection-line')
+      expect(path).toHaveStyle({ pointerEvents: 'stroke' })
+    })
   })
 })

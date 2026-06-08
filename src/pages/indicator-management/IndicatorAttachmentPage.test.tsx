@@ -540,6 +540,138 @@ describe('IndicatorAttachmentPage', () => {
     })
   })
 
+  describe('delete connection integration', () => {
+    function setupConnectionElements(sourceId: string, targetId: string) {
+      const sourceEl = document.createElement('div')
+      sourceEl.classList.add('test-cleanup')
+      sourceEl.setAttribute('data-indicator-id', sourceId)
+      sourceEl.style.position = 'absolute'
+      sourceEl.style.left = '0px'
+      sourceEl.style.top = '0px'
+      sourceEl.style.width = '10px'
+      sourceEl.style.height = '10px'
+      document.body.appendChild(sourceEl)
+      sourceEl.getBoundingClientRect = () => ({
+        x: 0, y: 0, width: 10, height: 10,
+        top: 0, left: 0, right: 10, bottom: 10, toJSON: () => '',
+      })
+
+      const targetEl = document.createElement('div')
+      targetEl.classList.add('test-cleanup')
+      targetEl.setAttribute('data-node-id', targetId)
+      targetEl.style.position = 'absolute'
+      targetEl.style.left = '100px'
+      targetEl.style.top = '100px'
+      targetEl.style.width = '10px'
+      targetEl.style.height = '10px'
+      document.body.appendChild(targetEl)
+      targetEl.getBoundingClientRect = () => ({
+        x: 100, y: 100, width: 10, height: 10,
+        top: 100, left: 100, right: 110, bottom: 110, toJSON: () => '',
+      })
+
+      return { sourceEl, targetEl }
+    }
+
+    it('shows undo toast after deleting a persistent connection', () => {
+      const { sourceEl, targetEl } = setupConnectionElements('del-src', 'del-target')
+
+      const state = useAttachmentStore.getState()
+      state.setIndicators([
+        ...state.indicators,
+        createIndicatorAttachment({
+          id: 'del-src',
+          name: '删除测试指标',
+          code: 'DEL-001',
+          indicatorCode: 'DEL-001',
+          indicatorDisplayName: '删除测试指标',
+          indicatorShowName: '删除测试指标',
+          indicatorType: '基础指标',
+          level1: '经营',
+          level2: '收入',
+          granularity: '全局',
+          frequency: '月',
+          unit: '元',
+          isBigScreen: false,
+          department: state.departments[0]?.name ?? '',
+          businessCaliber: '',
+          techCaliber: '',
+          tags: [],
+          treeParentId: 'del-target',
+          tagIds: [],
+          ruleIds: [],
+        }),
+      ])
+
+      render(<IndicatorAttachmentPage />)
+
+      const paths = screen.getAllByTestId('persistent-connection-line')
+      const path = paths[paths.length - 1]
+      fireEvent.mouseEnter(path)
+      fireEvent.click(screen.getByTestId('delete-connection-button'))
+
+      expect(screen.getByTestId('undo-toast')).toBeInTheDocument()
+      expect(screen.getByText('已删除挂靠')).toBeInTheDocument()
+
+      // Verify detached
+      const indicator = useAttachmentStore.getState().indicators.find((i) => i.id === 'del-src')
+      expect(indicator?.treeParentId).toBeUndefined()
+
+      document.body.removeChild(sourceEl)
+      document.body.removeChild(targetEl)
+    })
+
+    it('restores connection when undo button is clicked', () => {
+      const { sourceEl, targetEl } = setupConnectionElements('undo-src', 'undo-target')
+
+      const state = useAttachmentStore.getState()
+      state.setIndicators([
+        ...state.indicators,
+        createIndicatorAttachment({
+          id: 'undo-src',
+          name: '撤销测试指标',
+          code: 'UNDO-001',
+          indicatorCode: 'UNDO-001',
+          indicatorDisplayName: '撤销测试指标',
+          indicatorShowName: '撤销测试指标',
+          indicatorType: '基础指标',
+          level1: '经营',
+          level2: '收入',
+          granularity: '全局',
+          frequency: '月',
+          unit: '元',
+          isBigScreen: false,
+          department: state.departments[0]?.name ?? '',
+          businessCaliber: '',
+          techCaliber: '',
+          tags: [],
+          treeParentId: 'undo-target',
+          tagIds: [],
+          ruleIds: [],
+        }),
+      ])
+
+      render(<IndicatorAttachmentPage />)
+
+      const paths = screen.getAllByTestId('persistent-connection-line')
+      const path = paths[paths.length - 1]
+      fireEvent.mouseEnter(path)
+      fireEvent.click(screen.getByTestId('delete-connection-button'))
+
+      expect(screen.getByTestId('undo-toast')).toBeInTheDocument()
+
+      fireEvent.click(screen.getByTestId('undo-toast-button'))
+
+      expect(screen.queryByTestId('undo-toast')).not.toBeInTheDocument()
+
+      const restored = useAttachmentStore.getState().indicators.find((i) => i.id === 'undo-src')
+      expect(restored?.treeParentId).toBe('undo-target')
+
+      document.body.removeChild(sourceEl)
+      document.body.removeChild(targetEl)
+    })
+  })
+
   describe('feedback on successful attachment', () => {
     function createFeedbackTarget(id: string) {
       const el = document.createElement('div')
