@@ -1,6 +1,8 @@
 import { useMemo, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { getGeneratedReports, getReportsByPlanId } from '@/utils/generatedReportStorage'
+import { useCommentStore } from '@/stores/commentStore'
+import CommentThread from '@/components/report/CommentThread'
 import type { GeneratedReport, GeneratedReportSection } from '@/models/generatedReportModel'
 
 function sectionTitleMap(sections: GeneratedReportSection[]): Map<string, string> {
@@ -15,6 +17,8 @@ export default function ReportDetailPage() {
   const navigate = useNavigate()
   const { reportId } = useParams<{ reportId: string }>()
   const [compareVersionId, setCompareVersionId] = useState<string | null>(null)
+  const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set())
+  const allComments = useCommentStore((state) => state.comments)
 
   const report = useMemo(() => {
     const all = getGeneratedReports()
@@ -48,6 +52,23 @@ export default function ReportDetailPage() {
     }
     return changed
   }, [report, compareReport])
+
+  function toggleSection(sectionId: string) {
+    setExpandedSections((prev) => {
+      const next = new Set(prev)
+      if (next.has(sectionId)) {
+        next.delete(sectionId)
+      } else {
+        next.add(sectionId)
+      }
+      return next
+    })
+  }
+
+  function getCommentCount(sectionId: string): number {
+    const targetId = `${report!.id}:${report!.version}:${sectionId}`
+    return allComments.filter((c) => c.targetId === targetId && c.targetType === 'report-section').length
+  }
 
   if (!report) {
     return (
@@ -138,12 +159,36 @@ export default function ReportDetailPage() {
             </div>
           ) : (
             /* 正常模式 */
-            report.sections.map((section) => (
-              <div key={section.id} className="mb-4">
-                <h3 className="mb-2 font-medium text-dark-text-primary">{section.title}</h3>
-                <p className="whitespace-pre-wrap text-sm text-dark-text-secondary">{section.content}</p>
-              </div>
-            ))
+            report.sections.map((section) => {
+              const count = getCommentCount(section.id)
+              const isExpanded = expandedSections.has(section.id)
+              return (
+                <div key={section.id} data-testid={`report-section-${section.id}`} className="mb-4 rounded-md border border-dark-border bg-dark-card-l2 p-3">
+                  <div className="mb-2 flex items-center justify-between">
+                    <h3 className="font-medium text-dark-text-primary">{section.title}</h3>
+                    {count > 0 && (
+                      <span data-testid={`comment-badge-${section.id}`} className="rounded-full bg-dark-accent-primary/20 px-2 py-0.5 text-xs text-dark-accent-primary">
+                        {count}
+                      </span>
+                    )}
+                  </div>
+                  <p className="whitespace-pre-wrap text-sm text-dark-text-secondary">{section.content}</p>
+                  <button
+                    data-testid={`comment-toggle-${section.id}`}
+                    onClick={() => toggleSection(section.id)}
+                    className="mt-2 text-xs text-dark-text-secondary hover:text-dark-accent-primary"
+                  >
+                    评论 ({count})
+                  </button>
+                  {isExpanded && (
+                    <CommentThread
+                      targetId={`${report.id}:${report.version}:${section.id}`}
+                      targetType="report-section"
+                    />
+                  )}
+                </div>
+              )
+            })
           )}
         </div>
 

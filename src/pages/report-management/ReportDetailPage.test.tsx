@@ -2,6 +2,8 @@ import { describe, it, expect, beforeEach } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { MemoryRouter, Routes, Route } from 'react-router-dom'
 import { addGeneratedReport, __resetGeneratedReportStorageCache } from '@/utils/generatedReportStorage'
+import { __resetCommentStorageCache } from '@/utils/commentStorage'
+import { useCommentStore } from '@/stores/commentStore'
 import { createGeneratedReport } from '@/models/generatedReportModel'
 import ReportDetailPage from './ReportDetailPage'
 
@@ -9,6 +11,8 @@ describe('ReportDetailPage', () => {
   beforeEach(() => {
     localStorage.clear()
     __resetGeneratedReportStorageCache()
+    __resetCommentStorageCache()
+    useCommentStore.setState(useCommentStore.getInitialState())
   })
 
   it('renders report name and current version', () => {
@@ -244,5 +248,95 @@ describe('ReportDetailPage', () => {
     fireEvent.click(screen.getByTestId('rerun-generate-button'))
 
     expect(screen.getByTestId('generate-wizard-page')).toBeInTheDocument()
+  })
+
+  it('shows comment button and badge count on each section', () => {
+    const report = createGeneratedReport({
+      planId: 'plan-1',
+      planName: '核心指标日报',
+      templateId: 'tmpl-1',
+      templateName: '日报模板',
+      version: 'v0.1',
+      triggerType: 'manual',
+      filterScope: {
+        includedIndicatorIds: [],
+        excludedRuleIds: [],
+        excludedLinkRelationIds: [],
+      },
+      sections: [
+        { id: 's1', title: '概览', content: '内容A' },
+        { id: 's2', title: '详情', content: '内容B' },
+      ],
+    })
+    addGeneratedReport(report)
+
+    // Add 2 comments to s1, 0 to s2
+    useCommentStore.getState().addComment({
+      targetId: `${report.id}:${report.version}:s1`,
+      targetType: 'report-section',
+      author: '张三',
+      content: '评论1',
+    })
+    useCommentStore.getState().addComment({
+      targetId: `${report.id}:${report.version}:s1`,
+      targetType: 'report-section',
+      author: '李四',
+      content: '评论2',
+    })
+
+    render(
+      <MemoryRouter initialEntries={[`/reports/${report.id}`]}>
+        <Routes>
+          <Route path="/reports/:reportId" element={<ReportDetailPage />} />
+        </Routes>
+      </MemoryRouter>,
+    )
+
+    // Both sections have comment toggle button
+    expect(screen.getByTestId('comment-toggle-s1')).toHaveTextContent('评论 (2)')
+    expect(screen.getByTestId('comment-toggle-s2')).toHaveTextContent('评论 (0)')
+
+    // s1 has badge showing count
+    expect(screen.getByTestId('comment-badge-s1')).toHaveTextContent('2')
+
+    // s2 has no badge (count is 0)
+    expect(screen.queryByTestId('comment-badge-s2')).not.toBeInTheDocument()
+  })
+
+  it('toggles comment thread panel when clicking comment button', () => {
+    const report = createGeneratedReport({
+      planId: 'plan-1',
+      planName: '核心指标日报',
+      templateId: 'tmpl-1',
+      templateName: '日报模板',
+      version: 'v0.1',
+      triggerType: 'manual',
+      filterScope: {
+        includedIndicatorIds: [],
+        excludedRuleIds: [],
+        excludedLinkRelationIds: [],
+      },
+      sections: [{ id: 's1', title: '概览', content: '内容' }],
+    })
+    addGeneratedReport(report)
+
+    render(
+      <MemoryRouter initialEntries={[`/reports/${report.id}`]}>
+        <Routes>
+          <Route path="/reports/:reportId" element={<ReportDetailPage />} />
+        </Routes>
+      </MemoryRouter>,
+    )
+
+    // Initially no comment thread
+    expect(screen.queryByTestId('comment-thread')).not.toBeInTheDocument()
+
+    // Click toggle to expand
+    fireEvent.click(screen.getByTestId('comment-toggle-s1'))
+    expect(screen.getByTestId('comment-thread')).toBeInTheDocument()
+
+    // Click toggle again to collapse
+    fireEvent.click(screen.getByTestId('comment-toggle-s1'))
+    expect(screen.queryByTestId('comment-thread')).not.toBeInTheDocument()
   })
 })
