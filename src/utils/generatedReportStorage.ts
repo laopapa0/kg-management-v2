@@ -16,6 +16,12 @@ export function addGeneratedReport(report: GeneratedReport): void {
   saveGeneratedReports([...existing, report])
 }
 
+export function getReportsByPlanId(planId: string): GeneratedReport[] {
+  return getGeneratedReports()
+    .filter((r) => r.planId === planId)
+    .sort((a, b) => new Date(b.generatedAt).getTime() - new Date(a.generatedAt).getTime())
+}
+
 export function __resetGeneratedReportStorageCache(): void {
   __resetMemoryCache()
 }

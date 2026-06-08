@@ -10,6 +10,7 @@ import KnowledgeUploadPage from './pages/knowledge-upload/KnowledgeUploadPage'
 import ReportManagementPage from './pages/report-management/ReportManagementPage'
 import ReportTemplatesPage from './pages/report-management/ReportTemplatesPage'
 import ReportGenerationWizard from './pages/report-management/ReportGenerationWizard'
+import ReportDetailPage from './pages/report-management/ReportDetailPage'
 import { mockReportPlans } from '@/models/reportModel'
 import { getReportPlans, saveReportPlans } from '@/utils/reportStorage'
 import { mockReportTemplates } from '@/models/reportTemplateModel'
@@ -40,8 +41,9 @@ export default function App() {
           <Route path="/reports" element={<ReportManagementPage />} />
           <Route path="/reports/templates" element={<ReportTemplatesPage />} />
           <Route path="/reports/generate" element={<ReportGenerationWizard onComplete={(id) => {
-            window.location.href = `/reports`
+            window.location.href = `/reports/${id}`
           }} />} />
+          <Route path="/reports/:reportId" element={<ReportDetailPage />} />
           <Route path="/knowledge-upload" element={<KnowledgeUploadPage />} />
 
           {/* [LEGACY] /indicator/create */}

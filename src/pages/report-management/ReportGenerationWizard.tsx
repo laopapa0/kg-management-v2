@@ -2,8 +2,8 @@ import { useState, useMemo } from 'react'
 import { Button } from '@/components/ui/button'
 import FilterScopeSelector, { type FilterScopeValue } from '@/components/report/FilterScopeSelector'
 import { getReportTemplates } from '@/utils/reportTemplateStorage'
-import { addGeneratedReport } from '@/utils/generatedReportStorage'
-import { createGeneratedReport } from '@/models/generatedReportModel'
+import { addGeneratedReport, getGeneratedReports } from '@/utils/generatedReportStorage'
+import { createGeneratedReport, getNextVersion } from '@/models/generatedReportModel'
 import { generateMockReport } from '@/data/mockReportData'
 import type { ReportTemplate } from '@/models/reportTemplateModel'
 
@@ -166,11 +166,24 @@ export default function ReportGenerationWizard({ onComplete }: ReportGenerationW
           <Button
             data-testid="wizard-generate-button"
             onClick={() => {
+              const planId = 'plan-mock'
+              const existingReports = getGeneratedReports().filter((r) => r.planId === planId)
+              const latestVersion = existingReports
+                .map((r) => r.version)
+                .sort((a, b) => {
+                  const aMinor = parseInt(a.match(/v\d+\.(\d+)/)?.[1] ?? '0', 10)
+                  const bMinor = parseInt(b.match(/v\d+\.(\d+)/)?.[1] ?? '0', 10)
+                  return bMinor - aMinor
+                })[0] ?? 'v0.0'
+              const nextVersion = getNextVersion(latestVersion)
+
               const report = createGeneratedReport({
                 ...generateMockReport(
                   '报告计划',
                   selectedTemplate?.name ?? '默认模板',
                 ),
+                version: nextVersion,
+                triggerType: 'manual',
                 filterScope: {
                   includedIndicatorIds: filterScope.includedIndicatorIds,
                   excludedRuleIds: filterScope.excludedRuleIds,

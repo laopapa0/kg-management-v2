@@ -6,6 +6,7 @@ import ReportPlanDialog from '@/components/dialog/ReportPlanDialog'
 import { SCHEDULE_LABELS, createReportPlan } from '@/models/reportModel'
 import type { ReportPlan } from '@/models/reportModel'
 import { getReportPlans, saveReportPlans } from '@/utils/reportStorage'
+import { getGeneratedReports } from '@/utils/generatedReportStorage'
 import { useNavigate } from 'react-router-dom'
 
 
@@ -151,6 +152,21 @@ export default function ReportManagementPage() {
               <span>V{plan.latestVersion}</span>
               <span>{plan.lastGeneratedAt ? new Date(plan.lastGeneratedAt).toLocaleDateString('zh-CN') : '—'}</span>
               <div className="flex items-center gap-1">
+                {(() => {
+                  const latestReport = getGeneratedReports()
+                    .filter((r) => r.planName === plan.name)
+                    .sort((a, b) => new Date(b.generatedAt).getTime() - new Date(a.generatedAt).getTime())[0]
+                  return latestReport ? (
+                    <button
+                      data-testid={`view-report-${plan.id}`}
+                      onClick={() => navigate(`/reports/${latestReport.id}`)}
+                      className="rounded p-1 text-dark-text-secondary hover:bg-dark-card-l2 hover:text-dark-text-primary"
+                      title="查看报告"
+                    >
+                      <FileText size={14} />
+                    </button>
+                  ) : null
+                })()}
                 <button
                   data-testid={`edit-report-plan-${plan.id}`}
                   onClick={() => {

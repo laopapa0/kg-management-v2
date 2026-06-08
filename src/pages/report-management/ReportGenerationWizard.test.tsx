@@ -10,9 +10,10 @@ import {
 import { generateMockRules } from '@/data/mockAttachmentData'
 import { createMinimalIndicatorAttachment } from '@/models/indicatorAttachmentModel'
 import type { IndicatorAttachment } from '@/models/indicatorAttachmentModel'
-import { getGeneratedReports, __resetGeneratedReportStorageCache } from '@/utils/generatedReportStorage'
+import { getGeneratedReports, addGeneratedReport, __resetGeneratedReportStorageCache } from '@/utils/generatedReportStorage'
 import { saveReportTemplates, __resetReportTemplateStorageCache } from '@/utils/reportTemplateStorage'
 import { mockReportTemplates } from '@/models/reportTemplateModel'
+import { createGeneratedReport } from '@/models/generatedReportModel'
 import ReportGenerationWizard from './ReportGenerationWizard'
 
 describe('ReportGenerationWizard', () => {
@@ -120,6 +121,48 @@ describe('ReportGenerationWizard', () => {
     // Persisted in storage
     const stored = getGeneratedReports()
     expect(stored.some((r) => r.id === reportId)).toBe(true)
+  })
+
+  it('auto-increments version number when a report already exists for the plan', () => {
+    saveReportTemplates(mockReportTemplates)
+
+    // Pre-create a v0.1 report for plan-mock
+    addGeneratedReport(
+      createGeneratedReport({
+        planId: 'plan-mock',
+        planName: '报告计划',
+        templateId: 'tmpl-001',
+        templateName: '核心指标日报模板',
+        version: 'v0.1',
+        triggerType: 'manual',
+        filterScope: {
+          includedIndicatorIds: [],
+          excludedRuleIds: [],
+          excludedLinkRelationIds: [],
+        },
+        sections: [{ id: 's1', title: '概览', content: '内容' }],
+      }),
+    )
+
+    const onComplete = vi.fn()
+    render(<ReportGenerationWizard onComplete={onComplete} />)
+
+    // Step 1
+    fireEvent.click(screen.getByTestId('scope-indicator-checkbox-ind-root'))
+    fireEvent.click(screen.getByTestId('wizard-next-button'))
+
+    // Step 2
+    fireEvent.click(screen.getByTestId('wizard-template-tmpl-001'))
+    fireEvent.click(screen.getByTestId('wizard-next-button'))
+
+    // Step 3: generate
+    fireEvent.click(screen.getByTestId('wizard-generate-button'))
+
+    const reportId = onComplete.mock.calls[0][0] as string
+    const stored = getGeneratedReports()
+    const newReport = stored.find((r) => r.id === reportId)
+    expect(newReport?.version).toBe('v0.2')
+    expect(newReport?.triggerType).toBe('manual')
   })
 
   it('clicking prev button returns to previous step', () => {

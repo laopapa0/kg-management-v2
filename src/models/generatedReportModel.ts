@@ -21,6 +21,7 @@ export interface GeneratedReport {
     excludedRuleIds: string[]
     excludedLinkRelationIds: string[]
   }
+  triggerType: 'manual' | 'auto'
   sections: GeneratedReportSection[]
 }
 
@@ -42,4 +43,15 @@ export function createGeneratedReport(
     generatedAt: new Date().toISOString(),
     ...data,
   }
+}
+
+/**
+ * 计算下一个版本号（v0.1 → v0.2 → v0.3）
+ */
+export function getNextVersion(currentVersion: string): string {
+  const match = currentVersion.match(/v(\d+)\.(\d+)/)
+  if (!match) return 'v0.1'
+  const major = parseInt(match[1], 10)
+  const minor = parseInt(match[2], 10)
+  return `v${major}.${minor + 1}`
 }
