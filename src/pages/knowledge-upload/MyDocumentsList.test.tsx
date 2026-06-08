@@ -111,21 +111,18 @@ describe('MyDocumentsList', () => {
     expect(screen.getByText('驳回的文档.txt')).toBeInTheDocument();
   });
 
-  it('renders table columns: name, kb, upload time, size, status, action', () => {
+  it('renders table columns: name, upload time, size, status, action', () => {
     renderList();
     expect(screen.getByText('文档名称')).toBeInTheDocument();
-    expect(screen.getByText('目标知识库')).toBeInTheDocument();
     expect(screen.getByText('上传时间')).toBeInTheDocument();
     expect(screen.getByText('文件大小')).toBeInTheDocument();
     expect(screen.getByText('状态')).toBeInTheDocument();
     expect(screen.getByText('操作')).toBeInTheDocument();
   });
 
-  it('shows knowledge base names for each document', () => {
+  it('shows version number next to document name', () => {
     renderList();
-    // doc-1 and doc-3 both use default base, so there are 2 matches
-    expect(screen.getAllByText('默认业务知识库')).toHaveLength(2);
-    expect(screen.getByText('5G业务知识库')).toBeInTheDocument();
+    expect(screen.getByText('v1')).toBeInTheDocument();
   });
 
   it('shows formatted file sizes', () => {

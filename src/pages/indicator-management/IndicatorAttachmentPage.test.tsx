@@ -254,14 +254,14 @@ describe('IndicatorAttachmentPage', () => {
       render(<IndicatorAttachmentPage />)
 
       expect(screen.getByText('连续挂靠')).toBeInTheDocument()
-      expect(screen.getByRole('switch')).toBeInTheDocument()
+      expect(screen.getByLabelText('连续挂靠')).toBeInTheDocument()
     })
 
     it('toggles continuous mode on click', async () => {
       const user = userEvent.setup()
       render(<IndicatorAttachmentPage />)
 
-      const toggle = screen.getByRole('switch')
+      const toggle = screen.getByLabelText('连续挂靠')
       expect(toggle).toHaveAttribute('data-state', 'unchecked')
 
       await user.click(toggle)

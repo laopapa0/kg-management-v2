@@ -84,6 +84,7 @@ describe('ReportPlanDialog', () => {
       name: '新计划',
       schedule: 'daily',
       description: '新描述',
+      autoSchedule: false,
     })
   })
 
