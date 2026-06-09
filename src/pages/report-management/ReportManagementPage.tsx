@@ -12,21 +12,21 @@ import { getReportPlans, saveReportPlans } from '@/utils/reportStorage'
 import { getGeneratedReports, addGeneratedReport } from '@/utils/generatedReportStorage'
 import { getReportTemplates } from '@/utils/reportTemplateStorage'
 import { generateMockReport } from '@/data/mockReportData'
-import { useNavigate, useLocation } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
+import ReportHistoryPage from './ReportHistoryPage'
+import ReportTemplatesPage from './ReportTemplatesPage'
 
+type ReportTab = 'plans' | 'history' | 'templates'
 
 export default function ReportManagementPage() {
   const navigate = useNavigate()
-  const location = useLocation()
+  const [activeTab, setActiveTab] = useState<ReportTab>('plans')
   const [plans, setPlans] = useState(getReportPlans)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editingPlan, setEditingPlan] = useState<ReportPlan | null>(null)
 
-  const activeTab = location.pathname === '/reports/history' ? 'history' : 'plans'
-
   const handleGenerate = (plan: ReportPlan) => {
-    // 校验筛选范围不为空
     const scopeEmpty =
       !plan.filterScope ||
       (
@@ -102,20 +102,10 @@ export default function ReportManagementPage() {
     setPlans(getReportPlans())
   }, [])
 
-  if (plans.length === 0) {
-    return (
-      <>
-        <ReportPlanDialog
-          open={dialogOpen}
-          onOpenChange={setDialogOpen}
-          initialData={editingPlan}
-          onConfirm={handleSave}
-          onSaveAndGenerate={handleSaveAndGenerate}
-        />
-        <div
-          data-testid="report-management-page"
-          className="flex h-full flex-col items-center justify-center bg-dark-page p-6 text-dark-text-primary"
-        >
+  const renderPlansContent = () => {
+    if (plans.length === 0) {
+      return (
+        <div className="flex h-full flex-col items-center justify-center">
           <EmptyState
             icon={<FileText className="size-8" />}
             title="暂无报告计划"
@@ -134,6 +124,114 @@ export default function ReportManagementPage() {
             }
           />
         </div>
+      )
+    }
+
+    return (
+      <>
+        <div className="flex items-center justify-between">
+          <h2 className="text-h2 font-semibold text-dark-text-primary">报告管理</h2>
+          <div className="flex items-center gap-2">
+            <Button
+              data-testid="new-report-plan-button"
+              onClick={() => {
+                setEditingPlan(null)
+                setDialogOpen(true)
+              }}
+            >
+              <Plus size={16} />
+              新建报告计划
+            </Button>
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-2">
+          {plans.map((plan) => (
+            <div
+              key={plan.id}
+              data-testid={`report-plan-row-${plan.id}`}
+              className="flex items-center justify-between rounded-lg border border-dark-border bg-dark-card-l1 p-4"
+            >
+              <div className="flex flex-col gap-1">
+                <div className="flex items-center gap-2">
+                  <span className="font-medium text-dark-text-primary">{plan.name}</span>
+                  <span className="rounded-full bg-dark-card-l2 px-2 py-0.5 text-xs text-dark-text-secondary">
+                    {SCHEDULE_LABELS[plan.schedule]}
+                  </span>
+                  {plan.autoSchedule && (
+                    <span className="rounded-full bg-dark-accent-primary/15 px-2 py-0.5 text-xs text-dark-accent-primary">
+                      自动
+                    </span>
+                  )}
+                </div>
+                <span className="text-sm text-dark-text-secondary">{plan.filterSummary}</span>
+              </div>
+              <div className="flex items-center gap-4 text-sm text-dark-text-secondary">
+                <span>V{plan.latestVersion}</span>
+                <span>{plan.lastGeneratedAt ? new Date(plan.lastGeneratedAt).toLocaleDateString('zh-CN') : '—'}</span>
+                <div className="flex items-center gap-1">
+                  {(() => {
+                    const latestReport = getGeneratedReports()
+                      .filter((r) => r.planName === plan.name)
+                      .sort((a, b) => new Date(b.generatedAt).getTime() - new Date(a.generatedAt).getTime())[0]
+                    return latestReport ? (
+                      <button
+                        data-testid={`view-report-${plan.id}`}
+                        onClick={() => navigate(`/reports/${latestReport.id}`)}
+                        className="rounded p-1 text-dark-text-secondary hover:bg-dark-card-l2 hover:text-dark-text-primary"
+                        title="查看报告"
+                      >
+                        <FileText size={14} />
+                      </button>
+                    ) : null
+                  })()}
+                  {plan.latestVersion === 0 ? (
+                    <button
+                      data-testid={`generate-report-${plan.id}`}
+                      onClick={() => handleGenerate(plan)}
+                      className="rounded px-2 py-1 text-xs text-dark-text-secondary hover:bg-dark-card-l2 hover:text-dark-text-primary"
+                      title="首次生成"
+                    >
+                      首次生成
+                    </button>
+                  ) : (
+                    <button
+                      data-testid={`generate-report-${plan.id}`}
+                      onClick={() => handleGenerate(plan)}
+                      className="rounded p-1 text-dark-text-secondary hover:bg-dark-card-l2 hover:text-dark-text-primary"
+                      title="生成报告"
+                    >
+                      <Play size={14} />
+                    </button>
+                  )}
+                  <button
+                    data-testid={`edit-report-plan-${plan.id}`}
+                    onClick={() => {
+                      setEditingPlan(plan)
+                      setDialogOpen(true)
+                    }}
+                    className="rounded p-1 text-dark-text-secondary hover:bg-dark-card-l2 hover:text-dark-text-primary"
+                    title="编辑"
+                  >
+                    <Pencil size={14} />
+                  </button>
+                  <button
+                    data-testid={`delete-report-plan-${plan.id}`}
+                    onClick={() => {
+                      const next = plans.filter((p) => p.id !== plan.id)
+                      setPlans(next)
+                      saveReportPlans(next)
+                    }}
+                    className="rounded p-1 text-dark-text-secondary hover:bg-red-500/10 hover:text-red-400"
+                    title="删除"
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
       </>
     )
   }
@@ -141,25 +239,9 @@ export default function ReportManagementPage() {
   return (
     <div
       data-testid="report-management-page"
-      className="flex h-full flex-col gap-4 bg-dark-page p-6 text-dark-text-primary"
+      className="flex h-full flex-col gap-4 bg-dark-page p-6 text-dark-text-primary overflow-auto"
     >
-      <div className="flex items-center justify-between">
-        <h2 className="text-h2 font-semibold text-dark-text-primary">报告管理</h2>
-        <div className="flex items-center gap-2">
-          <Button
-            data-testid="new-report-plan-button"
-            onClick={() => {
-              setEditingPlan(null)
-              setDialogOpen(true)
-            }}
-          >
-            <Plus size={16} />
-            新建报告计划
-          </Button>
-        </div>
-      </div>
-
-      <Tabs value={activeTab} onValueChange={(v) => navigate(v === 'history' ? '/reports/history' : '/reports')}>
+      <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as ReportTab)}>
         <TabsList className="mb-4 bg-dark-elevated border border-dark-border">
           <TabsTrigger
             value="plans"
@@ -173,6 +255,12 @@ export default function ReportManagementPage() {
           >
             历史报告
           </TabsTrigger>
+          <TabsTrigger
+            value="templates"
+            className="data-[state=active]:text-dark-accent-primary data-[state=active]:border-b-2 data-[state=active]:border-dark-accent-primary"
+          >
+            报告模板
+          </TabsTrigger>
         </TabsList>
       </Tabs>
 
@@ -184,93 +272,9 @@ export default function ReportManagementPage() {
         onSaveAndGenerate={handleSaveAndGenerate}
       />
 
-      <div className="flex flex-col gap-2">
-        {plans.map((plan) => (
-          <div
-            key={plan.id}
-            data-testid={`report-plan-row-${plan.id}`}
-            className="flex items-center justify-between rounded-lg border border-dark-border bg-dark-card-l1 p-4"
-          >
-            <div className="flex flex-col gap-1">
-              <div className="flex items-center gap-2">
-                <span className="font-medium text-dark-text-primary">{plan.name}</span>
-                <span className="rounded-full bg-dark-card-l2 px-2 py-0.5 text-xs text-dark-text-secondary">
-                  {SCHEDULE_LABELS[plan.schedule]}
-                </span>
-                {plan.autoSchedule && (
-                  <span className="rounded-full bg-dark-accent-primary/15 px-2 py-0.5 text-xs text-dark-accent-primary">
-                    自动
-                  </span>
-                )}
-              </div>
-              <span className="text-sm text-dark-text-secondary">{plan.filterSummary}</span>
-            </div>
-            <div className="flex items-center gap-4 text-sm text-dark-text-secondary">
-              <span>V{plan.latestVersion}</span>
-              <span>{plan.lastGeneratedAt ? new Date(plan.lastGeneratedAt).toLocaleDateString('zh-CN') : '—'}</span>
-              <div className="flex items-center gap-1">
-                {(() => {
-                  const latestReport = getGeneratedReports()
-                    .filter((r) => r.planName === plan.name)
-                    .sort((a, b) => new Date(b.generatedAt).getTime() - new Date(a.generatedAt).getTime())[0]
-                  return latestReport ? (
-                    <button
-                      data-testid={`view-report-${plan.id}`}
-                      onClick={() => navigate(`/reports/${latestReport.id}`)}
-                      className="rounded p-1 text-dark-text-secondary hover:bg-dark-card-l2 hover:text-dark-text-primary"
-                      title="查看报告"
-                    >
-                      <FileText size={14} />
-                    </button>
-                  ) : null
-                })()}
-                {plan.latestVersion === 0 ? (
-                  <button
-                    data-testid={`generate-report-${plan.id}`}
-                    onClick={() => handleGenerate(plan)}
-                    className="rounded px-2 py-1 text-xs text-dark-text-secondary hover:bg-dark-card-l2 hover:text-dark-text-primary"
-                    title="首次生成"
-                  >
-                    首次生成
-                  </button>
-                ) : (
-                  <button
-                    data-testid={`generate-report-${plan.id}`}
-                    onClick={() => handleGenerate(plan)}
-                    className="rounded p-1 text-dark-text-secondary hover:bg-dark-card-l2 hover:text-dark-text-primary"
-                    title="生成报告"
-                  >
-                    <Play size={14} />
-                  </button>
-                )}
-                <button
-                  data-testid={`edit-report-plan-${plan.id}`}
-                  onClick={() => {
-                    setEditingPlan(plan)
-                    setDialogOpen(true)
-                  }}
-                  className="rounded p-1 text-dark-text-secondary hover:bg-dark-card-l2 hover:text-dark-text-primary"
-                  title="编辑"
-                >
-                  <Pencil size={14} />
-                </button>
-                <button
-                  data-testid={`delete-report-plan-${plan.id}`}
-                  onClick={() => {
-                    const next = plans.filter((p) => p.id !== plan.id)
-                    setPlans(next)
-                    saveReportPlans(next)
-                  }}
-                  className="rounded p-1 text-dark-text-secondary hover:bg-red-500/10 hover:text-red-400"
-                  title="删除"
-                >
-                  <Trash2 size={14} />
-                </button>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
+      {activeTab === 'plans' && renderPlansContent()}
+      {activeTab === 'history' && <ReportHistoryPage />}
+      {activeTab === 'templates' && <ReportTemplatesPage />}
     </div>
   )
 }

@@ -209,31 +209,51 @@ describe('ReportManagementPage', () => {
     expect(screen.getByTestId('report-detail-page')).toBeInTheDocument()
   })
 
-  it('shows tabs for switching between plans and history', () => {
+  it('shows tabs for switching between plans, history and templates', () => {
     saveReportPlans(mockReportPlans)
     render(<MemoryRouter><ReportManagementPage /></MemoryRouter>)
 
     expect(screen.getByRole('tab', { name: '报告计划' })).toBeInTheDocument()
     expect(screen.getByRole('tab', { name: '历史报告' })).toBeInTheDocument()
+    expect(screen.getByRole('tab', { name: '报告模板' })).toBeInTheDocument()
   })
 
-  it('navigates to history page when clicking history tab', async () => {
+  it('switches to history tab content without navigation', async () => {
     const user = userEvent.setup()
     saveReportPlans(mockReportPlans)
 
-    render(
-      <MemoryRouter initialEntries={['/reports']}>
-        <Routes>
-          <Route path="/reports" element={<ReportManagementPage />} />
-          <Route path="/reports/history" element={<div data-testid="history-page">History Page</div>} />
-        </Routes>
-      </MemoryRouter>,
-    )
+    render(<MemoryRouter><ReportManagementPage /></MemoryRouter>)
 
+    // Initially shows plans
+    expect(screen.getByText('核心指标日报')).toBeInTheDocument()
+
+    // Click history tab
     const historyTab = screen.getByRole('tab', { name: '历史报告' })
     await user.click(historyTab)
 
-    expect(screen.getByTestId('history-page')).toBeInTheDocument()
+    // Should show history page content (empty state since no reports)
+    expect(screen.getByText('暂无历史报告')).toBeInTheDocument()
+    // Plans content should be gone
+    expect(screen.queryByText('核心指标日报')).not.toBeInTheDocument()
+  })
+
+  it('switches to templates tab content without navigation', async () => {
+    const user = userEvent.setup()
+    saveReportPlans(mockReportPlans)
+
+    render(<MemoryRouter><ReportManagementPage /></MemoryRouter>)
+
+    // Initially shows plans
+    expect(screen.getByText('核心指标日报')).toBeInTheDocument()
+
+    // Click templates tab
+    const templatesTab = screen.getByRole('tab', { name: '报告模板' })
+    await user.click(templatesTab)
+
+    // Should show templates page content (empty state since no templates)
+    expect(screen.getByText('暂无报告模板')).toBeInTheDocument()
+    // Plans content should be gone
+    expect(screen.queryByText('核心指标日报')).not.toBeInTheDocument()
   })
 
   it('shows error toast when generating with empty filterScope', async () => {
