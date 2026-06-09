@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect, useCallback, useRef } from 'react'
 import { Switch } from '@/components/ui/switch'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+
 
 import DataTable, { type Column } from '@/components/DataTable'
 import ChangeTimeline from '@/components/timeline/ChangeTimeline'
@@ -13,7 +13,7 @@ import {
   mockLinkChangeLogs,
 } from '@/models/linkRelationModel'
 import type { LinkRelation, LinkChangeLog, ChangeLogEntry } from '@/models/linkRelationModel'
-import { IconRenderer } from '@/utils/icons'
+import { IconRenderer } from '@/utils/icons.tsx'
 
 const SOURCE_TYPE_OPTIONS = ['全部', '指标', '虚拟分组', '外部因素']
 const DIRECTION_OPTIONS = ['全部', '有向', '无向']
@@ -242,26 +242,26 @@ export default function LinkRelationManagePage() {
           }}
           className="w-80"
         />
-        <Select value={directionFilter} onValueChange={(v) => { setDirectionFilter(v); setPage(1) }}>
-          <SelectTrigger data-testid="direction-filter" className="w-24 h-9 bg-dark-card-l1 border-dark-border text-dark-text-primary [&>span]:text-dark-text-primary">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent className="border-dark-border bg-dark-card-l2">
-            {DIRECTION_OPTIONS.map((opt) => (
-              <SelectItem key={opt} value={opt} className="text-dark-text-primary focus:bg-dark-card-l1 focus:text-dark-text-primary">{opt}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <Select value={sourceTypeFilter} onValueChange={(v) => { setSourceTypeFilter(v); setPage(1) }}>
-          <SelectTrigger data-testid="source-type-filter" className="w-28 h-9 bg-dark-card-l1 border-dark-border text-dark-text-primary [&>span]:text-dark-text-primary">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent className="border-dark-border bg-dark-card-l2">
-            {SOURCE_TYPE_OPTIONS.map((opt) => (
-              <SelectItem key={opt} value={opt} className="text-dark-text-primary focus:bg-dark-card-l1 focus:text-dark-text-primary">{opt}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <select
+          data-testid="direction-filter"
+          value={directionFilter}
+          onChange={(e) => { setDirectionFilter(e.target.value); setPage(1) }}
+          className="h-9 w-24 rounded-md border border-dark-border bg-dark-card-l1 px-2 text-sm text-dark-text-primary focus:border-dark-accent-primary-hover focus:outline-none"
+        >
+          {DIRECTION_OPTIONS.map((opt) => (
+            <option key={opt} value={opt}>{opt}</option>
+          ))}
+        </select>
+        <select
+          data-testid="source-type-filter"
+          value={sourceTypeFilter}
+          onChange={(e) => { setSourceTypeFilter(e.target.value); setPage(1) }}
+          className="h-9 w-28 rounded-md border border-dark-border bg-dark-card-l1 px-2 text-sm text-dark-text-primary focus:border-dark-accent-primary-hover focus:outline-none"
+        >
+          {SOURCE_TYPE_OPTIONS.map((opt) => (
+            <option key={opt} value={opt}>{opt}</option>
+          ))}
+        </select>
         <Button
           data-testid="filter-reset"
           variant="ghost"

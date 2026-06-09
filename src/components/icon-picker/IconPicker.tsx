@@ -1,31 +1,13 @@
 import { useState, useMemo } from 'react'
-import {
-  Link, ArrowRight, Combine, GitBranch, Shuffle,
-  Layers, Replace, ExternalLink, ArrowLeftRight, TrendingUp,
-  TrendingDown, Activity, BarChart3, PieChart, LineChart,
-  Network, Share2, Merge, Split, Workflow, Search, X,
-} from 'lucide-react'
+import { Search, X } from 'lucide-react'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { cn } from '@/lib/utils'
+import { ICON_NAMES, IconRenderer } from '@/utils/icons.tsx'
 
 export interface IconPickerProps {
   value?: string
   onChange: (icon: string) => void
   'data-testid'?: string
-}
-
-const ICON_MAP: Record<string, React.ComponentType<{ size?: number; className?: string }>> = {
-  Link, ArrowRight, Combine, GitBranch, Shuffle,
-  Layers, Replace, ExternalLink, ArrowLeftRight, TrendingUp,
-  TrendingDown, Activity, BarChart3, PieChart, LineChart,
-  Network, Share2, Merge, Split, Workflow,
-}
-
-const ICON_NAMES = Object.keys(ICON_MAP)
-
-function IconRenderer({ name, size = 18 }: { name: string; size?: number }) {
-  const Comp = ICON_MAP[name] || Link
-  return <Comp size={size} className="text-dark-text-secondary" />
 }
 
 export default function IconPicker({

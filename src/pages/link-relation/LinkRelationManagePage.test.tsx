@@ -66,10 +66,23 @@ describe('LinkRelationManagePage', () => {
     await user.click(detailButtons[0])
 
     // Expanded detail should show source/target types and createdAt
-    // Use getAllByText and check at least one is in the expanded detail area
     expect(screen.getAllByText(/源类型/).length).toBeGreaterThanOrEqual(1)
     expect(screen.getAllByText(/目标类型/).length).toBeGreaterThanOrEqual(1)
     expect(screen.getAllByText(/创建时间/).length).toBeGreaterThanOrEqual(1)
+  })
+
+  it('filters by keyword including sourceTypes and targetTypes', async () => {
+    const user = userEvent.setup()
+    render(<LinkRelationManagePage />)
+
+    const searchInput = screen.getByPlaceholderText('搜索关系类型...')
+    // Search for '虚拟分组' which exists in sourceTypes of PART_OF
+    await user.type(searchInput, '虚拟分组')
+
+    // 组成关系 has 虚拟分组 in sourceTypes
+    expect(screen.getByText('组成关系')).toBeInTheDocument()
+    // Other relations without 虚拟分组 should be hidden
+    expect(screen.queryByText('聚合关系')).not.toBeInTheDocument()
   })
 
   it('filters by keyword across all fields', async () => {
@@ -90,8 +103,7 @@ describe('LinkRelationManagePage', () => {
     render(<LinkRelationManagePage />)
 
     // Select '有向' from direction filter
-    const directionSelect = screen.getByTestId('direction-filter')
-    await user.selectOptions(directionSelect, '有向')
+    await user.selectOptions(screen.getByTestId('direction-filter'), '有向')
 
     // 有向 relations should be visible
     expect(screen.getByText('聚合关系')).toBeInTheDocument()
@@ -105,8 +117,7 @@ describe('LinkRelationManagePage', () => {
     render(<LinkRelationManagePage />)
 
     // Select '虚拟分组' from source type filter
-    const sourceTypeSelect = screen.getByTestId('source-type-filter')
-    await user.selectOptions(sourceTypeSelect, '虚拟分组')
+    await user.selectOptions(screen.getByTestId('source-type-filter'), '虚拟分组')
 
     // Relations with 虚拟分组 in sourceTypes should be visible
     expect(screen.getByText('组成关系')).toBeInTheDocument()

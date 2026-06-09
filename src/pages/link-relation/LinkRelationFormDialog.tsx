@@ -22,7 +22,7 @@ export interface LinkRelationFormDialogProps {
   initialData?: LinkRelation
 }
 
-const CODE_REGEX = /^[A-Z][A-Z0-9_]*$/
+const CODE_REGEX = /^[A-Z][A-Z_]*$/
 
 const DEFAULT_FORM = {
   code: '',
