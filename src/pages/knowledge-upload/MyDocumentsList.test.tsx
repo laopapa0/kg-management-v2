@@ -39,14 +39,6 @@ const mockDocs = [
       removeUrls: false,
     },
     chunks: [],
-    auditRecords: [
-      {
-        status: 'approved' as const,
-        auditor: 'NOC小李',
-        auditTime: '2026-06-04T09:00:00.000Z',
-        reason: '内容完整，格式规范',
-      },
-    ],
   },
   {
     id: 'doc-3',
@@ -56,7 +48,7 @@ const mockDocs = [
     targetKnowledgeBaseId: 'default',
     uploader: '业务部门用户',
     uploadTime: '2026-06-05T12:00:00.000Z',
-    status: 'rejected' as const,
+    status: 'pending' as const,
     segmentConfig: {
       delimiter: '\\n\\n',
       maxLength: 1024,
@@ -65,14 +57,6 @@ const mockDocs = [
       removeUrls: false,
     },
     chunks: [],
-    auditRecords: [
-      {
-        status: 'rejected' as const,
-        auditor: 'NOC小李',
-        auditTime: '2026-06-05T14:00:00.000Z',
-        reason: '内容不完整',
-      },
-    ],
   },
 ];
 
@@ -140,13 +124,13 @@ describe('MyDocumentsList', () => {
 
   it('renders status badges with correct colors', () => {
     renderList();
-    const pendingBadge = screen.getByText('已上传').closest('span');
+    const pendingBadges = screen.getAllByText('已上传');
+    expect(pendingBadges.length).toBeGreaterThanOrEqual(1);
+    expect(pendingBadges[0].closest('span')).toHaveClass('bg-blue-100', 'text-blue-700');
     const approvedBadge = screen.getByText('已通过').closest('span');
-    const rejectedBadge = screen.getByText('审核不通过').closest('span');
 
-    expect(pendingBadge).toHaveClass('bg-blue-100', 'text-blue-700');
     expect(approvedBadge).toHaveClass('bg-green-100', 'text-green-700');
-    expect(rejectedBadge).toHaveClass('bg-red-100', 'text-red-700');
+    expect(screen.queryByText('审核不通过')).not.toBeInTheDocument();
   });
 
   it('sorts documents by upload time descending', () => {
@@ -191,18 +175,7 @@ describe('MyDocumentsList', () => {
     expect(within(drawer).getByText('50')).toBeInTheDocument();
   });
 
-  it('drawer shows audit history timeline for approved document', () => {
-    renderList();
-    // doc-2 is approved (index 2 in view buttons due to sorting)
-    fireEvent.click(screen.getAllByText('查看')[2]);
-
-    const drawer = screen.getByRole('dialog');
-    expect(within(drawer).getByText('审核历史')).toBeInTheDocument();
-    expect(within(drawer).getByText(/审核人：NOC小李/)).toBeInTheDocument();
-    expect(within(drawer).getByText(/原因：内容完整，格式规范/)).toBeInTheDocument();
-  });
-
-  it('drawer does not show audit history for pending document', () => {
+  it('drawer does not show audit history (removed in v2 - no audit)', () => {
     renderList();
     fireEvent.click(screen.getAllByText('查看')[1]);
 
@@ -210,67 +183,12 @@ describe('MyDocumentsList', () => {
     expect(within(drawer).queryByText('审核历史')).not.toBeInTheDocument();
   });
 
-  it('shows 重新编辑 button only for rejected documents', () => {
+  it('no documents show 重新编辑 (no rejected after removing audit)', () => {
     renderList();
     const rows = screen.getAllByTestId(/doc-row-/);
-
-    // doc-3 is rejected
-    const rejectedRow = rows.find((r) => r.getAttribute('data-testid') === 'doc-row-doc-3');
-    expect(rejectedRow?.textContent).toContain('重新编辑');
-
-    // doc-1 is pending
-    const pendingRow = rows.find((r) => r.getAttribute('data-testid') === 'doc-row-doc-1');
-    expect(pendingRow?.textContent).not.toContain('重新编辑');
-
-    // doc-2 is approved
-    const approvedRow = rows.find((r) => r.getAttribute('data-testid') === 'doc-row-doc-2');
-    expect(approvedRow?.textContent).not.toContain('重新编辑');
+    for (const row of rows) {
+      expect(row.textContent).not.toContain('重新编辑');
+    }
   });
 
-  it('opens re-edit dialog when clicking 重新编辑', () => {
-    renderList();
-    fireEvent.click(screen.getByText('重新编辑'));
-
-    expect(screen.getByText('重新编辑审核不通过的文档')).toBeInTheDocument();
-    expect(screen.getByText('驳回的文档.txt')).toBeInTheDocument();
-  });
-
-  it('re-edit dialog shows preserved segment config', () => {
-    renderList();
-    fireEvent.click(screen.getByText('重新编辑'));
-
-    // Segment config from doc-3 should be pre-filled
-    expect(screen.getByLabelText(/分段标识符/)).toHaveValue('\\n\\n');
-    expect(screen.getByLabelText(/最大长度/)).toHaveValue(1024);
-    expect(screen.getByLabelText(/重叠长度/)).toHaveValue(50);
-  });
-
-  it('submits re-edit and calls updateKnowledgeDocument with pending status', async () => {
-    renderList();
-    fireEvent.click(screen.getByText('重新编辑'));
-
-    // Upload a file
-    const fileInput = screen.getByTestId('reedit-file-input');
-    const file = new File(['test content'], 'new-version.txt', { type: 'text/plain' });
-    Object.defineProperty(file, 'size', { value: 1000 });
-    fireEvent.change(fileInput, { target: { files: [file] } });
-
-    // Wait for file to appear
-    await new Promise((r) => setTimeout(r, 10));
-
-    // Click submit
-    fireEvent.click(screen.getByRole('button', { name: /重新提交/ }));
-
-    await new Promise((r) => setTimeout(r, 50));
-
-    expect(updateKnowledgeDocument).toHaveBeenCalledWith(
-      'doc-3',
-      expect.objectContaining({
-        name: 'new-version.txt',
-        status: 'pending',
-        fileType: 'txt',
-        fileSize: 1000,
-      }),
-    );
-  });
 });

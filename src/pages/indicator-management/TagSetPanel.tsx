@@ -340,14 +340,7 @@ export default function TagSetPanel({ selectedIndicatorId }: { selectedIndicator
             >
               <div className="flex items-center gap-2">
                 {selectedIndicatorId ? (
-                  <input
-                    type="checkbox"
-                    data-testid={`tag-config-checkbox-${fullNode.id}`}
-                    checked={selectedTagIds.has(fullNode.id)}
-                    onChange={() => toggleTagForIndicator(fullNode.id)}
-                    className="size-4 cursor-pointer accent-dark-accent-primary"
-                  />
-                ) : null}
+                  <span />) : null}
                 <TagPill
                   tag={fullNode}
                   selected={selection.selected.has(fullNode.id)}

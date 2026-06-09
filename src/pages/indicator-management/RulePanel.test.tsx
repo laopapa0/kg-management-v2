@@ -399,13 +399,13 @@ describe('RulePanel config mode', () => {
     configIndicatorId = state.indicators[0]?.id ?? 'ind-0'
   })
 
-  it('shows checkbox before each rule when selectedIndicatorId is provided', () => {
+  it('does not show checkboxes before rules (removed per design update)', () => {
     render(<RulePanel selectedIndicatorId={configIndicatorId} />)
-    const checkboxes = screen.getAllByRole('checkbox')
-    expect(checkboxes.length).toBeGreaterThan(0)
+    const checkboxes = screen.queryAllByRole('checkbox')
+    expect(checkboxes.length).toBe(0)
   })
 
-  it('checkbox is checked when indicator has the rule in ruleIds', () => {
+  it('rules are still displayed for selected indicator (checkboxes removed)', () => {
     const state = useAttachmentStore.getState()
     const targetRule = state.rules.find((r: Rule) => r.name.includes('阈值'))!
     state.setIndicators(
@@ -414,8 +414,7 @@ describe('RulePanel config mode', () => {
       ),
     )
     render(<RulePanel selectedIndicatorId={configIndicatorId} />)
-    const checkbox = screen.getByTestId(`rule-config-checkbox-${targetRule.id}`)
-    expect(checkbox).toBeChecked()
+    expect(screen.getByText(targetRule.name)).toBeInTheDocument()
   })
 
   it('shows settings button for checked rules in config mode', () => {

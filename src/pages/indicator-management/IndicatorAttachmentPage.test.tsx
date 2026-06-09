@@ -67,7 +67,7 @@ describe('IndicatorAttachmentPage', () => {
     render(<IndicatorAttachmentPage />)
 
     expect(screen.getByText('指标树')).toBeInTheDocument()
-    expect(screen.getByText('待选指标')).toBeInTheDocument()
+    expect(screen.getByText('候选指标')).toBeInTheDocument()
     expect(screen.getByText('标签集')).toBeInTheDocument()
     expect(screen.getByText('规则')).toBeInTheDocument()
   })
@@ -250,27 +250,6 @@ describe('IndicatorAttachmentPage', () => {
   })
 
   describe('connection mode integration', () => {
-    it('renders continuous mode toggle', () => {
-      render(<IndicatorAttachmentPage />)
-
-      expect(screen.getByText('连续挂靠')).toBeInTheDocument()
-      expect(screen.getByLabelText('连续挂靠')).toBeInTheDocument()
-    })
-
-    it('toggles continuous mode on click', async () => {
-      const user = userEvent.setup()
-      render(<IndicatorAttachmentPage />)
-
-      const toggle = screen.getByLabelText('连续挂靠')
-      expect(toggle).toHaveAttribute('data-state', 'unchecked')
-
-      await user.click(toggle)
-      expect(toggle).toHaveAttribute('data-state', 'checked')
-
-      await user.click(toggle)
-      expect(toggle).toHaveAttribute('data-state', 'unchecked')
-    })
-
     it('shows connection status bar when a card is clicked', async () => {
       const user = userEvent.setup()
       render(<IndicatorAttachmentPage />)

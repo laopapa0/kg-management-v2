@@ -38,14 +38,6 @@ const mockDocs = [
       removeUrls: false,
     },
     chunks: [],
-    auditRecords: [
-      {
-        status: 'approved' as const,
-        auditor: 'NOC小李',
-        auditTime: '2026-06-04T09:00:00.000Z',
-        reason: '内容完整，格式规范',
-      },
-    ],
   },
   {
     id: 'doc-3',
@@ -64,14 +56,6 @@ const mockDocs = [
       removeUrls: false,
     },
     chunks: [],
-    auditRecords: [
-      {
-        status: 'rejected' as const,
-        auditor: 'NOC小李',
-        auditTime: '2026-06-05T14:00:00.000Z',
-        reason: '内容不完整',
-      },
-    ],
   },
   {
     id: 'doc-4',

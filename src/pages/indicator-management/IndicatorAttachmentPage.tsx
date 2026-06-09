@@ -13,7 +13,6 @@ import PulseRing from '@/components/connection/PulseRing'
 import MiniToast from '@/components/connection/MiniToast'
 import FocusModeOverlay from '@/components/connection/FocusModeOverlay'
 import AttachmentCommandPalette from '@/components/command/AttachmentCommandPalette'
-import { Switch } from '@/components/ui/switch'
 import { useConnectionMode } from '@/hooks/useConnectionMode'
 import { useFocusZone } from '@/hooks/useFocusZone'
 import { useFocusTrap } from '@/hooks/useFocusTrap'
@@ -44,7 +43,7 @@ export default function IndicatorAttachmentPage() {
   const treePanelRef = useRef<IndicatorTreePanelRef>(null)
   const pageRef = useRef<HTMLDivElement>(null)
   const rightColumnRef = useRef<HTMLDivElement>(null)
-  const { state, start, setHoverTarget, confirm, cancel, toggleContinuous, resetMisfireCount } = useConnectionMode()
+  const { state, start, setHoverTarget, confirm, cancel, resetMisfireCount } = useConnectionMode()
   const focusZone = useFocusZone()
   const focusZoneHint = useMemo(() => getFocusZoneHint(focusZone), [focusZone])
 
@@ -475,7 +474,8 @@ export default function IndicatorAttachmentPage() {
           >
             <div className="flex items-center justify-between shrink-0 px-3 py-2">
               <PanelHeader
-                title="待选指标"
+                title="候选指标"
+                description="筛选未纳入指标树的指标"
                 onAdd={() => {
                   // TODO: #20 指标添加节点
                 }}
@@ -491,12 +491,7 @@ export default function IndicatorAttachmentPage() {
                     data-testid="grid-search-input"
                   />
                 )}
-                <span className="text-xs text-dark-text-secondary">连续挂靠</span>
-                <Switch
-                  checked={state.isContinuous}
-                  onCheckedChange={toggleContinuous}
-                  aria-label="连续挂靠"
-                />
+                {indicatorsWithClick.length <= 500 && <span />}
               </div>
             </div>
             <IndicatorGrid

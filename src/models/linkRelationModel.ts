@@ -265,54 +265,55 @@ export const mockLinkUsages: LinkUsage[] = [
 ]
 
 // ─── 变更记录 mock ───
+// 记录业务部门调整指标与指标间关联关系的操作历史
 export const mockLinkChangeLogs: LinkChangeLog[] = [
   {
     relationId: 'LKT-001',
     changes: [
-      { timestamp: '2026-01-15 09:30:00', type: '创建', field: 'enabled', oldValue: '-', newValue: 'true', operator: 'admin' },
-      { timestamp: '2026-02-20 14:15:00', type: '修改', field: 'description', oldValue: '聚合关系', newValue: '子指标汇总为父指标', operator: 'zhangsan' },
+      { timestamp: '2026-01-15 09:30:00', type: '创建', field: 'enabled', oldValue: '-', newValue: 'true', operator: '财务部-张三' },
+      { timestamp: '2026-02-20 14:15:00', type: '修改', field: 'description', oldValue: '聚合关系', newValue: '子指标汇总为父指标', operator: '财务部-张三' },
     ],
   },
   {
     relationId: 'LKT-002',
     changes: [
-      { timestamp: '2026-01-20 10:00:00', type: '创建', field: 'enabled', oldValue: '-', newValue: 'true', operator: 'admin' },
-      { timestamp: '2026-03-05 11:20:00', type: '停用', field: 'enabled', oldValue: 'true', newValue: 'false', operator: 'lisi' },
-      { timestamp: '2026-03-10 16:45:00', type: '启用', field: 'enabled', oldValue: 'false', newValue: 'true', operator: 'wangwu' },
+      { timestamp: '2026-01-20 10:00:00', type: '创建', field: 'enabled', oldValue: '-', newValue: 'true', operator: '市场部-李四' },
+      { timestamp: '2026-03-05 11:20:00', type: '停用', field: 'enabled', oldValue: 'true', newValue: 'false', operator: '市场部-李四' },
+      { timestamp: '2026-03-10 16:45:00', type: '启用', field: 'enabled', oldValue: 'false', newValue: 'true', operator: '市场部-王五' },
     ],
   },
   {
     relationId: 'LKT-003',
     changes: [
-      { timestamp: '2026-02-01 08:00:00', type: '创建', field: 'enabled', oldValue: '-', newValue: 'true', operator: 'admin' },
-      { timestamp: '2026-04-12 09:10:00', type: '停用', field: 'enabled', oldValue: 'true', newValue: 'false', operator: 'zhangsan' },
+      { timestamp: '2026-02-01 08:00:00', type: '创建', field: 'enabled', oldValue: '-', newValue: 'true', operator: '财务部-张三' },
+      { timestamp: '2026-04-12 09:10:00', type: '停用', field: 'enabled', oldValue: 'true', newValue: 'false', operator: '财务部-赵六' },
     ],
   },
   {
     relationId: 'LKT-004',
     changes: [
-      { timestamp: '2026-02-10 13:30:00', type: '创建', field: 'enabled', oldValue: '-', newValue: 'true', operator: 'admin' },
+      { timestamp: '2026-02-10 13:30:00', type: '创建', field: 'enabled', oldValue: '-', newValue: 'true', operator: '运营部-陈七' },
     ],
   },
   {
     relationId: 'LKT-005',
     changes: [
-      { timestamp: '2026-03-01 09:00:00', type: '创建', field: 'enabled', oldValue: '-', newValue: 'true', operator: 'admin' },
-      { timestamp: '2026-05-15 10:30:00', type: '停用', field: 'enabled', oldValue: 'true', newValue: 'false', operator: 'lisi' },
+      { timestamp: '2026-03-01 09:00:00', type: '创建', field: 'enabled', oldValue: '-', newValue: 'true', operator: '市场部-李四' },
+      { timestamp: '2026-05-15 10:30:00', type: '停用', field: 'enabled', oldValue: 'true', newValue: 'false', operator: '市场部-王五' },
     ],
   },
   {
     relationId: 'LKT-006',
     changes: [
-      { timestamp: '2026-03-15 11:00:00', type: '创建', field: 'enabled', oldValue: '-', newValue: 'true', operator: 'admin' },
-      { timestamp: '2026-04-20 15:20:00', type: '修改', field: 'sourceTypes', oldValue: '指标', newValue: '指标,外部因素', operator: 'wangwu' },
+      { timestamp: '2026-03-15 11:00:00', type: '创建', field: 'enabled', oldValue: '-', newValue: 'true', operator: '财务部-赵六' },
+      { timestamp: '2026-04-20 15:20:00', type: '修改', field: 'sourceTypes', oldValue: '指标', newValue: '指标,外部因素', operator: '财务部-赵六' },
     ],
   },
   {
     relationId: 'LKT-007',
     changes: [
-      { timestamp: '2026-04-01 10:00:00', type: '创建', field: 'enabled', oldValue: '-', newValue: 'true', operator: 'admin' },
-      { timestamp: '2026-05-01 14:00:00', type: '修改', field: 'description', oldValue: '派生关系', newValue: '指标由其他指标计算得出', operator: 'zhangsan' },
+      { timestamp: '2026-04-01 10:00:00', type: '创建', field: 'enabled', oldValue: '-', newValue: 'true', operator: '运营部-陈七' },
+      { timestamp: '2026-05-01 14:00:00', type: '修改', field: 'description', oldValue: '派生关系', newValue: '指标由其他指标计算得出', operator: '运营部-陈七' },
     ],
   },
 ]

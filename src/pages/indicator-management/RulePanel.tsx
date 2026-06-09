@@ -289,14 +289,7 @@ export default function RulePanel({ selectedIndicatorId }: { selectedIndicatorId
                 >
                   <div className="flex items-center gap-2">
                     {selectedIndicatorId && (
-                      <input
-                        type="checkbox"
-                        data-testid={`rule-config-checkbox-${fullRule.id}`}
-                        checked={selectedRuleIds.has(fullRule.id)}
-                        onChange={() => toggleRuleForIndicator(fullRule.id)}
-                        className="size-4 cursor-pointer accent-dark-accent-primary"
-                      />
-                    )}
+                      <span />)}
                     <Switch
                       data-testid={`rule-toggle-${fullRule.id}`}
                       checked={fullRule.enabled ?? true}

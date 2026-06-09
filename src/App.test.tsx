@@ -22,7 +22,7 @@ describe('App routing', () => {
     )
 
     expect(screen.getByText('指标树')).toBeInTheDocument()
-    expect(screen.getByText('待选指标')).toBeInTheDocument()
+    expect(screen.getByText('候选指标')).toBeInTheDocument()
     expect(screen.getByText('标签集')).toBeInTheDocument()
     expect(screen.getByText('规则')).toBeInTheDocument()
   })
