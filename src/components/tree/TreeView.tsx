@@ -42,6 +42,7 @@ interface TreeViewProps<T extends TreeNode> {
   onDragNode?: (dragInfo: { draggedId: string; targetId: string; position: DropPosition }) => void
   renderIndentGuides?: 'always' | 'onHover' | 'none'
   renderChildren?: (node: T) => React.ReactNode
+  canEditNode?: (node: T) => boolean
 }
 
 interface DragState {
@@ -64,6 +65,7 @@ interface TreeItemProps<T extends TreeNode> {
   onDeleteNode?: (id: string) => void
   onDragNode?: (dragInfo: { draggedId: string; targetId: string; position: DropPosition }) => void
   renderChildren?: (node: T) => React.ReactNode
+  canEditNode?: (node: T) => boolean
 }
 
 const childrenContainerVariants = {
@@ -115,6 +117,7 @@ function TreeItem<T extends TreeNode>({
   onDeleteNode,
   onDragNode,
   renderChildren,
+  canEditNode,
 }: TreeItemProps<T>) {
   const [isHovered, setIsHovered] = useState(false)
   const isExpanded = expanded.has(node.id)
@@ -270,7 +273,7 @@ function TreeItem<T extends TreeNode>({
           {renderNode(node, { isSelected, isHovered, depth })}
         </div>
         <div className="z-10 flex items-center gap-0.5">
-          {onEditNode && (
+          {onEditNode && (!canEditNode || canEditNode(node)) && (
             <button
               type="button"
               data-testid="tree-node-edit-button"
@@ -341,6 +344,7 @@ function TreeItem<T extends TreeNode>({
                     onEditNode={onEditNode}
                     onDeleteNode={onDeleteNode}
                     onDragNode={onDragNode}
+                    canEditNode={canEditNode}
                   />
                 </motion.div>
               ))
@@ -378,6 +382,7 @@ export default function TreeView<T extends TreeNode>({
   onDeleteNode,
   onDragNode,
   renderChildren,
+  canEditNode,
 }: TreeViewProps<T>) {
   const [internalExpanded, setInternalExpanded] = useState<Set<string>>(
     () => new Set(initialExpanded ?? []),
@@ -528,6 +533,7 @@ export default function TreeView<T extends TreeNode>({
               onDeleteNode={onDeleteNode}
               onDragNode={onDragNode}
               renderChildren={renderChildren}
+              canEditNode={canEditNode}
             />
           </motion.div>
         ))}

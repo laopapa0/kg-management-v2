@@ -1,4 +1,5 @@
 import type { GeneratedReport, GeneratedReportSection } from '@/models/generatedReportModel'
+import type { FilterScopeValue } from '@/components/report/FilterScopeSelector'
 
 export const MOCK_REPORT_SECTIONS: GeneratedReportSection[] = [
   {
@@ -18,20 +19,28 @@ export const MOCK_REPORT_SECTIONS: GeneratedReportSection[] = [
   },
 ]
 
-export function generateMockReport(planName: string, templateName: string): GeneratedReport {
+export function generateMockReport(
+  planName: string,
+  templateName: string,
+  planId?: string,
+  templateId?: string,
+  filterScope?: FilterScopeValue,
+  triggerType: 'manual' | 'auto' = 'manual',
+): GeneratedReport {
   return {
     id: `gen-mock-${Date.now()}`,
-    planId: 'plan-mock',
+    planId: planId ?? 'plan-mock',
     planName,
-    templateId: 'tmpl-mock',
+    templateId: templateId ?? 'tmpl-mock',
     templateName,
     version: 'v0.1',
     generatedAt: new Date().toISOString(),
-    filterScope: {
+    filterScope: filterScope ?? {
       includedIndicatorIds: [],
       excludedRuleIds: [],
       excludedLinkRelationIds: [],
     },
+    triggerType,
     sections: MOCK_REPORT_SECTIONS,
   }
 }

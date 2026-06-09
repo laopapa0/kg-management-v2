@@ -282,6 +282,7 @@ const IndicatorTreePanel = forwardRef<IndicatorTreePanelRef>(function IndicatorT
           selectedId={selectedId}
           onSelect={setSelectedId}
           onEditNode={setEditingId}
+          canEditNode={(node) => node.indicator.indicatorType === '虚拟分组'}
           onDeleteNode={handleDeleteNode}
           onDragNode={handleDragNode}
           renderNode={(node, { isSelected, isHovered }) => {

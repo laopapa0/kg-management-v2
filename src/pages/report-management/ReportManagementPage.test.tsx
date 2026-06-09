@@ -129,4 +129,47 @@ describe('ReportManagementPage', () => {
     expect(screen.getByText('月度经营分析')).toBeInTheDocument()
     expect(screen.getByText('每月')).toBeInTheDocument()
   })
+
+  it('does not show global generate report button at the top', () => {
+    saveReportPlans(mockReportPlans)
+    render(<MemoryRouter><ReportManagementPage /></MemoryRouter>)
+    expect(screen.queryByTestId('generate-report-button')).not.toBeInTheDocument()
+  })
+
+  it('shows generate report button for each plan row', () => {
+    saveReportPlans(mockReportPlans)
+    render(<MemoryRouter><ReportManagementPage /></MemoryRouter>)
+    expect(screen.getByTestId('generate-report-report-plan-001')).toBeInTheDocument()
+    expect(screen.getByTestId('generate-report-report-plan-002')).toBeInTheDocument()
+    expect(screen.getByTestId('generate-report-report-plan-003')).toBeInTheDocument()
+  })
+
+  it('shows "首次生成" label for plans with latestVersion 0', () => {
+    saveReportPlans([{ ...mockReportPlans[0], latestVersion: 0 }])
+    render(<MemoryRouter><ReportManagementPage /></MemoryRouter>)
+    expect(screen.getByText('首次生成')).toBeInTheDocument()
+  })
+
+  it('increments latestVersion and generates a report when generate button is clicked', async () => {
+    const user = userEvent.setup()
+    saveReportPlans([{ ...mockReportPlans[0], latestVersion: 0 }])
+
+    render(<MemoryRouter><ReportManagementPage /></MemoryRouter>)
+
+    const generateButton = screen.getByText('首次生成')
+    await user.click(generateButton)
+
+    // Plan updated
+    const storedPlans = JSON.parse(localStorage.getItem('kgv2-reports') ?? '[]')
+    const plan = storedPlans.find((p: { id: string }) => p.id === 'report-plan-001')
+    expect(plan.latestVersion).toBe(1)
+    expect(plan.lastGeneratedAt).toBeTruthy()
+
+    // Report generated
+    const storedReports = JSON.parse(localStorage.getItem('kgv2-generated-reports') ?? '[]')
+    expect(storedReports.length).toBe(1)
+    expect(storedReports[0].planId).toBe('report-plan-001')
+    expect(storedReports[0].planName).toBe('核心指标日报')
+    expect(storedReports[0].triggerType).toBe('manual')
+  })
 })

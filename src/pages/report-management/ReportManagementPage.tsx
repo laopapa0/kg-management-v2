@@ -6,7 +6,9 @@ import ReportPlanDialog from '@/components/dialog/ReportPlanDialog'
 import { SCHEDULE_LABELS, createReportPlan } from '@/models/reportModel'
 import type { ReportPlan } from '@/models/reportModel'
 import { getReportPlans, saveReportPlans } from '@/utils/reportStorage'
-import { getGeneratedReports } from '@/utils/generatedReportStorage'
+import { getGeneratedReports, addGeneratedReport } from '@/utils/generatedReportStorage'
+import { getReportTemplates } from '@/utils/reportTemplateStorage'
+import { generateMockReport } from '@/data/mockReportData'
 import { useNavigate } from 'react-router-dom'
 
 
@@ -15,6 +17,34 @@ export default function ReportManagementPage() {
   const [plans, setPlans] = useState(getReportPlans)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editingPlan, setEditingPlan] = useState<ReportPlan | null>(null)
+
+  const handleGenerate = (plan: ReportPlan) => {
+    const templateName = plan.templateId
+      ? (getReportTemplates().find((t) => t.id === plan.templateId)?.name ?? '默认模板')
+      : '默认模板'
+
+    const report = generateMockReport(
+      plan.name,
+      templateName,
+      plan.id,
+      plan.templateId,
+      plan.filterScope,
+      'manual',
+    )
+    report.version = `v${plan.latestVersion + 1}`
+
+    addGeneratedReport(report)
+
+    const next = plans.map((p) =>
+      p.id === plan.id
+        ? { ...p, latestVersion: p.latestVersion + 1, lastGeneratedAt: new Date().toISOString() }
+        : p,
+    )
+    setPlans(next)
+    saveReportPlans(next)
+
+    navigate(`/reports/${report.id}`)
+  }
 
   useEffect(() => {
     setPlans(getReportPlans())
@@ -84,15 +114,6 @@ export default function ReportManagementPage() {
       <div className="flex items-center justify-between">
         <h2 className="text-h2 font-semibold text-dark-text-primary">报告管理</h2>
         <div className="flex items-center gap-2">
-          <Button
-            data-testid="generate-report-button"
-            variant="outline"
-            onClick={() => navigate('/reports/generate')}
-            className="bg-transparent border-dark-border text-dark-text-primary hover:bg-dark-card-l2 hover:text-dark-text-primary"
-          >
-            <Play size={16} />
-            生成报告
-          </Button>
           <Button
             data-testid="new-report-plan-button"
             onClick={() => {
@@ -174,6 +195,25 @@ export default function ReportManagementPage() {
                     </button>
                   ) : null
                 })()}
+                {plan.latestVersion === 0 ? (
+                  <button
+                    data-testid={`generate-report-${plan.id}`}
+                    onClick={() => handleGenerate(plan)}
+                    className="rounded px-2 py-1 text-xs text-dark-text-secondary hover:bg-dark-card-l2 hover:text-dark-text-primary"
+                    title="首次生成"
+                  >
+                    首次生成
+                  </button>
+                ) : (
+                  <button
+                    data-testid={`generate-report-${plan.id}`}
+                    onClick={() => handleGenerate(plan)}
+                    className="rounded p-1 text-dark-text-secondary hover:bg-dark-card-l2 hover:text-dark-text-primary"
+                    title="生成报告"
+                  >
+                    <Play size={14} />
+                  </button>
+                )}
                 <button
                   data-testid={`edit-report-plan-${plan.id}`}
                   onClick={() => {
