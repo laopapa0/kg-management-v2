@@ -1,11 +1,16 @@
 export interface LinkRelation {
   id: string
+  code: string
   name: string
+  displayName: string
   description: string
+  direction: '有向' | '无向'
+  color: string
+  icon: string
+  sourceTypes: string[]
+  targetTypes: string[]
   enabled: boolean
   usageCount: number
-  sourceType: string
-  targetType: string
   createdAt: string
 }
 
@@ -13,6 +18,7 @@ export interface LinkRelation {
 export interface LinkUsageConnection {
   sourceName: string
   targetName: string
+  createdAt: string
 }
 
 /** 关系类型的使用追踪 */
@@ -40,140 +46,220 @@ export interface LinkChangeLog {
 
 export const mockLinkRelations: LinkRelation[] = [
   {
-    id: '1',
+    id: 'LKT-001',
+    code: 'AGGREGATES',
     name: 'AGGREGATES',
-    description: '聚合关系：子指标汇总为父指标',
+    displayName: '聚合关系',
+    description: '子指标汇总为父指标',
+    direction: '有向',
+    color: '#10B981',
+    icon: 'Combine',
+    sourceTypes: ['指标'],
+    targetTypes: ['指标'],
     enabled: true,
     usageCount: 12,
-    sourceType: 'Indicator',
-    targetType: 'Indicator',
     createdAt: '2026-01-15',
   },
   {
-    id: '2',
+    id: 'LKT-002',
+    code: 'DEPENDS_ON',
     name: 'DEPENDS_ON',
-    description: '依赖关系：指标依赖于上游指标',
+    displayName: '依赖关系',
+    description: '指标依赖于上游指标',
+    direction: '有向',
+    color: '#3B82F6',
+    icon: 'Link',
+    sourceTypes: ['指标', '虚拟分组'],
+    targetTypes: ['指标', '虚拟分组'],
     enabled: true,
     usageCount: 34,
-    sourceType: 'Indicator',
-    targetType: 'Indicator',
     createdAt: '2026-01-20',
   },
   {
-    id: '3',
+    id: 'LKT-003',
+    code: 'DRIVES',
     name: 'DRIVES',
-    description: '驱动关系：指标驱动下游业务',
+    displayName: '驱动关系',
+    description: '指标驱动下游业务',
+    direction: '有向',
+    color: '#F59E0B',
+    icon: 'ArrowRight',
+    sourceTypes: ['指标'],
+    targetTypes: ['指标'],
     enabled: false,
     usageCount: 8,
-    sourceType: 'Indicator',
-    targetType: 'Business',
     createdAt: '2026-02-01',
   },
   {
-    id: '4',
+    id: 'LKT-004',
+    code: 'TRANSMISSION',
     name: 'TRANSMISSION',
-    description: '传导关系：异常在指标间传导',
+    displayName: '传导关系',
+    description: '异常在指标间传导',
+    direction: '有向',
+    color: '#06B6D4',
+    icon: 'GitBranch',
+    sourceTypes: ['指标'],
+    targetTypes: ['指标'],
     enabled: true,
     usageCount: 21,
-    sourceType: 'Indicator',
-    targetType: 'Indicator',
     createdAt: '2026-02-10',
   },
   {
-    id: '5',
+    id: 'LKT-005',
+    code: 'CORRELATES',
     name: 'CORRELATES',
-    description: '相关关系：指标间存在统计相关性',
+    displayName: '相关关系',
+    description: '指标间存在统计相关性',
+    direction: '无向',
+    color: '#6B7280',
+    icon: 'Shuffle',
+    sourceTypes: ['指标'],
+    targetTypes: ['指标'],
     enabled: false,
     usageCount: 5,
-    sourceType: 'Indicator',
-    targetType: 'Indicator',
     createdAt: '2026-03-01',
   },
   {
-    id: '6',
+    id: 'LKT-006',
+    code: 'INFLUENCES',
     name: 'INFLUENCES',
-    description: '影响关系：外部因素对指标的影响',
+    displayName: '影响关系',
+    description: '外部因素对指标的影响',
+    direction: '有向',
+    color: '#EC4899',
+    icon: 'TrendingUp',
+    sourceTypes: ['指标', '外部因素'],
+    targetTypes: ['指标'],
     enabled: true,
     usageCount: 17,
-    sourceType: 'Factor',
-    targetType: 'Indicator',
     createdAt: '2026-03-15',
   },
   {
-    id: '7',
+    id: 'LKT-007',
+    code: 'DERIVES',
     name: 'DERIVES',
-    description: '派生关系：指标由其他指标计算得出',
+    displayName: '派生关系',
+    description: '指标由其他指标计算得出',
+    direction: '有向',
+    color: '#8B5CF6',
+    icon: 'Layers',
+    sourceTypes: ['指标'],
+    targetTypes: ['指标'],
     enabled: true,
     usageCount: 29,
-    sourceType: 'Indicator',
-    targetType: 'Indicator',
     createdAt: '2026-04-01',
+  },
+  {
+    id: 'LKT-008',
+    code: 'PART_OF',
+    name: 'PART_OF',
+    displayName: '组成关系',
+    description: '源指标是目标指标的组成部分',
+    direction: '有向',
+    color: '#F97316',
+    icon: 'PieChart',
+    sourceTypes: ['虚拟分组'],
+    targetTypes: ['指标'],
+    enabled: true,
+    usageCount: 15,
+    createdAt: '2026-04-10',
+  },
+  {
+    id: 'LKT-009',
+    code: 'REPLACES',
+    name: 'REPLACES',
+    displayName: '替代关系',
+    description: '源指标替代了目标指标',
+    direction: '有向',
+    color: '#EF4444',
+    icon: 'Replace',
+    sourceTypes: ['指标'],
+    targetTypes: ['指标'],
+    enabled: true,
+    usageCount: 6,
+    createdAt: '2026-04-20',
+  },
+  {
+    id: 'LKT-010',
+    code: 'REFERENCES',
+    name: 'REFERENCES',
+    displayName: '引用关系',
+    description: '源指标引用了目标指标的定义',
+    direction: '有向',
+    color: '#14B8A6',
+    icon: 'ExternalLink',
+    sourceTypes: ['指标'],
+    targetTypes: ['指标'],
+    enabled: true,
+    usageCount: 11,
+    createdAt: '2026-05-01',
   },
 ]
 
 // ─── 使用追踪 mock ───
 export const mockLinkUsages: LinkUsage[] = [
   {
-    relationId: '1',
+    relationId: 'LKT-001',
     connectionCount: 3,
     connections: [
-      { sourceName: '月_收入_总收入', targetName: '季_收入_总收入' },
-      { sourceName: '日_用户_新增用户', targetName: '月_用户_新增用户' },
-      { sourceName: '月_成本_运营成本', targetName: '季_成本_总成本' },
+      { sourceName: '月_收入_总收入', targetName: '季_收入_总收入', createdAt: '2026-01-16' },
+      { sourceName: '日_用户_新增用户', targetName: '月_用户_新增用户', createdAt: '2026-02-01' },
+      { sourceName: '月_成本_运营成本', targetName: '季_成本_总成本', createdAt: '2026-02-15' },
     ],
   },
   {
-    relationId: '2',
+    relationId: 'LKT-002',
     connectionCount: 5,
     connections: [
-      { sourceName: '月_收入_主营业务收入', targetName: '月_收入_总收入' },
-      { sourceName: '日_网络_基站数', targetName: '月_网络_覆盖率' },
-      { sourceName: '月_用户_活跃用户', targetName: '月_用户_留存率' },
-      { sourceName: '周_服务_投诉量', targetName: '月_服务_满意度' },
-      { sourceName: '月_交付_订单量', targetName: '月_交付_交付率' },
+      { sourceName: '月_收入_主营业务收入', targetName: '月_收入_总收入', createdAt: '2026-01-21' },
+      { sourceName: '日_网络_基站数', targetName: '月_网络_覆盖率', createdAt: '2026-02-05' },
+      { sourceName: '月_用户_活跃用户', targetName: '月_用户_留存率', createdAt: '2026-03-01' },
+      { sourceName: '周_服务_投诉量', targetName: '月_服务_满意度', createdAt: '2026-03-10' },
+      { sourceName: '月_交付_订单量', targetName: '月_交付_交付率', createdAt: '2026-04-01' },
     ],
   },
   {
-    relationId: '3',
+    relationId: 'LKT-003',
     connectionCount: 2,
     connections: [
-      { sourceName: '月_收入_总收入', targetName: '经营分析大屏' },
-      { sourceName: '月_用户_新增用户', targetName: '用户增长看板' },
+      { sourceName: '月_收入_总收入', targetName: '经营分析大屏', createdAt: '2026-02-05' },
+      { sourceName: '月_用户_新增用户', targetName: '用户增长看板', createdAt: '2026-03-01' },
     ],
   },
   {
-    relationId: '4',
+    relationId: 'LKT-004',
     connectionCount: 4,
     connections: [
-      { sourceName: '月_网络_延迟', targetName: '月_网络_丢包率' },
-      { sourceName: '月_网络_丢包率', targetName: '月_服务_投诉量' },
-      { sourceName: '日_成本_能耗', targetName: '月_成本_运营成本' },
-      { sourceName: '月_交付_交付率', targetName: '月_收入_客户收入' },
+      { sourceName: '月_网络_延迟', targetName: '月_网络_丢包率', createdAt: '2026-02-15' },
+      { sourceName: '月_网络_丢包率', targetName: '月_服务_投诉量', createdAt: '2026-03-01' },
+      { sourceName: '日_成本_能耗', targetName: '月_成本_运营成本', createdAt: '2026-03-20' },
+      { sourceName: '月_交付_交付率', targetName: '月_收入_客户收入', createdAt: '2026-04-10' },
     ],
   },
   {
-    relationId: '5',
+    relationId: 'LKT-005',
     connectionCount: 1,
     connections: [
-      { sourceName: '月_用户_活跃用户', targetName: '月_收入_总收入' },
+      { sourceName: '月_用户_活跃用户', targetName: '月_收入_总收入', createdAt: '2026-03-10' },
     ],
   },
   {
-    relationId: '6',
+    relationId: 'LKT-006',
     connectionCount: 2,
     connections: [
-      { sourceName: '季节性波动', targetName: '月_收入_总收入' },
-      { sourceName: '政策调整', targetName: '月_成本_运营成本' },
+      { sourceName: '季节性波动', targetName: '月_收入_总收入', createdAt: '2026-04-01' },
+      { sourceName: '政策调整', targetName: '月_成本_运营成本', createdAt: '2026-05-01' },
     ],
   },
   {
-    relationId: '7',
+    relationId: 'LKT-007',
     connectionCount: 4,
     connections: [
-      { sourceName: '月_收入_A产品收入', targetName: '月_收入_总收入' },
-      { sourceName: '月_收入_B产品收入', targetName: '月_收入_总收入' },
-      { sourceName: '月_成本_人力成本', targetName: '月_成本_运营成本' },
-      { sourceName: '月_成本_物料成本', targetName: '月_成本_运营成本' },
+      { sourceName: '月_收入_A产品收入', targetName: '月_收入_总收入', createdAt: '2026-04-10' },
+      { sourceName: '月_收入_B产品收入', targetName: '月_收入_总收入', createdAt: '2026-04-15' },
+      { sourceName: '月_成本_人力成本', targetName: '月_成本_运营成本', createdAt: '2026-05-01' },
+      { sourceName: '月_成本_物料成本', targetName: '月_成本_运营成本', createdAt: '2026-05-10' },
     ],
   },
 ]
@@ -181,14 +267,14 @@ export const mockLinkUsages: LinkUsage[] = [
 // ─── 变更记录 mock ───
 export const mockLinkChangeLogs: LinkChangeLog[] = [
   {
-    relationId: '1',
+    relationId: 'LKT-001',
     changes: [
       { timestamp: '2026-01-15 09:30:00', type: '创建', field: 'enabled', oldValue: '-', newValue: 'true', operator: 'admin' },
-      { timestamp: '2026-02-20 14:15:00', type: '修改', field: 'description', oldValue: '聚合关系', newValue: '聚合关系：子指标汇总为父指标', operator: 'zhangsan' },
+      { timestamp: '2026-02-20 14:15:00', type: '修改', field: 'description', oldValue: '聚合关系', newValue: '子指标汇总为父指标', operator: 'zhangsan' },
     ],
   },
   {
-    relationId: '2',
+    relationId: 'LKT-002',
     changes: [
       { timestamp: '2026-01-20 10:00:00', type: '创建', field: 'enabled', oldValue: '-', newValue: 'true', operator: 'admin' },
       { timestamp: '2026-03-05 11:20:00', type: '停用', field: 'enabled', oldValue: 'true', newValue: 'false', operator: 'lisi' },
@@ -196,37 +282,37 @@ export const mockLinkChangeLogs: LinkChangeLog[] = [
     ],
   },
   {
-    relationId: '3',
+    relationId: 'LKT-003',
     changes: [
       { timestamp: '2026-02-01 08:00:00', type: '创建', field: 'enabled', oldValue: '-', newValue: 'true', operator: 'admin' },
       { timestamp: '2026-04-12 09:10:00', type: '停用', field: 'enabled', oldValue: 'true', newValue: 'false', operator: 'zhangsan' },
     ],
   },
   {
-    relationId: '4',
+    relationId: 'LKT-004',
     changes: [
       { timestamp: '2026-02-10 13:30:00', type: '创建', field: 'enabled', oldValue: '-', newValue: 'true', operator: 'admin' },
     ],
   },
   {
-    relationId: '5',
+    relationId: 'LKT-005',
     changes: [
       { timestamp: '2026-03-01 09:00:00', type: '创建', field: 'enabled', oldValue: '-', newValue: 'true', operator: 'admin' },
       { timestamp: '2026-05-15 10:30:00', type: '停用', field: 'enabled', oldValue: 'true', newValue: 'false', operator: 'lisi' },
     ],
   },
   {
-    relationId: '6',
+    relationId: 'LKT-006',
     changes: [
       { timestamp: '2026-03-15 11:00:00', type: '创建', field: 'enabled', oldValue: '-', newValue: 'true', operator: 'admin' },
-      { timestamp: '2026-04-20 15:20:00', type: '修改', field: 'sourceType', oldValue: 'Indicator', newValue: 'Factor', operator: 'wangwu' },
+      { timestamp: '2026-04-20 15:20:00', type: '修改', field: 'sourceTypes', oldValue: '指标', newValue: '指标,外部因素', operator: 'wangwu' },
     ],
   },
   {
-    relationId: '7',
+    relationId: 'LKT-007',
     changes: [
       { timestamp: '2026-04-01 10:00:00', type: '创建', field: 'enabled', oldValue: '-', newValue: 'true', operator: 'admin' },
-      { timestamp: '2026-05-01 14:00:00', type: '修改', field: 'description', oldValue: '派生关系', newValue: '派生关系：指标由其他指标计算得出', operator: 'zhangsan' },
+      { timestamp: '2026-05-01 14:00:00', type: '修改', field: 'description', oldValue: '派生关系', newValue: '指标由其他指标计算得出', operator: 'zhangsan' },
     ],
   },
 ]
