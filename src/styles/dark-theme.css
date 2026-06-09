@@ -932,3 +932,23 @@
     transition-duration: 0ms !important;
   }
 }
+
+/* ─── 全局暗色滚动条 ─── */
+[data-theme*="dark"] ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+[data-theme*="dark"] ::-webkit-scrollbar-track {
+  background: var(--dark-scrollbar-track);
+}
+[data-theme*="dark"] ::-webkit-scrollbar-thumb {
+  background: var(--dark-scrollbar-thumb);
+  border-radius: 4px;
+}
+[data-theme*="dark"] ::-webkit-scrollbar-thumb:hover {
+  background: #64748B;
+}
+[data-theme*="dark"] * {
+  scrollbar-width: thin;
+  scrollbar-color: var(--dark-scrollbar-thumb) var(--dark-scrollbar-track);
+}

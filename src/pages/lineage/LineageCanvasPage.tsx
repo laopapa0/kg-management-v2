@@ -821,7 +821,7 @@ export default function LineageCanvasPage() {
           <Button
             variant="outline"
             size="sm"
-            className="mb-3 h-8 px-3 text-[13px]"
+            className="mb-3 h-8 px-3 text-[13px] bg-transparent border-dark-border text-dark-text-primary hover:bg-dark-card-l2 hover:text-dark-text-primary"
             onClick={() => navigate('/')}
           >
             <ChevronLeft size={14} className="mr-1" />
@@ -1145,9 +1145,9 @@ export default function LineageCanvasPage() {
 
       {/* ════════ 创建关系弹窗 ════════ */}
       <Dialog open={showCreateModal} onOpenChange={setShowCreateModal}>
-        <DialogContent className="sm:max-w-[560px]">
+        <DialogContent className="sm:max-w-[560px] bg-dark-card-l1 text-dark-text-primary border-dark-border">
           <DialogHeader>
-            <DialogTitle className="text-[18px]">创建链接关系</DialogTitle>
+            <DialogTitle className="text-[18px] text-dark-text-primary">创建链接关系</DialogTitle>
           </DialogHeader>
           <div className="space-y-5 mt-2">
             {/* 源对象 */}
@@ -1406,11 +1406,12 @@ export default function LineageCanvasPage() {
             </div>
           </div>
           <DialogFooter className="mt-4 gap-2">
-            <Button variant="outline" onClick={() => setShowCreateModal(false)}>
+            <Button variant="outline" className="bg-transparent border-dark-border text-dark-text-primary hover:bg-dark-card-l2 hover:text-dark-text-primary" onClick={() => setShowCreateModal(false)}>
               取消
             </Button>
             <Button
               variant="outline"
+              className="bg-transparent border-dark-border text-dark-text-primary hover:bg-dark-card-l2 hover:text-dark-text-primary"
               onClick={() => {
                 if (!createForm.sourceId || !createForm.targetId || !createForm.relationType) {
                   toast.error('请先填写源对象、目标对象和关系类型');
@@ -1434,9 +1435,9 @@ export default function LineageCanvasPage() {
 
       {/* ════════ 血缘预览弹窗 ════════ */}
       <Dialog open={showPreviewModal} onOpenChange={setShowPreviewModal}>
-        <DialogContent className="sm:max-w-[900px] sm:h-[600px] flex flex-col">
+        <DialogContent className="sm:max-w-[900px] sm:h-[600px] flex flex-col bg-dark-card-l1 text-dark-text-primary border-dark-border">
           <DialogHeader>
-            <DialogTitle className="text-[18px] flex items-center gap-2">
+            <DialogTitle className="text-[18px] flex items-center gap-2 text-dark-text-primary">
               <Eye size={18} className="text-dark-accent-primary" />
               血缘影响预览
             </DialogTitle>
@@ -1592,7 +1593,7 @@ export default function LineageCanvasPage() {
             </div>
           </div>
           <DialogFooter className="mt-4 gap-2">
-            <Button variant="outline" onClick={() => setShowPreviewModal(false)}>
+            <Button variant="outline" className="bg-transparent border-dark-border text-dark-text-primary hover:bg-dark-card-l2 hover:text-dark-text-primary" onClick={() => setShowPreviewModal(false)}>
               关闭
             </Button>
             <Button

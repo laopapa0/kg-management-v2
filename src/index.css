@@ -7,35 +7,35 @@
 
 @layer base {
   :root {
-    /* shadcn/ui variables */
-    --background: 0 0% 100%;
-    --foreground: 222 20% 14%;
-    --card: 0 0% 100%;
-    --card-foreground: 222 20% 14%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222 20% 14%;
-    --primary: 217 91% 59%;
+    /* shadcn/ui variables — dark defaults */
+    --background: 222 47% 9%;
+    --foreground: 210 20% 93%;
+    --card: 222 30% 15%;
+    --card-foreground: 210 20% 93%;
+    --popover: 222 30% 15%;
+    --popover-foreground: 210 20% 93%;
+    --primary: 217 91% 65%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 220 14% 96%;
-    --secondary-foreground: 222 20% 14%;
-    --muted: 220 14% 96%;
-    --muted-foreground: 215 14% 46%;
-    --accent: 220 14% 96%;
-    --accent-foreground: 222 20% 14%;
-    --destructive: 0 84% 60%;
+    --secondary: 220 20% 18%;
+    --secondary-foreground: 210 20% 93%;
+    --muted: 220 20% 18%;
+    --muted-foreground: 215 16% 62%;
+    --accent: 222 30% 23%;
+    --accent-foreground: 210 20% 96%;
+    --destructive: 0 62% 50%;
     --destructive-foreground: 0 0% 98%;
-    --border: 216 20% 92%;
-    --input: 216 20% 92%;
-    --ring: 217 91% 59%;
+    --border: 220 13% 20%;
+    --input: 220 13% 20%;
+    --ring: 217 91% 65%;
     --radius: 0.5rem;
-    --sidebar-background: 220 14% 96%;
-    --sidebar-foreground: 215 14% 34%;
-    --sidebar-primary: 217 91% 59%;
+    --sidebar-background: 220 20% 12%;
+    --sidebar-foreground: 215 16% 70%;
+    --sidebar-primary: 217 91% 65%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 220 14% 94%;
-    --sidebar-accent-foreground: 222 20% 14%;
-    --sidebar-border: 216 20% 92%;
-    --sidebar-ring: 217 91% 59%;
+    --sidebar-accent: 220 20% 18%;
+    --sidebar-accent-foreground: 210 20% 93%;
+    --sidebar-border: 220 13% 20%;
+    --sidebar-ring: 217 91% 65%;
 
     /* Design system CSS variables */
     --primary-50: #eef4ff;

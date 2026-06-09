@@ -200,16 +200,16 @@ export default function KnowledgeUploadPage() {
                       checked={true}
                       disabled={true}
                     />
-                    <Label htmlFor="default-kb" className="text-[13px]">
+                    <Label htmlFor="default-kb" className="text-[13px] text-dark-text-primary">
                       默认业务知识库（必选）
                     </Label>
                   </div>
                   {professionalBases.length > 0 && (
                     <div className="flex items-center gap-2">
-                      <Label className="text-[13px] shrink-0">额外知识库:</Label>
+                      <Label className="text-[13px] shrink-0 text-dark-text-primary">额外知识库:</Label>
                       <select
                         aria-label="额外知识库"
-                        className="text-[13px] border border-dark-border rounded-md px-3 py-1.5 bg-dark-elevated"
+                        className="text-[13px] border border-dark-border rounded-md px-3 py-1.5 bg-dark-elevated text-dark-text-primary"
                         value={selectedExtraKb}
                         onChange={(e) => setSelectedExtraKb(e.target.value)}
                       >
@@ -288,7 +288,7 @@ export default function KnowledgeUploadPage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
-                    <Label htmlFor="delimiter" className="text-[13px]">
+                    <Label htmlFor="delimiter" className="text-[13px] text-dark-text-primary">
                       分段标识符
                     </Label>
                     <Input
@@ -301,7 +301,7 @@ export default function KnowledgeUploadPage() {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="maxLength" className="text-[13px]">
+                    <Label htmlFor="maxLength" className="text-[13px] text-dark-text-primary">
                       最大长度
                     </Label>
                     <Input
@@ -315,7 +315,7 @@ export default function KnowledgeUploadPage() {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="overlapLength" className="text-[13px]">
+                    <Label htmlFor="overlapLength" className="text-[13px] text-dark-text-primary">
                       重叠长度
                     </Label>
                     <Input
@@ -344,7 +344,7 @@ export default function KnowledgeUploadPage() {
                     />
                     <Label
                       htmlFor="replaceWhitespace"
-                      className="text-[13px] cursor-pointer"
+                      className="text-[13px] cursor-pointer text-dark-text-primary"
                     >
                       替换连续空格/换行/制表符
                     </Label>
@@ -359,7 +359,7 @@ export default function KnowledgeUploadPage() {
                     />
                     <Label
                       htmlFor="removeUrls"
-                      className="text-[13px] cursor-pointer"
+                      className="text-[13px] cursor-pointer text-dark-text-primary"
                     >
                       删除 URL 和邮箱
                     </Label>
@@ -431,9 +431,9 @@ export default function KnowledgeUploadPage() {
 
       {/* 错误弹窗 */}
       <Dialog open={!!dialogError} onOpenChange={() => setDialogError('')}>
-        <DialogContent>
+        <DialogContent className="bg-dark-card-l1 text-dark-text-primary border-dark-border">
           <DialogHeader>
-            <DialogTitle>提示</DialogTitle>
+            <DialogTitle className="text-dark-text-primary">提示</DialogTitle>
             <DialogDescription>{dialogError}</DialogDescription>
           </DialogHeader>
           <div className="flex justify-end">
@@ -444,9 +444,9 @@ export default function KnowledgeUploadPage() {
 
       {/* 成功弹窗 */}
       <Dialog open={submitSuccess} onOpenChange={() => setSubmitSuccess(false)}>
-        <DialogContent>
+        <DialogContent className="bg-dark-card-l1 text-dark-text-primary border-dark-border">
           <DialogHeader>
-            <DialogTitle>保存成功</DialogTitle>
+            <DialogTitle className="text-dark-text-primary">保存成功</DialogTitle>
             <DialogDescription>
               文档已保存到知识库
             </DialogDescription>
