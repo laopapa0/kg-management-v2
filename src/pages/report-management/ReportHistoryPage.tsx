@@ -106,7 +106,7 @@ export default function ReportHistoryPage() {
             className="text-[12px] h-7 px-2 border-dark-border text-dark-text-secondary hover:bg-dark-page"
             onClick={(e) => {
               e.stopPropagation()
-              window.open('docs/report.html', '_blank')
+              window.open('/kg-management-v2/report.html', '_blank')
             }}
           >
             <ExternalLink size={13} className="mr-1" />
@@ -132,7 +132,7 @@ export default function ReportHistoryPage() {
 
   if (allReports.length === 0) {
     return (
-      <div className="flex h-full flex-col items-center justify-center bg-dark-page p-6 text-dark-text-primary">
+      <div className="flex h-full flex-col items-center justify-center text-dark-text-primary">
         <EmptyState
           icon={<FileText className="size-8" />}
           title="暂无历史报告"
@@ -143,11 +143,9 @@ export default function ReportHistoryPage() {
   }
 
   return (
-    <div className="flex h-full flex-col gap-4 bg-dark-page p-6 text-dark-text-primary overflow-auto">
-      {/* 页面标题 */}
-      <div>
-        <h1 className="text-display">历史报告</h1>
-        <p className="text-small text-dark-text-secondary mt-1">查看所有已生成的报告记录</p>
+    <div className="flex h-full flex-col gap-4 text-dark-text-primary overflow-auto">
+      <div className="flex items-center justify-between">
+        <h2 className="text-h2 font-semibold text-dark-text-primary">历史报告</h2>
       </div>
 
       {/* 筛选栏 */}

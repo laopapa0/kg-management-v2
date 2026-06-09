@@ -3,7 +3,7 @@ import {
   getKnowledgeDocuments,
   getKnowledgeBases,
   getKnowledgeBaseById,
-  auditKnowledgeDocument,
+  addVersionRecord,
   updateKnowledgeDocument,
 } from '@/utils/knowledgeBaseStorage';
 import { DOCUMENT_STATUS_LABEL, type DocumentStatus, type KnowledgeDocument } from '@/models/knowledgeBaseModel';
@@ -157,15 +157,21 @@ export default function KnowledgeAuditList() {
 
   const handleAudit = useCallback(
     (docId: string, action: 'APPROVE' | 'REJECT', reason?: string) => {
-      const auditor = 'NOC审核员';
+      const auditor = '管理员';
       const result = transitionStatus('auditing', action, { auditor, reason });
-      auditKnowledgeDocument(docId, {
-        status: result.status,
-        auditRecord: result.auditRecord!,
+      addVersionRecord(docId, {
+        versionRecord: {
+          version: 1,
+          changeType: 'replace',
+          fileName: '--',
+          fileSize: 0,
+          operator: auditor,
+          changeTime: new Date().toISOString(),
+        },
       });
       setRefreshKey((k) => k + 1);
       toast.success(
-        action === 'APPROVE' ? '审核已通过并嵌入' : '审核已驳回',
+        action === 'APPROVE' ? '审核已通过' : '审核已驳回',
       );
     },
     [],

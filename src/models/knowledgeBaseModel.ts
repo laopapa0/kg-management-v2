@@ -41,12 +41,15 @@ export interface SegmentConfig {
   removeUrls: boolean;
 }
 
-/** 审核记录 */
-export interface AuditRecord {
-  status: 'approved' | 'rejected';
-  auditor: string;
-  auditTime: string;
-  reason: string;
+/** 版本变更记录 */
+export interface VersionRecord {
+  version: number
+  changeType: 'upload' | 'replace'
+  fileName: string
+  fileSize: number
+  similarityScore?: number
+  operator: string
+  changeTime: string
 }
 
 /** 知识文档实体 */
@@ -61,8 +64,8 @@ export interface KnowledgeDocument {
   status: DocumentStatus;
   segmentConfig: SegmentConfig;
   chunks: DocumentChunk[];
-  /** 审核历史记录（支持多次审核） */
-  auditRecords?: AuditRecord[];
+  /** 版本变更记录 */
+  versionRecords?: VersionRecord[];
   /** 版本号，默认 1 */
   version?: number;
   /** 相似度评分 (0-100)，新版本导入时记录 */

@@ -58,12 +58,15 @@ const mockDocs = [
       removeUrls: false,
     },
     chunks: [],
-    auditRecords: [
+    versionRecords: [
       {
-        status: 'approved' as const,
-        auditor: 'NOC小李',
-        auditTime: '2026-06-04T09:00:00.000Z',
-        reason: '内容完整，格式规范',
+        version: 1,
+        changeType: 'upload' as const,
+        fileName: '网络优化指南.docx',
+        fileSize: 512 * 1024,
+        similarityScore: undefined,
+        operator: '小李',
+        changeTime: '2026-06-04T09:00:00.000Z',
       },
     ],
   },

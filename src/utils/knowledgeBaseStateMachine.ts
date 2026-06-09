@@ -4,7 +4,7 @@
  * 纯函数：给定当前状态和操作，返回下一状态和（可选的）审核记录
  */
 
-import type { DocumentStatus, AuditRecord } from '@/models/knowledgeBaseModel';
+import type { DocumentStatus, VersionRecord } from '@/models/knowledgeBaseModel';
 
 export type AuditAction =
   | 'SUBMIT_AUDIT'
@@ -20,7 +20,6 @@ export interface TransitionPayload {
 
 export interface TransitionResult {
   status: DocumentStatus;
-  auditRecord?: AuditRecord;
 }
 
 /** 有效的状态流转表：currentStatus → 允许的 actions */
@@ -56,26 +55,10 @@ export function transitionStatus(
       return { status: 'auditing' };
 
     case 'APPROVE':
-      return {
-        status: 'approved',
-        auditRecord: {
-          status: 'approved',
-          auditor,
-          auditTime: now,
-          reason: payload?.reason?.trim() || '',
-        },
-      };
+      return { status: 'approved' };
 
     case 'REJECT':
-      return {
-        status: 'rejected',
-        auditRecord: {
-          status: 'rejected',
-          auditor,
-          auditTime: now,
-          reason: payload?.reason?.trim() || '',
-        },
-      };
+      return { status: 'rejected' };
 
     case 'RE_EDIT':
       return { status: 'pending' };

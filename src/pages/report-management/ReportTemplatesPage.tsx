@@ -151,7 +151,7 @@ export default function ReportTemplatesPage() {
 
   if (templates.length === 0) {
     return (
-      <div className="flex h-full flex-col items-center justify-center bg-dark-page p-6 text-dark-text-primary">
+      <div className="flex h-full flex-col items-center justify-center text-dark-text-primary">
         <EmptyState
           icon={<FileText className="size-8" />}
           title="暂无报告模板"
@@ -168,7 +168,7 @@ export default function ReportTemplatesPage() {
   }
 
   return (
-    <div className="flex h-full flex-col gap-4 bg-dark-page p-6 text-dark-text-primary">
+    <div className="flex h-full flex-col gap-4 text-dark-text-primary">
       <div className="flex items-center justify-between">
         <h2 className="text-h2 font-semibold text-dark-text-primary">报告模板管理</h2>
         <Button onClick={handleOpenCreate}>

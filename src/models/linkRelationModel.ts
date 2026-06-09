@@ -270,50 +270,50 @@ export const mockLinkChangeLogs: LinkChangeLog[] = [
   {
     relationId: 'LKT-001',
     changes: [
-      { timestamp: '2026-01-15 09:30:00', type: '创建', field: 'enabled', oldValue: '-', newValue: 'true', operator: '财务部-张三' },
-      { timestamp: '2026-02-20 14:15:00', type: '修改', field: 'description', oldValue: '聚合关系', newValue: '子指标汇总为父指标', operator: '财务部-张三' },
+      { timestamp: '2026-01-15 09:30:00', type: '新增', field: 'description', oldValue: '-', newValue: '新建“月_收入_总收入”与“季_收入_总收入”的汇总聚合关系', operator: '财务部-张三' },
+      { timestamp: '2026-02-20 14:15:00', type: '修改', field: 'description', oldValue: '“月_收入_总收入”直接汇总到“季_收入_总收入”', newValue: '“月_收入_总收入”通过“月_收入_净收入”间接汇总至“季_收入_总收入”', operator: '财务部-张三' },
     ],
   },
   {
     relationId: 'LKT-002',
     changes: [
-      { timestamp: '2026-01-20 10:00:00', type: '创建', field: 'enabled', oldValue: '-', newValue: 'true', operator: '市场部-李四' },
-      { timestamp: '2026-03-05 11:20:00', type: '停用', field: 'enabled', oldValue: 'true', newValue: 'false', operator: '市场部-李四' },
-      { timestamp: '2026-03-10 16:45:00', type: '启用', field: 'enabled', oldValue: 'false', newValue: 'true', operator: '市场部-王五' },
+      { timestamp: '2026-01-20 10:00:00', type: '新增', field: 'description', oldValue: '-', newValue: '新建“日_活跃用户_DAU”依赖“日_新增用户_NewUsers”的因果依赖关系', operator: '市场部-李四' },
+      { timestamp: '2026-03-05 11:20:00', type: '修改', field: 'description', oldValue: '“日_活跃用户_DAU”单向依赖“日_新增用户_NewUsers”', newValue: '“日_活跃用户_DAU”与“日_新增用户_NewUsers”互为双向依赖', operator: '市场部-李四' },
+      { timestamp: '2026-03-10 16:45:00', type: '修改', field: 'direction', oldValue: '有向', newValue: '无向', operator: '市场部-王五' },
     ],
   },
   {
     relationId: 'LKT-003',
     changes: [
-      { timestamp: '2026-02-01 08:00:00', type: '创建', field: 'enabled', oldValue: '-', newValue: 'true', operator: '财务部-张三' },
-      { timestamp: '2026-04-12 09:10:00', type: '停用', field: 'enabled', oldValue: 'true', newValue: 'false', operator: '财务部-赵六' },
+      { timestamp: '2026-02-01 08:00:00', type: '新增', field: 'description', oldValue: '-', newValue: '新建“月_营收_总收入”驱动“月_利润_净利润”的业务驱动关系', operator: '财务部-张三' },
+      { timestamp: '2026-04-12 09:10:00', type: '修改', field: 'description', oldValue: '“月_营收_总收入”驱动“月_利润_净利润”的计算', newValue: '“月_营收_总收入”和“月_成本_总成本”共同驱动“月_利润_净利润”', operator: '财务部-赵六' },
     ],
   },
   {
     relationId: 'LKT-004',
     changes: [
-      { timestamp: '2026-02-10 13:30:00', type: '创建', field: 'enabled', oldValue: '-', newValue: 'true', operator: '运营部-陈七' },
+      { timestamp: '2026-02-10 13:30:00', type: '新增', field: 'description', oldValue: '-', newValue: '新建“周_工单_总量”传递至“月_工单_完成率”的数据传递关系', operator: '运营部-陈七' },
     ],
   },
   {
     relationId: 'LKT-005',
     changes: [
-      { timestamp: '2026-03-01 09:00:00', type: '创建', field: 'enabled', oldValue: '-', newValue: 'true', operator: '市场部-李四' },
-      { timestamp: '2026-05-15 10:30:00', type: '停用', field: 'enabled', oldValue: 'true', newValue: 'false', operator: '市场部-王五' },
+      { timestamp: '2026-03-01 09:00:00', type: '新增', field: 'description', oldValue: '-', newValue: '新建“日_广告_曝光量”影响“日_收入_广告收入”的市场影响关系', operator: '市场部-李四' },
+      { timestamp: '2026-05-15 10:30:00', type: '修改', field: 'description', oldValue: '“日_广告_曝光量”影响“日_收入_广告收入”', newValue: '“日_广告_曝光量”和“日_广告_点击率”共同影响“日_收入_广告收入”', operator: '市场部-王五' },
     ],
   },
   {
     relationId: 'LKT-006',
     changes: [
-      { timestamp: '2026-03-15 11:00:00', type: '创建', field: 'enabled', oldValue: '-', newValue: 'true', operator: '财务部-赵六' },
+      { timestamp: '2026-03-15 11:00:00', type: '新增', field: 'description', oldValue: '-', newValue: '新建“日_用户_新增”关联“日_收入_新增用户ARPU”的关联分析关系', operator: '财务部-赵六' },
       { timestamp: '2026-04-20 15:20:00', type: '修改', field: 'sourceTypes', oldValue: '指标', newValue: '指标,外部因素', operator: '财务部-赵六' },
     ],
   },
   {
     relationId: 'LKT-007',
     changes: [
-      { timestamp: '2026-04-01 10:00:00', type: '创建', field: 'enabled', oldValue: '-', newValue: 'true', operator: '运营部-陈七' },
-      { timestamp: '2026-05-01 14:00:00', type: '修改', field: 'description', oldValue: '派生关系', newValue: '指标由其他指标计算得出', operator: '运营部-陈七' },
+      { timestamp: '2026-04-01 10:00:00', type: '新增', field: 'description', oldValue: '-', newValue: '新建“月_用户_MAU”派生“日_用户_DAU日均”的指标派生关系', operator: '运营部-陈七' },
+      { timestamp: '2026-05-01 14:00:00', type: '修改', field: 'description', oldValue: '“月_用户_MAU”直接派生“日_用户_DAU日均”', newValue: '“月_用户_MAU”乘以“月_活跃率”系数派生“日_用户_DAU日均”', operator: '运营部-陈七' },
     ],
   },
 ]

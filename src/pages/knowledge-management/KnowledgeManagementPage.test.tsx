@@ -59,12 +59,14 @@ vi.mock('@/utils/knowledgeBaseStorage', () => ({
         removeUrls: false,
       },
       chunks: [],
-      auditRecords: [
+      versionRecords: [
         {
-          status: 'approved',
-          auditor: 'NOC小李',
-          auditTime: '2026-06-04T09:00:00.000Z',
-          reason: '内容完整，格式规范',
+          version: 1,
+          changeType: 'upload' as const,
+          fileName: '网络优化指南.docx',
+          fileSize: 512 * 1024,
+          operator: 'NOC小李',
+          changeTime: '2026-06-04T09:00:00.000Z',
         },
       ],
     },
@@ -85,12 +87,14 @@ vi.mock('@/utils/knowledgeBaseStorage', () => ({
         removeUrls: false,
       },
       chunks: [],
-      auditRecords: [
+      versionRecords: [
         {
-          status: 'rejected',
-          auditor: 'NOC小李',
-          auditTime: '2026-06-05T14:00:00.000Z',
-          reason: '内容不完整',
+          version: 1,
+          changeType: 'upload' as const,
+          fileName: '驳回的文档.txt',
+          fileSize: 256 * 1024,
+          operator: 'NOC小李',
+          changeTime: '2026-06-05T14:00:00.000Z',
         },
       ],
     },

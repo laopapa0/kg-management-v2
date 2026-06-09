@@ -38,7 +38,7 @@ export default function DocumentDetailDrawer({
       <SheetContent className="w-[480px] sm:max-w-[480px]">
         <SheetHeader>
           <SheetTitle>文档详情</SheetTitle>
-          <SheetDescription>查看文档基本信息、分段参数和审核历史</SheetDescription>
+          <SheetDescription>查看文档基本信息、分段参数和版本记录</SheetDescription>
         </SheetHeader>
         <div className="mt-6 space-y-6">
           {/* 基本信息 */}
@@ -126,31 +126,38 @@ export default function DocumentDetailDrawer({
             </div>
           </div>
 
-          {/* 审核历史 */}
-          {doc.auditRecords && doc.auditRecords.length > 0 && (
+          {/* 版本记录 */}
+          {doc.versionRecords && doc.versionRecords.length > 0 && (
             <div className="space-y-3">
               <h4 className="text-[14px] font-medium text-dark-text-primary">
-                审核历史
+                版本记录
               </h4>
               <div className="relative pl-4 border-l-2 border-dark-border space-y-4">
-                {doc.auditRecords.map((record, index) => (
+                {doc.versionRecords.map((record, index) => (
                   <div key={index} className="relative">
-                    <div className="absolute -left-[21px] top-1 w-3 h-3 rounded-full bg-dark-accent-primary border-2 border-white" />
+                    <div className="absolute -left-[21px] top-1 w-3 h-3 rounded-full bg-dark-accent-primary border-2 border-dark-border" />
                     <div className="text-[13px]">
                       <p className="font-medium text-dark-text-primary">
-                        {DOCUMENT_STATUS_LABEL[record.status]}
+                        {record.changeType === 'upload' ? '首次上传' : '替换文件'}
+                        {record.similarityScore != null && (
+                          <span className="ml-2 text-[11px] text-dark-text-tertiary">
+                            相似度 {record.similarityScore}%
+                          </span>
+                        )}
                       </p>
                       <p className="text-dark-text-secondary mt-0.5">
-                        审核人：{record.auditor}
+                        文件：{record.fileName}（{record.fileSize >= 1024 * 1024
+                          ? `${(record.fileSize / 1024 / 1024).toFixed(1)} MB`
+                          : record.fileSize >= 1024
+                          ? `${(record.fileSize / 1024).toFixed(1)} KB`
+                          : `${record.fileSize} B`}）
+                      </p>
+                      <p className="text-dark-text-secondary mt-0.5">
+                        操作人：{record.operator}
                       </p>
                       <p className="text-dark-text-tertiary text-[11px] mt-0.5">
-                        {new Date(record.auditTime).toLocaleString('zh-CN')}
+                        {new Date(record.changeTime).toLocaleString('zh-CN')}
                       </p>
-                      {record.reason && (
-                        <p className="text-dark-text-secondary mt-1 bg-dark-page rounded p-2">
-                          原因：{record.reason}
-                        </p>
-                      )}
                     </div>
                   </div>
                 ))}

@@ -163,7 +163,7 @@ describe('ReportHistoryPage', () => {
     expect(screen.getByTestId('report-detail-page')).toBeInTheDocument()
   })
 
-  it('opens docs/report.html in new window when clicking view report button', async () => {
+  it('opens report.html in new window when clicking view report button', async () => {
     const user = userEvent.setup()
     const openSpy = vi.spyOn(window, 'open').mockImplementation(() => null)
 
@@ -192,7 +192,7 @@ describe('ReportHistoryPage', () => {
     const viewButton = screen.getByTestId('view-report-gen-001')
     await user.click(viewButton)
 
-    expect(openSpy).toHaveBeenCalledWith('docs/report.html', '_blank')
+    expect(openSpy).toHaveBeenCalledWith('/kg-management-v2/report.html', '_blank')
   })
 
   it('filters reports by plan when clicking plan filter buttons', async () => {

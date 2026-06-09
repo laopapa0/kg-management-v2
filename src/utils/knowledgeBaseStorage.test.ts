@@ -8,7 +8,7 @@ import {
   getKnowledgeDocuments,
   createKnowledgeDocument,
   updateKnowledgeDocument,
-  auditKnowledgeDocument,
+  addVersionRecord,
 } from './knowledgeBaseStorage';
 import type { KnowledgeBase, KnowledgeDocument, SegmentConfig } from '@/models/knowledgeBaseModel';
 
@@ -300,12 +300,14 @@ describe('knowledgeBaseStorage', () => {
         removeUrls: false,
       },
       chunks: [],
-      auditRecords: [
+      versionRecords: [
         {
-          status: 'rejected',
-          auditor: 'NOC小李',
-          auditTime: '2026-06-01T00:00:00.000Z',
-          reason: '内容不完整',
+          version: 1,
+          changeType: 'upload' as const,
+          fileName: 'old.txt',
+          fileSize: 100,
+          operator: 'NOC小李',
+          changeTime: '2026-06-01T00:00:00.000Z',
         },
       ],
     });
@@ -321,7 +323,7 @@ describe('knowledgeBaseStorage', () => {
     expect(updated.name).toBe('test-v2.txt');
     expect(updated.fileSize).toBe(200);
     expect(updated.status).toBe('pending');
-    expect(updated.auditRecords).toEqual(doc.auditRecords); // preserved
+    expect(updated.versionRecords).toEqual(doc.versionRecords); // preserved
 
     const docs = getKnowledgeDocuments();
     const found = docs.find((d) => d.id === doc.id);
@@ -346,9 +348,9 @@ describe('knowledgeBaseStorage', () => {
     ).toThrow('文档不存在');
   });
 
-  /* ─── auditKnowledgeDocument ─── */
+  /* ─── addVersionRecord ─── */
 
-  it('appends audit record and updates status', () => {
+  it('appends version record', () => {
     getKnowledgeBases();
     const doc = createKnowledgeDocument({
       name: 'test.txt',
@@ -368,24 +370,25 @@ describe('knowledgeBaseStorage', () => {
     });
 
     const record = {
-      status: 'approved' as const,
-      auditor: 'NOC小李',
-      auditTime: '2026-06-06T10:00:00.000Z',
-      reason: '内容完整',
+      version: 1,
+      changeType: 'upload' as const,
+      fileName: 'test.txt',
+      fileSize: 100,
+      similarityScore: undefined,
+      operator: '小李',
+      changeTime: '2026-06-06T10:00:00.000Z',
     };
 
-    const updated = auditKnowledgeDocument(doc.id, {
-      status: 'approved',
-      auditRecord: record,
+    const updated = addVersionRecord(doc.id, {
+      versionRecord: record,
     });
 
-    expect(updated.status).toBe('approved');
-    expect(updated.auditRecords).toHaveLength(1);
-    expect(updated.auditRecords?.[0]).toEqual(record);
+    expect(updated.versionRecords).toHaveLength(1);
+    expect(updated.versionRecords?.[0]).toEqual(record);
 
     const docs = getKnowledgeDocuments();
     const found = docs.find((d) => d.id === doc.id);
-    expect(found?.auditRecords).toHaveLength(1);
+    expect(found?.versionRecords).toHaveLength(1);
   });
 
   it('preserves existing audit records when appending new one', () => {
@@ -405,43 +408,49 @@ describe('knowledgeBaseStorage', () => {
         removeUrls: false,
       },
       chunks: [],
-      auditRecords: [
+      versionRecords: [
         {
-          status: 'rejected',
-          auditor: 'NOC小王',
-          auditTime: '2026-06-05T10:00:00.000Z',
-          reason: '格式错误',
+          version: 1,
+          changeType: 'upload' as const,
+          fileName: '旧版.txt',
+          fileSize: 100,
+          similarityScore: undefined,
+          operator: '小王',
+          changeTime: '2026-06-05T10:00:00.000Z',
         },
       ],
     });
 
     const newRecord = {
-      status: 'approved' as const,
-      auditor: 'NOC小李',
-      auditTime: '2026-06-06T10:00:00.000Z',
-      reason: '已修正',
+      version: 2,
+      changeType: 'replace' as const,
+      fileName: '新版.txt',
+      fileSize: 200,
+      similarityScore: 85,
+      operator: '小李',
+      changeTime: '2026-06-06T10:00:00.000Z',
     };
 
-    const updated = auditKnowledgeDocument(doc.id, {
-      status: 'approved',
-      auditRecord: newRecord,
+    const updated = addVersionRecord(doc.id, {
+      versionRecord: newRecord,
     });
 
-    expect(updated.auditRecords).toHaveLength(2);
-    expect(updated.auditRecords?.[0].reason).toBe('格式错误');
-    expect(updated.auditRecords?.[1].reason).toBe('已修正');
+    expect(updated.versionRecords).toHaveLength(2);
+    expect(updated.versionRecords?.[0].operator).toBe('小王');
+    expect(updated.versionRecords?.[1].operator).toBe('小李');
   });
 
-  it('throws when auditing non-existent document', () => {
+  it('throws when adding version to non-existent document', () => {
     getKnowledgeBases();
     expect(() =>
-      auditKnowledgeDocument('doc-nonexistent', {
-        status: 'approved',
-        auditRecord: {
-          status: 'approved',
-          auditor: 'NOC',
-          auditTime: new Date().toISOString(),
-          reason: '',
+      addVersionRecord('doc-nonexistent', {
+        versionRecord: {
+          version: 1,
+          changeType: 'upload',
+          fileName: 'test.txt',
+          fileSize: 100,
+          operator: 'NOC',
+          changeTime: new Date().toISOString(),
         },
       }),
     ).toThrow('文档不存在');

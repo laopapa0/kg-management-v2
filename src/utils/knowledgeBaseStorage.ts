@@ -1,4 +1,4 @@
-import type { KnowledgeBase, KnowledgeDocument, AuditRecord } from '@/models/knowledgeBaseModel';
+import type { KnowledgeBase, KnowledgeDocument, VersionRecord } from '@/models/knowledgeBaseModel';
 
 const KB_KEY = 'kg-knowledge-bases';
 const DOC_KEY = 'kg-knowledge-documents';
@@ -200,11 +200,10 @@ export function updateKnowledgeDocument(
 }
 
 /** 审核知识文档（追加审核记录到历史数组） */
-export function auditKnowledgeDocument(
+export function addVersionRecord(
   id: string,
   updates: {
-    status: KnowledgeDocument['status'];
-    auditRecord: AuditRecord;
+    versionRecord: VersionRecord;
   },
 ): KnowledgeDocument {
   const docs = getKnowledgeDocuments();
@@ -214,15 +213,14 @@ export function auditKnowledgeDocument(
   }
 
   const existing = docs[index];
-  const auditRecords: AuditRecord[] = existing.auditRecords
-    ? [...existing.auditRecords]
+  const versionRecords: VersionRecord[] = existing.versionRecords
+    ? [...existing.versionRecords]
     : [];
-  auditRecords.push(updates.auditRecord);
+  versionRecords.push(updates.versionRecord);
 
   docs[index] = {
     ...existing,
-    status: updates.status,
-    auditRecords,
+    versionRecords,
   };
   saveDocuments(docs);
   return docs[index];
