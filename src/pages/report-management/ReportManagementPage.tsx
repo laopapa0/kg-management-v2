@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import EmptyState from '@/components/empty-state/EmptyState'
 import { Button } from '@/components/ui/button'
 import ReportPlanDialog from '@/components/dialog/ReportPlanDialog'
+import type { ReportPlanFormData } from '@/components/dialog/ReportPlanDialog'
 import { SCHEDULE_LABELS, createReportPlan } from '@/models/reportModel'
 import type { ReportPlan } from '@/models/reportModel'
 import { getReportPlans, saveReportPlans } from '@/utils/reportStorage'
@@ -46,6 +47,55 @@ export default function ReportManagementPage() {
     navigate(`/reports/${report.id}`)
   }
 
+  const handleSave = (data: ReportPlanFormData) => {
+    if (editingPlan) {
+      const next = plans.map((p) =>
+        p.id === editingPlan.id
+          ? { ...p, name: data.name, schedule: data.schedule, description: data.description, autoSchedule: data.autoSchedule, filterScope: data.filterScope, templateId: data.templateId }
+          : p,
+      )
+      setPlans(next)
+      saveReportPlans(next)
+    } else {
+      const newPlan = createReportPlan({
+        name: data.name,
+        schedule: data.schedule,
+        description: data.description,
+        filterSummary: '全部指标 / 全部部门',
+        autoSchedule: data.autoSchedule,
+        filterScope: data.filterScope,
+        templateId: data.templateId,
+      })
+      const next = [...plans, newPlan]
+      setPlans(next)
+      saveReportPlans(next)
+    }
+  }
+
+  const handleSaveAndGenerate = (data: ReportPlanFormData) => {
+    let plan: ReportPlan
+    if (editingPlan) {
+      plan = { ...editingPlan, name: data.name, schedule: data.schedule, description: data.description, autoSchedule: data.autoSchedule, filterScope: data.filterScope, templateId: data.templateId }
+      const next = plans.map((p) => (p.id === editingPlan.id ? plan : p))
+      setPlans(next)
+      saveReportPlans(next)
+    } else {
+      plan = createReportPlan({
+        name: data.name,
+        schedule: data.schedule,
+        description: data.description,
+        filterSummary: '全部指标 / 全部部门',
+        autoSchedule: data.autoSchedule,
+        filterScope: data.filterScope,
+        templateId: data.templateId,
+      })
+      const next = [...plans, plan]
+      setPlans(next)
+      saveReportPlans(next)
+    }
+    handleGenerate(plan)
+  }
+
   useEffect(() => {
     setPlans(getReportPlans())
   }, [])
@@ -57,28 +107,8 @@ export default function ReportManagementPage() {
           open={dialogOpen}
           onOpenChange={setDialogOpen}
           initialData={editingPlan}
-          onConfirm={(data) => {
-          if (editingPlan) {
-            const next = plans.map((p) =>
-              p.id === editingPlan.id
-                ? { ...p, name: data.name, schedule: data.schedule, description: data.description, autoSchedule: data.autoSchedule }
-                : p,
-            )
-            setPlans(next)
-            saveReportPlans(next)
-          } else {
-            const newPlan = createReportPlan({
-              name: data.name,
-              schedule: data.schedule,
-              description: data.description,
-              filterSummary: '全部指标 / 全部部门',
-              autoSchedule: data.autoSchedule,
-            })
-            const next = [...plans, newPlan]
-            setPlans(next)
-            saveReportPlans(next)
-          }
-        }}
+          onConfirm={handleSave}
+          onSaveAndGenerate={handleSaveAndGenerate}
         />
         <div
           data-testid="report-management-page"
@@ -131,28 +161,8 @@ export default function ReportManagementPage() {
         open={dialogOpen}
         onOpenChange={setDialogOpen}
         initialData={editingPlan}
-        onConfirm={(data) => {
-          if (editingPlan) {
-            const next = plans.map((p) =>
-              p.id === editingPlan.id
-                ? { ...p, name: data.name, schedule: data.schedule, description: data.description, autoSchedule: data.autoSchedule }
-                : p,
-            )
-            setPlans(next)
-            saveReportPlans(next)
-          } else {
-            const newPlan = createReportPlan({
-              name: data.name,
-              schedule: data.schedule,
-              description: data.description,
-              filterSummary: '全部指标 / 全部部门',
-              autoSchedule: data.autoSchedule,
-            })
-            const next = [...plans, newPlan]
-            setPlans(next)
-            saveReportPlans(next)
-          }
-        }}
+        onConfirm={handleSave}
+        onSaveAndGenerate={handleSaveAndGenerate}
       />
 
       <div className="flex flex-col gap-2">

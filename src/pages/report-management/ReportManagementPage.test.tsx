@@ -34,8 +34,16 @@ describe('ReportManagementPage', () => {
     const descInput = screen.getByTestId('report-plan-description-input')
     await user.type(descInput, '这是一个测试报告')
 
-    const confirmButton = screen.getByTestId('report-plan-confirm-button')
-    await user.click(confirmButton)
+    // Step 1 → Step 2
+    await user.click(screen.getByTestId('report-plan-next-button'))
+    expect(screen.getByTestId('step-2')).toBeInTheDocument()
+
+    // Step 2 → Step 3
+    await user.click(screen.getByTestId('report-plan-next-button'))
+    expect(screen.getByTestId('step-3')).toBeInTheDocument()
+
+    // Save plan
+    await user.click(screen.getByTestId('report-plan-save-button'))
 
     // Dialog should close
     expect(screen.queryByRole('heading', { name: '新建报告计划' })).not.toBeInTheDocument()
@@ -68,8 +76,15 @@ describe('ReportManagementPage', () => {
 
     fireEvent.change(nameInput, { target: { value: '核心指标日报-已修改' } })
 
-    const confirmButton = screen.getByTestId('report-plan-confirm-button')
-    await user.click(confirmButton)
+    // Step 1 → Step 2 → Step 3
+    await user.click(screen.getByTestId('report-plan-next-button'))
+    expect(screen.getByTestId('step-2')).toBeInTheDocument()
+
+    await user.click(screen.getByTestId('report-plan-next-button'))
+    expect(screen.getByTestId('step-3')).toBeInTheDocument()
+
+    // Save plan
+    await user.click(screen.getByTestId('report-plan-save-button'))
 
     expect(screen.getByText('核心指标日报-已修改')).toBeInTheDocument()
     expect(screen.queryByText('核心指标日报')).not.toBeInTheDocument()
@@ -108,9 +123,11 @@ describe('ReportManagementPage', () => {
 
     expect(screen.getByRole('heading', { name: '新建报告计划' })).toBeInTheDocument()
     expect(screen.getByTestId('report-plan-name-input')).toBeInTheDocument()
-    expect(screen.getByTestId('report-plan-schedule-select')).toBeInTheDocument()
+    expect(screen.getByRole('radio', { name: '每日' })).toBeInTheDocument()
+    expect(screen.getByRole('radio', { name: '每周' })).toBeInTheDocument()
+    expect(screen.getByRole('radio', { name: '每月' })).toBeInTheDocument()
     expect(screen.getByTestId('report-plan-description-input')).toBeInTheDocument()
-    expect(screen.getByTestId('report-plan-confirm-button')).toBeInTheDocument()
+    expect(screen.getByTestId('report-plan-next-button')).toBeInTheDocument()
   })
 
   it('renders report plan list with name, schedule, filter summary, version and generation time', () => {

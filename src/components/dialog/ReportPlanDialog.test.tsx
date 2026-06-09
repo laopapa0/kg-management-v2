@@ -1,8 +1,10 @@
-import { describe, it, expect, vi } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/react'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import ReportPlanDialog from './ReportPlanDialog'
 import type { ReportPlan } from '@/models/reportModel'
+import { saveReportTemplates } from '@/utils/reportTemplateStorage'
+import { mockReportTemplates } from '@/models/reportTemplateModel'
 
 const mockPlan: ReportPlan = {
   id: 'report-1',
@@ -14,8 +16,18 @@ const mockPlan: ReportPlan = {
   createdAt: '2026-01-01T00:00:00.000Z',
 }
 
-describe('ReportPlanDialog', () => {
-  it('renders create mode fields when no initialData', () => {
+describe('ReportPlanDialog — 三步向导', () => {
+  beforeEach(() => {
+    localStorage.clear()
+    saveReportTemplates(mockReportTemplates)
+    // Setup minimal attachment data for FilterScopeSelector
+    localStorage.setItem('kgv2-attachment-departments', JSON.stringify([{ id: 'dept-1', name: '财务部' }]))
+    localStorage.setItem('kgv2-attachment-indicators-dept-1', JSON.stringify([]))
+    localStorage.setItem('kgv2-attachment-tagnodes-dept-1', JSON.stringify([]))
+    localStorage.setItem('kgv2-attachment-rules', JSON.stringify([]))
+  })
+
+  it('shows step 1 with name input, schedule radios, description and auto-schedule switch', () => {
     render(
       <ReportPlanDialog
         open={true}
@@ -24,13 +36,157 @@ describe('ReportPlanDialog', () => {
       />,
     )
 
-    expect(screen.getByRole('heading', { name: '新建报告计划' })).toBeInTheDocument()
-    expect(screen.getByTestId('report-plan-name-input')).toHaveValue('')
-    expect(screen.getByTestId('report-plan-schedule-select')).toHaveTextContent('每日')
-    expect(screen.getByTestId('report-plan-description-input')).toHaveValue('')
+    expect(screen.getByTestId('step-1')).toBeInTheDocument()
+    expect(screen.getByTestId('report-plan-name-input')).toBeInTheDocument()
+    expect(screen.getByRole('radio', { name: '每日' })).toBeInTheDocument()
+    expect(screen.getByRole('radio', { name: '每周' })).toBeInTheDocument()
+    expect(screen.getByRole('radio', { name: '每月' })).toBeInTheDocument()
+    expect(screen.getByTestId('report-plan-description-input')).toBeInTheDocument()
+    expect(screen.getByTestId('report-plan-auto-schedule')).toBeInTheDocument()
   })
 
-  it('renders edit mode fields with pre-filled values', () => {
+  it('disables next button when name is empty in step 1', () => {
+    render(
+      <ReportPlanDialog
+        open={true}
+        onOpenChange={vi.fn()}
+        onConfirm={vi.fn()}
+      />,
+    )
+
+    const nextButton = screen.getByTestId('report-plan-next-button')
+    expect(nextButton).toBeDisabled()
+  })
+
+  it('navigates to step 2 when clicking next with valid name', async () => {
+    const user = userEvent.setup()
+    render(
+      <ReportPlanDialog
+        open={true}
+        onOpenChange={vi.fn()}
+        onConfirm={vi.fn()}
+      />,
+    )
+
+    await user.type(screen.getByTestId('report-plan-name-input'), '测试计划')
+    await user.click(screen.getByTestId('report-plan-next-button'))
+
+    expect(screen.getByTestId('step-2')).toBeInTheDocument()
+    expect(screen.getByTestId('step-indicator-2')).toHaveClass('bg-dark-accent-primary')
+  })
+
+  it('renders FilterScopeSelector in step 2 and supports prev/next navigation', async () => {
+    const user = userEvent.setup()
+    render(
+      <ReportPlanDialog
+        open={true}
+        onOpenChange={vi.fn()}
+        onConfirm={vi.fn()}
+      />,
+    )
+
+    await user.type(screen.getByTestId('report-plan-name-input'), '测试计划')
+    await user.click(screen.getByTestId('report-plan-next-button'))
+
+    // Step 2 shows FilterScopeSelector
+    expect(screen.getByTestId('filter-scope-selector')).toBeInTheDocument()
+
+    // Back to step 1
+    await user.click(screen.getByRole('button', { name: '上一步' }))
+    expect(screen.getByTestId('step-1')).toBeInTheDocument()
+
+    // Forward to step 2 again
+    await user.click(screen.getByTestId('report-plan-next-button'))
+    expect(screen.getByTestId('step-2')).toBeInTheDocument()
+
+    // Forward to step 3
+    await user.click(screen.getByTestId('report-plan-next-button'))
+    expect(screen.getByTestId('step-3')).toBeInTheDocument()
+  })
+
+  it('shows enabled templates and summary in step 3', async () => {
+    const user = userEvent.setup()
+    render(
+      <ReportPlanDialog
+        open={true}
+        onOpenChange={vi.fn()}
+        onConfirm={vi.fn()}
+      />,
+    )
+
+    await user.type(screen.getByTestId('report-plan-name-input'), '测试计划')
+    await user.click(screen.getByTestId('report-plan-next-button'))
+    await user.click(screen.getByTestId('report-plan-next-button'))
+
+    // Shows enabled templates
+    expect(screen.getByText('核心指标日报模板')).toBeInTheDocument()
+    expect(screen.getByText('月度经营分析模板')).toBeInTheDocument()
+
+    // Can select a template
+    await user.click(screen.getByTestId('template-radio-tmpl-001'))
+    expect(screen.getByTestId('template-radio-tmpl-001')).toBeChecked()
+
+    // Shows summary
+    expect(screen.getByTestId('step-3-summary')).toHaveTextContent('测试计划')
+  })
+
+  it('calls onConfirm with full data when clicking save plan', async () => {
+    const user = userEvent.setup()
+    const onConfirm = vi.fn()
+    const onOpenChange = vi.fn()
+
+    render(
+      <ReportPlanDialog
+        open={true}
+        onOpenChange={onOpenChange}
+        onConfirm={onConfirm}
+      />,
+    )
+
+    await user.type(screen.getByTestId('report-plan-name-input'), '测试计划')
+    await user.click(screen.getByTestId('report-plan-next-button'))
+    await user.click(screen.getByTestId('report-plan-next-button'))
+    await user.click(screen.getByTestId('report-plan-save-button'))
+
+    expect(onConfirm).toHaveBeenCalledWith(expect.objectContaining({
+      name: '测试计划',
+      schedule: 'daily',
+      description: '',
+      autoSchedule: false,
+      filterScope: expect.any(Object),
+    }))
+    expect(onOpenChange).toHaveBeenCalledWith(false)
+  })
+
+  it('calls onSaveAndGenerate when clicking save and generate', async () => {
+    const user = userEvent.setup()
+    const onSaveAndGenerate = vi.fn()
+    const onOpenChange = vi.fn()
+
+    render(
+      <ReportPlanDialog
+        open={true}
+        onOpenChange={onOpenChange}
+        onConfirm={vi.fn()}
+        onSaveAndGenerate={onSaveAndGenerate}
+      />,
+    )
+
+    await user.type(screen.getByTestId('report-plan-name-input'), '测试计划')
+    await user.click(screen.getByTestId('report-plan-next-button'))
+    await user.click(screen.getByTestId('report-plan-next-button'))
+    await user.click(screen.getByTestId('report-plan-save-generate-button'))
+
+    expect(onSaveAndGenerate).toHaveBeenCalledWith(expect.objectContaining({
+      name: '测试计划',
+      schedule: 'daily',
+      autoSchedule: false,
+      filterScope: expect.any(Object),
+    }))
+    expect(onOpenChange).toHaveBeenCalledWith(false)
+  })
+
+  it('pre-fills values and shows edit title in edit mode', () => {
     render(
       <ReportPlanDialog
         open={true}
@@ -42,88 +198,25 @@ describe('ReportPlanDialog', () => {
 
     expect(screen.getByRole('heading', { name: '编辑报告计划' })).toBeInTheDocument()
     expect(screen.getByTestId('report-plan-name-input')).toHaveValue('测试计划')
-    expect(screen.getByTestId('report-plan-schedule-select')).toHaveTextContent('每周')
+    expect(screen.getByRole('radio', { name: '每周' })).toBeChecked()
     expect(screen.getByTestId('report-plan-description-input')).toHaveValue('测试描述')
   })
 
-  it('disables confirm button when name is empty', () => {
+  it('shows "保存并重新生成" in edit mode', async () => {
+    const user = userEvent.setup()
     render(
       <ReportPlanDialog
         open={true}
         onOpenChange={vi.fn()}
+        initialData={mockPlan}
         onConfirm={vi.fn()}
+        onSaveAndGenerate={vi.fn()}
       />,
     )
 
-    const confirmButton = screen.getByTestId('report-plan-confirm-button')
-    expect(confirmButton).toBeDisabled()
-  })
+    await user.click(screen.getByTestId('report-plan-next-button'))
+    await user.click(screen.getByTestId('report-plan-next-button'))
 
-  it('calls onConfirm with form data when confirmed', async () => {
-    const user = userEvent.setup()
-    const onConfirm = vi.fn()
-
-    render(
-      <ReportPlanDialog
-        open={true}
-        onOpenChange={vi.fn()}
-        onConfirm={onConfirm}
-      />,
-    )
-
-    const nameInput = screen.getByTestId('report-plan-name-input')
-    await user.type(nameInput, '新计划')
-
-    const descInput = screen.getByTestId('report-plan-description-input')
-    await user.type(descInput, '新描述')
-
-    const confirmButton = screen.getByTestId('report-plan-confirm-button')
-    await user.click(confirmButton)
-
-    expect(onConfirm).toHaveBeenCalledWith({
-      name: '新计划',
-      schedule: 'daily',
-      description: '新描述',
-      autoSchedule: false,
-    })
-  })
-
-  it('calls onOpenChange with false when cancel is clicked', async () => {
-    const user = userEvent.setup()
-    const onOpenChange = vi.fn()
-
-    render(
-      <ReportPlanDialog
-        open={true}
-        onOpenChange={onOpenChange}
-        onConfirm={vi.fn()}
-      />,
-    )
-
-    const cancelButton = screen.getByRole('button', { name: '取消' })
-    await user.click(cancelButton)
-
-    expect(onOpenChange).toHaveBeenCalledWith(false)
-  })
-
-  it('calls onOpenChange with false when confirm is clicked', async () => {
-    const user = userEvent.setup()
-    const onOpenChange = vi.fn()
-
-    render(
-      <ReportPlanDialog
-        open={true}
-        onOpenChange={onOpenChange}
-        onConfirm={vi.fn()}
-      />,
-    )
-
-    const nameInput = screen.getByTestId('report-plan-name-input')
-    await user.type(nameInput, '计划')
-
-    const confirmButton = screen.getByTestId('report-plan-confirm-button')
-    await user.click(confirmButton)
-
-    expect(onOpenChange).toHaveBeenCalledWith(false)
+    expect(screen.getByTestId('report-plan-save-generate-button')).toHaveTextContent('保存并重新生成')
   })
 })
