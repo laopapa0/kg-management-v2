@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
-import { MemoryRouter } from 'react-router-dom'
+import { MemoryRouter, Routes, Route } from 'react-router-dom'
 import userEvent from '@testing-library/user-event'
 import { __resetReportStorageCache } from '@/utils/reportStorage'
 import { mockReportPlans } from '@/models/reportModel'
@@ -171,5 +171,24 @@ describe('ReportManagementPage', () => {
     expect(storedReports[0].planId).toBe('report-plan-001')
     expect(storedReports[0].planName).toBe('核心指标日报')
     expect(storedReports[0].triggerType).toBe('manual')
+  })
+
+  it('navigates to /reports/:newId after generating a report', async () => {
+    const user = userEvent.setup()
+    saveReportPlans([{ ...mockReportPlans[0], latestVersion: 0 }])
+
+    render(
+      <MemoryRouter initialEntries={['/reports']}>
+        <Routes>
+          <Route path="/reports" element={<ReportManagementPage />} />
+          <Route path="/reports/:id" element={<div data-testid="report-detail-page">Report Detail</div>} />
+        </Routes>
+      </MemoryRouter>,
+    )
+
+    const generateButton = screen.getByText('首次生成')
+    await user.click(generateButton)
+
+    expect(screen.getByTestId('report-detail-page')).toBeInTheDocument()
   })
 })
