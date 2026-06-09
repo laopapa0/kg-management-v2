@@ -9,7 +9,7 @@ import LineageCanvasPage from './pages/lineage/LineageCanvasPage'
 import KnowledgeUploadPage from './pages/knowledge-upload/KnowledgeUploadPage'
 import ReportManagementPage from './pages/report-management/ReportManagementPage'
 import ReportTemplatesPage from './pages/report-management/ReportTemplatesPage'
-import ReportGenerationWizard from './pages/report-management/ReportGenerationWizard'
+import ReportHistoryPage from './pages/report-management/ReportHistoryPage'
 import ReportDetailPage from './pages/report-management/ReportDetailPage'
 import NocRulePage from './pages/noc/NocRulePage'
 import LinkRelationManagePage from './pages/link-relation/LinkRelationManagePage'
@@ -42,9 +42,7 @@ export default function App() {
           <Route path="/lineage" element={<LineageCanvasPage />} />
           <Route path="/reports" element={<ReportManagementPage />} />
           <Route path="/reports/templates" element={<ReportTemplatesPage />} />
-          <Route path="/reports/generate" element={<ReportGenerationWizard onComplete={(id) => {
-            window.location.href = `/reports/${id}`
-          }} />} />
+          <Route path="/reports/history" element={<ReportHistoryPage />} />
           <Route path="/reports/:reportId" element={<ReportDetailPage />} />
           <Route path="/knowledge-upload" element={<KnowledgeUploadPage />} />
           <Route path="/noc/rule" element={<NocRulePage />} />

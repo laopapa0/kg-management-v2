@@ -1,3 +1,5 @@
+import type { FilterScopeValue } from '@/components/report/FilterScopeSelector'
+
 /**
  * 报告计划模型
  *
@@ -18,6 +20,10 @@ export interface ReportPlan {
   autoSchedule?: boolean
   nextRunAt?: string
   createdAt: string
+  /** 计划绑定的筛选范围 */
+  filterScope?: FilterScopeValue
+  /** 绑定的模板 ID */
+  templateId?: string
 }
 
 /** 执行周期中文映射 */
@@ -56,6 +62,12 @@ export const mockReportPlans: ReportPlan[] = [
     latestVersion: 12,
     lastGeneratedAt: '2026-06-07T08:00:00.000Z',
     createdAt: '2026-05-01T00:00:00.000Z',
+    filterScope: {
+      includedIndicatorIds: ['ind-001', 'ind-002'],
+      excludedRuleIds: [],
+      excludedLinkRelationIds: [],
+    },
+    templateId: 'template-001',
   },
   {
     id: 'report-plan-002',

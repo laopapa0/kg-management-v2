@@ -260,25 +260,24 @@ describe('TreeView', () => {
       )
     })
 
-    it('does not show edit button by default', () => {
-      render(<TreeView nodes={mockNodes} renderNode={renderNode} />)
-      expect(screen.queryByTestId('tree-node-edit-button')).not.toBeInTheDocument()
+    it('shows edit button by default when onEditNode is provided', () => {
+      const onEditNode = vi.fn()
+      render(<TreeView nodes={mockNodes} renderNode={renderNode} onEditNode={onEditNode} />)
+      const editButtons = screen.getAllByTestId('tree-node-edit-button')
+      expect(editButtons.length).toBeGreaterThanOrEqual(1)
     })
 
-    it('shows edit button on hover when onEditNode is provided', async () => {
+    it('remains visible when not hovered (no longer hover-dependent)', async () => {
       const user = userEvent.setup()
       const onEditNode = vi.fn()
       render(<TreeView nodes={mockNodes} renderNode={renderNode} onEditNode={onEditNode} />)
 
       const rows = screen.getAllByTestId('tree-node-row')
-      await user.hover(rows[0])
-
       const editButton = within(rows[0]).getByTestId('tree-node-edit-button')
       expect(editButton).toBeInTheDocument()
-      expect(editButton).toHaveClass('opacity-100')
     })
 
-    it('hides edit button on mouse leave', async () => {
+    it('remains visible after mouse leave', async () => {
       const user = userEvent.setup()
       const onEditNode = vi.fn()
       render(<TreeView nodes={mockNodes} renderNode={renderNode} onEditNode={onEditNode} />)
@@ -288,7 +287,7 @@ describe('TreeView', () => {
       await user.unhover(rows[0])
 
       const editButton = within(rows[0]).getByTestId('tree-node-edit-button')
-      expect(editButton).toHaveClass('opacity-0')
+      expect(editButton).toBeInTheDocument()
     })
 
     it('calls onEditNode when edit button is clicked', async () => {
