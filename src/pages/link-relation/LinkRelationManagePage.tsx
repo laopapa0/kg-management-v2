@@ -1,13 +1,9 @@
 import { useState, useMemo, useEffect, useCallback, useRef } from 'react'
-import {
-  Link, ArrowRight, Combine, GitBranch, Shuffle,
-  Layers, Replace, ExternalLink, ArrowLeftRight, TrendingUp,
-  TrendingDown, Activity, BarChart3, PieChart, LineChart,
-  Network, Share2, Merge, Split, Workflow,
-} from 'lucide-react'
 import { Switch } from '@/components/ui/switch'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+
 import DataTable, { type Column } from '@/components/DataTable'
 import ChangeTimeline from '@/components/timeline/ChangeTimeline'
 import LinkRelationFormDialog from './LinkRelationFormDialog'
@@ -17,18 +13,7 @@ import {
   mockLinkChangeLogs,
 } from '@/models/linkRelationModel'
 import type { LinkRelation, LinkChangeLog, ChangeLogEntry } from '@/models/linkRelationModel'
-
-const ICON_MAP: Record<string, React.ComponentType<{ size?: number; className?: string }>> = {
-  Link, ArrowRight, Combine, GitBranch, Shuffle,
-  Layers, Replace, ExternalLink, ArrowLeftRight, TrendingUp,
-  TrendingDown, Activity, BarChart3, PieChart, LineChart,
-  Network, Share2, Merge, Split, Workflow,
-}
-
-function IconRenderer({ name, size = 16 }: { name: string; size?: number }) {
-  const Comp = ICON_MAP[name] || Link
-  return <Comp size={size} className="text-dark-text-secondary" />
-}
+import { IconRenderer } from '@/utils/icons'
 
 const SOURCE_TYPE_OPTIONS = ['全部', '指标', '虚拟分组', '外部因素']
 const DIRECTION_OPTIONS = ['全部', '有向', '无向']
@@ -55,8 +40,10 @@ export default function LinkRelationManagePage() {
         (r) =>
           r.code.toLowerCase().includes(kw) ||
           r.name.toLowerCase().includes(kw) ||
-          r.displayName.includes(kw) ||
-          r.description.toLowerCase().includes(kw),
+          r.displayName.toLowerCase().includes(kw) ||
+          r.description.toLowerCase().includes(kw) ||
+          r.sourceTypes.some((t) => t.toLowerCase().includes(kw)) ||
+          r.targetTypes.some((t) => t.toLowerCase().includes(kw)),
       )
     }
 
@@ -223,15 +210,15 @@ export default function LinkRelationManagePage() {
             </button>
             <button
               className="text-xs text-blue-400 hover:underline"
-              onClick={() => setExpandedId(expandedId === r.id ? null : r.id)}
+              onClick={() => setExpandedId((prev) => (prev === r.id ? null : r.id))}
             >
-              {expandedId === r.id ? '收起' : '查看详情'}
+              查看详情
             </button>
           </div>
         ),
       },
     ],
-    [expandedId],
+    [],
   )
 
   return (
@@ -255,32 +242,26 @@ export default function LinkRelationManagePage() {
           }}
           className="w-80"
         />
-        <select
-          data-testid="direction-filter"
-          value={directionFilter}
-          onChange={(e) => {
-            setDirectionFilter(e.target.value)
-            setPage(1)
-          }}
-          className="h-9 rounded-md border border-dark-border bg-dark-card-l1 px-2 text-sm text-dark-text-primary focus:border-dark-accent-primary-hover focus:outline-none"
-        >
-          {DIRECTION_OPTIONS.map((opt) => (
-            <option key={opt} value={opt}>{opt}</option>
-          ))}
-        </select>
-        <select
-          data-testid="source-type-filter"
-          value={sourceTypeFilter}
-          onChange={(e) => {
-            setSourceTypeFilter(e.target.value)
-            setPage(1)
-          }}
-          className="h-9 rounded-md border border-dark-border bg-dark-card-l1 px-2 text-sm text-dark-text-primary focus:border-dark-accent-primary-hover focus:outline-none"
-        >
-          {SOURCE_TYPE_OPTIONS.map((opt) => (
-            <option key={opt} value={opt}>{opt}</option>
-          ))}
-        </select>
+        <Select value={directionFilter} onValueChange={(v) => { setDirectionFilter(v); setPage(1) }}>
+          <SelectTrigger data-testid="direction-filter" className="w-24 h-9 bg-dark-card-l1 border-dark-border text-dark-text-primary [&>span]:text-dark-text-primary">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent className="border-dark-border bg-dark-card-l2">
+            {DIRECTION_OPTIONS.map((opt) => (
+              <SelectItem key={opt} value={opt} className="text-dark-text-primary focus:bg-dark-card-l1 focus:text-dark-text-primary">{opt}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Select value={sourceTypeFilter} onValueChange={(v) => { setSourceTypeFilter(v); setPage(1) }}>
+          <SelectTrigger data-testid="source-type-filter" className="w-28 h-9 bg-dark-card-l1 border-dark-border text-dark-text-primary [&>span]:text-dark-text-primary">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent className="border-dark-border bg-dark-card-l2">
+            {SOURCE_TYPE_OPTIONS.map((opt) => (
+              <SelectItem key={opt} value={opt} className="text-dark-text-primary focus:bg-dark-card-l1 focus:text-dark-text-primary">{opt}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
         <Button
           data-testid="filter-reset"
           variant="ghost"

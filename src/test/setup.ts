@@ -19,6 +19,12 @@ global.IntersectionObserver = class IntersectionObserver {
 if (typeof Element !== 'undefined') {
   Element.prototype.scrollIntoView = function () {};
   Element.prototype.scrollTo = function () {};
+  ;(Element.prototype as any).hasPointerCapture = function () { return false };
+}
+
+// Mock PointerEvent for Radix UI Select / Popover in jsdom
+if (typeof window !== 'undefined' && !window.PointerEvent) {
+  window.PointerEvent = class PointerEvent extends MouseEvent {}
 }
 
 // Mock matchMedia for sonner Toaster / next-themes in jsdom
