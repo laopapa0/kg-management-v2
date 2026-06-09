@@ -17,6 +17,7 @@ export interface ReportTemplate {
   id: string
   name: string
   description: string
+  styleGuide: string
   sections: ReportSection[]
   usageCount: number
   enabled: boolean
@@ -44,6 +45,7 @@ export function createReportTemplate(
     id: generateId(),
     createdAt: new Date().toISOString(),
     usageCount: 0,
+    styleGuide: '',
     ...data,
   }
 }
@@ -64,6 +66,7 @@ export const mockReportTemplates: ReportTemplate[] = [
     id: 'tmpl-001',
     name: '核心指标日报模板',
     description: '每日核心指标监控报告的标准模板',
+    styleGuide: '语气专业客观，多用数据说话。每个板块用标题 + 简要分析 + 关键数字摘要的结构。',
     sections: [
       { id: 'sec-001', title: '指标概览', prompt: '汇总关键指标趋势' },
       { id: 'sec-002', title: '异常检测', prompt: '检测异常值并标注' },
@@ -77,6 +80,7 @@ export const mockReportTemplates: ReportTemplate[] = [
     id: 'tmpl-002',
     name: '月度经营分析模板',
     description: '月度经营分析报告，含部门对比与波动分析',
+    styleGuide: '用图表和数据支撑结论，突出异常和波动。篇幅控制在 2000 字以内。',
     sections: [
       { id: 'sec-004', title: '经营概览', prompt: '生成结论性摘要' },
       { id: 'sec-005', title: '部门对比', prompt: '对比各部门表现' },

@@ -1,5 +1,5 @@
-import { describe, it, expect, beforeEach } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { render, screen, waitFor, act } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { mockReportTemplates } from '@/models/reportTemplateModel'
 import {
@@ -106,5 +106,50 @@ describe('ReportTemplatesPage', () => {
 
     const statusLabels = screen.getAllByText(/启用|停用/)
     expect(statusLabels[0]).toHaveTextContent('停用')
+  })
+
+  it('shows style guide input in create dialog', async () => {
+    render(<ReportTemplatesPage />)
+
+    await userEvent.click(screen.getByRole('button', { name: /新建模板/ }))
+
+    expect(screen.getByPlaceholderText(/整体风格要求/)).toBeInTheDocument()
+  })
+
+  it('shows AI generation panel in create dialog', async () => {
+    render(<ReportTemplatesPage />)
+
+    await userEvent.click(screen.getByRole('button', { name: /新建模板/ }))
+
+    expect(screen.getByText('AI 生成板块')).toBeInTheDocument()
+    expect(screen.getByPlaceholderText(/描述你的报告需求/)).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /开始生成/ })).toBeInTheDocument()
+  })
+
+  it('generates sections via AI and fills them into the dialog', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true })
+    render(<ReportTemplatesPage />)
+
+    await userEvent.click(screen.getByRole('button', { name: /新建模板/ }))
+    await userEvent.type(screen.getByPlaceholderText(/描述你的报告需求/), '月度运营分析报告')
+
+    const generateBtn = screen.getByRole('button', { name: /开始生成/ })
+    await userEvent.click(generateBtn)
+
+    // Button should show loading state
+    expect(screen.getByText('生成中...')).toBeInTheDocument()
+
+    // Advance timers to complete generation
+    await act(async () => {
+      vi.advanceTimersByTime(2000)
+    })
+
+    await waitFor(() => {
+      expect(screen.getByDisplayValue('核心指标概览')).toBeInTheDocument()
+    })
+    expect(screen.getByDisplayValue('异常波动检测')).toBeInTheDocument()
+    expect(screen.getByDisplayValue('智能归因分析')).toBeInTheDocument()
+
+    vi.useRealTimers()
   })
 })
