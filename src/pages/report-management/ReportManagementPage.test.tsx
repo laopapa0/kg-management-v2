@@ -208,4 +208,31 @@ describe('ReportManagementPage', () => {
 
     expect(screen.getByTestId('report-detail-page')).toBeInTheDocument()
   })
+
+  it('shows tabs for switching between plans and history', () => {
+    saveReportPlans(mockReportPlans)
+    render(<MemoryRouter><ReportManagementPage /></MemoryRouter>)
+
+    expect(screen.getByRole('tab', { name: '报告计划' })).toBeInTheDocument()
+    expect(screen.getByRole('tab', { name: '历史报告' })).toBeInTheDocument()
+  })
+
+  it('navigates to history page when clicking history tab', async () => {
+    const user = userEvent.setup()
+    saveReportPlans(mockReportPlans)
+
+    render(
+      <MemoryRouter initialEntries={['/reports']}>
+        <Routes>
+          <Route path="/reports" element={<ReportManagementPage />} />
+          <Route path="/reports/history" element={<div data-testid="history-page">History Page</div>} />
+        </Routes>
+      </MemoryRouter>,
+    )
+
+    const historyTab = screen.getByRole('tab', { name: '历史报告' })
+    await user.click(historyTab)
+
+    expect(screen.getByTestId('history-page')).toBeInTheDocument()
+  })
 })

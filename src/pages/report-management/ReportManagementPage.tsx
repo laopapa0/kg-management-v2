@@ -2,6 +2,7 @@ import { FileText, Plus, Pencil, Trash2, Play } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import EmptyState from '@/components/empty-state/EmptyState'
 import { Button } from '@/components/ui/button'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import ReportPlanDialog from '@/components/dialog/ReportPlanDialog'
 import type { ReportPlanFormData } from '@/components/dialog/ReportPlanDialog'
 import { SCHEDULE_LABELS, createReportPlan } from '@/models/reportModel'
@@ -10,14 +11,17 @@ import { getReportPlans, saveReportPlans } from '@/utils/reportStorage'
 import { getGeneratedReports, addGeneratedReport } from '@/utils/generatedReportStorage'
 import { getReportTemplates } from '@/utils/reportTemplateStorage'
 import { generateMockReport } from '@/data/mockReportData'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 
 
 export default function ReportManagementPage() {
   const navigate = useNavigate()
+  const location = useLocation()
   const [plans, setPlans] = useState(getReportPlans)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editingPlan, setEditingPlan] = useState<ReportPlan | null>(null)
+
+  const activeTab = location.pathname === '/reports/history' ? 'history' : 'plans'
 
   const handleGenerate = (plan: ReportPlan) => {
     const templateName = plan.templateId
@@ -156,6 +160,23 @@ export default function ReportManagementPage() {
           </Button>
         </div>
       </div>
+
+      <Tabs value={activeTab} onValueChange={(v) => navigate(v === 'history' ? '/reports/history' : '/reports')}>
+        <TabsList className="mb-4 bg-dark-elevated border border-dark-border">
+          <TabsTrigger
+            value="plans"
+            className="data-[state=active]:text-dark-accent-primary data-[state=active]:border-b-2 data-[state=active]:border-dark-accent-primary"
+          >
+            报告计划
+          </TabsTrigger>
+          <TabsTrigger
+            value="history"
+            className="data-[state=active]:text-dark-accent-primary data-[state=active]:border-b-2 data-[state=active]:border-dark-accent-primary"
+          >
+            历史报告
+          </TabsTrigger>
+        </TabsList>
+      </Tabs>
 
       <ReportPlanDialog
         open={dialogOpen}
