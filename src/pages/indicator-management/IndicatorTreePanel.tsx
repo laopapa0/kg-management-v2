@@ -306,10 +306,10 @@ const IndicatorTreePanel = forwardRef<IndicatorTreePanelRef>(function IndicatorT
                     />
                   ) : (
                     <div className="flex items-center justify-between gap-2">
-                      <div className="flex flex-col justify-center">
+                      <div className="flex flex-col justify-center min-w-0">
                         <span
                           className={[
-                            'text-body leading-tight',
+                            'text-body leading-tight truncate',
                             isSelected ? 'font-medium text-dark-text-primary' : 'text-dark-text-primary',
                             isHovered && !isSelected ? 'text-dark-text-primary' : '',
                           ].join(' ')}

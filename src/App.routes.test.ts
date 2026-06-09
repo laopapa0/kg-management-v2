@@ -6,11 +6,13 @@ import { resolve } from 'node:path'
 const appSource = readFileSync(resolve('src/App.tsx'), 'utf-8')
 
 describe('App.tsx legacy route annotation', () => {
-  it('retains 5 active routes: /, /indicator-management, /lineage, /reports, /knowledge-upload', () => {
+  it('retains 7 active routes: /, /indicator-management, /lineage, /noc/rule, /link-relation, /reports, /knowledge-upload', () => {
     const activeRoutes = [
       { path: '/', element: 'DashboardPage' },
       { path: '/indicator-management', element: 'IndicatorManagementPage' },
       { path: '/lineage', element: 'LineageCanvasPage' },
+      { path: '/noc/rule', element: 'NocRulePage' },
+      { path: '/link-relation', element: 'LinkRelationManagePage' },
       { path: '/reports', element: 'ReportManagementPage' },
       { path: '/knowledge-upload', element: 'KnowledgeUploadPage' },
     ]
@@ -35,13 +37,12 @@ describe('App.tsx legacy route annotation', () => {
     expect(appSource).toContain('{/* [LEGACY] /inspection-todo */}')
   })
 
-  it('annotates all /noc/* routes with [LEGACY]', () => {
+  it('annotates all /noc/* routes (except /noc/rule) with [LEGACY]', () => {
     const nocRoutes = [
       '/noc/object-type',
       '/noc/link-relation',
       '/noc/property',
       '/noc/tag',
-      '/noc/rule',
       '/noc/audit',
       '/noc/inspection',
     ]

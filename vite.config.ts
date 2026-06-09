@@ -5,7 +5,7 @@ import { inspectAttr } from 'plugin-inspect-react-code'
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: '/kg-management-ui/',
+  base: '/kg-management-v2/',
   plugins: [process.env.VITEST ? undefined : inspectAttr(), react()].filter(Boolean),
   server: {
     port: 3000,

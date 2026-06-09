@@ -11,6 +11,8 @@ import ReportManagementPage from './pages/report-management/ReportManagementPage
 import ReportTemplatesPage from './pages/report-management/ReportTemplatesPage'
 import ReportGenerationWizard from './pages/report-management/ReportGenerationWizard'
 import ReportDetailPage from './pages/report-management/ReportDetailPage'
+import NocRulePage from './pages/noc/NocRulePage'
+import LinkRelationManagePage from './pages/link-relation/LinkRelationManagePage'
 import { mockReportPlans } from '@/models/reportModel'
 import { getReportPlans, saveReportPlans } from '@/utils/reportStorage'
 import { mockReportTemplates } from '@/models/reportTemplateModel'
@@ -45,6 +47,8 @@ export default function App() {
           }} />} />
           <Route path="/reports/:reportId" element={<ReportDetailPage />} />
           <Route path="/knowledge-upload" element={<KnowledgeUploadPage />} />
+          <Route path="/noc/rule" element={<NocRulePage />} />
+          <Route path="/link-relation" element={<LinkRelationManagePage />} />
 
           {/* [LEGACY] /indicator/create */}
           {/* <Route path="/indicator/create" element={<IndicatorCreatePage />} /> */}
@@ -64,8 +68,6 @@ export default function App() {
           {/* <Route path="/noc/property" element={<NocPropertyPage />} /> */}
           {/* [LEGACY] /noc/tag */}
           {/* <Route path="/noc/tag" element={<NocTagPage />} /> */}
-          {/* [LEGACY] /noc/rule */}
-          {/* <Route path="/noc/rule" element={<NocRulePage />} /> */}
           {/* [LEGACY] /noc/audit */}
           {/* <Route path="/noc/audit" element={<NocAuditPage />} /> */}
           {/* [LEGACY] /noc/inspection */}

@@ -8,6 +8,8 @@ import {
   FileText,
   BookOpen,
   Database,
+  Link,
+  Scale,
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react';
@@ -21,12 +23,14 @@ interface NavItem {
 }
 
 /* ─── 导航配置 ───
- * 精简后只保留 5 项核心菜单（PRD #57 平台模块精简）
+ * 核心菜单项（PRD #57 平台模块精简 + 规则管理 + 关联关系管理）
  */
 const navItems: NavItem[] = [
   { label: '首页', path: '/', icon: <Home size={18} /> },
   { label: '指标管理', path: '/indicator-management', icon: <BarChart3 size={18} /> },
   { label: '血缘画布', path: '/lineage', icon: <Network size={18} /> },
+  { label: '规则管理', path: '/noc/rule', icon: <Scale size={18} /> },
+  { label: '关联关系管理', path: '/link-relation', icon: <Link size={18} /> },
   { label: '报告管理', path: '/reports', icon: <FileText size={18} /> },
   { label: '知识库管理', path: '/knowledge-upload', icon: <BookOpen size={18} /> },
 ];

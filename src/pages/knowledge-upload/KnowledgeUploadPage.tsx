@@ -168,9 +168,19 @@ export default function KnowledgeUploadPage() {
       </div>
 
       <Tabs defaultValue="upload" className="w-full">
-        <TabsList className="mb-4">
-          <TabsTrigger value="upload">上传新文档</TabsTrigger>
-          <TabsTrigger value="my">我的文档</TabsTrigger>
+        <TabsList className="mb-4 bg-dark-card-l2 border border-dark-border">
+          <TabsTrigger
+            value="upload"
+            className="text-dark-text-secondary data-[state=active]:bg-dark-card-l1 data-[state=active]:text-dark-text-primary"
+          >
+            上传新文档
+          </TabsTrigger>
+          <TabsTrigger
+            value="my"
+            className="text-dark-text-secondary data-[state=active]:bg-dark-card-l1 data-[state=active]:text-dark-text-primary"
+          >
+            我的文档
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="upload">
@@ -271,7 +281,7 @@ export default function KnowledgeUploadPage() {
                   <h3 className="text-[15px] font-semibold text-dark-text-primary">
                     分段设置
                   </h3>
-                  <Button variant="outline" size="sm" onClick={handleReset}>
+                  <Button variant="outline" size="sm" onClick={handleReset} className="bg-transparent border-dark-border text-dark-text-primary hover:bg-dark-card-l2 hover:text-dark-text-primary">
                     重置
                   </Button>
                 </div>
@@ -359,7 +369,7 @@ export default function KnowledgeUploadPage() {
 
               {/* 操作按钮 */}
               <div className="flex justify-end gap-3">
-                <Button variant="outline" onClick={handlePreviewChunks}>
+                <Button variant="outline" onClick={handlePreviewChunks} className="bg-transparent border-dark-border text-dark-text-primary hover:bg-dark-card-l2 hover:text-dark-text-primary">
                   预览块
                 </Button>
                 <Button onClick={handleSubmit}>保存到知识库</Button>

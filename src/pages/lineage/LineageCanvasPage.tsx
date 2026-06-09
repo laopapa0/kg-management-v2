@@ -347,7 +347,7 @@ function LineageCanvasSVG({
         {/* 网格背景 */}
         <defs>
           <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
-            <circle cx="10" cy="10" r="1.5" fill="#e8ecf1" />
+            <circle cx="10" cy="10" r="1.5" fill="#334155" />
           </pattern>
         </defs>
         <rect x="-5000" y="-5000" width="10000" height="10000" fill="url(#grid)" />
@@ -394,8 +394,8 @@ function LineageCanvasSVG({
                   width="64"
                   height="18"
                   rx="4"
-                  fill="white"
-                  stroke={isHighlighted ? '#bcd3ff' : '#e8ecf1'}
+                  fill="#1e293b"
+                  stroke={isHighlighted ? '#3478f6' : '#334155'}
                   strokeWidth={isHighlighted ? '1.5' : '1'}
                   style={{ transition: 'all 0.2s ease' }}
                 />
@@ -423,10 +423,10 @@ function LineageCanvasSVG({
                   rx="3"
                   fill={
                     rel.confidence >= 80
-                      ? '#ecfdf5'
+                      ? '#064e3b'
                       : rel.confidence >= 50
-                      ? '#fffbeb'
-                      : '#fef2f2'
+                      ? '#78350f'
+                      : '#7f1d1d'
                   }
                 />
                 <text
@@ -434,10 +434,10 @@ function LineageCanvasSVG({
                   dominantBaseline="central"
                   fill={
                     rel.confidence >= 80
-                      ? '#059669'
+                      ? '#34d399'
                       : rel.confidence >= 50
-                      ? '#d97706'
-                      : '#dc2626'
+                      ? '#fbbf24'
+                      : '#f87171'
                   }
                   fontSize="8"
                   fontWeight="600"
@@ -474,7 +474,7 @@ function LineageCanvasSVG({
                 width={nodeWidth}
                 height={nodeHeight}
                 rx="8"
-                fill={isSelected ? bgColor : 'white'}
+                fill={isSelected ? bgColor : '#1e293b'}
                 stroke={isSelected ? '#3478f6' : isHovered ? '#5a96ff' : isNeighbor ? '#5a96ff' : borderColor}
                 strokeWidth={isSelected ? 2.5 : isHovered ? 2.5 : 1.5}
                 style={{ transition: 'all 0.2s ease' }}
@@ -497,12 +497,12 @@ function LineageCanvasSVG({
                 y={nodeHeight / 2 - 6}
                 textAnchor="middle"
                 dominantBaseline="central"
-                fill="#2d3748"
+                fill="#e2e8f0"
                 fontSize="12"
                 fontWeight="600"
                 style={{ pointerEvents: 'none' }}
               >
-                {node.name.length > 7 ? node.name.slice(0, 6) + '…' : node.name}
+                {node.name.length > 7 ? node.name.slice(0, 6) + '\u2026' : node.name}
               </motion.text>
               <motion.text
                 initial={{ opacity: 0 }}

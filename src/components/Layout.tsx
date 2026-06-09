@@ -24,14 +24,14 @@ export default function Layout({ children }: LayoutProps) {
 
       {/* 主内容区 */}
       <motion.main
-        className="pt-12 min-h-[100dvh] transition-[margin] duration-250"
+        className="pt-12 h-[calc(100dvh-0px)] overflow-hidden transition-[margin] duration-250"
         style={{
           marginLeft: sidebarCollapsed ? 64 : 240,
           transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)',
           transitionDuration: '250ms',
         }}
       >
-        <div className="p-6">
+        <div className="p-6 h-full">
           {children}
         </div>
       </motion.main>

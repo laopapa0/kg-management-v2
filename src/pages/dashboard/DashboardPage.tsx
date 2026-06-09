@@ -142,7 +142,7 @@ export default function DashboardPage() {
   const dateStr = `${today.getFullYear()}年${today.getMonth() + 1}月${today.getDate()}日 ${weekdays[today.getDay()]}`;
 
   return (
-    <div>
+    <div className="text-dark-text-primary">
       {/* Section 1: Page Header */}
       <motion.div
         initial={{ opacity: 0 }}

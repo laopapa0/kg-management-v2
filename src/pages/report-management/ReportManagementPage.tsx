@@ -88,7 +88,7 @@ export default function ReportManagementPage() {
             data-testid="generate-report-button"
             variant="outline"
             onClick={() => navigate('/reports/generate')}
-            className="border-dark-border text-dark-text-primary"
+            className="bg-transparent border-dark-border text-dark-text-primary hover:bg-dark-card-l2 hover:text-dark-text-primary"
           >
             <Play size={16} />
             生成报告

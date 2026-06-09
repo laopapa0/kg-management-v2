@@ -129,7 +129,7 @@ export default function ReportPlanDialog({
           <Button
             variant="outline"
             onClick={() => onOpenChange(false)}
-            className="border-dark-border text-dark-text-primary"
+            className="bg-transparent border-dark-border text-dark-text-primary hover:bg-dark-card-l2 hover:text-dark-text-primary"
           >
             取消
           </Button>

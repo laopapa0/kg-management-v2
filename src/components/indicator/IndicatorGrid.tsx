@@ -12,7 +12,7 @@ export interface IndicatorGridProps {
 }
 
 const GRID_CLASSES =
-  'grid grid-cols-1 gap-4 overflow-y-auto p-4 md:grid-cols-2 lg:grid-cols-3 min-[1440px]:grid-cols-4'
+  'grid flex-1 grid-cols-1 gap-4 overflow-y-auto p-4 md:grid-cols-2 lg:grid-cols-3 min-[1440px]:grid-cols-4'
 
 const GridList = forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ children, ...props }, ref) => (

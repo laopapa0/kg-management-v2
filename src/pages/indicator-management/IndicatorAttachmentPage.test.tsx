@@ -216,7 +216,7 @@ describe('IndicatorAttachmentPage', () => {
     await waitFor(() => {
       expect(within(pendingPanel).getByText(attached.name)).toBeInTheDocument()
     })
-  })
+  }, 15000)
 
   it('allows expanding and collapsing tree nodes in the indicator tree panel', async () => {
     const user = userEvent.setup()

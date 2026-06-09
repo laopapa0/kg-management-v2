@@ -43,8 +43,6 @@ describe('Sidebar', () => {
         '链接关系',
         '属性管理',
         '标签管理',
-        '规则管理',
-        '图谱管理',
       ];
       for (const label of legacyItems) {
         expect(screen.queryByText(label)).not.toBeInTheDocument();

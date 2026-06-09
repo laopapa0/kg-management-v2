@@ -10,6 +10,7 @@ export interface TagPillProps {
   onClick?: () => void
   searchTerm?: string
   dimmed?: boolean
+  inTree?: boolean
   editable?: boolean
   onColorChange?: (color: string) => void
 }
@@ -51,9 +52,10 @@ export default function TagPill({
   searchTerm = '',
   dimmed = false,
   editable = false,
+  inTree = false,
   onColorChange,
 }: TagPillProps) {
-  const baseColor = tag.color ?? '#64748B'
+  const baseColor = inTree ? 'transparent' : (tag.color ?? '#64748B')
   const isChecked = selected || partial
   const hasColorBackground = !isChecked && Boolean(tag.color)
 
@@ -83,8 +85,8 @@ export default function TagPill({
           ],
         )}
         style={{
-          borderColor: isChecked ? '#15417E' : baseColor,
-          backgroundColor: hasColorBackground ? `${tag.color}1A` : undefined,
+          borderColor: isChecked ? '#15417E' : (inTree ? 'var(--dark-border-color, #334155)' : baseColor),
+          backgroundColor: (hasColorBackground && !inTree) ? `${tag.color}1A` : undefined,
         }}
       >
         <span>

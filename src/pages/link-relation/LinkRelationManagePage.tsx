@@ -27,7 +27,7 @@ export default function LinkRelationManagePage() {
   }
 
   return (
-    <div data-testid="link-relation-manage-page" className="h-full bg-dark-page p-6 text-dark-text-primary">
+    <div data-testid="link-relation-manage-page" className="h-full text-dark-text-primary">
       <h1 className="mb-6 text-xl font-semibold">关联关系类型管理</h1>
       <div className="mb-4">
         <Input

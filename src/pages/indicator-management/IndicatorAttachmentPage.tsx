@@ -412,7 +412,7 @@ export default function IndicatorAttachmentPage() {
       ref={pageRef}
       data-testid="indicator-attachment-page"
       data-dim-mode={state.isConnecting ? 'true' : undefined}
-      className="relative h-full w-full bg-dark-page p-3 text-dark-text-primary"
+      className="relative h-full w-full text-dark-text-primary"
     >
       {/* Connection mode status bar */}
       {state.isConnecting && (
@@ -473,7 +473,7 @@ export default function IndicatorAttachmentPage() {
             data-focus-zone="indicator"
             className="flex h-full flex-col rounded-lg border border-dark-border bg-dark-elevated"
           >
-            <div className="flex items-center justify-between px-3 py-2">
+            <div className="flex items-center justify-between shrink-0 px-3 py-2">
               <PanelHeader
                 title="待选指标"
                 onAdd={() => {

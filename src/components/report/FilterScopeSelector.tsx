@@ -226,18 +226,22 @@ export default function FilterScopeSelector({ value, onChange }: FilterScopeSele
       <div className="rounded-lg border border-dark-border bg-dark-card-l1 p-4">
         <h3 className="mb-2 font-medium text-dark-text-primary">标签范围</h3>
         <div className="flex flex-col gap-1">
-          {tagTree.map((tag) => (
-            <label key={tag.id} className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                data-testid={`scope-tag-checkbox-${tag.id}`}
-                checked={checkedTagIds.has(tag.id)}
-                onChange={() => toggleTag(tag.id)}
-                className="size-4 cursor-pointer accent-dark-accent-primary"
-              />
-              <span className="text-sm text-dark-text-secondary">{tag.name}</span>
-            </label>
-          ))}
+          <TreeView
+            nodes={tagTree}
+            renderNode={(node) => (
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  data-testid={`scope-tag-checkbox-${node.id}`}
+                  checked={checkedTagIds.has(node.id)}
+                  onChange={() => toggleTag(node.id)}
+                  onClick={(e) => e.stopPropagation()}
+                  className="size-4 cursor-pointer accent-dark-accent-primary"
+                />
+                <span className="text-sm text-dark-text-secondary">{node.name}</span>
+              </label>
+            )}
+          />
         </div>
       </div>
 
@@ -245,18 +249,22 @@ export default function FilterScopeSelector({ value, onChange }: FilterScopeSele
       <div className="rounded-lg border border-dark-border bg-dark-card-l1 p-4">
         <h3 className="mb-2 font-medium text-dark-text-primary">剔除规则</h3>
         <div className="flex flex-col gap-1">
-          {allRules.map((rule) => (
-            <label key={rule.id} className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                data-testid={`scope-rule-checkbox-${rule.id}`}
-                checked={checkedRuleIds.has(rule.id)}
-                onChange={() => toggleRule(rule.id)}
-                className="size-4 cursor-pointer accent-dark-accent-primary"
-              />
-              <span className="text-sm text-dark-text-secondary">{rule.name}</span>
-            </label>
-          ))}
+          <TreeView
+            nodes={allRules}
+            renderNode={(node) => (
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  data-testid={`scope-rule-checkbox-${node.id}`}
+                  checked={checkedRuleIds.has(node.id)}
+                  onChange={() => toggleRule(node.id)}
+                  onClick={(e) => e.stopPropagation()}
+                  className="size-4 cursor-pointer accent-dark-accent-primary"
+                />
+                <span className="text-sm text-dark-text-secondary">{node.name}</span>
+              </label>
+            )}
+          />
         </div>
       </div>
 
