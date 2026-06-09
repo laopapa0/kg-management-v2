@@ -1,5 +1,6 @@
-import { useState, type ReactNode } from 'react';
+import { useState, useMemo, type ReactNode } from 'react';
 import { ChevronUp, ChevronDown, ChevronsUpDown } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 /* ─── 类型 ─── */
@@ -57,6 +58,12 @@ export default function DataTable<T extends object>({
   pagination,
 }: DataTableProps<T>) {
   const [selected] = useState<string | null>(selectedRow ?? null);
+
+  const displayData = useMemo(() => {
+    if (!pagination) return data;
+    const start = (pagination.current - 1) * pagination.pageSize;
+    return data.slice(start, start + pagination.pageSize);
+  }, [data, pagination]);
 
   const getRowKey = (record: T, index: number): string => {
     if (typeof rowKey === 'function') return rowKey(record, index);
@@ -135,7 +142,7 @@ export default function DataTable<T extends object>({
                 </td>
               </tr>
             ) : (
-              data.map((record, index) => {
+              displayData.map((record, index) => {
                 const key = getRowKey(record, index);
                 const isSelected = selected === key;
                 return (
@@ -180,18 +187,20 @@ export default function DataTable<T extends object>({
           </span>
           <div className="flex items-center gap-1">
             {Array.from({ length: Math.ceil(pagination.total / pagination.pageSize) }).map((_, i) => (
-              <button
+              <Button
                 key={i}
+                variant="outline"
+                size="sm"
                 onClick={() => pagination.onChange(i + 1)}
                 className={cn(
-                  'w-8 h-8 rounded-md text-[13px] font-medium transition-colors',
+                  'w-8 h-8 p-0 text-[13px] font-medium transition-colors',
                   pagination.current === i + 1
-                    ? 'bg-dark-accent-primary text-white'
+                    ? 'bg-dark-accent-primary text-white border-dark-accent-primary'
                     : 'text-dark-text-secondary hover:bg-dark-card-l2'
                 )}
               >
                 {i + 1}
-              </button>
+              </Button>
             ))}
           </div>
         </div>

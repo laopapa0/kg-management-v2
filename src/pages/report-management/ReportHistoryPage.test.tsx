@@ -24,7 +24,7 @@ describe('ReportHistoryPage', () => {
     expect(screen.getByText('生成的报告将在此处展示')).toBeInTheDocument()
   })
 
-  it('renders generated report cards with plan name, version, template, date and trigger type', () => {
+  it('renders DataTable with plan name, version, template, date and trigger type', () => {
     const mockReports: GeneratedReport[] = [
       {
         id: 'gen-001',
@@ -59,17 +59,19 @@ describe('ReportHistoryPage', () => {
       </MemoryRouter>,
     )
 
-    const card1 = screen.getByTestId('report-history-card-gen-001')
-    expect(card1).toHaveTextContent('核心指标日报')
-    expect(card1).toHaveTextContent('v1')
-    expect(card1).toHaveTextContent('标准日报模板')
-    expect(card1).toHaveTextContent('手动')
+    const rows = screen.getAllByRole('row')
+    expect(rows.length).toBeGreaterThanOrEqual(3) // header + 2 data rows
 
-    const card2 = screen.getByTestId('report-history-card-gen-002')
-    expect(card2).toHaveTextContent('周报汇总')
-    expect(card2).toHaveTextContent('v2')
-    expect(card2).toHaveTextContent('周报模板')
-    expect(card2).toHaveTextContent('自动')
+    // Sorted by generatedAt desc: gen-002 (2024-06-02) first, then gen-001 (2024-06-01)
+    // Row 1 (auto report - latest)
+    expect(rows[1]).toHaveTextContent('周报汇总 v2')
+    expect(rows[1]).toHaveTextContent('周报模板')
+    expect(rows[1]).toHaveTextContent('自动')
+
+    // Row 2 (manual report)
+    expect(rows[2]).toHaveTextContent('核心指标日报 v1')
+    expect(rows[2]).toHaveTextContent('标准日报模板')
+    expect(rows[2]).toHaveTextContent('手动')
   })
 
   it('sorts reports by generatedAt in descending order', () => {
@@ -119,11 +121,13 @@ describe('ReportHistoryPage', () => {
       </MemoryRouter>,
     )
 
-    const cards = screen.getAllByTestId(/report-history-card-/)
-    expect(cards).toHaveLength(3)
-    expect(cards[0]).toHaveAttribute('data-testid', 'report-history-card-gen-002')
-    expect(cards[1]).toHaveAttribute('data-testid', 'report-history-card-gen-003')
-    expect(cards[2]).toHaveAttribute('data-testid', 'report-history-card-gen-001')
+    // DataTable rows should be in tbody
+    const rows = screen.getAllByRole('row')
+    // rows[0] is header, rows[1+] are data
+    expect(rows.length).toBeGreaterThanOrEqual(4)
+    expect(rows[1]).toHaveTextContent('最新报告')
+    expect(rows[2]).toHaveTextContent('中期报告')
+    expect(rows[3]).toHaveTextContent('早期报告')
   })
 
   it('navigates to report detail when clicking online detail button', async () => {
@@ -240,26 +244,23 @@ describe('ReportHistoryPage', () => {
     )
 
     // All reports visible initially
-    expect(screen.getByTestId('report-history-card-gen-001')).toBeInTheDocument()
-    expect(screen.getByTestId('report-history-card-gen-002')).toBeInTheDocument()
-    expect(screen.getByTestId('report-history-card-gen-003')).toBeInTheDocument()
+    expect(screen.getByText('核心指标日报 v1')).toBeInTheDocument()
+    expect(screen.getByText('周报汇总 v1')).toBeInTheDocument()
 
-    // Filter by plan-001 (click the plan button)
+    // Filter by plan-001
     const planButton = screen.getByRole('button', { name: '核心指标日报' })
     await user.click(planButton)
 
-    expect(screen.getByTestId('report-history-card-gen-001')).toBeInTheDocument()
-    expect(screen.getByTestId('report-history-card-gen-002')).toBeInTheDocument()
-    expect(screen.queryByTestId('report-history-card-gen-003')).not.toBeInTheDocument()
+    expect(screen.getByText('核心指标日报 v1')).toBeInTheDocument()
+    expect(screen.getByText('核心指标日报 v2')).toBeInTheDocument()
+    expect(screen.queryByText('周报汇总 v1')).not.toBeInTheDocument()
 
-    // Filter by all (plan filter "全部" button — first of two "全部" buttons on page)
+    // Filter by all
     const allButtons = screen.getAllByRole('button', { name: '全部' })
-    expect(allButtons.length).toBe(2)
     await user.click(allButtons[0])
 
-    expect(screen.getByTestId('report-history-card-gen-001')).toBeInTheDocument()
-    expect(screen.getByTestId('report-history-card-gen-002')).toBeInTheDocument()
-    expect(screen.getByTestId('report-history-card-gen-003')).toBeInTheDocument()
+    expect(screen.getByText('核心指标日报 v1')).toBeInTheDocument()
+    expect(screen.getByText('周报汇总 v1')).toBeInTheDocument()
   })
 
   it('filters reports by trigger type when clicking trigger filter buttons', async () => {
@@ -302,15 +303,15 @@ describe('ReportHistoryPage', () => {
     const manualButton = screen.getByRole('button', { name: '手动' })
     await user.click(manualButton)
 
-    expect(screen.getByTestId('report-history-card-gen-001')).toBeInTheDocument()
-    expect(screen.queryByTestId('report-history-card-gen-002')).not.toBeInTheDocument()
+    expect(screen.getByText('手动报告 v1')).toBeInTheDocument()
+    expect(screen.queryByText('自动报告 v2')).not.toBeInTheDocument()
 
-    // Filter by auto (there are two "自动" buttons — plan name and trigger type; use the trigger filter one)
+    // Filter by auto
     const autoButtons = screen.getAllByRole('button', { name: '自动' })
     await user.click(autoButtons[autoButtons.length - 1])
 
-    expect(screen.queryByTestId('report-history-card-gen-001')).not.toBeInTheDocument()
-    expect(screen.getByTestId('report-history-card-gen-002')).toBeInTheDocument()
+    expect(screen.queryByText('手动报告 v1')).not.toBeInTheDocument()
+    expect(screen.getByText('自动报告 v2')).toBeInTheDocument()
   })
 
   it('paginates reports with 10 items per page', async () => {
@@ -335,29 +336,28 @@ describe('ReportHistoryPage', () => {
       </MemoryRouter>,
     )
 
-    // Page 1 should show 10 items
-    expect(screen.getAllByTestId(/report-history-card-/)).toHaveLength(10)
-    expect(screen.getByTestId('report-history-card-gen-001')).toBeInTheDocument()
-    expect(screen.getByTestId('report-history-card-gen-010')).toBeInTheDocument()
-    expect(screen.queryByTestId('report-history-card-gen-011')).not.toBeInTheDocument()
+    // Page 1: should show first 10 reports
+    expect(screen.getByText('报告1 v1')).toBeInTheDocument()
+    expect(screen.getByText('报告10 v10')).toBeInTheDocument()
+    expect(screen.queryByText('报告11 v11')).not.toBeInTheDocument()
 
-    // Pagination info
-    expect(screen.getByTestId('pagination-info')).toHaveTextContent('1 / 3')
+    // DataTable pagination shows page numbers
+    expect(screen.getByRole('button', { name: '1' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: '2' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: '3' })).toBeInTheDocument()
 
-    // Next page
-    const nextButton = screen.getByTestId('pagination-next')
-    expect(nextButton).not.toBeDisabled()
-    await user.click(nextButton)
+    // Go to page 2
+    await user.click(screen.getByRole('button', { name: '2' }))
 
-    expect(screen.getAllByTestId(/report-history-card-/)).toHaveLength(10)
-    expect(screen.getByTestId('report-history-card-gen-011')).toBeInTheDocument()
-    expect(screen.getByTestId('pagination-info')).toHaveTextContent('2 / 3')
+    expect(screen.queryByText('报告1 v1')).not.toBeInTheDocument()
+    expect(screen.getByText('报告11 v11')).toBeInTheDocument()
+    expect(screen.getByText('报告20 v20')).toBeInTheDocument()
 
-    // Prev page
-    const prevButton = screen.getByTestId('pagination-prev')
-    await user.click(prevButton)
+    // Go to page 3
+    await user.click(screen.getByRole('button', { name: '3' }))
 
-    expect(screen.getByTestId('report-history-card-gen-001')).toBeInTheDocument()
-    expect(screen.getByTestId('pagination-info')).toHaveTextContent('1 / 3')
+    expect(screen.queryByText('报告20 v20')).not.toBeInTheDocument()
+    expect(screen.getByText('报告21 v21')).toBeInTheDocument()
+    expect(screen.getByText('报告25 v25')).toBeInTheDocument()
   })
 })

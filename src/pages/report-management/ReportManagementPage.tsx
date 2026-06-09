@@ -7,11 +7,13 @@ import ReportPlanDialog from '@/components/dialog/ReportPlanDialog'
 import type { ReportPlanFormData } from '@/components/dialog/ReportPlanDialog'
 import { SCHEDULE_LABELS, createReportPlan } from '@/models/reportModel'
 import type { ReportPlan } from '@/models/reportModel'
+import { getNextVersion } from '@/models/generatedReportModel'
 import { getReportPlans, saveReportPlans } from '@/utils/reportStorage'
 import { getGeneratedReports, addGeneratedReport } from '@/utils/generatedReportStorage'
 import { getReportTemplates } from '@/utils/reportTemplateStorage'
 import { generateMockReport } from '@/data/mockReportData'
 import { useNavigate, useLocation } from 'react-router-dom'
+import { toast } from 'sonner'
 
 
 export default function ReportManagementPage() {
@@ -24,6 +26,19 @@ export default function ReportManagementPage() {
   const activeTab = location.pathname === '/reports/history' ? 'history' : 'plans'
 
   const handleGenerate = (plan: ReportPlan) => {
+    // 校验筛选范围不为空
+    const scopeEmpty =
+      !plan.filterScope ||
+      (
+        plan.filterScope.includedIndicatorIds.length === 0 &&
+        plan.filterScope.excludedRuleIds.length === 0 &&
+        plan.filterScope.excludedLinkRelationIds.length === 0
+      )
+    if (scopeEmpty) {
+      toast.error('筛选范围为空，请编辑计划调整范围')
+      return
+    }
+
     const templateName = plan.templateId
       ? (getReportTemplates().find((t) => t.id === plan.templateId)?.name ?? '默认模板')
       : '默认模板'
@@ -36,7 +51,7 @@ export default function ReportManagementPage() {
       plan.filterScope,
       'manual',
     )
-    report.version = `v${plan.latestVersion + 1}`
+    report.version = getNextVersion(`v${plan.latestVersion}`)
 
     addGeneratedReport(report)
 
@@ -51,52 +66,35 @@ export default function ReportManagementPage() {
     navigate(`/reports/${report.id}`)
   }
 
-  const handleSave = (data: ReportPlanFormData) => {
+  const upsertPlanFromFormData = (data: ReportPlanFormData): ReportPlan => {
     if (editingPlan) {
-      const next = plans.map((p) =>
-        p.id === editingPlan.id
-          ? { ...p, name: data.name, schedule: data.schedule, description: data.description, autoSchedule: data.autoSchedule, filterScope: data.filterScope, templateId: data.templateId }
-          : p,
-      )
+      const updated = { ...editingPlan, name: data.name, schedule: data.schedule, description: data.description, autoSchedule: data.autoSchedule, filterScope: data.filterScope, templateId: data.templateId }
+      const next = plans.map((p) => (p.id === editingPlan.id ? updated : p))
       setPlans(next)
       saveReportPlans(next)
-    } else {
-      const newPlan = createReportPlan({
-        name: data.name,
-        schedule: data.schedule,
-        description: data.description,
-        filterSummary: '全部指标 / 全部部门',
-        autoSchedule: data.autoSchedule,
-        filterScope: data.filterScope,
-        templateId: data.templateId,
-      })
-      const next = [...plans, newPlan]
-      setPlans(next)
-      saveReportPlans(next)
+      return updated
     }
+    const newPlan = createReportPlan({
+      name: data.name,
+      schedule: data.schedule,
+      description: data.description,
+      filterSummary: '全部指标 / 全部部门',
+      autoSchedule: data.autoSchedule,
+      filterScope: data.filterScope,
+      templateId: data.templateId,
+    })
+    const next = [...plans, newPlan]
+    setPlans(next)
+    saveReportPlans(next)
+    return newPlan
+  }
+
+  const handleSave = (data: ReportPlanFormData) => {
+    upsertPlanFromFormData(data)
   }
 
   const handleSaveAndGenerate = (data: ReportPlanFormData) => {
-    let plan: ReportPlan
-    if (editingPlan) {
-      plan = { ...editingPlan, name: data.name, schedule: data.schedule, description: data.description, autoSchedule: data.autoSchedule, filterScope: data.filterScope, templateId: data.templateId }
-      const next = plans.map((p) => (p.id === editingPlan.id ? plan : p))
-      setPlans(next)
-      saveReportPlans(next)
-    } else {
-      plan = createReportPlan({
-        name: data.name,
-        schedule: data.schedule,
-        description: data.description,
-        filterSummary: '全部指标 / 全部部门',
-        autoSchedule: data.autoSchedule,
-        filterScope: data.filterScope,
-        templateId: data.templateId,
-      })
-      const next = [...plans, plan]
-      setPlans(next)
-      saveReportPlans(next)
-    }
+    const plan = upsertPlanFromFormData(data)
     handleGenerate(plan)
   }
 

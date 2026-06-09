@@ -1,8 +1,9 @@
 import { useState, useMemo } from 'react'
-import { Eye, FileText, ExternalLink } from 'lucide-react'
+import { FileText, ExternalLink, Eye } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import EmptyState from '@/components/empty-state/EmptyState'
 import { Button } from '@/components/ui/button'
+import DataTable, { type Column } from '@/components/DataTable'
 import { getGeneratedReports } from '@/utils/generatedReportStorage'
 import type { GeneratedReport } from '@/models/generatedReportModel'
 
@@ -54,12 +55,80 @@ export default function ReportHistoryPage() {
     })
   }, [allReports, triggerFilter, planFilter])
 
-  const totalPages = Math.max(1, Math.ceil(filteredReports.length / PAGE_SIZE))
-  const currentPage = Math.min(page, totalPages)
-  const pagedReports = useMemo(() => {
-    const start = (currentPage - 1) * PAGE_SIZE
-    return filteredReports.slice(start, start + PAGE_SIZE)
-  }, [filteredReports, currentPage])
+  const columns: Column<GeneratedReport>[] = [
+    {
+      key: 'title',
+      title: '报告标题',
+      render: (r) => (
+        <span className="font-medium text-dark-text-primary">
+          {r.planName} {r.version}
+        </span>
+      ),
+    },
+    {
+      key: 'planName',
+      title: '所属计划',
+    },
+    {
+      key: 'templateName',
+      title: '使用模板',
+    },
+    {
+      key: 'generatedAt',
+      title: '生成时间',
+      render: (r) => (
+        <span className="text-dark-text-secondary">
+          {new Date(r.generatedAt).toLocaleString('zh-CN', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+          })}
+        </span>
+      ),
+    },
+    {
+      key: 'triggerType',
+      title: '生成方式',
+      render: (r) => <TriggerBadge type={r.triggerType} />,
+    },
+    {
+      key: 'actions',
+      title: '操作',
+      align: 'right',
+      render: (r) => (
+        <div className="flex items-center justify-end gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            data-testid={`view-report-${r.id}`}
+            className="text-[12px] h-7 px-2 border-dark-border text-dark-text-secondary hover:bg-dark-page"
+            onClick={(e) => {
+              e.stopPropagation()
+              window.open('docs/report.html', '_blank')
+            }}
+          >
+            <ExternalLink size={13} className="mr-1" />
+            查看报告
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            data-testid={`online-detail-${r.id}`}
+            className="text-[12px] h-7 px-2 border-dark-border text-dark-accent-primary hover:bg-dark-accent-primary/10"
+            onClick={(e) => {
+              e.stopPropagation()
+              navigate(`/reports/${r.id}`)
+            }}
+          >
+            <Eye size={13} className="mr-1" />
+            在线详情
+          </Button>
+        </div>
+      ),
+    },
+  ]
 
   if (allReports.length === 0) {
     return (
@@ -140,106 +209,21 @@ export default function ReportHistoryPage() {
         </div>
       </div>
 
-      {/* 报告卡片列表 */}
-      {filteredReports.length === 0 ? (
-        <div className="bg-dark-elevated rounded-lg border border-dark-border shadow-[0_1px_3px_rgba(0,0,0,0.06)] p-10 text-center">
-          <FileText size={32} className="mx-auto text-dark-text-tertiary mb-3" />
-          <div className="text-[15px] text-dark-text-secondary mb-1">未找到匹配的报告</div>
-          <div className="text-[13px] text-dark-text-tertiary">请调整筛选条件后重试</div>
-        </div>
-      ) : (
-        <>
-          <div className="grid grid-cols-3 gap-4">
-            {pagedReports.map((report) => (
-              <div
-                key={report.id}
-                data-testid={`report-history-card-${report.id}`}
-                className="bg-dark-elevated rounded-lg border border-dark-border shadow-[0_1px_3px_rgba(0,0,0,0.06)] p-4 flex flex-col"
-              >
-                {/* 头部：报告标题 + 触发类型 */}
-                <div className="flex items-start justify-between mb-3">
-                  <h3 className="text-[14px] font-medium text-dark-text-primary leading-tight pr-2">
-                    {report.planName} {report.version}
-                  </h3>
-                  <TriggerBadge type={report.triggerType} />
-                </div>
-
-                {/* 生成时间 */}
-                <div className="text-[12px] text-dark-text-tertiary mb-3">
-                  {new Date(report.generatedAt).toLocaleString('zh-CN', {
-                    year: 'numeric',
-                    month: '2-digit',
-                    day: '2-digit',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })}
-                </div>
-
-                {/* 信息栏 */}
-                <div className="flex gap-4 mb-4">
-                  <div>
-                    <div className="text-[11px] text-dark-text-tertiary">所属计划</div>
-                    <div className="text-[13px] font-medium text-dark-text-primary">{report.planName}</div>
-                  </div>
-                  <div>
-                    <div className="text-[11px] text-dark-text-tertiary">使用模板</div>
-                    <div className="text-[13px] font-medium text-dark-text-primary">{report.templateName}</div>
-                  </div>
-                </div>
-
-                {/* 操作栏 */}
-                <div className="mt-auto pt-3 border-t border-dark-border flex items-center gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    data-testid={`view-report-${report.id}`}
-                    className="text-[12px] h-7 px-2 border-dark-border text-dark-text-secondary hover:bg-dark-page"
-                    onClick={() => window.open('docs/report.html', '_blank')}
-                  >
-                    <ExternalLink size={13} className="mr-1" />
-                    查看报告
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    data-testid={`online-detail-${report.id}`}
-                    className="text-[12px] h-7 px-2 border-dark-border text-dark-accent-primary hover:bg-dark-accent-primary/10"
-                    onClick={() => navigate(`/reports/${report.id}`)}
-                  >
-                    <Eye size={13} className="mr-1" />
-                    在线详情
-                  </Button>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* 分页 */}
-          {totalPages > 1 && (
-            <div className="flex items-center justify-center gap-2 py-2">
-              <button
-                data-testid="pagination-prev"
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
-                disabled={currentPage <= 1}
-                className="px-3 py-1.5 rounded text-[13px] border border-dark-border bg-dark-elevated text-dark-text-secondary hover:bg-dark-page disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                上一页
-              </button>
-              <span data-testid="pagination-info" className="text-[13px] text-dark-text-secondary">
-                {currentPage} / {totalPages}
-              </span>
-              <button
-                data-testid="pagination-next"
-                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                disabled={currentPage >= totalPages}
-                className="px-3 py-1.5 rounded text-[13px] border border-dark-border bg-dark-elevated text-dark-text-secondary hover:bg-dark-page disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                下一页
-              </button>
-            </div>
-          )}
-        </>
-      )}
+      {/* DataTable */}
+      <div className="bg-dark-elevated rounded-lg border border-dark-border shadow-[0_1px_3px_rgba(0,0,0,0.06)] p-4">
+        <DataTable
+          columns={columns}
+          data={filteredReports}
+          rowKey="id"
+          emptyText="未找到匹配的报告"
+          pagination={{
+            current: page,
+            pageSize: PAGE_SIZE,
+            total: filteredReports.length,
+            onChange: setPage,
+          }}
+        />
+      </div>
     </div>
   )
 }

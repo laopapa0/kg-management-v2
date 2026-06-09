@@ -235,4 +235,32 @@ describe('ReportManagementPage', () => {
 
     expect(screen.getByTestId('history-page')).toBeInTheDocument()
   })
+
+  it('shows error toast when generating with empty filterScope', async () => {
+    const user = userEvent.setup()
+    saveReportPlans([{
+      ...mockReportPlans[0],
+      latestVersion: 0,
+      filterScope: { includedIndicatorIds: [], excludedRuleIds: [], excludedLinkRelationIds: [] },
+    }])
+
+    render(
+      <MemoryRouter initialEntries={['/reports']}>
+        <Routes>
+          <Route path="/reports" element={<ReportManagementPage />} />
+          <Route path="/reports/:id" element={<div data-testid="report-detail-page">Report Detail</div>} />
+        </Routes>
+      </MemoryRouter>,
+    )
+
+    const generateButton = screen.getByText('首次生成')
+    await user.click(generateButton)
+
+    // Should not navigate
+    expect(screen.queryByTestId('report-detail-page')).not.toBeInTheDocument()
+    // Plan version should not change
+    const stored = JSON.parse(localStorage.getItem('kgv2-reports') ?? '[]')
+    const plan = stored.find((p: { id: string }) => p.id === 'report-plan-001')
+    expect(plan.latestVersion).toBe(0)
+  })
 })

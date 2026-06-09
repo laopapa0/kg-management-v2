@@ -46,12 +46,24 @@ export function createGeneratedReport(
 }
 
 /**
- * 计算下一个版本号（v0.1 → v0.2 → v0.3）
+ * 计算下一个版本号
+ * 支持两种格式：
+ * - v{integer} → v1, v2, v3... (从 latestVersion 整数递增)
+ * - v{major}.{minor} → v0.1, v0.2... (minor 递增)
  */
 export function getNextVersion(currentVersion: string): string {
-  const match = currentVersion.match(/v(\d+)\.(\d+)/)
-  if (!match) return 'v0.1'
-  const major = parseInt(match[1], 10)
-  const minor = parseInt(match[2], 10)
-  return `v${major}.${minor + 1}`
+  // 优先匹配 v{integer} 格式（如 v1, v12）
+  const intMatch = currentVersion.match(/^v(\d+)$/)
+  if (intMatch) {
+    const num = parseInt(intMatch[1], 10)
+    return `v${num + 1}`
+  }
+  // 匹配 v{major}.{minor} 格式（如 v0.1）
+  const dotMatch = currentVersion.match(/^v(\d+)\.(\d+)$/)
+  if (dotMatch) {
+    const major = parseInt(dotMatch[1], 10)
+    const minor = parseInt(dotMatch[2], 10)
+    return `v${major}.${minor + 1}`
+  }
+  return 'v1'
 }
