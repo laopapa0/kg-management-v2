@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>运营监控智能分析报告（2026年3月）</title>
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, "Microsoft YaHei", sans-serif; background: #f5f7fa; color: #2c3e50; line-height: 1.6; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+    .header { background: linear-gradient(135deg, #1a237e, #283593); color: #fff; padding: 30px; border-radius: 8px; margin-bottom: 24px; }
+    .header h1 { font-size: 28px; margin-bottom: 8px; }
+    .header .meta { font-size: 14px; opacity: 0.8; }
+    .section { background: #fff; border-radius: 8px; padding: 24px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+    .section h2 { font-size: 22px; color: #1a237e; border-left: 4px solid #1a237e; padding-left: 12px; margin-bottom: 16px; }
+    .section h3 { font-size: 18px; color: #34495e; margin: 16px 0 10px; }
+    .section h4 { font-size: 16px; color: #455a64; margin: 12px 0 8px; }
+    .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 20px; }
+    .stat-card { background: #f8f9fa; border-radius: 6px; padding: 16px; text-align: center; }
+    .stat-card .label { font-size: 13px; color: #7f8c8d; }
+    .stat-card .value { font-size: 26px; font-weight: bold; color: #2c3e50; }
+    .stat-card .unit { font-size: 12px; color: #95a5a6; }
+    table { width: 100%; border-collapse: collapse; margin: 12px 0; }
+    th { background: #1a237e; color: #fff; padding: 10px 12px; text-align: left; font-size: 13px; }
+    td { padding: 8px 12px; border-bottom: 1px solid #ecf0f1; font-size: 13px; }
+    tr:nth-child(even) { background: #f8f9fa; }
+    tr:hover { background: #e8eaf6; }
+    .chart-box { width: 100%; height: 400px; margin: 16px 0; }
+    .chart-box.gauge { height: 250px; }
+    .chart-box.graph { height: 550px; }
+    .tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 12px; margin: 2px; }
+    .tag-success { background: #e8f5e9; color: #2e7d32; }
+    .tag-danger { background: #ffebee; color: #c62828; }
+    .tag-warning { background: #fff3e0; color: #e65100; }
+    .tag-info { background: #e3f2fd; color: #1565c0; }
+    .tag-purple { background: #f3e5f5; color: #7b1fa2; }
+    .footer { text-align: center; color: #95a5a6; font-size: 13px; padding: 20px 0; }
+    .alert { padding: 12px 16px; border-radius: 6px; margin: 12px 0; font-size: 14px; }
+    .alert-danger { background: #ffebee; border-left: 4px solid #c62828; color: #c62828; }
+    .alert-warning { background: #fff8e1; border-left: 4px solid #f57f17; color: #f57f17; }
+    .alert-info { background: #e3f2fd; border-left: 4px solid #1565c0; color: #1565c0; }
+    .alert-success { background: #e8f5e9; border-left: 4px solid #2e7d32; color: #2e7d32; }
+    .chart-note { background: #f8f9fa; border-radius: 6px; padding: 12px 16px; margin: 0 0 20px 0; font-size: 14px; line-height: 1.8; color: #555; }
+    .chart-note p { margin: 4px 0; }
+    .chart-note strong { color: #2c3e50; }
+    .nb-table { font-size: 12px; }
+    .nb-table th { font-size: 12px; padding: 6px 8px; }
+    .nb-table td { font-size: 12px; padding: 5px 8px; }
+    .nb-table .deviated { color: #c62828; font-weight: bold; }
+    .nb-table .normal { color: #2e7d32; }
+    .nb-table .note { color: #e65100; font-style: italic; }
+    .legend-box { background: #f8f9fa; border-radius: 6px; padding: 10px 16px; margin: 8px 0 12px; font-size: 13px; line-height: 1.8; }
+    .legend-box span { margin-right: 16px; }
+  </style>
+</head>
+<body>
+<div class="container">
+
+<div class="header">
+  <h1>运营监控智能分析报告（2026年3月）</h1>
+  <div class="meta">报告生成时间: 2026-05-24 | 数据范围: 2026-03-01 ~ 2026-03-31</div>
+</div>
+
+<!-- 一、黄金指标概览 -->
+<div class="section">
+  <h2>一、黄金指标概览（月度）</h2>
+
+  <h3>1.1 经营板块 — 核心金额指标</h3>
+  <div id="chart-0" class="chart-box"></div>
+  <div class="chart-note">
+    <p><strong>图表解读</strong>：3月经营收入85.94亿元，累计进度25.34%，略高于时间进度（25%）；台阶收入37.48亿元，进度24.51%；利润总额15.53亿元，进度24.22%。产数收入累计完成48.53亿元，同比增长2.80%，产数ICT毛利额8.17亿元但同比下降11.05%，需关注产数盈利能力下滑趋势。</p>
+    <p><strong>指标口径</strong>：经营收入=当月所有业务收入合计；经营收入进度=累计收入÷年度预算×100%；利润总额（考核口径）=考核用利润合计；利润总额进度=累计利润÷年度考核目标×100%；产数收入=产业数字化业务收入累计值；产数ICT毛利额=产数ICT收入-直接相关成本</p>
+  </div>
+
+  <h3>1.1b 经营板块 — 进度与同比</h3>
+  <div id="chart-0b" class="chart-box"></div>
+  <div class="chart-note">
+    <p><strong>图表解读</strong>：经营收入进度25.34%和台阶收入进度24.51%均接近时间进度线，利润总额进度24.22%略偏慢。利润总额同比下降2.57%，产数ICT毛利额同比大幅下降11.05%，为当前经营最大隐忧。产数资源型业务毛利额环比增长51.34%，基础资源型环比增长54.23%，毛利有所回升。</p>
+    <p><strong>指标口径</strong>：同比=（本期-去年同期）/去年同期×100%；环比=（本期-上期）/上期×100%</p>
+  </div>
+
+  <h3>1.1c 关键KPI进度仪表盘</h3>
+  <div id="chart-1" class="chart-box gauge"></div>
+  <div id="chart-2" class="chart-box gauge"></div>
+  <div id="chart-3" class="chart-box gauge"></div>
+  <div class="chart-note">
+    <p><strong>图表解读</strong>：三大KPI进度均在24%~26%区间，略高于或接近时间进度（25%）。利润总额进度24.22%略有缺口，经营收入进度25.34%表现较好，台阶收入进度24.51%基本达标。</p>
+    <p><strong>指标口径</strong>：利润总额进度=累计利润÷年度考核目标×100%；经营收入进度=累计收入÷年度预算×100%；台阶收入进度=累计台阶收入÷年度台阶目标×100%</p>
+  </div>
+
+  <h3>1.2 效能板块</h3>
+  <div id="chart-4" class="chart-box"></div>
+  <div class="chart-note">
+    <p><strong>图表解读</strong>：劳动生产率192.89万元/人，保持在较高水平。营业收现率67.41%，应收占收比20.04%，回款效率尚可。资产负债率23.30%、净资产收益率5.39%处于健康区间。研发投入强度1.17%偏低，产数资源型毛利率65.42%表现优秀。房屋土地租赁收支差改善额为-10189.63万元，租赁收支仍为负贡献。</p>
+    <p><strong>指标口径</strong>：劳动生产率=营业收入/从业人数；营业收现率=销售商品提供劳务收到的现金/营业收入×100%；应收占收比=应收账款余额/营业收入×100%；资产负债率=负债总额/资产总额×100%；净资产收益率=净利润/平均净资产×100%</p>
+  </div>
+
+  <h3>1.3 发展板块 — 渗透率</h3>
+  <div id="chart-5" class="chart-box"></div>
+  <div class="chart-note">
+    <p><strong>图表解读</strong>：名单制客户三线渗透率81.00%领先，高套渗透率52.04%过半，家庭宽带渗透率43.22%仍有提升空间。极致融合渗透率仅9.39%，为最大短板，需重点推进。政企服务派单及时响应率86.00%。</p>
+    <p><strong>指标口径</strong>：家庭宽带渗透率=家庭宽带用户数/家庭户数×100%；高套渗透率=高套餐用户数/总用户数×100%；极致融合渗透率=极致融合用户数/总用户数×100%；名单制客户三线渗透率=有宽带+互联网专线+组网专线收入的行业客户数/在网行业客户数×100%</p>
+  </div>
+
+  <h3>1.4 运维板块</h3>
+  <div id="chart-6" class="chart-box"></div>
+  <div class="chart-note">
+    <p><strong>图表解读</strong>：3月新终端核销399083台，旧终端核销94266台，核销旧终端比例19%。新终端单价210.09元/台，旧终端单价30.61元/台，总成本占比1.0%，终端成本管控整体可控。</p>
+    <p><strong>指标口径</strong>：核销旧终端比例=旧终端核销数量/(新+旧终端核销数量)×100%；总成本占比=终端核销总成本/总支出×100%</p>
+  </div>
+
+  <h3>1.5 客户服务板块</h3>
+  <div id="chart-7" class="chart-box"></div>
+  <div class="chart-note">
+    <p><strong>图表解读</strong>：装维即时评价满意度99.65%表现最优，营业厅满意度97.05%，热线满意度91.37%相对偏低，建议关注热线服务质量提升。政企服务派单及时响应率86.00%仍有提升空间。</p>
+    <p><strong>指标口径</strong>：满意度=评价满意次数/总评价次数×100%；政企服务派单及时响应率=及时响应的派单数/总派单数×100%</p>
+  </div>
+</div>
+
+<!-- 二、毛刺检测分析 -->
+<div class="section">
+  <h2>二、毛刺检测分析</h2>
+
+  <div class="stat-grid">
+    <div class="stat-card"><div class="label">检测日指标数</div><div class="value">66</div></div>
+    <div class="stat-card"><div class="label">算法检出异常</div><div class="value">131</div></div>
+    <div class="stat-card"><div class="label">验证通过</div><div class="value">42</div></div>
+    <div class="stat-card"><div class="label">极高置信(3票)</div><div class="value">18</div></div>
+    <div class="stat-card"><div class="label">真异常(LLM审核)</div><div class="value" style="color:#c62828">8</div></div>
+  </div>
+
+  <h3>2.1 异常指标汇总表</h3>
+  <table>
+    <tr><th>序号</th><th>指标名称</th><th>异常日期</th><th>异常值</th><th>日变化</th><th>审核判定</th></tr>
+    <tr><td>1</td><td>战新当日新增</td><td>03-09</td><td>504线</td><td>+50300%</td><td><span class="tag tag-danger">真异常</span></td></tr>
+    <tr><td>2</td><td>战新当日完工平均交付时长</td><td>03-22</td><td>161.5分钟</td><td>+194.3%</td><td><span class="tag tag-danger">真异常</span></td></tr>
+    <tr><td>3</td><td>当日聚焦销账</td><td>03-24</td><td>5900.04万元</td><td>+359658%</td><td><span class="tag tag-danger">真异常</span></td></tr>
+    <tr><td>4</td><td>云宽带当日新增</td><td>03-27</td><td>506线</td><td>-67.8%</td><td><span class="tag tag-danger">真异常</span></td></tr>
+    <tr><td>5</td><td>99+拆机当日完成率</td><td>03-09</td><td>122%</td><td>+52.5%</td><td><span class="tag tag-danger">真异常</span></td></tr>
+    <tr><td>6</td><td>移动当日完成率</td><td>03-27</td><td>133%</td><td>+26.7%</td><td><span class="tag tag-danger">真异常</span></td></tr>
+    <tr><td>7</td><td>上网专线新增完成率</td><td>03-24</td><td>12%</td><td>-75.5%</td><td><span class="tag tag-danger">真异常</span></td></tr>
+    <tr><td>8</td><td>商务宽带新增完成率</td><td>03-24</td><td>12%</td><td>-81.0%</td><td><span class="tag tag-danger">真异常</span></td></tr>
+    <tr><td>9</td><td>10000号呼入量</td><td>03-31</td><td>38715个</td><td>+70.6%</td><td><span class="tag tag-warning">月末效应</span></td></tr>
+    <tr><td>10</td><td>申告量</td><td>03-31</td><td>5795个</td><td>+62.8%</td><td><span class="tag tag-warning">月末效应</span></td></tr>
+    <tr><td>11</td><td>99+拆机</td><td>03-30</td><td>551线</td><td>+53.1%</td><td><span class="tag tag-warning">月末效应</span></td></tr>
+    <tr><td>12</td><td>上年度存货盘盈</td><td>03-31</td><td>43.8亿元</td><td>+421%</td><td><span class="tag tag-warning">月末效应</span></td></tr>
+    <tr><td>13</td><td>投诉单总量</td><td>03-18</td><td>3个</td><td>-99.9%</td><td><span class="tag tag-info">数据质量</span></td></tr>
+    <tr><td>14</td><td>营业厅即时评价满意度</td><td>03-11</td><td>192</td><td>+97.9%</td><td><span class="tag tag-info">数据质量</span></td></tr>
+    <tr><td>15</td><td>5G基站总数</td><td>03-10</td><td>18894个</td><td>-0.1%</td><td><span class="tag tag-success">边界</span></td></tr>
+    <tr><td>16</td><td>热线满意度环比</td><td>03-11</td><td>1.8%</td><td>+81.8%</td><td><span class="tag tag-success">边界</span></td></tr>
+    <tr><td>17</td><td>线上触达（日）</td><td>03-23</td><td>2218650</td><td>-78.5%</td><td><span class="tag tag-success">边界</span></td></tr>
+    <tr><td>18</td><td>公客工单流转时长</td><td>03-18</td><td>1.23小时</td><td>+46.4%</td><td><span class="tag tag-success">边界</span></td></tr>
+  </table>
+
+  <h3>2.2 真异常指标折线图</h3>
+
+  <h4>① 战新当日新增（03-09，504线，+50300%）</h4>
+  <div id="chart-s1" class="chart-box"></div>
+  <div class="chart-note">
+    <p><strong>图表解读</strong>：03-07降至3线、03-08仅1线后，03-09突然飙升至504线（+50300%），次日即回落至128线。前两日接近零为异常低值，03-09可能为积压工单集中释放。月末03-30/31再次出现805/709线的高位。</p>
+  </div>
+
+  <h4>② 战新当日完工平均交付时长（03-22，161.5分钟，+194.3%）</h4>
+  <div id="chart-s2" class="chart-box"></div>
+  <div class="chart-note">
+    <p><strong>图表解读</strong>：03-22交付时长从54.88分钟飙升至161.5分钟（+194%），为3月最高值，次日即回落至60.22分钟。03-20也有105.45分钟的偏高值，可能与工单积压有关。</p>
+  </div>
+
+  <h4>③ 当日聚焦销账（03-24，5900.04万元，+359658%）</h4>
+  <div id="chart-s3" class="chart-box"></div>
+  <div class="chart-note">
+    <p><strong>图表解读</strong>：03-22/23连续两天仅1.2/1.64万元（异常低值），03-24突然飙升至5900.04万元，为典型的"压缩后释放"模式，可能为系统延迟入账后集中确认。03-31也有4505.63万元的月末高峰。</p>
+  </div>
+
+  <h4>④ 云宽带当日新增（03-27，506线，-67.8%）</h4>
+  <div id="chart-s4" class="chart-box"></div>
+  <div class="chart-note">
+    <p><strong>图表解读</strong>：03-27从1573线骤降至506线（-67.8%），形成孤立深谷，次日立即恢复至1828线。为典型的单日数据异常，可能为系统故障或数据采集不完整。</p>
+  </div>
+
+  <h4>⑤ 99+拆机当日完成率（03-09，122%，+52.5%）</h4>
+  <div id="chart-s5" class="chart-box"></div>
+  <div class="chart-note">
+    <p><strong>图表解读</strong>：03-09完成率从80%跳升至122%（完工>新增），与战新当日新增504线同日发生。月末完成率持续下行至22%（03-31），反映月末新增量激增而完工跟不上。</p>
+  </div>
+
+  <h4>⑥ 移动当日完成率（03-27，133%，+26.7%）</h4>
+  <div id="chart-s6" class="chart-box"></div>
+  <div class="chart-note">
+    <p><strong>图表解读</strong>：03-27完成率从105%跳升至133%，与云宽带当日新增骤降同日。当新增量大幅减少时，完工量相对稳定导致完成率虚高。孤立尖峰后次日即回落至91%。</p>
+  </div>
+
+  <h4>⑦ 上网专线新增完成率（03-24，12%，-75.5%）</h4>
+  <div id="chart-s7" class="chart-box"></div>
+  <div class="chart-note">
+    <p><strong>图表解读</strong>：03-24完成率从49%骤降至12%（-75.5%），与商务宽带完成率同日暴跌。此后缓慢恢复至月底33%，但仍远低于正常水平（50%+）。可能与新增量突增或完工延迟有关。</p>
+  </div>
+
+  <h4>⑧ 商务宽带新增完成率（03-24，12%，-81.0%）</h4>
+  <div id="chart-s8" class="chart-box"></div>
+  <div class="chart-note">
+    <p><strong>图表解读</strong>：03-24完成率从63%骤降至12%（-81%），与上网专线完成率同日暴跌，模式完全一致。此后缓慢回升至月底29%。两个指标同日异常指向共同的上游原因。</p>
+  </div>
+</div>
+
+<!-- 三、知识图谱归因分析 -->
+<div class="section">
+  <h2>三、知识图谱归因分析</h2>
+
+  <div class="legend-box">
+    <strong>图例说明：</strong><br>
+    <span>🔴 红色节点 = 异常中心指标</span>
+    <span>🔵 蓝色节点 = DEPENDS_ON上游</span>
+    <span>🟠 橙色节点 = 已偏离邻居</span>
+    <span>🟢 绿色节点 = 未偏离邻居</span><br>
+    <span>━━ 实线(蓝色, 2.5px) = 已验证传导（邻居异常日偏离）</span>
+    <span>┅┅ 虚线(灰色, 1px) = 无数据证据的关系</span><br>
+    <strong>偏离判定</strong>：日变化&thinsp;>&thinsp;20% 或超出 月均值±2σ
+  </div>
+
+  <!-- 3.1 战新当日新增 -->
+  <h3>3.1 战新当日新增（03-09，504线，+50300%）</h3>
+  <div class="alert alert-danger">
+    <strong>异常表现</strong>：异常日值504线，前日值1线，日变化+50300%<br>
+    月均值88.87线，月标准差202.38，CV=227.7%（极高波动）
+  </div>
+  <h4>图谱邻居数据（03-09）</h4>
+  <table class="nb-table">
+    <tr><th>邻居</th><th>关系</th><th>方向</th><th>03-09值</th><th>03-08值</th><th>日变化</th><th>月均值</th><th>偏离?</th></tr>
+    <tr><td>三线当日新增</td><td>DRIVES</td><td>出→</td><td>28</td><td>0</td><td class="note">N/A</td><td>16.4</td><td class="note">⚠️前日为0</td></tr>
+    <tr><td>三线当日完工</td><td>DRIVES</td><td>出→</td><td>24</td><td>1</td><td class="note">+2300%</td><td>17.9</td><td class="note">⚠️前日极低</td></tr>
+    <tr><td>战新当日完工</td><td>DRIVES</td><td>出→</td><td>6</td><td>0</td><td class="note">N/A</td><td>12.1</td><td class="normal">正常</td></tr>
+    <tr><td>三线完工平均交付时长</td><td>DRIVES</td><td>出→</td><td>182.46</td><td>189.52</td><td>-3.7%</td><td>128.6</td><td class="normal">正常</td></tr>
+    <tr><td>装维工单数</td><td>DRIVES</td><td>出→</td><td>12847</td><td>13788</td><td>-6.8%</td><td>—</td><td class="normal">正常</td></tr>
+    <tr><td>申告量</td><td>DRIVES</td><td>出→</td><td>3110</td><td>—</td><td>—</td><td>3054</td><td class="normal">正常</td></tr>
+    <tr><td>战新在途超时</td><td>DRIVES</td><td>出→</td><td>0</td><td>0</td><td>0%</td><td>0</td><td class="normal">正常</td></tr>
+    <tr><td>5G基站总数</td><td>DRIVES</td><td>入←</td><td>18907</td><td>18904</td><td>+0.02%</td><td>18920</td><td class="normal">正常</td></tr>
+    <tr><td>高套当日新增</td><td>DRIVES</td><td>入←</td><td>421</td><td>505</td><td>-16.6%</td><td>420</td><td class="normal">正常</td></tr>
+  </table>
+  <div id="chart-g1" class="chart-box graph"></div>
+  <div class="alert alert-warning">
+    <strong>归因分析</strong>：战新当日新增在知识图谱中<strong>无DEPENDS_ON关系</strong>，仅有DRIVES（驱动下游）出/入关系。所有邻居03-09当天均未偏离（部分前日极低导致日变化不可靠）。<br>
+    <strong>归因判定</strong>：<span class="tag tag-warning">无法归因</span> — 无上游DEPENDS_ON关系，该指标为源头业务量指标，波动由市场行为驱动<br>
+    <strong>建议负责部门</strong>：云网运
+  </div>
+
+  <!-- 3.2 战新当日完工平均交付时长 -->
+  <h3>3.2 战新当日完工平均交付时长（03-22，161.5分钟，+194.3%）</h3>
+  <div class="alert alert-danger">
+    <strong>异常表现</strong>：异常日值161.5分钟，前日值54.88分钟，日变化+194.3%<br>
+    月均值49.35分钟，月标准差34.62
+  </div>
+  <h4>图谱邻居数据（03-22）</h4>
+  <table class="nb-table">
+    <tr><th>邻居</th><th>关系</th><th>方向</th><th>03-22值</th><th>03-21值</th><th>日变化</th><th>月均值</th><th>偏离?</th></tr>
+    <tr><td>战新当日完工</td><td>DEPENDS_ON</td><td>入←</td><td>1</td><td>1</td><td>0%</td><td>12.1</td><td class="normal">正常</td></tr>
+    <tr><td>战新当日新增</td><td>DRIVES</td><td>入←</td><td>0</td><td>0</td><td>0%</td><td>88.9</td><td class="normal">正常</td></tr>
+    <tr><td>战新在途超时</td><td>DRIVES</td><td>入←</td><td>0</td><td>0</td><td>0%</td><td>0</td><td class="normal">正常</td></tr>
+    <tr><td>装维工单数</td><td>DRIVES</td><td>入←</td><td>14798</td><td>15029</td><td>-1.5%</td><td>—</td><td class="normal">正常</td></tr>
+    <tr><td>三线当日新增</td><td>DRIVES</td><td>入←</td><td>0</td><td>0</td><td>0%</td><td>16.4</td><td class="normal">正常</td></tr>
+    <tr><td>三线当日完工</td><td>DRIVES</td><td>入←</td><td>0</td><td>1</td><td>-100%</td><td>17.9</td><td class="normal">正常</td></tr>
+    <tr><td>三线完工平均交付时长</td><td>DRIVES</td><td>入←</td><td>103.96</td><td>103.96</td><td>0%</td><td>128.6</td><td class="normal">正常</td></tr>
+    <tr><td>政企平均处理时长</td><td>DRIVES</td><td>出→</td><td>1.87</td><td>1.86</td><td>+0.5%</td><td>—</td><td class="normal">正常</td></tr>
+  </table>
+  <div id="chart-g2" class="chart-box graph"></div>
+  <div class="alert alert-info">
+    <strong>归因分析</strong>：交付时长 = 总完工时长 ÷ 完工数量。03-22战新当日完工仅1单，若该单为复杂工单则平均时长被放大。所有上游邻居（含DEPENDS_ON）当天均未偏离。<br>
+    <strong>归因判定</strong>：<span class="tag tag-info">关系存在但未传导</span> — DEPENDS_ON关系存在（战新当日完工），但上游邻居未偏离，无法构成传导证据<br>
+    <strong>建议负责部门</strong>：云网运
+  </div>
+
+  <!-- 3.3 当日聚焦销账 -->
+  <h3>3.3 当日聚焦销账（03-24，5900.04万元，+359658%）</h3>
+  <div class="alert alert-danger">
+    <strong>异常表现</strong>：异常日值5900.04万元，前日值1.64万元，日变化+359658%<br>
+    月均值293.67万元，月标准差2044.19
+  </div>
+  <h4>图谱邻居数据（03-24）</h4>
+  <table class="nb-table">
+    <tr><th>邻居</th><th>关系</th><th>方向</th><th>03-24值</th><th>03-23值</th><th>日变化</th><th>月均值</th><th>偏离?</th></tr>
+    <tr><td>当日计费销账</td><td>AGGREGATES</td><td>出→</td><td>57.3亿</td><td>6.4亿</td><td class="deviated">+801%</td><td>47.6亿</td><td class="deviated">✅ 偏离</td></tr>
+    <tr><td>三线当日新增</td><td>DRIVES</td><td>入←</td><td>20</td><td>17</td><td>+18%</td><td>16.4</td><td class="normal">正常</td></tr>
+    <tr><td>三线当日完工</td><td>TRANSMISSION</td><td>入←</td><td>25</td><td>27</td><td>-7%</td><td>17.9</td><td class="normal">正常</td></tr>
+    <tr><td>政企平均处理时长</td><td>DRIVES</td><td>出→</td><td>1.82</td><td>1.83</td><td>-0.5%</td><td>—</td><td class="normal">正常</td></tr>
+  </table>
+  <div id="chart-g3" class="chart-box graph"></div>
+  <div class="alert alert-success">
+    <strong>归因分析</strong>：当日计费销账03-22/23连续两天仅1.2/1.64万元（远低于月均293万元），为数据积压。03-24计费销账飙升至57.3亿（+801%），聚焦销账同步释放至5900万元。<br>
+    <strong>归因链路</strong>：当日聚焦销账 —AGGREGATES→ 当日计费销账(+801%，✅已验证传导)<br>
+    <strong>归因判定</strong>：<span class="tag tag-danger">图谱归因成功</span><br>
+    <strong>建议负责部门</strong>：市场部
+  </div>
+
+  <!-- 3.4 云宽带当日新增 -->
+  <h3>3.4 云宽带当日新增（03-27，506线，-67.8%）</h3>
+  <div class="alert alert-danger">
+    <strong>异常表现</strong>：异常日值506线，前日值1573.4线，日变化-67.8%<br>
+    月均值1742.11线，月标准差300.14
+  </div>
+  <h4>图谱邻居数据（03-27）</h4>
+  <table class="nb-table">
+    <tr><th>邻居</th><th>关系</th><th>方向</th><th>03-27值</th><th>03-26值</th><th>日变化</th><th>偏离?</th></tr>
+    <tr><td>移动当日完成率</td><td>DRIVES</td><td>出→</td><td>133%</td><td>105%</td><td>+26.7%</td><td class="note">下游受影响</td></tr>
+    <tr><td>上网专线完成率</td><td>DRIVES</td><td>出→</td><td>—</td><td>—</td><td>—</td><td class="note">下游(无数据)</td></tr>
+    <tr><td>商务宽带完成率</td><td>DRIVES</td><td>出→</td><td>—</td><td>—</td><td>—</td><td class="note">下游(无数据)</td></tr>
+    <tr><td>线上触达(日)</td><td>DRIVES</td><td>入←</td><td>—</td><td>14.2M</td><td>—</td><td class="note">⚠️ 03-23曾-78.5%</td></tr>
+    <tr><td>宽带当日新增</td><td>DRIVES</td><td>入←</td><td>1</td><td>1</td><td>0%</td><td class="normal">正常</td></tr>
+  </table>
+  <div id="chart-g4" class="chart-box graph"></div>
+  <div class="alert alert-warning">
+    <strong>归因分析</strong>：无直接上游邻居在03-27当天偏离。线上触达(日)曾在03-23出现-78.5%异常，但距03-27已有4天，因果链较弱。宽带当日新增恒为1（正常）。506线骤降为自包含异常。<br>
+    <strong>归因判定</strong>：<span class="tag tag-warning">无法归因</span> — 无上游邻居在异常日当天偏离<br>
+    <strong>建议负责部门</strong>：市场部
+  </div>
+
+  <!-- 3.5 99+拆机当日完成率 -->
+  <h3>3.5 99+拆机当日完成率（03-09，122%，+52.5%）</h3>
+  <div class="alert alert-danger">
+    <strong>异常表现</strong>：异常日值122%，前日值80%，日变化+52.5%<br>
+    月均值83.37%，月标准差22.26
+  </div>
+  <h4>图谱邻居数据（03-09）</h4>
+  <table class="nb-table">
+    <tr><th>邻居</th><th>关系</th><th>方向</th><th>03-09值</th><th>03-08值</th><th>日变化</th><th>月均值</th><th>偏离?</th></tr>
+    <tr><td>99+拆机</td><td>DEPENDS_ON</td><td>入←</td><td>95</td><td>17</td><td class="deviated">+459%</td><td>230</td><td class="deviated">✅ 偏离</td></tr>
+    <tr><td>99+拆机数</td><td>DEPENDS_ON</td><td>入←</td><td>—</td><td>—</td><td>—</td><td>—</td><td class="note">数据缺失</td></tr>
+    <tr><td>战新当日新增</td><td>DRIVES</td><td>入←</td><td>504</td><td>1</td><td class="deviated">+50300%</td><td>88.9</td><td class="deviated">✅ 偏离</td></tr>
+    <tr><td>移动当日完成率</td><td>DRIVES</td><td>出→</td><td>87</td><td>79</td><td>+10%</td><td>88.7</td><td class="normal">正常</td></tr>
+  </table>
+  <div id="chart-g5" class="chart-box graph"></div>
+  <div class="alert alert-success">
+    <strong>归因分析</strong>：完成率=完工÷新增。03-09 99+拆机新增95线(+459%)，战新当日新增504线(+50300%)驱动拆机需求。完工量增速快于新增量→完成率超100%达122%。<br>
+    <strong>归因链路</strong>：战新当日新增(504线,+50300%) —DRIVES→ 99+拆机(95线,+459%) —DEPENDS_ON→ 完成率(122%)<br>
+    <strong>归因判定</strong>：<span class="tag tag-danger">图谱归因成功</span><br>
+    <strong>建议负责部门</strong>：市场部
+  </div>
+
+  <!-- 3.6 移动当日完成率 -->
+  <h3>3.6 移动当日完成率（03-27，133%，+26.7%）</h3>
+  <div class="alert alert-danger">
+    <strong>异常表现</strong>：异常日值133%，前日值105%，日变化+26.7%<br>
+    月均值88.68%，月标准差9.74
+  </div>
+  <h4>图谱邻居数据（03-27）</h4>
+  <table class="nb-table">
+    <tr><th>邻居</th><th>关系</th><th>方向</th><th>03-27值</th><th>03-26值</th><th>日变化</th><th>偏离?</th></tr>
+    <tr><td>移动当日新增</td><td>DEPENDS_ON</td><td>入←</td><td>⚠️有重复</td><td>8111(03-26)</td><td>—</td><td class="note">数据有重复</td></tr>
+    <tr><td>云宽带当日新增</td><td>DRIVES</td><td>入←</td><td>506</td><td>1573</td><td class="deviated">-67.8%</td><td class="deviated">✅ 偏离(已确认异常)</td></tr>
+    <tr><td>三线当日新增</td><td>DRIVES</td><td>入←</td><td>—</td><td>—</td><td>—</td><td class="note">无03-27数据</td></tr>
+    <tr><td>高套当日新增</td><td>DRIVES</td><td>入←</td><td>—</td><td>—</td><td>—</td><td class="note">无03-27数据</td></tr>
+    <tr><td>营业厅满意度</td><td>DRIVES</td><td>入←</td><td>—</td><td>—</td><td>—</td><td class="note">无03-27数据</td></tr>
+  </table>
+  <div id="chart-g6" class="chart-box graph"></div>
+  <div class="alert alert-success">
+    <strong>归因分析</strong>：移动完成率=移动完工÷移动新增。03-27云宽带新增骤降至506线(-67.8%，已确认真异常)，整体新增量下降导致完成率虚高至133%。<br>
+    <strong>归因链路</strong>：云宽带当日新增(506线,-67.8%) —DRIVES→ 移动当日完成率(133%)<br>
+    <strong>归因判定</strong>：<span class="tag tag-danger">图谱归因成功</span><br>
+    <strong>建议负责部门</strong>：市场部
+  </div>
+
+  <!-- 3.7 上网专线新增完成率 -->
+  <h3>3.7 上网专线新增完成率（03-24，12%，-75.5%）</h3>
+  <div class="alert alert-danger">
+    <strong>异常表现</strong>：异常日值12%，前日值49%，日变化-75.5%<br>
+    月均值46.3%，月标准差22.7
+  </div>
+  <h4>图谱邻居数据（03-24）</h4>
+  <table class="nb-table">
+    <tr><th>邻居</th><th>关系</th><th>方向</th><th>03-24值</th><th>03-23值</th><th>日变化</th><th>月均值</th><th>偏离?</th></tr>
+    <tr><td>上网专线新增</td><td>DEPENDS_ON</td><td>入←</td><td>67</td><td>44</td><td>+52%</td><td>140</td><td class="normal">正常(低于月均)</td></tr>
+    <tr><td>线上触达(日)</td><td>DRIVES</td><td>入←</td><td>12.5M</td><td>2.2M</td><td class="deviated">+465%</td><td>11.8M</td><td class="deviated">✅ 偏离(03-23异常后恢复)</td></tr>
+    <tr><td>云宽带当日新增</td><td>DRIVES</td><td>入←</td><td>1701</td><td>1660</td><td>+2.5%</td><td>1742</td><td class="normal">正常</td></tr>
+    <tr><td>商务宽带完成率</td><td>DRIVES</td><td>入←</td><td>12%</td><td>63%</td><td class="deviated">-81%</td><td>—</td><td class="deviated">✅ 同日异常</td></tr>
+    <tr><td>移动当日完成率</td><td>DRIVES</td><td>入←</td><td>86%</td><td>86%</td><td>0%</td><td>—</td><td class="normal">正常</td></tr>
+    <tr><td>高套当日新增</td><td>DRIVES</td><td>入←</td><td>—</td><td>—</td><td>—</td><td>—</td><td class="note">无03-24数据</td></tr>
+    <tr><td>营业厅满意度</td><td>DRIVES</td><td>入←</td><td>—</td><td>—</td><td>—</td><td>—</td><td class="note">无数据</td></tr>
+    <tr><td>装维满意度</td><td>DRIVES</td><td>入←</td><td>—</td><td>—</td><td>—</td><td>—</td><td class="note">无数据</td></tr>
+  </table>
+  <div id="chart-g7" class="chart-box graph"></div>
+  <div class="alert alert-success">
+    <strong>归因分析</strong>：上网专线新增03-24=67（低于月均140），完成率=完工÷新增，新增量未降但完工停止→完成率暴跌至12%。同日商务宽带完成率也暴跌至12%（-81%），当日聚焦销账异常飙升至5900万元（+359658%）。三个指标同日共现指向同一系统事件。<br>
+    <strong>归因链路</strong>：上网专线新增 →(DEPENDS_ON)→ 完成率(12%)；同日共现：商务宽带完成率(12%)、当日聚焦销账(5900万)<br>
+    <strong>归因判定</strong>：<span class="tag tag-danger">图谱归因成功</span>（同日共现+销账异常指向系统事件）<br>
+    <strong>建议负责部门</strong>：政企群
+  </div>
+
+  <!-- 3.8 商务宽带新增完成率 -->
+  <h3>3.8 商务宽带新增完成率（03-24，12%，-81.0%）</h3>
+  <div class="alert alert-danger">
+    <strong>异常表现</strong>：异常日值12%，前日值63%，日变化-81.0%<br>
+    月均值56.4%，月标准差25.59
+  </div>
+  <h4>图谱邻居数据（03-24）</h4>
+  <table class="nb-table">
+    <tr><th>邻居</th><th>关系</th><th>方向</th><th>03-24值</th><th>03-23值</th><th>日变化</th><th>月均值</th><th>偏离?</th></tr>
+    <tr><td>商务宽带新增</td><td>DEPENDS_ON</td><td>入←</td><td>258</td><td>179</td><td>+44%</td><td>628</td><td class="normal">正常(低于月均)</td></tr>
+  </table>
+  <p style="font-size:13px;color:#555;margin:4px 0 8px;">同日共现异常与3.7完全一致：上网专线完成率(12%)、当日聚焦销账(5900.04万元)</p>
+  <div id="chart-g8" class="chart-box graph"></div>
+  <div class="alert alert-success">
+    <strong>归因分析</strong>：与3.7完全同构。商务宽带新增03-24=258（远低于月均628），完成率暴跌。同日上网专线完成率、聚焦销账同步异常，三指标共现指向统一系统/业务事件。<br>
+    <strong>归因链路</strong>：商务宽带新增 →(DEPENDS_ON)→ 完成率(12%)；同日共现：上网专线完成率(12%)、当日聚焦销账(5900万)<br>
+    <strong>归因判定</strong>：<span class="tag tag-danger">图谱归因成功</span><br>
+    <strong>建议负责部门</strong>：政企群
+  </div>
+</div>
+
+<!-- 四、总结与建议 -->
+<div class="section">
+  <h2>四、总结与建议</h2>
+  <h3>4.1 月度经营总览</h3>
+  <p>2026年3月经营收入85.94亿元，累计进度25.34%，基本匹配时间进度。利润总额15.53亿元，进度24.22%略有缺口。产数收入同比增长2.80%，但产数ICT毛利额同比下降11.05%，盈利能力承压。</p>
+
+  <h3>4.2 异常事件总结</h3>
+  <p>3月共检出<strong>8个真异常</strong>，集中在3个日期：</p>
+  <ul style="margin:8px 0 8px 24px;">
+    <li><strong>03-09</strong>：战新当日新增飙升至504线，驱动99+拆机完成率升至122%</li>
+    <li><strong>03-24</strong>：当日聚焦销账飙升至5900万元，上网专线/商务宽带完成率同时暴跌至12%</li>
+    <li><strong>03-27</strong>：云宽带新增骤降至506线，移动完成率虚高至133%</li>
+  </ul>
+
+  <h3>4.3 归因结论统计</h3>
+  <table>
+    <tr><th>归因结果</th><th>数量</th><th>指标</th></tr>
+    <tr><td><span class="tag tag-danger">图谱归因成功</span></td><td>5</td><td>99+拆机完成率、移动完成率、上网专线完成率、商务宽带完成率、当日聚焦销账</td></tr>
+    <tr><td><span class="tag tag-info">关系存在但未传导</span></td><td>1</td><td>战新完工交付时长</td></tr>
+    <tr><td><span class="tag tag-warning">无法归因</span></td><td>2</td><td>战新当日新增、云宽带当日新增</td></tr>
+  </table>
+
+  <h3>4.4 建议措施</h3>
+  <ol style="margin:8px 0 0 24px;">
+    <li><strong>市场部</strong>：排查03-27云宽带新增骤降原因，确认是否存在系统故障；关注产数ICT毛利额同比下降11%的趋势</li>
+    <li><strong>政企群</strong>：排查03-24上网专线/商务宽带完成率同日暴跌原因，核实是否存在集中结算操作影响</li>
+    <li><strong>云网运</strong>：分析战新当日新增的剧烈波动规律，03-09积压释放和月末冲量模式需关注</li>
+    <li><strong>业财中心</strong>：核实03-22/23销账数据异常低值，排查系统入账延迟问题</li>
+  </ol>
+</div>
+
+<div class="footer">报告由运营监控智能分析Pipeline自动生成 | 2026-05-24</div>
+
+</div>
+
+<script>
+window.addEventListener('load', function() {
+  var colorPalette = ['#1a237e','#283593','#3949ab','#5c6bc0','#7986cb','#9fa8da','#c5cae9','#e8eaf6'];
+
+  // chart-0: 经营-金额类
+  echarts.init(document.getElementById('chart-0')).setOption({
+    title:{text:'经营板块 — 核心金额指标（亿元）',left:'center',textStyle:{fontSize:16}},
+    tooltip:{trigger:'axis'},
+    xAxis:{type:'category',data:['经营收入','产数收入累计','台阶收入','利润总额','产数ICT毛利额','一年以上应收余额'],axisLabel:{fontSize:11}},
+    yAxis:{type:'value',name:'亿元'},
+    series:[{type:'bar',data:[85.94,48.53,37.48,15.53,8.17,4.48],
+      itemStyle:{color:new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'#1a237e'},{offset:1,color:'#5c6bc0'}])},
+      label:{show:true,position:'top',formatter:'{c}亿',fontSize:11}
+    }]
+  });
+
+  // chart-0b: 经营-进度/同比
+  echarts.init(document.getElementById('chart-0b')).setOption({
+    title:{text:'经营板块 — 进度与同比（%）',left:'center',textStyle:{fontSize:16}},
+    tooltip:{trigger:'axis'},
+    xAxis:{type:'category',data:['经营收入进度','台阶收入进度','利润总额进度','台阶收入同比','产数收入同比','利润总额同比','产数ICT毛利同比','产数资源型毛利环比','基础资源型毛利环比'],axisLabel:{fontSize:10,rotate:30}},
+    yAxis:{type:'value',name:'%',max:60,min:-15},
+    series:[{type:'bar',data:[
+      {value:25.34,itemStyle:{color:'#2e7d32'}},
+      {value:24.51,itemStyle:{color:'#2e7d32'}},
+      {value:24.22,itemStyle:{color:'#2e7d32'}},
+      {value:1.44,itemStyle:{color:'#1565c0'}},
+      {value:2.80,itemStyle:{color:'#1565c0'}},
+      {value:-2.57,itemStyle:{color:'#c62828'}},
+      {value:-11.05,itemStyle:{color:'#c62828'}},
+      {value:51.34,itemStyle:{color:'#e65100'}},
+      {value:54.23,itemStyle:{color:'#e65100'}}
+    ],label:{show:true,position:'top',formatter:'{c}%',fontSize:10}}]
+  });
+
+  // chart-1/2/3: gauge
+  echarts.init(document.getElementById('chart-1')).setOption({
+    title:{text:'利润总额进度',left:'center',textStyle:{fontSize:14}},
+    series:[{type:'gauge',startAngle:200,endAngle:-20,min:0,max:50,
+      axisLine:{lineStyle:{width:18,color:[[0.3,'#c62828'],[0.5,'#f57f17'],[1,'#2e7d32']]}},
+      pointer:{width:5},
+      detail:{formatter:'{value}%',fontSize:20,offsetCenter:[0,'60%']},
+      data:[{value:24.22}]}]
+  });
+  echarts.init(document.getElementById('chart-2')).setOption({
+    title:{text:'经营收入进度',left:'center',textStyle:{fontSize:14}},
+    series:[{type:'gauge',startAngle:200,endAngle:-20,min:0,max:50,
+      axisLine:{lineStyle:{width:18,color:[[0.3,'#c62828'],[0.5,'#f57f17'],[1,'#2e7d32']]}},
+      pointer:{width:5},
+      detail:{formatter:'{value}%',fontSize:20,offsetCenter:[0,'60%']},
+      data:[{value:25.34}]}]
+  });
+  echarts.init(document.getElementById('chart-3')).setOption({
+    title:{text:'台阶收入进度',left:'center',textStyle:{fontSize:14}},
+    series:[{type:'gauge',startAngle:200,endAngle:-20,min:0,max:50,
+      axisLine:{lineStyle:{width:18,color:[[0.3,'#c62828'],[0.5,'#f57f17'],[1,'#2e7d32']]}},
+      pointer:{width:5},
+      detail:{formatter:'{value}%',fontSize:20,offsetCenter:[0,'60%']},
+      data:[{value:24.51}]}]
+  });
+
+  // chart-4: 效能
+  echarts.init(document.getElementById('chart-4')).setOption({
+    title:{text:'效能板块指标',left:'center',textStyle:{fontSize:16}},
+    tooltip:{trigger:'axis'},
+    legend:{data:['百分比指标(%)','金额指标(万元)','金额指标(万元)'],
+      top:30,formatter:function(p){return p}},
+    grid:{top:80},
+    xAxis:{type:'category',data:['营业收现率','产数资源型毛利率','应收占收比','资产负债率','净资产收益率','研发投入强度','劳动生产率','房屋改善额'],axisLabel:{fontSize:10,rotate:20}},
+    yAxis:[{type:'value',name:'%',min:0,max:100},{type:'value',name:'万元'}],
+    series:[
+      {name:'%',type:'bar',yAxisIndex:0,data:[67.41,65.42,20.04,23.30,5.39,1.17,null,null],
+        itemStyle:{color:'#3949ab'},label:{show:true,position:'top',formatter:function(p){return p.value!=null?p.value+'%':''},fontSize:10}},
+      {name:'万元',type:'bar',yAxisIndex:1,data:[null,null,null,null,null,null,192.89,-10189.63],
+        itemStyle:{color:'#e65100'},label:{show:true,position:'top',formatter:function(p){return p.value!=null?p.value+'':''},fontSize:10}}
+    ]
+  });
+
+  // chart-5: 发展-渗透率
+  echarts.init(document.getElementById('chart-5')).setOption({
+    title:{text:'发展板块 — 渗透率与服务指标（%）',left:'center',textStyle:{fontSize:16}},
+    tooltip:{trigger:'axis'},
+    xAxis:{type:'category',data:['名单制客户三线渗透率','高套渗透率','家庭宽带渗透率','政企服务派单响应率','极致融合渗透率'],axisLabel:{fontSize:10,rotate:15}},
+    yAxis:{type:'value',name:'%',min:0,max:100},
+    series:[{type:'bar',data:[81.0,52.04,43.22,86.0,9.39],
+      itemStyle:{color:function(p){return p.dataIndex===4?'#c62828':'#1a237e'}},
+      label:{show:true,position:'top',formatter:'{c}%',fontSize:11}}]
+  });
+
+  // chart-6: 运维
+  echarts.init(document.getElementById('chart-6')).setOption({
+    title:{text:'运维板块 — 终端核销与成本',left:'center',textStyle:{fontSize:16}},
+    tooltip:{trigger:'axis'},
+    legend:{top:30},
+    grid:{top:70},
+    xAxis:{type:'category',data:['新终端核销数量(万台)','旧终端核销数量(万台)','核销旧终端比例(%)','新终端单价(元)','旧终端单价(元)','总成本占比(%)']},
+    yAxis:[{type:'value',name:'万台/元/%'}],
+    series:[{type:'bar',data:[39.9,9.4,19,210.09,30.61,1.0],
+      label:{show:true,position:'top',fontSize:11},
+      itemStyle:{color:['#1a237e','#283593','#5c6bc0','#7986cb','#9fa8da','#c5cae9']}
+    }]
+  });
+
+  // chart-7: 客户服务
+  echarts.init(document.getElementById('chart-7')).setOption({
+    title:{text:'客户服务板块 — 满意度与服务指标（%）',left:'center',textStyle:{fontSize:16}},
+    tooltip:{trigger:'axis'},
+    xAxis:{type:'category',data:['装维满意度','营业厅满意度','热线满意度','政企服务派单响应率']},
+    yAxis:{type:'value',name:'%',min:85,max:100},
+    series:[{type:'bar',data:[99.65,97.05,91.37,86.0],
+      itemStyle:{color:function(p){return p.value<90?'#c62828':'#1a237e'}},
+      label:{show:true,position:'top',formatter:'{c}%',fontSize:11}}]
+  });
+
+  // spike line charts
+  var spikeData = {
+    s1: {
+      title:'战新当日新增（线）',anomalyDate:'03-09',anomalyVal:504,
+      dates:['03-01','03-02','03-03','03-05','03-06','03-07','03-08','03-09','03-10','03-11','03-12','03-13','03-14','03-15','03-16','03-17','03-18','03-19','03-20','03-21','03-22','03-23','03-24','03-25','03-26','03-27','03-28','03-29','03-30','03-31'],
+      values:[0,0,95,17,114,3,1,504,128,24,84,111,3,6,42,20,0,0,0,0,0,0,0,0,0,0,0,0,805,709]
+    },
+    s2: {
+      title:'战新当日完工平均交付时长（分钟）',anomalyDate:'03-22',anomalyVal:161.5,
+      dates:['03-03','03-04','03-05','03-06','03-07','03-08','03-09','03-10','03-11','03-12','03-13','03-14','03-15','03-16','03-17','03-18','03-19','03-20','03-21','03-22','03-23','03-24','03-25','03-26','03-27','03-28','03-29','03-30','03-31'],
+      values:[33.59,71.88,40.94,97.08,92.91,0,61.28,52.79,53.5,41.18,47.93,15.89,0,38.33,58.21,44.04,49.26,105.45,54.88,161.5,60.22,41.04,24.28,26.57,25.29,0,0,75.44,57.67]
+    },
+    s3: {
+      title:'当日聚焦销账（万元）',anomalyDate:'03-24',anomalyVal:5900.04,
+      dates:['03-01','03-02','03-03','03-04','03-05','03-06','03-07','03-08','03-09','03-10','03-11','03-12','03-13','03-14','03-15','03-16','03-17','03-18','03-20','03-21','03-22','03-23','03-24','03-25','03-26','03-28','03-29','03-30','03-31'],
+      values:[-8061.71,1.85,19.99,0,265.47,60.04,731.99,65.6,0,214.05,163.06,334.51,578.96,191.39,36.3,0,101.67,230.76,126.48,971.27,1.2,1.64,5900.04,632.3,598.67,791.65,31.41,22.07,4505.63]
+    },
+    s4: {
+      title:'云宽带当日新增（线）',anomalyDate:'03-27',anomalyVal:506,
+      dates:['03-01','03-02','03-03','03-04','03-05','03-06','03-07','03-08','03-09','03-10','03-11','03-12','03-13','03-14','03-15','03-16','03-17','03-18','03-19','03-20','03-21','03-22','03-23','03-24','03-25','03-26','03-27','03-28','03-29','03-30','03-31'],
+      values:[1926,1656,1895,2028,1636,1930,2057,2115,2067,2036,2109,2099,1769.2,1749.4,1611.6,1402.7,1572.7,1496.8,1715.4,1550.9,1750.9,1523.7,1660.1,1701.4,1681.5,1573.4,506,1828,1674.3,1854.8,1828.7]
+    },
+    s5: {
+      title:'99+拆机当日完成率（%）',anomalyDate:'03-09',anomalyVal:122,
+      dates:['03-01','03-02','03-03','03-04','03-05','03-06','03-07','03-08','03-09','03-10','03-11','03-13','03-14','03-15','03-16','03-17','03-18','03-19','03-20','03-21','03-22','03-23','03-24','03-25','03-26','03-27','03-28','03-29','03-30','03-31'],
+      values:[95,99,93,108,87,85,96,80,122,93,116,86,75,78,82,103,104,101,99,84,98,65,77,78,64,62,67,55,27,22]
+    },
+    s6: {
+      title:'移动当日完成率（%）',anomalyDate:'03-27',anomalyVal:133,
+      dates:['03-01','03-02','03-03','03-04','03-05','03-06','03-07','03-08','03-09','03-10','03-11','03-12','03-13','03-14','03-15','03-16','03-17','03-18','03-19','03-20','03-21','03-22','03-23','03-24','03-25','03-26','03-27','03-28','03-29','03-30','03-31'],
+      values:[94,82,82,79,83,86,92,79,87,91,86,96,91,88,83,82,81,81,89,90,85,88,90,86,93,105,133,91,85,85,86]
+    },
+    s7: {
+      title:'上网专线新增完成率（%）',anomalyDate:'03-24',anomalyVal:12,
+      dates:['03-01','03-02','03-03','03-04','03-05','03-06','03-07','03-08','03-09','03-10','03-11','03-12','03-13','03-14','03-15','03-16','03-17','03-18','03-19','03-20','03-21','03-22','03-24','03-25','03-26','03-27','03-28','03-29','03-30','03-31'],
+      values:[119,119,36,37,47,51,48,42,48,47,46,50,52,52,50,51,50,50,51,53,51,49,12,17,20,26,26,25,31,33]
+    },
+    s8: {
+      title:'商务宽带新增完成率（%）',anomalyDate:'03-24',anomalyVal:12,
+      dates:['03-01','03-02','03-03','03-04','03-05','03-06','03-07','03-08','03-09','03-10','03-11','03-12','03-13','03-14','03-15','03-16','03-17','03-18','03-19','03-20','03-21','03-22','03-24','03-25','03-26','03-27','03-28','03-29','03-30','03-31'],
+      values:[120,120,56,60,65,68,64,59,62,63,65,67,67,65,62,65,66,66,66,68,66,63,12,16,18,22,23,23,26,29]
+    }
+  };
+
+  for (var key in spikeData) {
+    var sd = spikeData[key];
+    echarts.init(document.getElementById('chart-'+key)).setOption({
+      title:{text:sd.title,left:'center',textStyle:{fontSize:15}},
+      tooltip:{trigger:'axis'},
+      grid:{left:60,right:30,bottom:40},
+      xAxis:{type:'category',data:sd.dates,axisLabel:{fontSize:10,rotate:30}},
+      yAxis:{type:'value'},
+      series:[{
+        type:'line',data:sd.values,smooth:true,
+        areaStyle:{color:'rgba(26,35,126,0.08)'},
+        lineStyle:{color:'#1a237e',width:2},
+        itemStyle:{color:'#1a237e'},
+        markPoint:{
+          data:[{coord:[sd.anomalyDate,sd.anomalyVal],value:sd.anomalyVal,
+            itemStyle:{color:'#c62828'},symbolSize:40,label:{fontSize:12,color:'#fff'}}]
+        }
+      }]
+    });
+  }
+
+  var dashedLink = {color:'#bdc3c7',width:1,type:'dashed'};
+  var solidBlue = {color:'#3498db',width:2.5};
+  var solidRed = {color:'#e74c3c',width:2.5};
+
+  // g1: 战新当日新增
+  echarts.init(document.getElementById('chart-g1')).setOption({
+    title:{text:'3.1 战新当日新增 因果链路图',left:'center',textStyle:{fontSize:15}},
+    tooltip:{},
+    series:[{
+      type:'graph',layout:'force',roam:true,
+      data:[
+        {name:'战新当日新增\n(504线,+50300%)',symbolSize:55,itemStyle:{color:'#e74c3c'},label:{fontSize:13,fontWeight:'bold'}},
+        {name:'三线当日新增\n(28,⚠️)',symbolSize:18,itemStyle:{color:'#f39c12'}},
+        {name:'三线当日完工\n(24,⚠️)',symbolSize:18,itemStyle:{color:'#f39c12'}},
+        {name:'战新当日完工\n(6)',symbolSize:15,itemStyle:{color:'#27ae60'}},
+        {name:'装维工单数\n(12847)',symbolSize:15,itemStyle:{color:'#27ae60'}},
+        {name:'申告量\n(3110)',symbolSize:15,itemStyle:{color:'#27ae60'}},
+        {name:'5G基站总数\n(18907)',symbolSize:15,itemStyle:{color:'#27ae60'}},
+        {name:'高套当日新增\n(421)',symbolSize:15,itemStyle:{color:'#27ae60'}}
+      ],
+      links:[
+        {source:'战新当日新增\n(504线,+50300%)',target:'三线当日新增\n(28,⚠️)',lineStyle:dashedLink,label:{show:true,formatter:'DRIVES→',fontSize:9,color:'#95a5a6'}},
+        {source:'战新当日新增\n(504线,+50300%)',target:'三线当日完工\n(24,⚠️)',lineStyle:dashedLink,label:{show:true,formatter:'DRIVES→',fontSize:9,color:'#95a5a6'}},
+        {source:'战新当日新增\n(504线,+50300%)',target:'战新当日完工\n(6)',lineStyle:dashedLink,label:{show:true,formatter:'DRIVES→',fontSize:9,color:'#95a5a6'}},
+        {source:'战新当日新增\n(504线,+50300%)',target:'装维工单数\n(12847)',lineStyle:dashedLink,label:{show:true,formatter:'DRIVES→',fontSize:9,color:'#95a5a6'}},
+        {source:'战新当日新增\n(504线,+50300%)',target:'申告量\n(3110)',lineStyle:dashedLink,label:{show:true,formatter:'DRIVES→',fontSize:9,color:'#95a5a6'}},
+        {source:'5G基站总数\n(18907)',target:'战新当日新增\n(504线,+50300%)',lineStyle:dashedLink,label:{show:true,formatter:'→DRIVES',fontSize:9,color:'#95a5a6'}},
+        {source:'高套当日新增\n(421)',target:'战新当日新增\n(504线,+50300%)',lineStyle:dashedLink,label:{show:true,formatter:'→DRIVES',fontSize:9,color:'#95a5a6'}}
+      ],
+      force:{repulsion:380,gravity:0.08,edgeLength:[100,220]},
+      edgeLabel:{fontSize:9},
+      label:{show:true,fontSize:10,color:'#2c3e50'},
+      emphasis:{focus:'adjacency'}
+    }]
+  });
+
+  // g2: 战新完工交付时长
+  echarts.init(document.getElementById('chart-g2')).setOption({
+    title:{text:'3.2 战新完工交付时长 因果链路图',left:'center',textStyle:{fontSize:15}},
+    tooltip:{},
+    series:[{
+      type:'graph',layout:'force',roam:true,
+      data:[
+        {name:'战新完工交付时长\n(161.5分钟,+194%)',symbolSize:55,itemStyle:{color:'#e74c3c'},label:{fontSize:13,fontWeight:'bold'}},
+        {name:'战新当日完工\n(1)',symbolSize:22,itemStyle:{color:'#3498db'}},
+        {name:'战新当日新增\n(0)',symbolSize:18,itemStyle:{color:'#f39c12'}},
+        {name:'战新在途超时\n(0)',symbolSize:16,itemStyle:{color:'#27ae60'}},
+        {name:'装维工单数\n(14798)',symbolSize:15,itemStyle:{color:'#27ae60'}},
+        {name:'三线当日新增\n(0)',symbolSize:15,itemStyle:{color:'#27ae60'}},
+        {name:'三线当日完工\n(0)',symbolSize:15,itemStyle:{color:'#27ae60'}},
+        {name:'三线完工交付时长\n(103.96)',symbolSize:15,itemStyle:{color:'#27ae60'}},
+        {name:'政企平均处理时长\n(1.87)',symbolSize:15,itemStyle:{color:'#27ae60'}}
+      ],
+      links:[
+        {source:'战新当日完工\n(1)',target:'战新完工交付时长\n(161.5分钟,+194%)',lineStyle:dashedLink,label:{show:true,formatter:'DEPENDS_ON',fontSize:9,color:'#95a5a6'}},
+        {source:'战新当日新增\n(0)',target:'战新完工交付时长\n(161.5分钟,+194%)',lineStyle:dashedLink,label:{show:true,formatter:'DRIVES',fontSize:9,color:'#95a5a6'}},
+        {source:'战新在途超时\n(0)',target:'战新完工交付时长\n(161.5分钟,+194%)',lineStyle:dashedLink,label:{show:true,formatter:'DRIVES',fontSize:9,color:'#95a5a6'}},
+        {source:'装维工单数\n(14798)',target:'战新完工交付时长\n(161.5分钟,+194%)',lineStyle:dashedLink,label:{show:true,formatter:'DRIVES',fontSize:9,color:'#95a5a6'}},
+        {source:'三线当日新增\n(0)',target:'战新完工交付时长\n(161.5分钟,+194%)',lineStyle:dashedLink,label:{show:true,formatter:'DRIVES',fontSize:9,color:'#95a5a6'}},
+        {source:'三线当日完工\n(0)',target:'战新完工交付时长\n(161.5分钟,+194%)',lineStyle:dashedLink,label:{show:true,formatter:'DRIVES',fontSize:9,color:'#95a5a6'}},
+        {source:'三线完工交付时长\n(103.96)',target:'战新完工交付时长\n(161.5分钟,+194%)',lineStyle:dashedLink,label:{show:true,formatter:'DRIVES',fontSize:9,color:'#95a5a6'}},
+        {source:'战新完工交付时长\n(161.5分钟,+194%)',target:'政企平均处理时长\n(1.87)',lineStyle:dashedLink,label:{show:true,formatter:'DRIVES→',fontSize:9,color:'#95a5a6'}}
+      ],
+      force:{repulsion:400,gravity:0.08,edgeLength:[100,240]},
+      edgeLabel:{fontSize:9},
+      label:{show:true,fontSize:10,color:'#2c3e50'},
+      emphasis:{focus:'adjacency'}
+    }]
+  });
+
+  // g3: 当日聚焦销账
+  echarts.init(document.getElementById('chart-g3')).setOption({
+    title:{text:'3.3 当日聚焦销账 因果链路图',left:'center',textStyle:{fontSize:15}},
+    tooltip:{},
+    series:[{
+      type:'graph',layout:'force',roam:true,
+      data:[
+        {name:'当日聚焦销账\n(5900万,+359658%)',symbolSize:55,itemStyle:{color:'#e74c3c'},label:{fontSize:13,fontWeight:'bold'}},
+        {name:'当日计费销账\n(57.3亿,+801%)',symbolSize:28,itemStyle:{color:'#3498db'}},
+        {name:'三线当日新增\n(20)',symbolSize:18,itemStyle:{color:'#27ae60'}},
+        {name:'三线当日完工\n(25)',symbolSize:18,itemStyle:{color:'#27ae60'}},
+        {name:'政企平均处理时长\n(1.82)',symbolSize:15,itemStyle:{color:'#27ae60'}}
+      ],
+      links:[
+        {source:'当日聚焦销账\n(5900万,+359658%)',target:'当日计费销账\n(57.3亿,+801%)',lineStyle:solidBlue,label:{show:true,formatter:'AGGREGATES ✅',fontSize:10,color:'#3498db',fontWeight:'bold'}},
+        {source:'三线当日新增\n(20)',target:'当日聚焦销账\n(5900万,+359658%)',lineStyle:dashedLink,label:{show:true,formatter:'DRIVES',fontSize:9,color:'#95a5a6'}},
+        {source:'三线当日完工\n(25)',target:'当日聚焦销账\n(5900万,+359658%)',lineStyle:dashedLink,label:{show:true,formatter:'TRANSMISSION',fontSize:9,color:'#95a5a6'}},
+        {source:'当日聚焦销账\n(5900万,+359658%)',target:'政企平均处理时长\n(1.82)',lineStyle:dashedLink,label:{show:true,formatter:'DRIVES→',fontSize:9,color:'#95a5a6'}}
+      ],
+      force:{repulsion:400,gravity:0.1,edgeLength:[100,200]},
+      edgeLabel:{fontSize:9},
+      label:{show:true,fontSize:10,color:'#2c3e50'},
+      emphasis:{focus:'adjacency'}
+    }]
+  });
+
+  // g4: 云宽带当日新增
+  echarts.init(document.getElementById('chart-g4')).setOption({
+    title:{text:'3.4 云宽带当日新增 因果链路图',left:'center',textStyle:{fontSize:15}},
+    tooltip:{},
+    series:[{
+      type:'graph',layout:'force',roam:true,
+      data:[
+        {name:'云宽带当日新增\n(506线,-67.8%)',symbolSize:55,itemStyle:{color:'#e74c3c'},label:{fontSize:13,fontWeight:'bold'}},
+        {name:'线上触达(日)\n(⚠️03-23异常)',symbolSize:20,itemStyle:{color:'#f39c12'}},
+        {name:'宽带当日新增\n(1)',symbolSize:15,itemStyle:{color:'#27ae60'}},
+        {name:'移动当日完成率\n(133%)',symbolSize:20,itemStyle:{color:'#27ae60'}},
+        {name:'上网专线完成率\n(下游)',symbolSize:15,itemStyle:{color:'#27ae60'}},
+        {name:'商务宽带完成率\n(下游)',symbolSize:15,itemStyle:{color:'#27ae60'}}
+      ],
+      links:[
+        {source:'线上触达(日)\n(⚠️03-23异常)',target:'云宽带当日新增\n(506线,-67.8%)',lineStyle:dashedLink,label:{show:true,formatter:'DRIVES(距4天)',fontSize:9,color:'#f39c12'}},
+        {source:'宽带当日新增\n(1)',target:'云宽带当日新增\n(506线,-67.8%)',lineStyle:dashedLink,label:{show:true,formatter:'DRIVES',fontSize:9,color:'#95a5a6'}},
+        {source:'云宽带当日新增\n(506线,-67.8%)',target:'移动当日完成率\n(133%)',lineStyle:dashedLink,label:{show:true,formatter:'DRIVES→',fontSize:9,color:'#95a5a6'}},
+        {source:'云宽带当日新增\n(506线,-67.8%)',target:'上网专线完成率\n(下游)',lineStyle:dashedLink,label:{show:true,formatter:'DRIVES→',fontSize:9,color:'#95a5a6'}},
+        {source:'云宽带当日新增\n(506线,-67.8%)',target:'商务宽带完成率\n(下游)',lineStyle:dashedLink,label:{show:true,formatter:'DRIVES→',fontSize:9,color:'#95a5a6'}}
+      ],
+      force:{repulsion:380,gravity:0.1,edgeLength:[100,200]},
+      edgeLabel:{fontSize:9},
+      label:{show:true,fontSize:10,color:'#2c3e50'},
+      emphasis:{focus:'adjacency'}
+    }]
+  });
+
+  // g5: 99+拆机完成率
+  echarts.init(document.getElementById('chart-g5')).setOption({
+    title:{text:'3.5 99+拆机完成率 因果链路图',left:'center',textStyle:{fontSize:15}},
+    tooltip:{},
+    series:[{
+      type:'graph',layout:'force',roam:true,
+      data:[
+        {name:'99+拆机完成率\n(122%,+52.5%)',symbolSize:55,itemStyle:{color:'#e74c3c'},label:{fontSize:13,fontWeight:'bold'}},
+        {name:'战新当日新增\n(504线,+50300%)',symbolSize:30,itemStyle:{color:'#e67e22'}},
+        {name:'99+拆机\n(95线,+459%)',symbolSize:28,itemStyle:{color:'#3498db'}},
+        {name:'99+拆机数\n(数据缺失)',symbolSize:22,itemStyle:{color:'#3498db'}},
+        {name:'移动当日完成率\n(87)',symbolSize:18,itemStyle:{color:'#27ae60'}}
+      ],
+      links:[
+        {source:'战新当日新增\n(504线,+50300%)',target:'99+拆机完成率\n(122%,+52.5%)',lineStyle:solidRed,label:{show:true,formatter:'DRIVES ✅',fontSize:10,color:'#e74c3c',fontWeight:'bold'}},
+        {source:'99+拆机\n(95线,+459%)',target:'99+拆机完成率\n(122%,+52.5%)',lineStyle:solidBlue,label:{show:true,formatter:'DEPENDS_ON ✅',fontSize:10,color:'#3498db',fontWeight:'bold'}},
+        {source:'99+拆机数\n(数据缺失)',target:'99+拆机完成率\n(122%,+52.5%)',lineStyle:dashedLink,label:{show:true,formatter:'DEPENDS_ON',fontSize:9,color:'#95a5a6'}},
+        {source:'99+拆机完成率\n(122%,+52.5%)',target:'移动当日完成率\n(87)',lineStyle:dashedLink,label:{show:true,formatter:'DRIVES→',fontSize:9,color:'#95a5a6'}}
+      ],
+      force:{repulsion:400,gravity:0.1,edgeLength:[120,240]},
+      edgeLabel:{fontSize:9},
+      label:{show:true,fontSize:10,color:'#2c3e50'},
+      emphasis:{focus:'adjacency'}
+    }]
+  });
+
+  // g6: 移动当日完成率
+  echarts.init(document.getElementById('chart-g6')).setOption({
+    title:{text:'3.6 移动当日完成率 因果链路图',left:'center',textStyle:{fontSize:15}},
+    tooltip:{},
+    series:[{
+      type:'graph',layout:'force',roam:true,
+      data:[
+        {name:'移动当日完成率\n(133%,+26.7%)',symbolSize:55,itemStyle:{color:'#e74c3c'},label:{fontSize:13,fontWeight:'bold'}},
+        {name:'云宽带当日新增\n(506线,-67.8%)',symbolSize:30,itemStyle:{color:'#e67e22'}},
+        {name:'移动当日新增\n(有重复)',symbolSize:22,itemStyle:{color:'#3498db'}},
+        {name:'三线当日新增\n(无数据)',symbolSize:15,itemStyle:{color:'#27ae60'}},
+        {name:'高套当日新增\n(无数据)',symbolSize:15,itemStyle:{color:'#27ae60'}},
+        {name:'营业厅满意度\n(无数据)',symbolSize:15,itemStyle:{color:'#27ae60'}}
+      ],
+      links:[
+        {source:'云宽带当日新增\n(506线,-67.8%)',target:'移动当日完成率\n(133%,+26.7%)',lineStyle:solidRed,label:{show:true,formatter:'DRIVES ✅',fontSize:10,color:'#e74c3c',fontWeight:'bold'}},
+        {source:'移动当日新增\n(有重复)',target:'移动当日完成率\n(133%,+26.7%)',lineStyle:solidBlue,label:{show:true,formatter:'DEPENDS_ON ✅',fontSize:10,color:'#3498db',fontWeight:'bold'}},
+        {source:'三线当日新增\n(无数据)',target:'移动当日完成率\n(133%,+26.7%)',lineStyle:dashedLink,label:{show:true,formatter:'DRIVES',fontSize:9,color:'#95a5a6'}},
+        {source:'高套当日新增\n(无数据)',target:'移动当日完成率\n(133%,+26.7%)',lineStyle:dashedLink,label:{show:true,formatter:'DRIVES',fontSize:9,color:'#95a5a6'}},
+        {source:'营业厅满意度\n(无数据)',target:'移动当日完成率\n(133%,+26.7%)',lineStyle:dashedLink,label:{show:true,formatter:'DRIVES',fontSize:9,color:'#95a5a6'}}
+      ],
+      force:{repulsion:400,gravity:0.1,edgeLength:[120,240]},
+      edgeLabel:{fontSize:9},
+      label:{show:true,fontSize:10,color:'#2c3e50'},
+      emphasis:{focus:'adjacency'}
+    }]
+  });
+
+  // g7: 上网专线完成率
+  echarts.init(document.getElementById('chart-g7')).setOption({
+    title:{text:'3.7 上网专线完成率 因果链路图',left:'center',textStyle:{fontSize:15}},
+    tooltip:{},
+    series:[{
+      type:'graph',layout:'force',roam:true,
+      data:[
+        {name:'上网专线完成率\n(12%,-75.5%)',symbolSize:55,itemStyle:{color:'#e74c3c'},label:{fontSize:13,fontWeight:'bold'}},
+        {name:'上网专线新增\n(67)',symbolSize:22,itemStyle:{color:'#3498db'}},
+        {name:'商务宽带完成率\n(12%,-81%)',symbolSize:25,itemStyle:{color:'#e67e22'}},
+        {name:'当日聚焦销账\n(5900万)',symbolSize:25,itemStyle:{color:'#e67e22'}},
+        {name:'线上触达(日)\n(12.5M,+465%)',symbolSize:18,itemStyle:{color:'#f39c12'}},
+        {name:'云宽带当日新增\n(1701)',symbolSize:15,itemStyle:{color:'#27ae60'}},
+        {name:'移动当日完成率\n(86%)',symbolSize:15,itemStyle:{color:'#27ae60'}}
+      ],
+      links:[
+        {source:'上网专线新增\n(67)',target:'上网专线完成率\n(12%,-75.5%)',lineStyle:solidBlue,label:{show:true,formatter:'DEPENDS_ON ✅',fontSize:10,color:'#3498db',fontWeight:'bold'}},
+        {source:'商务宽带完成率\n(12%,-81%)',target:'上网专线完成率\n(12%,-75.5%)',lineStyle:solidRed,label:{show:true,formatter:'同日共现 ✅',fontSize:10,color:'#e74c3c',fontWeight:'bold'}},
+        {source:'当日聚焦销账\n(5900万)',target:'上网专线完成率\n(12%,-75.5%)',lineStyle:solidRed,label:{show:true,formatter:'同日共现 ✅',fontSize:10,color:'#e74c3c',fontWeight:'bold'}},
+        {source:'线上触达(日)\n(12.5M,+465%)',target:'上网专线完成率\n(12%,-75.5%)',lineStyle:dashedLink,label:{show:true,formatter:'DRIVES',fontSize:9,color:'#95a5a6'}},
+        {source:'云宽带当日新增\n(1701)',target:'上网专线完成率\n(12%,-75.5%)',lineStyle:dashedLink,label:{show:true,formatter:'DRIVES',fontSize:9,color:'#95a5a6'}},
+        {source:'移动当日完成率\n(86%)',target:'上网专线完成率\n(12%,-75.5%)',lineStyle:dashedLink,label:{show:true,formatter:'DRIVES',fontSize:9,color:'#95a5a6'}}
+      ],
+      force:{repulsion:420,gravity:0.08,edgeLength:[120,240]},
+      edgeLabel:{fontSize:9},
+      label:{show:true,fontSize:10,color:'#2c3e50'},
+      emphasis:{focus:'adjacency'}
+    }]
+  });
+
+  // g8: 商务宽带完成率
+  echarts.init(document.getElementById('chart-g8')).setOption({
+    title:{text:'3.8 商务宽带完成率 因果链路图',left:'center',textStyle:{fontSize:15}},
+    tooltip:{},
+    series:[{
+      type:'graph',layout:'force',roam:true,
+      data:[
+        {name:'商务宽带完成率\n(12%,-81%)',symbolSize:55,itemStyle:{color:'#e74c3c'},label:{fontSize:13,fontWeight:'bold'}},
+        {name:'商务宽带新增\n(258)',symbolSize:22,itemStyle:{color:'#3498db'}},
+        {name:'上网专线完成率\n(12%,-75.5%)',symbolSize:25,itemStyle:{color:'#e67e22'}},
+        {name:'当日聚焦销账\n(5900万)',symbolSize:25,itemStyle:{color:'#e67e22'}}
+      ],
+      links:[
+        {source:'商务宽带新增\n(258)',target:'商务宽带完成率\n(12%,-81%)',lineStyle:solidBlue,label:{show:true,formatter:'DEPENDS_ON ✅',fontSize:10,color:'#3498db',fontWeight:'bold'}},
+        {source:'上网专线完成率\n(12%,-75.5%)',target:'商务宽带完成率\n(12%,-81%)',lineStyle:solidRed,label:{show:true,formatter:'同日共现 ✅',fontSize:10,color:'#e74c3c',fontWeight:'bold'}},
+        {source:'当日聚焦销账\n(5900万)',target:'商务宽带完成率\n(12%,-81%)',lineStyle:solidRed,label:{show:true,formatter:'同日共现 ✅',fontSize:10,color:'#e74c3c',fontWeight:'bold'}}
+      ],
+      force:{repulsion:380,gravity:0.1,edgeLength:[120,220]},
+      edgeLabel:{fontSize:9},
+      label:{show:true,fontSize:10,color:'#2c3e50'},
+      emphasis:{focus:'adjacency'}
+    }]
+  });
+});
+</script>
+</body>
+</html>

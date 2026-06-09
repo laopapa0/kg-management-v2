@@ -140,7 +140,7 @@ describe('MyDocumentsList', () => {
 
   it('renders status badges with correct colors', () => {
     renderList();
-    const pendingBadge = screen.getByText('待审核').closest('span');
+    const pendingBadge = screen.getByText('已上传').closest('span');
     const approvedBadge = screen.getByText('已通过').closest('span');
     const rejectedBadge = screen.getByText('审核不通过').closest('span');
 

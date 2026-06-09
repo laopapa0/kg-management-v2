@@ -282,7 +282,6 @@ function TreeItem<T extends TreeNode>({
               className={[
                 'flex size-6 items-center justify-center rounded text-dark-text-secondary',
                 'transition-all', DURATION_CLASS.fast, 'ease-out hover:bg-dark-tree-hover-bg hover:text-dark-accent-primary',
-                isHovered ? 'translate-x-0 opacity-100' : '-translate-x-1 opacity-0',
               ].join(' ')}
             >
               <Pencil className="size-3.5" />

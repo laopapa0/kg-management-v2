@@ -81,7 +81,7 @@ export const DEFAULT_SEGMENT_CONFIG: SegmentConfig = {
 /** 文档状态显示映射 */
 export const DOCUMENT_STATUS_LABEL: Record<DocumentStatus, string> = {
   editing: '编辑中',
-  pending: '待审核',
+  pending: '已上传',
   auditing: '审核中',
   approved: '已通过',
   rejected: '审核不通过',

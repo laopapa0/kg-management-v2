@@ -31,7 +31,7 @@ export default function Layout({ children }: LayoutProps) {
           transitionDuration: '250ms',
         }}
       >
-        <div className="p-6 h-full">
+        <div className="p-6 h-full overflow-y-auto">
           {children}
         </div>
       </motion.main>

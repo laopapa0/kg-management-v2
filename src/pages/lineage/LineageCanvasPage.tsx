@@ -1410,20 +1410,6 @@ export default function LineageCanvasPage() {
               取消
             </Button>
             <Button
-              variant="outline"
-              className="bg-transparent border-dark-border text-dark-text-primary hover:bg-dark-card-l2 hover:text-dark-text-primary"
-              onClick={() => {
-                if (!createForm.sourceId || !createForm.targetId || !createForm.relationType) {
-                  toast.error('请先填写源对象、目标对象和关系类型');
-                  return;
-                }
-                setShowCreateModal(false);
-              }}
-            >
-              <Eye size={14} className="mr-1.5" />
-              血缘预览
-            </Button>
-            <Button
               className="bg-dark-accent-primary hover:bg-dark-accent-primary-active text-white"
               onClick={handleCreateRelation}
             >
