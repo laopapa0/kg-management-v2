@@ -122,7 +122,7 @@ export default function ReportPlanDialog({
 
         {/* 步骤指示器 */}
         <div className="flex items-center gap-2 text-sm">
-          {['基本信息', '筛选范围', '选择模板'].map((label, i) => (
+          {['基本信息', '筛选范围', '排除配置', '选择模板'].map((label, i) => (
             <span
               key={i}
               data-testid={`step-indicator-${i + 1}`}
@@ -188,13 +188,20 @@ export default function ReportPlanDialog({
         {/* Step 2 — 筛选范围 */}
         {step === 1 && (
           <div data-testid="step-2" className="py-2 max-h-[520px] overflow-y-auto">
-            <FilterScopeSelector value={filterScope} onChange={setFilterScope} />
+            <FilterScopeSelector value={filterScope} onChange={setFilterScope} mode="inclusion-only" />
           </div>
         )}
 
-        {/* Step 3 — 模板选择 */}
+        {/* Step 3 — 排除配置 */}
         {step === 2 && (
-          <div data-testid="step-3" className="py-2 flex flex-col gap-4">
+          <div data-testid="step-3" className="py-2 max-h-[520px] overflow-y-auto">
+            <FilterScopeSelector value={filterScope} onChange={setFilterScope} mode="exclusion-only" />
+          </div>
+        )}
+
+        {/* Step 4 — 模板选择 */}
+        {step === 3 && (
+          <div data-testid="step-4" className="py-2 flex flex-col gap-4">
             <div>
               <h3 className="mb-2 font-medium text-dark-text-primary">选择模板</h3>
               <div className="flex flex-col gap-2">
@@ -265,6 +272,23 @@ export default function ReportPlanDialog({
             <>
               <Button
                 variant="outline"
+                onClick={() => setStep(1)}
+                className="bg-transparent border-dark-border text-dark-text-primary hover:bg-dark-card-l2 hover:text-dark-text-primary"
+              >
+                上一步
+              </Button>
+              <Button
+                data-testid="report-plan-next-button"
+                onClick={() => setStep(3)}
+              >
+                下一步
+              </Button>
+            </>
+          )}
+          {step === 3 && (
+            <>
+              <Button
+                variant="outline"
                 onClick={() => onOpenChange(false)}
                 className="bg-transparent border-dark-border text-dark-text-primary hover:bg-dark-card-l2 hover:text-dark-text-primary"
               >
@@ -272,7 +296,7 @@ export default function ReportPlanDialog({
               </Button>
               <Button
                 variant="outline"
-                onClick={() => setStep(1)}
+                onClick={() => setStep(2)}
                 className="bg-transparent border-dark-border text-dark-text-primary hover:bg-dark-card-l2 hover:text-dark-text-primary"
               >
                 上一步

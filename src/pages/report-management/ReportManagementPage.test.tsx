@@ -42,6 +42,10 @@ describe('ReportManagementPage', () => {
     await user.click(screen.getByTestId('report-plan-next-button'))
     expect(screen.getByTestId('step-3')).toBeInTheDocument()
 
+    // Step 3 → Step 4
+    await user.click(screen.getByTestId('report-plan-next-button'))
+    expect(screen.getByTestId('step-4')).toBeInTheDocument()
+
     // Save plan
     await user.click(screen.getByTestId('report-plan-save-button'))
 
@@ -76,12 +80,15 @@ describe('ReportManagementPage', () => {
 
     fireEvent.change(nameInput, { target: { value: '核心指标日报-已修改' } })
 
-    // Step 1 → Step 2 → Step 3
+    // Step 1 → Step 2 → Step 3 → Step 4
     await user.click(screen.getByTestId('report-plan-next-button'))
     expect(screen.getByTestId('step-2')).toBeInTheDocument()
 
     await user.click(screen.getByTestId('report-plan-next-button'))
     expect(screen.getByTestId('step-3')).toBeInTheDocument()
+
+    await user.click(screen.getByTestId('report-plan-next-button'))
+    expect(screen.getByTestId('step-4')).toBeInTheDocument()
 
     // Save plan
     await user.click(screen.getByTestId('report-plan-save-button'))

@@ -19,9 +19,12 @@ export interface FilterScopeValue {
   excludedLinkRelationIds: string[]
 }
 
+export type FilterScopeMode = 'full' | 'inclusion-only' | 'exclusion-only'
+
 export interface FilterScopeSelectorProps {
   value: FilterScopeValue
   onChange: (value: FilterScopeValue) => void
+  mode?: FilterScopeMode
 }
 
 /** 标准关联关系类型 */
@@ -54,7 +57,7 @@ function getIndicatorsByTagIds(
     .map((ind) => ind.id)
 }
 
-export default function FilterScopeSelector({ value, onChange }: FilterScopeSelectorProps) {
+export default function FilterScopeSelector({ value, onChange, mode = 'full' }: FilterScopeSelectorProps) {
   // ── 读取跨部门全量数据 ──
   const departments = useMemo(() => getDepartments(), [])
   const allIndicators = useMemo(
@@ -239,6 +242,8 @@ export default function FilterScopeSelector({ value, onChange }: FilterScopeSele
 
   return (
     <div data-testid="filter-scope-selector" className="flex flex-col gap-4 text-dark-text-primary">
+      {mode !== 'exclusion-only' && (
+      <>
       {/* 统计行 + 部门筛选 — sticky 固定在 Step 2 区域顶部 */}
       <div className="sticky top-0 z-10 flex flex-col gap-2 rounded-lg border border-dark-border bg-dark-card-l1/95 p-3 shadow-lg backdrop-blur-sm">
         <div className="flex items-center justify-between text-sm text-dark-text-secondary">
@@ -406,7 +411,11 @@ export default function FilterScopeSelector({ value, onChange }: FilterScopeSele
           )}
         />
         </div>
+      </>
+      )}
 
+      {mode !== 'inclusion-only' && (
+      <div className="flex flex-col gap-4">
       {/* 剔除规则 */}
       <div className="rounded-lg border border-dark-border bg-dark-card-l1/95 p-4 backdrop-blur-sm">
         <h3 className="mb-2 font-medium text-dark-text-primary">剔除规则</h3>
@@ -444,6 +453,8 @@ export default function FilterScopeSelector({ value, onChange }: FilterScopeSele
           </div>
         ))}
       </div>
+      </div>
+      )}
     </div>
   )
 }

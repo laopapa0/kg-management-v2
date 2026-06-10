@@ -103,7 +103,7 @@ describe('ReportPlanDialog — 三步向导', () => {
     expect(screen.getByTestId('step-3')).toBeInTheDocument()
   })
 
-  it('shows enabled templates and summary in step 3', async () => {
+  it('shows enabled templates in step 4', async () => {
     const user = userEvent.setup()
     render(
       <ReportPlanDialog
@@ -114,6 +114,7 @@ describe('ReportPlanDialog — 三步向导', () => {
     )
 
     await user.type(screen.getByTestId('report-plan-name-input'), '测试计划')
+    await user.click(screen.getByTestId('report-plan-next-button'))
     await user.click(screen.getByTestId('report-plan-next-button'))
     await user.click(screen.getByTestId('report-plan-next-button'))
 
@@ -140,6 +141,7 @@ describe('ReportPlanDialog — 三步向导', () => {
     )
 
     await user.type(screen.getByTestId('report-plan-name-input'), '测试计划')
+    await user.click(screen.getByTestId('report-plan-next-button'))
     await user.click(screen.getByTestId('report-plan-next-button'))
     await user.click(screen.getByTestId('report-plan-next-button'))
     await user.click(screen.getByTestId('report-plan-save-button'))

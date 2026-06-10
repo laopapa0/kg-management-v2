@@ -1,6 +1,23 @@
 import { useState, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import {
   Plus,
   AlertTriangle,
   FolderTree,
@@ -65,7 +82,7 @@ interface ConflictItem {
 }
 
 /* ─── Mock 数据 ─── */
-const ruleCategoryTree: RuleCategory[] = [
+const ruleCategoryTreeData: RuleCategory[] = [
   {
     id: 'cat-abnormal', name: '异常规则',
     children: [
@@ -205,8 +222,107 @@ function CatTreeNode({ node, selectedId, expandedIds, onSelect, onToggleExpand }
   );
 }
 
+/* ─── 可拖拽顶层树节点 ─── */
+function TreeDragNode({ node, selectedId, expandedIds, onSelect, onToggleExpand }: CatTreeNodeProps) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: node.id })
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.4 : 1,
+  }
+
+  const hasChildren = node.children && node.children.length > 0
+  const isExpanded = expandedIds.has(node.id)
+  const isSelected = selectedId === node.id
+
+  return (
+    <div ref={setNodeRef} style={style}>
+      <div
+        onClick={() => { onSelect(node); if (hasChildren) onToggleExpand(node.id); }}
+        className={cn(
+          'flex items-center h-9 px-2 rounded-md transition-colors duration-100 select-none relative',
+          isSelected ? 'bg-[var(--accent-noc)]/10 text-[var(--accent-noc)]' : 'hover:bg-dark-tree-hover-bg text-dark-text-secondary cursor-pointer',
+        )}
+      >
+        {isSelected && (
+          <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-[var(--accent-noc)] rounded-r-full" />
+        )}
+        <button
+          {...attributes}
+          {...listeners}
+          onClick={(e) => e.stopPropagation()}
+          className="text-dark-text-tertiary mr-0.5 cursor-grab active:cursor-grabbing focus:outline-none flex-shrink-0"
+        >
+          <GripVertical size={12} />
+        </button>
+        {hasChildren ? (
+          <span className="mr-1 text-dark-text-tertiary" onClick={(e) => { e.stopPropagation(); onToggleExpand(node.id); }}>
+            {isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+          </span>
+        ) : (
+          <span className="w-[14px] mr-1" />
+        )}
+        <FolderTree size={14} className={cn('mr-2 shrink-0', isSelected ? 'text-[var(--accent-noc)]' : 'text-dark-text-tertiary')} />
+        <span className={cn('text-[13px] truncate', isSelected && 'font-medium')}>{node.name}</span>
+      </div>
+      {hasChildren && isExpanded && (
+        <div style={{ paddingLeft: '16px' }}>
+          {node.children!.map((child) => (
+            <CatTreeNode key={child.id} node={child} selectedId={selectedId} expandedIds={expandedIds} onSelect={onSelect} onToggleExpand={onToggleExpand} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ─── 可拖拽分类项 ─── */
+function CatChildItem({ child }: { child: RuleCategory }) {
+  return (
+    <div className="ml-6 mt-1">
+      <div className="flex items-center h-9 px-3 rounded-md border border-dark-border hover:bg-dark-page">
+        <GripVertical size={14} className="text-dark-text-tertiary mr-2 cursor-default" />
+        <span className="flex-1 text-[13px] text-dark-text-secondary">{child.name}</span>
+        <div className="flex items-center gap-2">
+          <button className="text-[12px] text-dark-accent-primary hover:underline">编辑</button>
+          <button className="text-[12px] text-error-500 hover:underline">删除</button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function SortableCatItem({ cat }: { cat: RuleCategory }) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: cat.id })
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  }
+
+  return (
+    <div ref={setNodeRef} style={style}>
+      <div className="flex items-center h-10 px-3 bg-dark-page rounded-md border border-dark-border">
+        <button {...attributes} {...listeners} className="text-dark-text-tertiary mr-2 cursor-grab active:cursor-grabbing">
+          <GripVertical size={14} />
+        </button>
+        <FolderTree size={14} className="text-dark-text-tertiary mr-2" />
+        <span className="flex-1 text-[14px] text-dark-text-secondary">{cat.name}</span>
+        <div className="flex items-center gap-2">
+          <button className="text-[12px] text-dark-accent-primary hover:underline">编辑</button>
+          <button className="text-[12px] text-error-500 hover:underline">删除</button>
+        </div>
+      </div>
+      {cat.children?.map((child) => (
+        <CatChildItem key={child.id} child={child} />
+      ))}
+    </div>
+  )
+}
+
 /* ─── 主页面 ─── */
 export default function NocRulePage() {
+  const [ruleCategoryTree, setRuleCategoryTree] = useState<RuleCategory[]>(ruleCategoryTreeData);
   const [selectedCatId, setSelectedCatId] = useState<string | null>(null);
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set(['cat-abnormal', 'cat-indicator-alert', 'cat-anomaly-algo']));
   const [treeSearch, setTreeSearch] = useState('');
@@ -264,6 +380,23 @@ export default function NocRulePage() {
       if (next.has(id)) next.delete(id);
       else next.add(id);
       return next;
+    });
+  }, []);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
+
+  const handleDragEnd = useCallback((event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    setRuleCategoryTree((prev) => {
+      const oldIndex = prev.findIndex((c) => c.id === active.id);
+      const newIndex = prev.findIndex((c) => c.id === over.id);
+      if (oldIndex === -1 || newIndex === -1) return prev;
+      return arrayMove(prev, oldIndex, newIndex);
     });
   }, []);
 
@@ -393,16 +526,20 @@ export default function NocRulePage() {
             />
           </div>
           <div className="flex-1 overflow-y-auto p-2">
-            {ruleCategoryTree.map((node) => (
-              <CatTreeNode
-                key={node.id}
-                node={node}
-                selectedId={selectedCatId}
-                expandedIds={expandedIds}
-                onSelect={(n) => setSelectedCatId(n.id)}
-                onToggleExpand={handleToggleExpand}
-              />
-            ))}
+            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+              <SortableContext items={ruleCategoryTree.map((c) => c.id)} strategy={verticalListSortingStrategy}>
+                {ruleCategoryTree.map((node) => (
+                  <TreeDragNode
+                    key={node.id}
+                    node={node}
+                    selectedId={selectedCatId}
+                    expandedIds={expandedIds}
+                    onSelect={(n) => setSelectedCatId(n.id)}
+                    onToggleExpand={handleToggleExpand}
+                  />
+                ))}
+              </SortableContext>
+            </DndContext>
           </div>
           {selectedCat && (
             <div className="p-3 border-t border-dark-border bg-[var(--accent-noc)]/10">
@@ -760,29 +897,13 @@ export default function NocRulePage() {
           </DialogHeader>
 
           <div className="mt-4 space-y-2 max-h-[400px] overflow-y-auto">
-            {ruleCategoryTree.map((cat) => (
-              <div key={cat.id}>
-                <div className="flex items-center h-10 px-3 bg-dark-page rounded-md border border-dark-border">
-                  <GripVertical size={14} className="text-dark-text-tertiary mr-2 cursor-grab" />
-                  <FolderTree size={14} className="text-dark-text-tertiary mr-2" />
-                  <span className="flex-1 text-[14px] text-dark-text-secondary">{cat.name}</span>
-                  <div className="flex items-center gap-2">
-                    <button className="text-[12px] text-dark-accent-primary hover:underline">编辑</button>
-                    <button className="text-[12px] text-error-500 hover:underline">删除</button>
-                  </div>
-                </div>
-                {cat.children && cat.children.map((child) => (
-                  <div key={child.id} className="flex items-center h-9 px-3 ml-6 mt-1 rounded-md border border-dark-border hover:bg-dark-page">
-                    <GripVertical size={14} className="text-dark-text-tertiary mr-2 cursor-grab" />
-                    <span className="flex-1 text-[13px] text-dark-text-secondary">{child.name}</span>
-                    <div className="flex items-center gap-2">
-                      <button className="text-[12px] text-dark-accent-primary hover:underline">编辑</button>
-                      <button className="text-[12px] text-error-500 hover:underline">删除</button>
-                    </div>
-                  </div>
+            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+              <SortableContext items={ruleCategoryTree.map((c) => c.id)} strategy={verticalListSortingStrategy}>
+                {ruleCategoryTree.map((cat) => (
+                  <SortableCatItem key={cat.id} cat={cat} />
                 ))}
-              </div>
-            ))}
+              </SortableContext>
+            </DndContext>
           </div>
 
           <div className="flex items-center justify-between mt-6 pt-4 border-t border-dark-border">
