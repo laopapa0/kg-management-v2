@@ -16,6 +16,17 @@ export function addGeneratedReport(report: GeneratedReport): void {
   saveGeneratedReports([...existing, report])
 }
 
+export function updateGeneratedReport(id: string, updater: (r: GeneratedReport) => GeneratedReport): void {
+  const all = getGeneratedReports()
+  const idx = all.findIndex((r) => r.id === id)
+  if (idx === -1) return
+  saveGeneratedReports([
+    ...all.slice(0, idx),
+    updater(all[idx]),
+    ...all.slice(idx + 1),
+  ])
+}
+
 export function getReportsByPlanId(planId: string): GeneratedReport[] {
   return getGeneratedReports()
     .filter((r) => r.planId === planId)

@@ -24,6 +24,8 @@ const routeNameMap: Record<string, string> = {
   '/reports/templates': '报告模板',
   '/reports/generate': '生成报告',
   '/knowledge-upload': '知识库管理',
+  '/noc/rule': '规则管理',
+  '/link-relation': '关联关系管理',
 };
 
 function getBreadcrumbItems(pathname: string) {

@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import { MemoryRouter, Routes, Route } from 'react-router-dom'
+import { MemoryRouter } from 'react-router-dom'
 import userEvent from '@testing-library/user-event'
 import { __resetGeneratedReportStorageCache, saveGeneratedReports } from '@/utils/generatedReportStorage'
 import type { GeneratedReport } from '@/models/generatedReportModel'
@@ -130,8 +130,7 @@ describe('ReportHistoryPage', () => {
     expect(rows[3]).toHaveTextContent('早期报告')
   })
 
-  it('navigates to report detail when clicking online detail button', async () => {
-    const user = userEvent.setup()
+  it('renders view report button and version history button', () => {
     const mockReports: GeneratedReport[] = [
       {
         id: 'gen-001',
@@ -149,18 +148,16 @@ describe('ReportHistoryPage', () => {
     saveGeneratedReports(mockReports)
 
     render(
-      <MemoryRouter initialEntries={['/reports/history']}>
-        <Routes>
-          <Route path="/reports/history" element={<ReportHistoryPage />} />
-          <Route path="/reports/:reportId" element={<div data-testid="report-detail-page">Report Detail</div>} />
-        </Routes>
+      <MemoryRouter>
+        <ReportHistoryPage />
       </MemoryRouter>,
     )
 
-    const detailButton = screen.getByTestId('online-detail-gen-001')
-    await user.click(detailButton)
-
-    expect(screen.getByTestId('report-detail-page')).toBeInTheDocument()
+    expect(screen.getByTestId('view-report-gen-001')).toBeInTheDocument()
+    expect(screen.getByTestId('version-history-gen-001')).toBeInTheDocument()
+    expect(screen.getByTestId('rerun-report-gen-001')).toBeInTheDocument()
+    expect(screen.getByText('历史版本')).toBeInTheDocument()
+    expect(screen.getByText('重新跑')).toBeInTheDocument()
   })
 
   it('opens report.html in new window when clicking view report button', async () => {

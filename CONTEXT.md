@@ -138,3 +138,4 @@ interface Indicator {
 - 工具文件：`src/utils/<feature>.ts`
 - 模型文件：`src/models/<model>.ts`
 - localStorage key 前缀：`kgv2-`（与 v1 区分）
+- **sticky 搜索栏/统计行**：使用 `bg-dark-card-l1/95 backdrop-blur-sm z-20`，确保滚动时遮挡下方内容不穿透、不被树节点动画层级覆盖

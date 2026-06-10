@@ -356,8 +356,8 @@ describe('LinkRelationManagePage', () => {
     const detailButtons = screen.getAllByText('查看详情')
     await user.click(detailButtons[0])
 
-    // Should show a new '停用' entry in the timeline
+    // Should show a new '修改' entry in the timeline
     const timeline = screen.getByTestId('change-timeline')
-    expect(timeline.textContent).toContain('停用')
+    expect(timeline.textContent).toContain('修改')
   })
 })

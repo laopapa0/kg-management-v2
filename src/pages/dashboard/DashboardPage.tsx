@@ -150,7 +150,7 @@ export default function DashboardPage() {
         transition={{ duration: 0.3, ease: 'easeOut' }}
         className="flex items-center justify-between mb-6"
       >
-        <h1 className="text-display">工作台</h1>
+        <h1 className="text-display text-white">工作台</h1>
         <div className="flex items-center gap-1.5 text-[13px] text-dark-text-secondary">
           <Calendar size={14} />
           {dateStr}

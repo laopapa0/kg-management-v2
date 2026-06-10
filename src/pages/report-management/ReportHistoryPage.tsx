@@ -1,11 +1,16 @@
-import { useState, useMemo } from 'react'
-import { FileText, ExternalLink, Eye } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
+import { useState, useMemo, useCallback } from 'react'
+import { FileText, ExternalLink, History, RotateCcw } from 'lucide-react'
 import EmptyState from '@/components/empty-state/EmptyState'
 import { Button } from '@/components/ui/button'
 import DataTable, { type Column } from '@/components/DataTable'
-import { getGeneratedReports } from '@/utils/generatedReportStorage'
-import type { GeneratedReport } from '@/models/generatedReportModel'
+import { getGeneratedReports, updateGeneratedReport } from '@/utils/generatedReportStorage'
+import { getReportPlans, saveReportPlans } from '@/utils/reportStorage'
+import { getReportTemplates } from '@/utils/reportTemplateStorage'
+import { getNextVersion, makeReportTitle } from '@/models/generatedReportModel'
+import type { GeneratedReport, ReportVersionSnapshot } from '@/models/generatedReportModel'
+import { generateMockReport } from '@/data/mockReportData'
+import { toast } from 'sonner'
+import ReportVersionHistoryDialog from '@/components/report/ReportVersionHistoryDialog'
 
 type TriggerFilter = 'all' | 'manual' | 'auto'
 
@@ -25,17 +30,20 @@ function TriggerBadge({ type }: { type: GeneratedReport['triggerType'] }) {
 }
 
 export default function ReportHistoryPage() {
-  const navigate = useNavigate()
   const [triggerFilter, setTriggerFilter] = useState<TriggerFilter>('all')
   const [planFilter, setPlanFilter] = useState<string>('all')
   const [page, setPage] = useState(1)
+  const [refreshKey, setRefreshKey] = useState(0)
+  const [versionDialogOpen, setVersionDialogOpen] = useState(false)
+  const [versionDialogReport, setVersionDialogReport] = useState<GeneratedReport | null>(null)
 
   const allReports = useMemo(() => {
     const reports = getGeneratedReports()
     return [...reports].sort(
-      (a, b) => new Date(b.generatedAt).getTime() - new Date(a.generatedAt).getTime(),
+      (a, b) => new Date(b.createdAt ?? b.generatedAt).getTime() - new Date(a.createdAt ?? a.generatedAt).getTime(),
     )
-  }, [])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [refreshKey])
 
   const planOptions = useMemo(() => {
     const map = new Map<string, string>()
@@ -55,13 +63,77 @@ export default function ReportHistoryPage() {
     })
   }, [allReports, triggerFilter, planFilter])
 
+  const handleOpenVersionHistory = (report: GeneratedReport) => {
+    const fresh = getGeneratedReports().find((r) => r.id === report.id)
+    setVersionDialogReport(fresh ?? report)
+    setVersionDialogOpen(true)
+  }
+
+  const handleRerun = useCallback((report: GeneratedReport) => {
+    const now = new Date()
+    const newVersion = getNextVersion(report.version)
+    const snapshot: ReportVersionSnapshot = {
+      version: report.version,
+      generatedAt: report.generatedAt,
+      sections: report.sections,
+      triggerType: report.triggerType,
+    }
+
+    const plans = getReportPlans()
+    const plan = plans.find((p) => p.id === report.planId) ?? {
+      name: report.planName,
+      id: report.planId,
+      schedule: 'daily' as const,
+      templateId: report.templateId,
+      latestVersion: 0,
+      autoSchedule: false,
+      filterScope: report.filterScope,
+    }
+
+    const templateName = plan.templateId
+      ? (getReportTemplates().find((t) => t.id === plan.templateId)?.name ?? '默认模板')
+      : '默认模板'
+
+    const freshReport = generateMockReport(
+      plan.name,
+      templateName,
+      plan.id,
+      plan.templateId,
+      plan.filterScope,
+      'manual',
+    )
+
+    updateGeneratedReport(report.id, (r) => ({
+      ...r,
+      version: newVersion,
+      generatedAt: now.toISOString(),
+      createdAt: r.createdAt ?? r.generatedAt,
+      title: makeReportTitle(r.planName, now),
+      sections: freshReport.sections,
+      triggerType: 'manual',
+      previousVersions: [...(r.previousVersions ?? []), snapshot],
+    }))
+
+    const nextPlans = plans.map((p) =>
+      p.id === plan.id
+        ? { ...p, latestVersion: plan.latestVersion + 1, lastGeneratedAt: now.toISOString() }
+        : p,
+    )
+    saveReportPlans(nextPlans)
+
+    setRefreshKey((k) => k + 1)
+    toast.success('报告已重新生成', {
+      action: { label: '查看', onClick: () => window.open(`/kg-management-v2/report.html?reportId=${report.id}`, '_blank') },
+    })
+  }, [])
+
   const columns: Column<GeneratedReport>[] = [
     {
       key: 'title',
       title: '报告标题',
       render: (r) => (
         <span className="font-medium text-dark-text-primary">
-          {r.planName} {r.version}
+          {r.title ? `${r.title} ${r.version}` : `${r.planName} ${r.version}`}
         </span>
       ),
     },
@@ -115,15 +187,28 @@ export default function ReportHistoryPage() {
           <Button
             variant="outline"
             size="sm"
-            data-testid={`online-detail-${r.id}`}
+            data-testid={`version-history-${r.id}`}
+            className="text-[12px] h-7 px-2 border-dark-border text-dark-text-secondary hover:bg-dark-page"
+            onClick={(e) => {
+              e.stopPropagation()
+              handleOpenVersionHistory(r)
+            }}
+          >
+            <History size={13} className="mr-1" />
+            历史版本
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            data-testid={`rerun-report-${r.id}`}
             className="text-[12px] h-7 px-2 border-dark-border text-dark-accent-primary hover:bg-dark-accent-primary/10"
             onClick={(e) => {
               e.stopPropagation()
-              navigate(`/reports/${r.id}`)
+              handleRerun(r)
             }}
           >
-            <Eye size={13} className="mr-1" />
-            在线详情
+            <RotateCcw size={13} className="mr-1" />
+            重新跑
           </Button>
         </div>
       ),
@@ -222,6 +307,12 @@ export default function ReportHistoryPage() {
           }}
         />
       </div>
+
+      <ReportVersionHistoryDialog
+        open={versionDialogOpen}
+        onOpenChange={setVersionDialogOpen}
+        report={versionDialogReport}
+      />
     </div>
   )
 }

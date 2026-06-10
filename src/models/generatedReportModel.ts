@@ -8,10 +8,19 @@
  * - 版本号与生成时间
  */
 
+export interface ReportVersionSnapshot {
+  version: string
+  generatedAt: string
+  sections: GeneratedReportSection[]
+  triggerType: 'manual' | 'auto'
+}
+
 export interface GeneratedReport {
   id: string
   planId: string
   planName: string
+  title?: string
+  createdAt?: string
   templateId: string
   templateName: string
   version: string
@@ -23,6 +32,7 @@ export interface GeneratedReport {
   }
   triggerType: 'manual' | 'auto'
   sections: GeneratedReportSection[]
+  previousVersions?: ReportVersionSnapshot[]
 }
 
 export interface GeneratedReportSection {
@@ -35,12 +45,25 @@ function generateId(): string {
   return `gen-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
 }
 
+/** 生成带时间戳的报告标题 */
+export function makeReportTitle(planName: string, date = new Date()): string {
+  const ts = date.toLocaleString('zh-CN', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+  return `${planName}-${ts}`
+}
+
 export function createGeneratedReport(
-  data: Omit<GeneratedReport, 'id' | 'generatedAt'>,
+  data: Omit<GeneratedReport, 'id' | 'generatedAt' | 'title'> & { title?: string },
 ): GeneratedReport {
   return {
     id: generateId(),
     generatedAt: new Date().toISOString(),
+    title: data.title ?? makeReportTitle(data.planName),
     ...data,
   }
 }

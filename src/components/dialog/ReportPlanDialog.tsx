@@ -11,7 +11,6 @@ import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { Switch } from '@/components/ui/switch'
 import type { ReportPlan } from '@/models/reportModel'
 import FilterScopeSelector, { type FilterScopeValue } from '@/components/report/FilterScopeSelector'
 import { getReportTemplates } from '@/utils/reportTemplateStorage'
@@ -123,17 +122,17 @@ export default function ReportPlanDialog({
 
         {/* 步骤指示器 */}
         <div className="flex items-center gap-2 text-sm">
-          {[1, 2, 3].map((s) => (
+          {['基本信息', '筛选范围', '选择模板'].map((label, i) => (
             <span
-              key={s}
-              data-testid={`step-indicator-${s}`}
-              className={`rounded-full px-2 py-0.5 ${
-                step + 1 === s
+              key={i}
+              data-testid={`step-indicator-${i + 1}`}
+              className={`rounded-full px-3 py-1 ${
+                step === i
                   ? 'bg-dark-accent-primary text-white'
                   : 'bg-dark-card-l2 text-dark-text-secondary'
               }`}
             >
-              Step {s}
+              {i + 1}.{label}
             </span>
           ))}
         </div>
@@ -183,23 +182,12 @@ export default function ReportPlanDialog({
                 className="bg-dark-card-l2 text-dark-text-primary min-h-[80px]"
               />
             </div>
-
-            <div className="flex items-center gap-2">
-              <Switch
-                data-testid="report-plan-auto-schedule"
-                checked={autoSchedule}
-                onCheckedChange={setAutoSchedule}
-              />
-              <Label className="text-sm text-dark-text-secondary">
-                {autoSchedule ? '自动执行已启用' : '启用自动执行'}
-              </Label>
-            </div>
           </div>
         )}
 
         {/* Step 2 — 筛选范围 */}
         {step === 1 && (
-          <div data-testid="step-2" className="py-2 max-h-[400px] overflow-y-auto">
+          <div data-testid="step-2" className="py-2 max-h-[520px] overflow-y-auto">
             <FilterScopeSelector value={filterScope} onChange={setFilterScope} />
           </div>
         )}
@@ -233,13 +221,6 @@ export default function ReportPlanDialog({
                     </label>
                   ))}
               </div>
-            </div>
-
-            <div data-testid="step-3-summary" className="rounded-lg border border-dark-border bg-dark-card-l2 p-3 text-sm text-dark-text-secondary">
-              <div className="font-medium text-dark-text-primary mb-1">配置摘要</div>
-              <div>名称：{name || '—'}</div>
-              <div>频率：{SCHEDULE_LABELS[schedule]}</div>
-              <div>自动排程：{autoSchedule ? '是' : '否'}</div>
             </div>
           </div>
         )}

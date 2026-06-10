@@ -136,16 +136,16 @@ export default function RulePanel({ selectedIndicatorId }: { selectedIndicatorId
     return map
   }, [tree])
 
+  function toRuleTreeNode(node: Rule): RuleTreeNode {
+    return {
+      id: node.id,
+      rule: node,
+      children: node.children?.length ? node.children.map(toRuleTreeNode) : undefined,
+    }
+  }
+
   const rootNodes: RuleTreeNode[] = useMemo(
-    () =>
-      tree.map((node) => ({
-        id: node.id,
-        rule: node,
-        children:
-          node.children && node.children.length > 0
-            ? node.children.map((child) => ({ id: child.id, rule: child }))
-            : undefined,
-      })),
+    () => tree.map(toRuleTreeNode),
     [tree],
   )
 
@@ -219,7 +219,7 @@ export default function RulePanel({ selectedIndicatorId }: { selectedIndicatorId
 
   return (
     <div className="flex-1 overflow-y-auto px-2 pb-2" data-testid="rule-panel">
-      <div className="sticky top-0 z-10 bg-dark-card-l1 pb-2 pt-1">
+      <div className="sticky top-0 z-20 bg-dark-card-l1/95 pb-2 pt-1 backdrop-blur-sm">
         <TreeSearchInput
           value={searchTerm}
           onChange={setSearchTerm}

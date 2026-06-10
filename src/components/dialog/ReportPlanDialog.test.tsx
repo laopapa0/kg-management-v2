@@ -27,7 +27,7 @@ describe('ReportPlanDialog — 三步向导', () => {
     localStorage.setItem('kgv2-attachment-rules', JSON.stringify([]))
   })
 
-  it('shows step 1 with name input, schedule radios, description and auto-schedule switch', () => {
+  it('shows step 1 with name input, schedule radios and description', () => {
     render(
       <ReportPlanDialog
         open={true}
@@ -42,7 +42,6 @@ describe('ReportPlanDialog — 三步向导', () => {
     expect(screen.getByRole('radio', { name: '每周' })).toBeInTheDocument()
     expect(screen.getByRole('radio', { name: '每月' })).toBeInTheDocument()
     expect(screen.getByTestId('report-plan-description-input')).toBeInTheDocument()
-    expect(screen.getByTestId('report-plan-auto-schedule')).toBeInTheDocument()
   })
 
   it('disables next button when name is empty in step 1', () => {
@@ -125,9 +124,6 @@ describe('ReportPlanDialog — 三步向导', () => {
     // Can select a template
     await user.click(screen.getByTestId('template-radio-tmpl-001'))
     expect(screen.getByTestId('template-radio-tmpl-001')).toBeChecked()
-
-    // Shows summary
-    expect(screen.getByTestId('step-3-summary')).toHaveTextContent('测试计划')
   })
 
   it('calls onConfirm with full data when clicking save plan', async () => {

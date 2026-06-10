@@ -2,6 +2,7 @@ import { FileText, Plus, Pencil, Trash2, Play } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import EmptyState from '@/components/empty-state/EmptyState'
 import { Button } from '@/components/ui/button'
+import { Switch } from '@/components/ui/switch'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import ReportPlanDialog from '@/components/dialog/ReportPlanDialog'
 import type { ReportPlanFormData } from '@/components/dialog/ReportPlanDialog'
@@ -12,7 +13,6 @@ import { getReportPlans, saveReportPlans } from '@/utils/reportStorage'
 import { getGeneratedReports, addGeneratedReport } from '@/utils/generatedReportStorage'
 import { getReportTemplates } from '@/utils/reportTemplateStorage'
 import { generateMockReport } from '@/data/mockReportData'
-import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 import ReportHistoryPage from './ReportHistoryPage'
 import ReportTemplatesPage from './ReportTemplatesPage'
@@ -20,25 +20,12 @@ import ReportTemplatesPage from './ReportTemplatesPage'
 type ReportTab = 'plans' | 'history' | 'templates'
 
 export default function ReportManagementPage() {
-  const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState<ReportTab>('plans')
   const [plans, setPlans] = useState(getReportPlans)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editingPlan, setEditingPlan] = useState<ReportPlan | null>(null)
 
   const handleGenerate = (plan: ReportPlan) => {
-    const scopeEmpty =
-      !plan.filterScope ||
-      (
-        plan.filterScope.includedIndicatorIds.length === 0 &&
-        plan.filterScope.excludedRuleIds.length === 0 &&
-        plan.filterScope.excludedLinkRelationIds.length === 0
-      )
-    if (scopeEmpty) {
-      toast.error('筛选范围为空，请编辑计划调整范围')
-      return
-    }
-
     const templateName = plan.templateId
       ? (getReportTemplates().find((t) => t.id === plan.templateId)?.name ?? '默认模板')
       : '默认模板'
@@ -63,7 +50,7 @@ export default function ReportManagementPage() {
     setPlans(next)
     saveReportPlans(next)
 
-    navigate(`/reports/${report.id}`)
+    window.open(`/kg-management-v2/report.html?reportId=${report.id}`, '_blank')
   }
 
   const upsertPlanFromFormData = (data: ReportPlanFormData): ReportPlan => {
@@ -96,6 +83,23 @@ export default function ReportManagementPage() {
   const handleSaveAndGenerate = (data: ReportPlanFormData) => {
     const plan = upsertPlanFromFormData(data)
     handleGenerate(plan)
+  }
+
+  const handleToggleAutoSchedule = (plan: ReportPlan) => {
+    const updated = { ...plan, autoSchedule: !plan.autoSchedule }
+    const next = plans.map((p) => (p.id === plan.id ? updated : p))
+    setPlans(next)
+    saveReportPlans(next)
+    toast.success(updated.autoSchedule ? '自动执行已开启' : '自动执行已关闭', {
+      action: {
+        label: '撤销',
+        onClick: () => {
+          const reverted = plans.map((p) => (p.id === plan.id ? plan : p))
+          setPlans(reverted)
+          saveReportPlans(reverted)
+        },
+      },
+    })
   }
 
   useEffect(() => {
@@ -158,33 +162,19 @@ export default function ReportManagementPage() {
                   <span className="rounded-full bg-dark-card-l2 px-2 py-0.5 text-xs text-dark-text-secondary">
                     {SCHEDULE_LABELS[plan.schedule]}
                   </span>
-                  {plan.autoSchedule && (
-                    <span className="rounded-full bg-dark-accent-primary/15 px-2 py-0.5 text-xs text-dark-accent-primary">
-                      自动
-                    </span>
-                  )}
                 </div>
                 <span className="text-sm text-dark-text-secondary">{plan.filterSummary}</span>
               </div>
-              <div className="flex items-center gap-4 text-sm text-dark-text-secondary">
+                <div className="flex items-center gap-4 text-sm text-dark-text-secondary">
                 <span>V{plan.latestVersion}</span>
                 <span>{plan.lastGeneratedAt ? new Date(plan.lastGeneratedAt).toLocaleDateString('zh-CN') : '—'}</span>
                 <div className="flex items-center gap-1">
-                  {(() => {
-                    const latestReport = getGeneratedReports()
-                      .filter((r) => r.planName === plan.name)
-                      .sort((a, b) => new Date(b.generatedAt).getTime() - new Date(a.generatedAt).getTime())[0]
-                    return latestReport ? (
-                      <button
-                        data-testid={`view-report-${plan.id}`}
-                        onClick={() => navigate(`/reports/${latestReport.id}`)}
-                        className="rounded p-1 text-dark-text-secondary hover:bg-dark-card-l2 hover:text-dark-text-primary"
-                        title="查看报告"
-                      >
-                        <FileText size={14} />
-                      </button>
-                    ) : null
-                  })()}
+                  <span className="text-xs text-dark-text-secondary">自动执行</span>
+                  <Switch
+                    data-testid={`auto-schedule-switch-${plan.id}`}
+                    checked={plan.autoSchedule}
+                    onCheckedChange={() => handleToggleAutoSchedule(plan)}
+                  />
                   {plan.latestVersion === 0 ? (
                     <button
                       data-testid={`generate-report-${plan.id}`}

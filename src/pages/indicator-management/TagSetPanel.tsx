@@ -249,7 +249,7 @@ export default function TagSetPanel({ selectedIndicatorId }: { selectedIndicator
 
   return (
     <div className="flex-1 overflow-y-auto px-3 pb-2" data-testid="tag-set-panel">
-      <div className="sticky top-0 z-10 space-y-2 bg-dark-card-l1 pb-2 pt-1">
+      <div className="sticky top-0 z-20 space-y-2 bg-dark-card-l1/95 pb-2 pt-1 backdrop-blur-sm">
         <div className="flex items-center justify-between">
           <span className="text-sm text-dark-text-secondary">
             已选{' '}

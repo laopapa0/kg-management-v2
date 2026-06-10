@@ -159,6 +159,6 @@ describe('FilterScopeSelector', () => {
     expect(lastCall.includedIndicatorIds).toContain('ind-child')
     expect(lastCall.includedIndicatorIds).toContain('ind-tagged')
 
-    expect(screen.getByText(/已选/)).toHaveTextContent('已选 3 个指标，覆盖 1 个部门')
+    expect(screen.getByText(/已选.*个指标/)).toHaveTextContent('已选 3 个指标，覆盖 1 个部门')
   })
 })

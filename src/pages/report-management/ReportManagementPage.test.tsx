@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
-import { MemoryRouter, Routes, Route } from 'react-router-dom'
+import { MemoryRouter } from 'react-router-dom'
 import userEvent from '@testing-library/user-event'
 import { __resetReportStorageCache } from '@/utils/reportStorage'
 import { mockReportPlans } from '@/models/reportModel'
@@ -190,23 +190,24 @@ describe('ReportManagementPage', () => {
     expect(storedReports[0].triggerType).toBe('manual')
   })
 
-  it('navigates to /reports/:newId after generating a report', async () => {
+  it('opens report.html after generating a report', async () => {
     const user = userEvent.setup()
+    const openSpy = vi.spyOn(window, 'open').mockImplementation(() => null)
     saveReportPlans([{ ...mockReportPlans[0], latestVersion: 0 }])
 
     render(
-      <MemoryRouter initialEntries={['/reports']}>
-        <Routes>
-          <Route path="/reports" element={<ReportManagementPage />} />
-          <Route path="/reports/:id" element={<div data-testid="report-detail-page">Report Detail</div>} />
-        </Routes>
+      <MemoryRouter>
+        <ReportManagementPage />
       </MemoryRouter>,
     )
 
     const generateButton = screen.getByText('首次生成')
     await user.click(generateButton)
 
-    expect(screen.getByTestId('report-detail-page')).toBeInTheDocument()
+    expect(openSpy).toHaveBeenCalledWith(
+      expect.stringMatching(/\/kg-management-v2\/report\.html\?reportId=/),
+      '_blank',
+    )
   })
 
   it('shows tabs for switching between plans, history and templates', () => {
@@ -256,8 +257,9 @@ describe('ReportManagementPage', () => {
     expect(screen.queryByText('核心指标日报')).not.toBeInTheDocument()
   })
 
-  it('shows error toast when generating with empty filterScope', async () => {
+  it('generates report even with empty filterScope', async () => {
     const user = userEvent.setup()
+    const openSpy = vi.spyOn(window, 'open').mockImplementation(() => null)
     saveReportPlans([{
       ...mockReportPlans[0],
       latestVersion: 0,
@@ -265,22 +267,17 @@ describe('ReportManagementPage', () => {
     }])
 
     render(
-      <MemoryRouter initialEntries={['/reports']}>
-        <Routes>
-          <Route path="/reports" element={<ReportManagementPage />} />
-          <Route path="/reports/:id" element={<div data-testid="report-detail-page">Report Detail</div>} />
-        </Routes>
+      <MemoryRouter>
+        <ReportManagementPage />
       </MemoryRouter>,
     )
 
     const generateButton = screen.getByText('首次生成')
     await user.click(generateButton)
 
-    // Should not navigate
-    expect(screen.queryByTestId('report-detail-page')).not.toBeInTheDocument()
-    // Plan version should not change
+    expect(openSpy).toHaveBeenCalled()
     const stored = JSON.parse(localStorage.getItem('kgv2-reports') ?? '[]')
     const plan = stored.find((p: { id: string }) => p.id === 'report-plan-001')
-    expect(plan.latestVersion).toBe(0)
+    expect(plan.latestVersion).toBe(1)
   })
 })

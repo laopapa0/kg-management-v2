@@ -361,7 +361,7 @@ export default function NocRulePage() {
       {/* ── Page Header ── */}
       <div className="flex items-center justify-between mb-5">
         <div>
-          <h1 className="text-[28px] font-semibold text-dark-text-primary leading-tight tracking-[-0.02em]">业务规则管理</h1>
+          <h1 className="text-[28px] font-semibold text-dark-text-primary leading-tight tracking-[-0.02em]">规则管理</h1>
           <p className="text-[13px] text-dark-text-secondary mt-1">维护业务规则模板与分类体系，定义参数JSON Schema与继承关系</p>
         </div>
         <div className="flex items-center gap-3">

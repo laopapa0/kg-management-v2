@@ -31,7 +31,7 @@ export interface LinkUsage {
 /** 单条变更记录 */
 export interface ChangeLogEntry {
   timestamp: string
-  type: string
+  type: '新增' | '修改' | '删除'
   field: string
   oldValue: string
   newValue: string

@@ -2,7 +2,13 @@ import { useState, useMemo, useEffect, useCallback, useRef } from 'react'
 import { Switch } from '@/components/ui/switch'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 
 import DataTable, { type Column } from '@/components/DataTable'
 import ChangeTimeline from '@/components/timeline/ChangeTimeline'
@@ -12,11 +18,50 @@ import {
   mockLinkUsages,
   mockLinkChangeLogs,
 } from '@/models/linkRelationModel'
-import type { LinkRelation, LinkChangeLog, ChangeLogEntry } from '@/models/linkRelationModel'
+import type { LinkRelation, LinkChangeLog, ChangeLogEntry, LinkUsageConnection } from '@/models/linkRelationModel'
 import { IconRenderer } from '@/utils/icons.tsx'
 
 const SOURCE_TYPE_OPTIONS = ['全部', '指标', '虚拟分组', '外部因素']
 const DIRECTION_OPTIONS = ['全部', '有向', '无向']
+
+const TIME_FILTER_OPTIONS = [
+  { label: '全部时间', value: 'all' },
+  { label: '最近7天', value: '7' },
+  { label: '最近30天', value: '30' },
+  { label: '最近90天', value: '90' },
+]
+
+function matchTimeFilter(createdAt: string, filterValue: string): boolean {
+  if (filterValue === 'all' || !filterValue) return true
+  const days = parseInt(filterValue, 10)
+  if (isNaN(days)) return true
+  const connDate = new Date(createdAt)
+  const cutoffDate = new Date()
+  cutoffDate.setDate(cutoffDate.getDate() - days)
+  return connDate >= cutoffDate
+}
+
+/** 将业务域映射到固定部门 */
+function mapToDepartment(businessDomain: string): string {
+  const domain = businessDomain.trim()
+  if (['收入', '成本'].includes(domain)) return '财务部'
+  if (['用户', '交付'].includes(domain)) return '市场部'
+  if (domain === '网络') return '网络部'
+  if (['服务', '投诉'].includes(domain)) return '客服部'
+  return '市场部'
+}
+
+/** 从 sourceName 中提取部门，例如 "月_收入_总收入" -> "财务部" */
+function extractDeptFromSourceName(sourceName: string): string {
+  const parts = sourceName.split('_')
+  const businessDomain = parts.length >= 2 ? parts[1] : ''
+  return mapToDepartment(businessDomain)
+}
+
+/** 获取固定的部门筛选项 */
+function getDeptOptions(_connections?: LinkUsageConnection[]): string[] {
+  return ['全部', '财务部', '市场部', '网络部', '客服部']
+}
 
 export default function LinkRelationManagePage() {
   const [relations, setRelations] = useState<LinkRelation[]>(mockLinkRelations)
@@ -28,6 +73,8 @@ export default function LinkRelationManagePage() {
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editingRelation, setEditingRelation] = useState<LinkRelation | undefined>(undefined)
   const [changeLogs, setChangeLogs] = useState<LinkChangeLog[]>(mockLinkChangeLogs)
+  const [usageDeptFilter, setUsageDeptFilter] = useState<Record<string, string>>({})
+  const [usageTimeFilter, setUsageTimeFilter] = useState<Record<string, string>>({})
   const pageSize = 10
   const searchRef = useRef<HTMLInputElement>(null)
 
@@ -87,15 +134,14 @@ export default function LinkRelationManagePage() {
       const relation = prev.find((r) => r.id === id)
       if (!relation) return prev
       const newEnabled = !relation.enabled
-      // Record change log
       const now = new Date().toISOString().replace('T', ' ').slice(0, 19)
       const entry: ChangeLogEntry = {
         timestamp: now,
-        type: newEnabled ? '启用' : '停用',
+        type: '修改',
         field: 'enabled',
         oldValue: String(relation.enabled),
         newValue: String(newEnabled),
-        operator: 'admin',
+        operator: '运营部-系统',
       }
       setChangeLogs((logs) => {
         const existing = logs.find((l) => l.relationId === id)
@@ -109,6 +155,22 @@ export default function LinkRelationManagePage() {
       return prev.map((r) => (r.id === id ? { ...r, enabled: newEnabled } : r))
     })
   }
+
+  const getFilteredConnections = useCallback(
+    (connections: LinkUsageConnection[], relationId: string) => {
+      const deptFilter = usageDeptFilter[relationId] || '全部'
+      const timeFilter = usageTimeFilter[relationId] || 'all'
+
+      return connections.filter((conn) => {
+        const deptMatch =
+          deptFilter === '全部' ||
+          extractDeptFromSourceName(conn.sourceName) === deptFilter
+        const timeMatch = matchTimeFilter(conn.createdAt, timeFilter)
+        return deptMatch && timeMatch
+      })
+    },
+    [usageDeptFilter, usageTimeFilter],
+  )
 
   const columns: Column<LinkRelation>[] = useMemo(
     () => [
@@ -321,6 +383,10 @@ export default function LinkRelationManagePage() {
           if (expandedId !== r.id) return null
           const usage = mockLinkUsages.find((u) => u.relationId === r.id)
           const changeLog = changeLogs.find((c) => c.relationId === r.id)
+          const filteredConnections = usage
+            ? getFilteredConnections(usage.connections, r.id)
+            : []
+          const deptOptions = getDeptOptions(usage?.connections)
           return (
             <div
               key={`detail-${r.id}`}
@@ -332,34 +398,100 @@ export default function LinkRelationManagePage() {
                 <div>创建时间：{r.createdAt}</div>
               </div>
               <div className="mb-4 border-t border-dark-border pt-4" data-testid="usage-tracking">
+                {usage && usage.connections.length > 0 && (
+                  <div className="mb-3 flex items-center gap-3 flex-wrap">
+                    <span className="text-xs text-dark-text-secondary">筛选：</span>
+                    <Select
+                      value={usageDeptFilter[r.id] || '全部'}
+                      onValueChange={(v) =>
+                        setUsageDeptFilter((prev) => ({ ...prev, [r.id]: v }))
+                      }
+                    >
+                      <SelectTrigger
+                        data-testid="usage-dept-filter"
+                        className="h-8 w-32"
+                      >
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {deptOptions.map((opt) => (
+                          <SelectItem key={opt} value={opt}>
+                            {opt === '全部' ? '全部部门' : opt}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Select
+                      value={usageTimeFilter[r.id] || 'all'}
+                      onValueChange={(v) =>
+                        setUsageTimeFilter((prev) => ({ ...prev, [r.id]: v }))
+                      }
+                    >
+                      <SelectTrigger
+                        data-testid="usage-time-filter"
+                        className="h-8 w-32"
+                      >
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {TIME_FILTER_OPTIONS.map((opt) => (
+                          <SelectItem key={opt.value} value={opt.value}>
+                            {opt.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <button
+                      data-testid="usage-filter-reset"
+                      className="text-xs text-blue-400 hover:underline"
+                      onClick={() => {
+                        setUsageDeptFilter((prev) => ({ ...prev, [r.id]: '全部' }))
+                        setUsageTimeFilter((prev) => ({ ...prev, [r.id]: 'all' }))
+                      }}
+                    >
+                      重置
+                    </button>
+                    <span className="ml-auto text-xs text-dark-text-secondary">
+                      共 {filteredConnections.length} 条
+                      {filteredConnections.length !== (usage?.connections.length ?? 0) &&
+                        ` / 总计 ${usage?.connections.length ?? 0} 条`}
+                    </span>
+                  </div>
+                )}
                 <h4 className="mb-2 text-sm font-medium text-dark-text-primary">使用追踪</h4>
                 {usage && usage.connections.length > 0 ? (
                   <>
                     <p className="mb-2 text-sm">
                       该类型已被 <span className="font-medium text-dark-text-primary">{usage.connectionCount}</span> 条血缘连线引用
                     </p>
-                    <table className="w-full border-collapse text-xs">
-                      <thead>
-                        <tr className="border-b border-dark-border text-dark-text-secondary">
-                          <th className="py-1.5 text-left font-medium">来源指标</th>
-                          <th className="py-1.5 text-left font-medium">目标指标</th>
-                          <th className="py-1.5 text-left font-medium">创建时间</th>
-                          <th className="py-1.5 text-left font-medium"></th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {usage.connections.map((conn, idx) => (
-                          <tr key={idx} className="border-b border-dark-border/50">
-                            <td className="py-1.5">{conn.sourceName}</td>
-                            <td className="py-1.5">{conn.targetName}</td>
-                            <td className="py-1.5">{conn.createdAt}</td>
-                            <td className="py-1.5">
-                              <button className="text-blue-400 hover:underline">跳转画布</button>
-                            </td>
+                    {filteredConnections.length > 0 ? (
+                      <table className="w-full border-collapse text-xs">
+                        <thead>
+                          <tr className="border-b border-dark-border text-dark-text-secondary">
+                            <th className="py-1.5 text-left font-medium">来源指标</th>
+                            <th className="py-1.5 text-left font-medium">目标指标</th>
+                            <th className="py-1.5 text-left font-medium">创建时间</th>
+                            <th className="py-1.5 text-left font-medium"></th>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                        </thead>
+                        <tbody>
+                          {filteredConnections.map((conn, idx) => (
+                            <tr key={idx} className="border-b border-dark-border/50">
+                              <td className="py-1.5">{conn.sourceName}</td>
+                              <td className="py-1.5">{conn.targetName}</td>
+                              <td className="py-1.5">{conn.createdAt}</td>
+                              <td className="py-1.5">
+                                <button className="text-blue-400 hover:underline">跳转画布</button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    ) : (
+                      <p className="py-4 text-center text-sm text-dark-text-secondary">
+                        暂无符合筛选条件的数据
+                      </p>
+                    )}
                   </>
                 ) : (
                   <p className="text-sm">暂无连线引用此关系类型</p>
