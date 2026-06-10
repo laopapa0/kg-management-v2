@@ -1,5 +1,5 @@
 import { useState, useCallback, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { z } from 'zod';
 import {
@@ -633,7 +633,8 @@ export default function LineageCanvasPage() {
   const navigate = useNavigate();
 
   // 左侧面板状态
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchParams] = useSearchParams();
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
   const [filterType, setFilterType] = useState<string>('全部');
   const [selectedRelationId, setSelectedRelationId] = useState<string | null>(null);
 

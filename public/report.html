@@ -52,13 +52,28 @@
     .nb-table .note { color: #e65100; font-style: italic; }
     .legend-box { background: #f8f9fa; border-radius: 6px; padding: 10px 16px; margin: 8px 0 12px; font-size: 13px; line-height: 1.8; }
     .legend-box span { margin-right: 16px; }
-  </style>
+  
+a.ind-link { color: #1a237e; text-decoration: underline dotted; text-underline-offset: 2px; }
+a.ind-link:hover { color: #3949ab; }
+</style>
 </head>
 <body>
+<script>
+(function () {
+  var params = new URLSearchParams(window.location.search);
+  var reportId = params.get('reportId');
+  if (!reportId) return;
+  try {
+    var reports = JSON.parse(localStorage.getItem('kgv2-generated-reports') || '[]');
+    var report = reports.find(function (r) { return r.id === reportId; });
+    if (report) { window.__reportData = report; }
+  } catch (_) {}
+})();
+</script>
 <div class="container">
 
 <div class="header">
-  <h1>运营监控智能分析报告（2026年3月）</h1>
+  <h1 id="report-title">运营监控智能分析报告（2026年3月）</h1>
   <div class="meta">报告生成时间: 2026-05-24 | 数据范围: 2026-03-01 ~ 2026-03-31</div>
 </div>
 
@@ -220,7 +235,7 @@
   </div>
 
   <!-- 3.1 战新当日新增 -->
-  <h3>3.1 战新当日新增（03-09，504线，+50300%）</h3>
+  <h3>3.1 <a href="/kg-management-v2/#/lineage?q=战新当日新增" target="_blank" class="ind-link">战新当日新增</a>（03-09，504线，+50300%）</h3>
   <div class="alert alert-danger">
     <strong>异常表现</strong>：异常日值504线，前日值1线，日变化+50300%<br>
     月均值88.87线，月标准差202.38，CV=227.7%（极高波动）
@@ -228,25 +243,25 @@
   <h4>图谱邻居数据（03-09）</h4>
   <table class="nb-table">
     <tr><th>邻居</th><th>关系</th><th>方向</th><th>03-09值</th><th>03-08值</th><th>日变化</th><th>月均值</th><th>偏离?</th></tr>
-    <tr><td>三线当日新增</td><td>DRIVES</td><td>出→</td><td>28</td><td>0</td><td class="note">N/A</td><td>16.4</td><td class="note">⚠️前日为0</td></tr>
-    <tr><td>三线当日完工</td><td>DRIVES</td><td>出→</td><td>24</td><td>1</td><td class="note">+2300%</td><td>17.9</td><td class="note">⚠️前日极低</td></tr>
-    <tr><td>战新当日完工</td><td>DRIVES</td><td>出→</td><td>6</td><td>0</td><td class="note">N/A</td><td>12.1</td><td class="normal">正常</td></tr>
-    <tr><td>三线完工平均交付时长</td><td>DRIVES</td><td>出→</td><td>182.46</td><td>189.52</td><td>-3.7%</td><td>128.6</td><td class="normal">正常</td></tr>
-    <tr><td>装维工单数</td><td>DRIVES</td><td>出→</td><td>12847</td><td>13788</td><td>-6.8%</td><td>—</td><td class="normal">正常</td></tr>
-    <tr><td>申告量</td><td>DRIVES</td><td>出→</td><td>3110</td><td>—</td><td>—</td><td>3054</td><td class="normal">正常</td></tr>
-    <tr><td>战新在途超时</td><td>DRIVES</td><td>出→</td><td>0</td><td>0</td><td>0%</td><td>0</td><td class="normal">正常</td></tr>
-    <tr><td>5G基站总数</td><td>DRIVES</td><td>入←</td><td>18907</td><td>18904</td><td>+0.02%</td><td>18920</td><td class="normal">正常</td></tr>
-    <tr><td>高套当日新增</td><td>DRIVES</td><td>入←</td><td>421</td><td>505</td><td>-16.6%</td><td>420</td><td class="normal">正常</td></tr>
+    <tr><td><a href="/kg-management-v2/#/lineage?q=三线当日新增" target="_blank" class="ind-link">三线当日新增</a></td><td>DRIVES</td><td>出→</td><td>28</td><td>0</td><td class="note">N/A</td><td>16.4</td><td class="note">⚠️前日为0</td></tr>
+    <tr><td><a href="/kg-management-v2/#/lineage?q=三线当日完工" target="_blank" class="ind-link">三线当日完工</a></td><td>DRIVES</td><td>出→</td><td>24</td><td>1</td><td class="note">+2300%</td><td>17.9</td><td class="note">⚠️前日极低</td></tr>
+    <tr><td><a href="/kg-management-v2/#/lineage?q=战新当日完工" target="_blank" class="ind-link">战新当日完工</a></td><td>DRIVES</td><td>出→</td><td>6</td><td>0</td><td class="note">N/A</td><td>12.1</td><td class="normal">正常</td></tr>
+    <tr><td><a href="/kg-management-v2/#/lineage?q=三线完工平均交付时长" target="_blank" class="ind-link">三线完工平均交付时长</a></td><td>DRIVES</td><td>出→</td><td>182.46</td><td>189.52</td><td>-3.7%</td><td>128.6</td><td class="normal">正常</td></tr>
+    <tr><td><a href="/kg-management-v2/#/lineage?q=装维工单数" target="_blank" class="ind-link">装维工单数</a></td><td>DRIVES</td><td>出→</td><td>12847</td><td>13788</td><td>-6.8%</td><td>—</td><td class="normal">正常</td></tr>
+    <tr><td><a href="/kg-management-v2/#/lineage?q=申告量" target="_blank" class="ind-link">申告量</a></td><td>DRIVES</td><td>出→</td><td>3110</td><td>—</td><td>—</td><td>3054</td><td class="normal">正常</td></tr>
+    <tr><td><a href="/kg-management-v2/#/lineage?q=战新在途超时" target="_blank" class="ind-link">战新在途超时</a></td><td>DRIVES</td><td>出→</td><td>0</td><td>0</td><td>0%</td><td>0</td><td class="normal">正常</td></tr>
+    <tr><td><a href="/kg-management-v2/#/lineage?q=5G基站总数" target="_blank" class="ind-link">5G基站总数</a></td><td>DRIVES</td><td>入←</td><td>18907</td><td>18904</td><td>+0.02%</td><td>18920</td><td class="normal">正常</td></tr>
+    <tr><td><a href="/kg-management-v2/#/lineage?q=高套当日新增" target="_blank" class="ind-link">高套当日新增</a></td><td>DRIVES</td><td>入←</td><td>421</td><td>505</td><td>-16.6%</td><td>420</td><td class="normal">正常</td></tr>
   </table>
   <div id="chart-g1" class="chart-box graph"></div>
   <div class="alert alert-warning">
-    <strong>归因分析</strong>：战新当日新增在知识图谱中<strong>无DEPENDS_ON关系</strong>，仅有DRIVES（驱动下游）出/入关系。所有邻居03-09当天均未偏离（部分前日极低导致日变化不可靠）。<br>
+    <strong>归因分析</strong>：<a href="/kg-management-v2/#/lineage?q=战新当日新增" target="_blank" class="ind-link">战新当日新增</a>在知识图谱中<strong>无DEPENDS_ON关系</strong>，仅有DRIVES（驱动下游）出/入关系。所有邻居03-09当天均未偏离（部分前日极低导致日变化不可靠）。<br>
     <strong>归因判定</strong>：<span class="tag tag-warning">无法归因</span> — 无上游DEPENDS_ON关系，该指标为源头业务量指标，波动由市场行为驱动<br>
     <strong>建议负责部门</strong>：云网运
   </div>
 
   <!-- 3.2 战新当日完工平均交付时长 -->
-  <h3>3.2 战新当日完工平均交付时长（03-22，161.5分钟，+194.3%）</h3>
+  <h3>3.2 <a href="/kg-management-v2/#/lineage?q=战新当日完工平均交付时长" target="_blank" class="ind-link">战新当日完工平均交付时长</a>（03-22，161.5分钟，+194.3%）</h3>
   <div class="alert alert-danger">
     <strong>异常表现</strong>：异常日值161.5分钟，前日值54.88分钟，日变化+194.3%<br>
     月均值49.35分钟，月标准差34.62
@@ -254,24 +269,24 @@
   <h4>图谱邻居数据（03-22）</h4>
   <table class="nb-table">
     <tr><th>邻居</th><th>关系</th><th>方向</th><th>03-22值</th><th>03-21值</th><th>日变化</th><th>月均值</th><th>偏离?</th></tr>
-    <tr><td>战新当日完工</td><td>DEPENDS_ON</td><td>入←</td><td>1</td><td>1</td><td>0%</td><td>12.1</td><td class="normal">正常</td></tr>
-    <tr><td>战新当日新增</td><td>DRIVES</td><td>入←</td><td>0</td><td>0</td><td>0%</td><td>88.9</td><td class="normal">正常</td></tr>
-    <tr><td>战新在途超时</td><td>DRIVES</td><td>入←</td><td>0</td><td>0</td><td>0%</td><td>0</td><td class="normal">正常</td></tr>
-    <tr><td>装维工单数</td><td>DRIVES</td><td>入←</td><td>14798</td><td>15029</td><td>-1.5%</td><td>—</td><td class="normal">正常</td></tr>
-    <tr><td>三线当日新增</td><td>DRIVES</td><td>入←</td><td>0</td><td>0</td><td>0%</td><td>16.4</td><td class="normal">正常</td></tr>
-    <tr><td>三线当日完工</td><td>DRIVES</td><td>入←</td><td>0</td><td>1</td><td>-100%</td><td>17.9</td><td class="normal">正常</td></tr>
-    <tr><td>三线完工平均交付时长</td><td>DRIVES</td><td>入←</td><td>103.96</td><td>103.96</td><td>0%</td><td>128.6</td><td class="normal">正常</td></tr>
-    <tr><td>政企平均处理时长</td><td>DRIVES</td><td>出→</td><td>1.87</td><td>1.86</td><td>+0.5%</td><td>—</td><td class="normal">正常</td></tr>
+    <tr><td><a href="/kg-management-v2/#/lineage?q=战新当日完工" target="_blank" class="ind-link">战新当日完工</a></td><td>DEPENDS_ON</td><td>入←</td><td>1</td><td>1</td><td>0%</td><td>12.1</td><td class="normal">正常</td></tr>
+    <tr><td><a href="/kg-management-v2/#/lineage?q=战新当日新增" target="_blank" class="ind-link">战新当日新增</a></td><td>DRIVES</td><td>入←</td><td>0</td><td>0</td><td>0%</td><td>88.9</td><td class="normal">正常</td></tr>
+    <tr><td><a href="/kg-management-v2/#/lineage?q=战新在途超时" target="_blank" class="ind-link">战新在途超时</a></td><td>DRIVES</td><td>入←</td><td>0</td><td>0</td><td>0%</td><td>0</td><td class="normal">正常</td></tr>
+    <tr><td><a href="/kg-management-v2/#/lineage?q=装维工单数" target="_blank" class="ind-link">装维工单数</a></td><td>DRIVES</td><td>入←</td><td>14798</td><td>15029</td><td>-1.5%</td><td>—</td><td class="normal">正常</td></tr>
+    <tr><td><a href="/kg-management-v2/#/lineage?q=三线当日新增" target="_blank" class="ind-link">三线当日新增</a></td><td>DRIVES</td><td>入←</td><td>0</td><td>0</td><td>0%</td><td>16.4</td><td class="normal">正常</td></tr>
+    <tr><td><a href="/kg-management-v2/#/lineage?q=三线当日完工" target="_blank" class="ind-link">三线当日完工</a></td><td>DRIVES</td><td>入←</td><td>0</td><td>1</td><td>-100%</td><td>17.9</td><td class="normal">正常</td></tr>
+    <tr><td><a href="/kg-management-v2/#/lineage?q=三线完工平均交付时长" target="_blank" class="ind-link">三线完工平均交付时长</a></td><td>DRIVES</td><td>入←</td><td>103.96</td><td>103.96</td><td>0%</td><td>128.6</td><td class="normal">正常</td></tr>
+    <tr><td><a href="/kg-management-v2/#/lineage?q=政企平均处理时长" target="_blank" class="ind-link">政企平均处理时长</a></td><td>DRIVES</td><td>出→</td><td>1.87</td><td>1.86</td><td>+0.5%</td><td>—</td><td class="normal">正常</td></tr>
   </table>
   <div id="chart-g2" class="chart-box graph"></div>
   <div class="alert alert-info">
-    <strong>归因分析</strong>：交付时长 = 总完工时长 ÷ 完工数量。03-22战新当日完工仅1单，若该单为复杂工单则平均时长被放大。所有上游邻居（含DEPENDS_ON）当天均未偏离。<br>
-    <strong>归因判定</strong>：<span class="tag tag-info">关系存在但未传导</span> — DEPENDS_ON关系存在（战新当日完工），但上游邻居未偏离，无法构成传导证据<br>
+    <strong>归因分析</strong>：交付时长 = 总完工时长 ÷ 完工数量。03-22<a href="/kg-management-v2/#/lineage?q=战新当日完工" target="_blank" class="ind-link">战新当日完工</a>仅1单，若该单为复杂工单则平均时长被放大。所有上游邻居（含DEPENDS_ON）当天均未偏离。<br>
+    <strong>归因判定</strong>：<span class="tag tag-info">关系存在但未传导</span> — DEPENDS_ON关系存在（<a href="/kg-management-v2/#/lineage?q=战新当日完工" target="_blank" class="ind-link">战新当日完工</a>），但上游邻居未偏离，无法构成传导证据<br>
     <strong>建议负责部门</strong>：云网运
   </div>
 
   <!-- 3.3 当日聚焦销账 -->
-  <h3>3.3 当日聚焦销账（03-24，5900.04万元，+359658%）</h3>
+  <h3>3.3 <a href="/kg-management-v2/#/lineage?q=当日聚焦销账" target="_blank" class="ind-link">当日聚焦销账</a>（03-24，5900.04万元，+359658%）</h3>
   <div class="alert alert-danger">
     <strong>异常表现</strong>：异常日值5900.04万元，前日值1.64万元，日变化+359658%<br>
     月均值293.67万元，月标准差2044.19
@@ -279,21 +294,21 @@
   <h4>图谱邻居数据（03-24）</h4>
   <table class="nb-table">
     <tr><th>邻居</th><th>关系</th><th>方向</th><th>03-24值</th><th>03-23值</th><th>日变化</th><th>月均值</th><th>偏离?</th></tr>
-    <tr><td>当日计费销账</td><td>AGGREGATES</td><td>出→</td><td>57.3亿</td><td>6.4亿</td><td class="deviated">+801%</td><td>47.6亿</td><td class="deviated">✅ 偏离</td></tr>
-    <tr><td>三线当日新增</td><td>DRIVES</td><td>入←</td><td>20</td><td>17</td><td>+18%</td><td>16.4</td><td class="normal">正常</td></tr>
-    <tr><td>三线当日完工</td><td>TRANSMISSION</td><td>入←</td><td>25</td><td>27</td><td>-7%</td><td>17.9</td><td class="normal">正常</td></tr>
-    <tr><td>政企平均处理时长</td><td>DRIVES</td><td>出→</td><td>1.82</td><td>1.83</td><td>-0.5%</td><td>—</td><td class="normal">正常</td></tr>
+    <tr><td><a href="/kg-management-v2/#/lineage?q=当日计费销账" target="_blank" class="ind-link">当日计费销账</a></td><td>AGGREGATES</td><td>出→</td><td>57.3亿</td><td>6.4亿</td><td class="deviated">+801%</td><td>47.6亿</td><td class="deviated">✅ 偏离</td></tr>
+    <tr><td><a href="/kg-management-v2/#/lineage?q=三线当日新增" target="_blank" class="ind-link">三线当日新增</a></td><td>DRIVES</td><td>入←</td><td>20</td><td>17</td><td>+18%</td><td>16.4</td><td class="normal">正常</td></tr>
+    <tr><td><a href="/kg-management-v2/#/lineage?q=三线当日完工" target="_blank" class="ind-link">三线当日完工</a></td><td>TRANSMISSION</td><td>入←</td><td>25</td><td>27</td><td>-7%</td><td>17.9</td><td class="normal">正常</td></tr>
+    <tr><td><a href="/kg-management-v2/#/lineage?q=政企平均处理时长" target="_blank" class="ind-link">政企平均处理时长</a></td><td>DRIVES</td><td>出→</td><td>1.82</td><td>1.83</td><td>-0.5%</td><td>—</td><td class="normal">正常</td></tr>
   </table>
   <div id="chart-g3" class="chart-box graph"></div>
   <div class="alert alert-success">
-    <strong>归因分析</strong>：当日计费销账03-22/23连续两天仅1.2/1.64万元（远低于月均293万元），为数据积压。03-24计费销账飙升至57.3亿（+801%），聚焦销账同步释放至5900万元。<br>
-    <strong>归因链路</strong>：当日聚焦销账 —AGGREGATES→ 当日计费销账(+801%，✅已验证传导)<br>
+    <strong>归因分析</strong>：<a href="/kg-management-v2/#/lineage?q=当日计费销账" target="_blank" class="ind-link">当日计费销账</a>03-22/23连续两天仅1.2/1.64万元（远低于月均293万元），为数据积压。03-24计费销账飙升至57.3亿（+801%），聚焦销账同步释放至5900万元。<br>
+    <strong>归因链路</strong>：<a href="/kg-management-v2/#/lineage?q=当日聚焦销账" target="_blank" class="ind-link">当日聚焦销账</a> —AGGREGATES→ <a href="/kg-management-v2/#/lineage?q=当日计费销账" target="_blank" class="ind-link">当日计费销账</a>(+801%，✅已验证传导)<br>
     <strong>归因判定</strong>：<span class="tag tag-danger">图谱归因成功</span><br>
     <strong>建议负责部门</strong>：市场部
   </div>
 
   <!-- 3.4 云宽带当日新增 -->
-  <h3>3.4 云宽带当日新增（03-27，506线，-67.8%）</h3>
+  <h3>3.4 <a href="/kg-management-v2/#/lineage?q=云宽带当日新增" target="_blank" class="ind-link">云宽带当日新增</a>（03-27，506线，-67.8%）</h3>
   <div class="alert alert-danger">
     <strong>异常表现</strong>：异常日值506线，前日值1573.4线，日变化-67.8%<br>
     月均值1742.11线，月标准差300.14
@@ -301,21 +316,21 @@
   <h4>图谱邻居数据（03-27）</h4>
   <table class="nb-table">
     <tr><th>邻居</th><th>关系</th><th>方向</th><th>03-27值</th><th>03-26值</th><th>日变化</th><th>偏离?</th></tr>
-    <tr><td>移动当日完成率</td><td>DRIVES</td><td>出→</td><td>133%</td><td>105%</td><td>+26.7%</td><td class="note">下游受影响</td></tr>
-    <tr><td>上网专线完成率</td><td>DRIVES</td><td>出→</td><td>—</td><td>—</td><td>—</td><td class="note">下游(无数据)</td></tr>
-    <tr><td>商务宽带完成率</td><td>DRIVES</td><td>出→</td><td>—</td><td>—</td><td>—</td><td class="note">下游(无数据)</td></tr>
-    <tr><td>线上触达(日)</td><td>DRIVES</td><td>入←</td><td>—</td><td>14.2M</td><td>—</td><td class="note">⚠️ 03-23曾-78.5%</td></tr>
-    <tr><td>宽带当日新增</td><td>DRIVES</td><td>入←</td><td>1</td><td>1</td><td>0%</td><td class="normal">正常</td></tr>
+    <tr><td><a href="/kg-management-v2/#/lineage?q=移动当日完成率" target="_blank" class="ind-link">移动当日完成率</a></td><td>DRIVES</td><td>出→</td><td>133%</td><td>105%</td><td>+26.7%</td><td class="note">下游受影响</td></tr>
+    <tr><td><a href="/kg-management-v2/#/lineage?q=上网专线完成率" target="_blank" class="ind-link">上网专线完成率</a></td><td>DRIVES</td><td>出→</td><td>—</td><td>—</td><td>—</td><td class="note">下游(无数据)</td></tr>
+    <tr><td><a href="/kg-management-v2/#/lineage?q=商务宽带完成率" target="_blank" class="ind-link">商务宽带完成率</a></td><td>DRIVES</td><td>出→</td><td>—</td><td>—</td><td>—</td><td class="note">下游(无数据)</td></tr>
+    <tr><td><a href="/kg-management-v2/#/lineage?q=线上触达(日)" target="_blank" class="ind-link">线上触达(日)</a></td><td>DRIVES</td><td>入←</td><td>—</td><td>14.2M</td><td>—</td><td class="note">⚠️ 03-23曾-78.5%</td></tr>
+    <tr><td><a href="/kg-management-v2/#/lineage?q=宽带当日新增" target="_blank" class="ind-link">宽带当日新增</a></td><td>DRIVES</td><td>入←</td><td>1</td><td>1</td><td>0%</td><td class="normal">正常</td></tr>
   </table>
   <div id="chart-g4" class="chart-box graph"></div>
   <div class="alert alert-warning">
-    <strong>归因分析</strong>：无直接上游邻居在03-27当天偏离。线上触达(日)曾在03-23出现-78.5%异常，但距03-27已有4天，因果链较弱。宽带当日新增恒为1（正常）。506线骤降为自包含异常。<br>
+    <strong>归因分析</strong>：无直接上游邻居在03-27当天偏离。<a href="/kg-management-v2/#/lineage?q=线上触达(日)" target="_blank" class="ind-link">线上触达(日)</a>曾在03-23出现-78.5%异常，但距03-27已有4天，因果链较弱。<a href="/kg-management-v2/#/lineage?q=宽带当日新增" target="_blank" class="ind-link">宽带当日新增</a>恒为1（正常）。506线骤降为自包含异常。<br>
     <strong>归因判定</strong>：<span class="tag tag-warning">无法归因</span> — 无上游邻居在异常日当天偏离<br>
     <strong>建议负责部门</strong>：市场部
   </div>
 
   <!-- 3.5 99+拆机当日完成率 -->
-  <h3>3.5 99+拆机当日完成率（03-09，122%，+52.5%）</h3>
+  <h3>3.5 <a href="/kg-management-v2/#/lineage?q=99+拆机当日完成率" target="_blank" class="ind-link">99+拆机当日完成率</a>（03-09，122%，+52.5%）</h3>
   <div class="alert alert-danger">
     <strong>异常表现</strong>：异常日值122%，前日值80%，日变化+52.5%<br>
     月均值83.37%，月标准差22.26
@@ -323,21 +338,21 @@
   <h4>图谱邻居数据（03-09）</h4>
   <table class="nb-table">
     <tr><th>邻居</th><th>关系</th><th>方向</th><th>03-09值</th><th>03-08值</th><th>日变化</th><th>月均值</th><th>偏离?</th></tr>
-    <tr><td>99+拆机</td><td>DEPENDS_ON</td><td>入←</td><td>95</td><td>17</td><td class="deviated">+459%</td><td>230</td><td class="deviated">✅ 偏离</td></tr>
-    <tr><td>99+拆机数</td><td>DEPENDS_ON</td><td>入←</td><td>—</td><td>—</td><td>—</td><td>—</td><td class="note">数据缺失</td></tr>
-    <tr><td>战新当日新增</td><td>DRIVES</td><td>入←</td><td>504</td><td>1</td><td class="deviated">+50300%</td><td>88.9</td><td class="deviated">✅ 偏离</td></tr>
-    <tr><td>移动当日完成率</td><td>DRIVES</td><td>出→</td><td>87</td><td>79</td><td>+10%</td><td>88.7</td><td class="normal">正常</td></tr>
+    <tr><td><a href="/kg-management-v2/#/lineage?q=99+拆机" target="_blank" class="ind-link">99+拆机</a></td><td>DEPENDS_ON</td><td>入←</td><td>95</td><td>17</td><td class="deviated">+459%</td><td>230</td><td class="deviated">✅ 偏离</td></tr>
+    <tr><td><a href="/kg-management-v2/#/lineage?q=99+拆机数" target="_blank" class="ind-link">99+拆机数</a></td><td>DEPENDS_ON</td><td>入←</td><td>—</td><td>—</td><td>—</td><td>—</td><td class="note">数据缺失</td></tr>
+    <tr><td><a href="/kg-management-v2/#/lineage?q=战新当日新增" target="_blank" class="ind-link">战新当日新增</a></td><td>DRIVES</td><td>入←</td><td>504</td><td>1</td><td class="deviated">+50300%</td><td>88.9</td><td class="deviated">✅ 偏离</td></tr>
+    <tr><td><a href="/kg-management-v2/#/lineage?q=移动当日完成率" target="_blank" class="ind-link">移动当日完成率</a></td><td>DRIVES</td><td>出→</td><td>87</td><td>79</td><td>+10%</td><td>88.7</td><td class="normal">正常</td></tr>
   </table>
   <div id="chart-g5" class="chart-box graph"></div>
   <div class="alert alert-success">
-    <strong>归因分析</strong>：完成率=完工÷新增。03-09 99+拆机新增95线(+459%)，战新当日新增504线(+50300%)驱动拆机需求。完工量增速快于新增量→完成率超100%达122%。<br>
-    <strong>归因链路</strong>：战新当日新增(504线,+50300%) —DRIVES→ 99+拆机(95线,+459%) —DEPENDS_ON→ 完成率(122%)<br>
+    <strong>归因分析</strong>：完成率=完工÷新增。03-09 <a href="/kg-management-v2/#/lineage?q=99+拆机" target="_blank" class="ind-link">99+拆机</a>新增95线(+459%)，<a href="/kg-management-v2/#/lineage?q=战新当日新增" target="_blank" class="ind-link">战新当日新增</a>504线(+50300%)驱动拆机需求。完工量增速快于新增量→完成率超100%达122%。<br>
+    <strong>归因链路</strong>：<a href="/kg-management-v2/#/lineage?q=战新当日新增" target="_blank" class="ind-link">战新当日新增</a>(504线,+50300%) —DRIVES→ <a href="/kg-management-v2/#/lineage?q=99+拆机" target="_blank" class="ind-link">99+拆机</a>(95线,+459%) —DEPENDS_ON→ 完成率(122%)<br>
     <strong>归因判定</strong>：<span class="tag tag-danger">图谱归因成功</span><br>
     <strong>建议负责部门</strong>：市场部
   </div>
 
   <!-- 3.6 移动当日完成率 -->
-  <h3>3.6 移动当日完成率（03-27，133%，+26.7%）</h3>
+  <h3>3.6 <a href="/kg-management-v2/#/lineage?q=移动当日完成率" target="_blank" class="ind-link">移动当日完成率</a>（03-27，133%，+26.7%）</h3>
   <div class="alert alert-danger">
     <strong>异常表现</strong>：异常日值133%，前日值105%，日变化+26.7%<br>
     月均值88.68%，月标准差9.74
@@ -345,22 +360,22 @@
   <h4>图谱邻居数据（03-27）</h4>
   <table class="nb-table">
     <tr><th>邻居</th><th>关系</th><th>方向</th><th>03-27值</th><th>03-26值</th><th>日变化</th><th>偏离?</th></tr>
-    <tr><td>移动当日新增</td><td>DEPENDS_ON</td><td>入←</td><td>⚠️有重复</td><td>8111(03-26)</td><td>—</td><td class="note">数据有重复</td></tr>
-    <tr><td>云宽带当日新增</td><td>DRIVES</td><td>入←</td><td>506</td><td>1573</td><td class="deviated">-67.8%</td><td class="deviated">✅ 偏离(已确认异常)</td></tr>
-    <tr><td>三线当日新增</td><td>DRIVES</td><td>入←</td><td>—</td><td>—</td><td>—</td><td class="note">无03-27数据</td></tr>
-    <tr><td>高套当日新增</td><td>DRIVES</td><td>入←</td><td>—</td><td>—</td><td>—</td><td class="note">无03-27数据</td></tr>
-    <tr><td>营业厅满意度</td><td>DRIVES</td><td>入←</td><td>—</td><td>—</td><td>—</td><td class="note">无03-27数据</td></tr>
+    <tr><td><a href="/kg-management-v2/#/lineage?q=移动当日新增" target="_blank" class="ind-link">移动当日新增</a></td><td>DEPENDS_ON</td><td>入←</td><td>⚠️有重复</td><td>8111(03-26)</td><td>—</td><td class="note">数据有重复</td></tr>
+    <tr><td><a href="/kg-management-v2/#/lineage?q=云宽带当日新增" target="_blank" class="ind-link">云宽带当日新增</a></td><td>DRIVES</td><td>入←</td><td>506</td><td>1573</td><td class="deviated">-67.8%</td><td class="deviated">✅ 偏离(已确认异常)</td></tr>
+    <tr><td><a href="/kg-management-v2/#/lineage?q=三线当日新增" target="_blank" class="ind-link">三线当日新增</a></td><td>DRIVES</td><td>入←</td><td>—</td><td>—</td><td>—</td><td class="note">无03-27数据</td></tr>
+    <tr><td><a href="/kg-management-v2/#/lineage?q=高套当日新增" target="_blank" class="ind-link">高套当日新增</a></td><td>DRIVES</td><td>入←</td><td>—</td><td>—</td><td>—</td><td class="note">无03-27数据</td></tr>
+    <tr><td><a href="/kg-management-v2/#/lineage?q=营业厅满意度" target="_blank" class="ind-link">营业厅满意度</a></td><td>DRIVES</td><td>入←</td><td>—</td><td>—</td><td>—</td><td class="note">无03-27数据</td></tr>
   </table>
   <div id="chart-g6" class="chart-box graph"></div>
   <div class="alert alert-success">
     <strong>归因分析</strong>：移动完成率=移动完工÷移动新增。03-27云宽带新增骤降至506线(-67.8%，已确认真异常)，整体新增量下降导致完成率虚高至133%。<br>
-    <strong>归因链路</strong>：云宽带当日新增(506线,-67.8%) —DRIVES→ 移动当日完成率(133%)<br>
+    <strong>归因链路</strong>：<a href="/kg-management-v2/#/lineage?q=云宽带当日新增" target="_blank" class="ind-link">云宽带当日新增</a>(506线,-67.8%) —DRIVES→ <a href="/kg-management-v2/#/lineage?q=移动当日完成率" target="_blank" class="ind-link">移动当日完成率</a>(133%)<br>
     <strong>归因判定</strong>：<span class="tag tag-danger">图谱归因成功</span><br>
     <strong>建议负责部门</strong>：市场部
   </div>
 
   <!-- 3.7 上网专线新增完成率 -->
-  <h3>3.7 上网专线新增完成率（03-24，12%，-75.5%）</h3>
+  <h3>3.7 <a href="/kg-management-v2/#/lineage?q=上网专线新增完成率" target="_blank" class="ind-link">上网专线新增完成率</a>（03-24，12%，-75.5%）</h3>
   <div class="alert alert-danger">
     <strong>异常表现</strong>：异常日值12%，前日值49%，日变化-75.5%<br>
     月均值46.3%，月标准差22.7
@@ -368,25 +383,25 @@
   <h4>图谱邻居数据（03-24）</h4>
   <table class="nb-table">
     <tr><th>邻居</th><th>关系</th><th>方向</th><th>03-24值</th><th>03-23值</th><th>日变化</th><th>月均值</th><th>偏离?</th></tr>
-    <tr><td>上网专线新增</td><td>DEPENDS_ON</td><td>入←</td><td>67</td><td>44</td><td>+52%</td><td>140</td><td class="normal">正常(低于月均)</td></tr>
-    <tr><td>线上触达(日)</td><td>DRIVES</td><td>入←</td><td>12.5M</td><td>2.2M</td><td class="deviated">+465%</td><td>11.8M</td><td class="deviated">✅ 偏离(03-23异常后恢复)</td></tr>
-    <tr><td>云宽带当日新增</td><td>DRIVES</td><td>入←</td><td>1701</td><td>1660</td><td>+2.5%</td><td>1742</td><td class="normal">正常</td></tr>
-    <tr><td>商务宽带完成率</td><td>DRIVES</td><td>入←</td><td>12%</td><td>63%</td><td class="deviated">-81%</td><td>—</td><td class="deviated">✅ 同日异常</td></tr>
-    <tr><td>移动当日完成率</td><td>DRIVES</td><td>入←</td><td>86%</td><td>86%</td><td>0%</td><td>—</td><td class="normal">正常</td></tr>
-    <tr><td>高套当日新增</td><td>DRIVES</td><td>入←</td><td>—</td><td>—</td><td>—</td><td>—</td><td class="note">无03-24数据</td></tr>
-    <tr><td>营业厅满意度</td><td>DRIVES</td><td>入←</td><td>—</td><td>—</td><td>—</td><td>—</td><td class="note">无数据</td></tr>
-    <tr><td>装维满意度</td><td>DRIVES</td><td>入←</td><td>—</td><td>—</td><td>—</td><td>—</td><td class="note">无数据</td></tr>
+    <tr><td><a href="/kg-management-v2/#/lineage?q=上网专线新增" target="_blank" class="ind-link">上网专线新增</a></td><td>DEPENDS_ON</td><td>入←</td><td>67</td><td>44</td><td>+52%</td><td>140</td><td class="normal">正常(低于月均)</td></tr>
+    <tr><td><a href="/kg-management-v2/#/lineage?q=线上触达(日)" target="_blank" class="ind-link">线上触达(日)</a></td><td>DRIVES</td><td>入←</td><td>12.5M</td><td>2.2M</td><td class="deviated">+465%</td><td>11.8M</td><td class="deviated">✅ 偏离(03-23异常后恢复)</td></tr>
+    <tr><td><a href="/kg-management-v2/#/lineage?q=云宽带当日新增" target="_blank" class="ind-link">云宽带当日新增</a></td><td>DRIVES</td><td>入←</td><td>1701</td><td>1660</td><td>+2.5%</td><td>1742</td><td class="normal">正常</td></tr>
+    <tr><td><a href="/kg-management-v2/#/lineage?q=商务宽带完成率" target="_blank" class="ind-link">商务宽带完成率</a></td><td>DRIVES</td><td>入←</td><td>12%</td><td>63%</td><td class="deviated">-81%</td><td>—</td><td class="deviated">✅ 同日异常</td></tr>
+    <tr><td><a href="/kg-management-v2/#/lineage?q=移动当日完成率" target="_blank" class="ind-link">移动当日完成率</a></td><td>DRIVES</td><td>入←</td><td>86%</td><td>86%</td><td>0%</td><td>—</td><td class="normal">正常</td></tr>
+    <tr><td><a href="/kg-management-v2/#/lineage?q=高套当日新增" target="_blank" class="ind-link">高套当日新增</a></td><td>DRIVES</td><td>入←</td><td>—</td><td>—</td><td>—</td><td>—</td><td class="note">无03-24数据</td></tr>
+    <tr><td><a href="/kg-management-v2/#/lineage?q=营业厅满意度" target="_blank" class="ind-link">营业厅满意度</a></td><td>DRIVES</td><td>入←</td><td>—</td><td>—</td><td>—</td><td>—</td><td class="note">无数据</td></tr>
+    <tr><td><a href="/kg-management-v2/#/lineage?q=装维满意度" target="_blank" class="ind-link">装维满意度</a></td><td>DRIVES</td><td>入←</td><td>—</td><td>—</td><td>—</td><td>—</td><td class="note">无数据</td></tr>
   </table>
   <div id="chart-g7" class="chart-box graph"></div>
   <div class="alert alert-success">
-    <strong>归因分析</strong>：上网专线新增03-24=67（低于月均140），完成率=完工÷新增，新增量未降但完工停止→完成率暴跌至12%。同日商务宽带完成率也暴跌至12%（-81%），当日聚焦销账异常飙升至5900万元（+359658%）。三个指标同日共现指向同一系统事件。<br>
-    <strong>归因链路</strong>：上网专线新增 →(DEPENDS_ON)→ 完成率(12%)；同日共现：商务宽带完成率(12%)、当日聚焦销账(5900万)<br>
+    <strong>归因分析</strong>：<a href="/kg-management-v2/#/lineage?q=上网专线新增" target="_blank" class="ind-link">上网专线新增</a>03-24=67（低于月均140），完成率=完工÷新增，新增量未降但完工停止→完成率暴跌至12%。同日<a href="/kg-management-v2/#/lineage?q=商务宽带完成率" target="_blank" class="ind-link">商务宽带完成率</a>也暴跌至12%（-81%），<a href="/kg-management-v2/#/lineage?q=当日聚焦销账" target="_blank" class="ind-link">当日聚焦销账</a>异常飙升至5900万元（+359658%）。三个指标同日共现指向同一系统事件。<br>
+    <strong>归因链路</strong>：<a href="/kg-management-v2/#/lineage?q=上网专线新增" target="_blank" class="ind-link">上网专线新增</a> →(DEPENDS_ON)→ 完成率(12%)；同日共现：<a href="/kg-management-v2/#/lineage?q=商务宽带完成率" target="_blank" class="ind-link">商务宽带完成率</a>(12%)、<a href="/kg-management-v2/#/lineage?q=当日聚焦销账" target="_blank" class="ind-link">当日聚焦销账</a>(5900万)<br>
     <strong>归因判定</strong>：<span class="tag tag-danger">图谱归因成功</span>（同日共现+销账异常指向系统事件）<br>
     <strong>建议负责部门</strong>：政企群
   </div>
 
   <!-- 3.8 商务宽带新增完成率 -->
-  <h3>3.8 商务宽带新增完成率（03-24，12%，-81.0%）</h3>
+  <h3>3.8 <a href="/kg-management-v2/#/lineage?q=商务宽带新增完成率" target="_blank" class="ind-link">商务宽带新增完成率</a>（03-24，12%，-81.0%）</h3>
   <div class="alert alert-danger">
     <strong>异常表现</strong>：异常日值12%，前日值63%，日变化-81.0%<br>
     月均值56.4%，月标准差25.59
@@ -394,13 +409,13 @@
   <h4>图谱邻居数据（03-24）</h4>
   <table class="nb-table">
     <tr><th>邻居</th><th>关系</th><th>方向</th><th>03-24值</th><th>03-23值</th><th>日变化</th><th>月均值</th><th>偏离?</th></tr>
-    <tr><td>商务宽带新增</td><td>DEPENDS_ON</td><td>入←</td><td>258</td><td>179</td><td>+44%</td><td>628</td><td class="normal">正常(低于月均)</td></tr>
+    <tr><td><a href="/kg-management-v2/#/lineage?q=商务宽带新增" target="_blank" class="ind-link">商务宽带新增</a></td><td>DEPENDS_ON</td><td>入←</td><td>258</td><td>179</td><td>+44%</td><td>628</td><td class="normal">正常(低于月均)</td></tr>
   </table>
-  <p style="font-size:13px;color:#555;margin:4px 0 8px;">同日共现异常与3.7完全一致：上网专线完成率(12%)、当日聚焦销账(5900.04万元)</p>
+  <p style="font-size:13px;color:#555;margin:4px 0 8px;">同日共现异常与3.7完全一致：<a href="/kg-management-v2/#/lineage?q=上网专线完成率" target="_blank" class="ind-link">上网专线完成率</a>(12%)、<a href="/kg-management-v2/#/lineage?q=当日聚焦销账" target="_blank" class="ind-link">当日聚焦销账</a>(5900.04万元)</p>
   <div id="chart-g8" class="chart-box graph"></div>
   <div class="alert alert-success">
-    <strong>归因分析</strong>：与3.7完全同构。商务宽带新增03-24=258（远低于月均628），完成率暴跌。同日上网专线完成率、聚焦销账同步异常，三指标共现指向统一系统/业务事件。<br>
-    <strong>归因链路</strong>：商务宽带新增 →(DEPENDS_ON)→ 完成率(12%)；同日共现：上网专线完成率(12%)、当日聚焦销账(5900万)<br>
+    <strong>归因分析</strong>：与3.7完全同构。<a href="/kg-management-v2/#/lineage?q=商务宽带新增" target="_blank" class="ind-link">商务宽带新增</a>03-24=258（远低于月均628），完成率暴跌。同日<a href="/kg-management-v2/#/lineage?q=上网专线完成率" target="_blank" class="ind-link">上网专线完成率</a>、聚焦销账同步异常，三指标共现指向统一系统/业务事件。<br>
+    <strong>归因链路</strong>：<a href="/kg-management-v2/#/lineage?q=商务宽带新增" target="_blank" class="ind-link">商务宽带新增</a> →(DEPENDS_ON)→ 完成率(12%)；同日共现：<a href="/kg-management-v2/#/lineage?q=上网专线完成率" target="_blank" class="ind-link">上网专线完成率</a>(12%)、<a href="/kg-management-v2/#/lineage?q=当日聚焦销账" target="_blank" class="ind-link">当日聚焦销账</a>(5900万)<br>
     <strong>归因判定</strong>：<span class="tag tag-danger">图谱归因成功</span><br>
     <strong>建议负责部门</strong>：政企群
   </div>
@@ -443,6 +458,12 @@
 
 <script>
 window.addEventListener('load', function() {
+  if (window.__reportData) {
+    var r = window.__reportData;
+    document.title = r.title || (r.planName + ' - ' + r.version);
+    var h1 = document.getElementById('report-title');
+    if (h1) h1.textContent = r.title || (r.planName + ' - ' + r.version);
+  }
   var colorPalette = ['#1a237e','#283593','#3949ab','#5c6bc0','#7986cb','#9fa8da','#c5cae9','#e8eaf6'];
 
   // chart-0: 经营-金额类

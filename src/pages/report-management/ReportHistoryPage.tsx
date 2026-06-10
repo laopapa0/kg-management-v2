@@ -178,7 +178,7 @@ export default function ReportHistoryPage() {
             className="text-[12px] h-7 px-2 border-dark-border text-dark-text-secondary hover:bg-dark-page"
             onClick={(e) => {
               e.stopPropagation()
-              window.open('/kg-management-v2/report.html', '_blank')
+              window.open(`/kg-management-v2/report.html?reportId=${r.id}`, '_blank')
             }}
           >
             <ExternalLink size={13} className="mr-1" />
