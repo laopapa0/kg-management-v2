@@ -1,0 +1,145 @@
+import { buildIndicatorTree, type IndicatorTreeNode } from './attachmentTree';
+import type { IndicatorAttachment } from '@/models/indicatorAttachmentModel';
+
+/**
+ * Mind Elixir 嵌套节点数据的最小子集。
+ *
+ * 不直接依赖 `mind-elixir` 的类型包，避免 adapter 被框架版本绑定。
+ */
+export interface MindElixirNodeData {
+  id: string;
+  topic: string;
+  expanded?: boolean;
+  children?: MindElixirNodeData[];
+}
+
+/** 默认虚拟分组节点 ID 的固定前缀 */
+export const DEFAULT_GROUP_ID_PREFIX = 'mindmap-default-group';
+
+/**
+ * 生成默认虚拟分组节点的稳定 ID。
+ *
+ * 规则：`mindmap-default-group-{seed}`。seed 通常使用部门 ID 或默认分组名，
+ * 保证同一上下文下 `indicatorsToMindElixirData` 与连线投递逻辑使用同一 ID。
+ */
+export function createDefaultGroupId(seed: string): string {
+  return `${DEFAULT_GROUP_ID_PREFIX}-${seed}`;
+}
+
+/**
+ * 判断节点 ID 是否属于默认虚拟分组。
+ */
+export function isDefaultGroupId(id: string): boolean {
+  return id.startsWith(`${DEFAULT_GROUP_ID_PREFIX}-`);
+}
+
+function convertIndicatorTreeNode(node: IndicatorTreeNode): MindElixirNodeData {
+  return {
+    id: node.id,
+    topic: node.indicator.name,
+    expanded: true,
+    children: node.children?.map(convertIndicatorTreeNode),
+  };
+}
+
+/**
+ * 将 IndicatorAttachment 平表转换为 Mind Elixir 可渲染的嵌套数据。
+ *
+ * 转换规则：
+ * - 始终生成一个根级"默认"虚拟分组节点作为 Mind Elixir 的根
+ * - 原有树结构的根节点（treeParentId 为空）会成为"默认"分组的直接子节点
+ * - 原有子树层级保留，直接挂在"默认"分组下
+ * - topic ← indicator.name，id ← indicator.id
+ *
+ * @param indicators 指标平表
+ * @param defaultGroupName 默认分组名称，会作为根级虚拟分组节点的 topic
+ */
+export function indicatorsToMindElixirData(
+  indicators: IndicatorAttachment[],
+  defaultGroupName: string,
+): MindElixirNodeData {
+  const defaultGroupId = createDefaultGroupId(defaultGroupName);
+
+  const defaultGroupIndicator = {
+    id: defaultGroupId,
+    name: defaultGroupName,
+    treeParentId: undefined,
+    tagIds: [],
+    ruleIds: [],
+  } as unknown as IndicatorAttachment;
+
+  const tree = buildIndicatorTree([defaultGroupIndicator, ...indicators]);
+  const defaultGroupNode = tree.find((node) => node.id === defaultGroupId);
+  const orphanRoots = tree.filter((node) => node.id !== defaultGroupId);
+
+  if (!defaultGroupNode) {
+    // 防御性分支：理论上 defaultGroupIndicator 一定会成为根节点
+    return {
+      id: defaultGroupId,
+      topic: defaultGroupName,
+      expanded: true,
+      children: orphanRoots.map(convertIndicatorTreeNode),
+    };
+  }
+
+  // 把其他根节点（含原 treeParentId 为空的指标、找不到父的孤儿节点）统一挂到默认分组下，
+  // 保证 Mind Elixir 只有一个根节点。
+  defaultGroupNode.children = [...(defaultGroupNode.children ?? []), ...orphanRoots];
+
+  return convertIndicatorTreeNode(defaultGroupNode);
+}
+
+/**
+ * 将 Mind Elixir 嵌套数据还原为 IndicatorAttachment 平表。
+ *
+ * 还原规则：
+ * - 根级"默认"虚拟分组节点不会被写入结果（它是 adapter 内部合成的）
+ * - 默认分组的直接子节点，treeParentId = 默认分组 ID
+ * - 更深层的子节点，treeParentId = 父节点 ID
+ * - 非树字段（tagIds / ruleIds 等）从 existingIndicators 中保留
+ *
+ * @param data Mind Elixir 嵌套数据
+ * @param existingIndicators 现有平表，用于保留非树字段
+ */
+export function mindElixirDataToIndicators(
+  data: MindElixirNodeData,
+  existingIndicators: IndicatorAttachment[],
+): IndicatorAttachment[] {
+  const existingMap = new Map(existingIndicators.map((indicator) => [indicator.id, indicator]));
+
+  // 兼容两种结构：默认分组作为根，或被包装在更外层根下
+  const defaultGroupId = isDefaultGroupId(data.id)
+    ? data.id
+    : data.children?.find((child) => isDefaultGroupId(child.id))?.id ?? data.id;
+
+  const result: IndicatorAttachment[] = [];
+
+  function walk(node: MindElixirNodeData, parentId: string | undefined): void {
+    if (node.id !== defaultGroupId) {
+      const existing = existingMap.get(node.id);
+      if (existing) {
+        const effectiveParentId =
+          parentId === defaultGroupId && existing.treeParentId === undefined
+            ? undefined
+            : parentId;
+
+        result.push({
+          ...existing,
+          treeParentId: effectiveParentId,
+        });
+      } else {
+        console.warn(
+          `[mindMapAdapter] 节点 ${node.id}（topic: ${node.topic}）在现有平表中不存在，已跳过`,
+        );
+      }
+    }
+
+    const nextParentId = node.id === defaultGroupId ? defaultGroupId : node.id;
+    for (const child of node.children ?? []) {
+      walk(child, nextParentId);
+    }
+  }
+
+  walk(data, undefined);
+  return result;
+}
