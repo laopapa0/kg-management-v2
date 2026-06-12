@@ -50,6 +50,8 @@ export default function MindMapWrapper({
   const containerRef = useRef<HTMLDivElement>(null);
   const mindRef = useRef<MindElixirInstance | null>(null);
   const isFirstDataEffect = useRef(true);
+  const onOperationRef = useRef(onOperation);
+  onOperationRef.current = onOperation;
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -60,6 +62,7 @@ export default function MindMapWrapper({
       editable: isConnectionMode ? false : draggable,
       toolBar: toolbar,
       keypress,
+      allowUndo: false,
       theme: {
         name: 'project-dark',
         cssVar: mapDarkThemeToMindElixir(),
@@ -73,7 +76,7 @@ export default function MindMapWrapper({
     mind.init({ nodeData });
     onInit?.(mind);
 
-    const handleOperation = (op: Operation) => onOperation?.(op);
+    const handleOperation = (op: Operation) => onOperationRef.current?.(op);
     const handleSelectNewNode = (nodeObj: NodeObj) => onNodeSelect?.(nodeObj.id);
 
     if (onOperation) mind.bus.addListener('operation', handleOperation);

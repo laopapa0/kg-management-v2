@@ -107,7 +107,7 @@ const IndicatorTreePanel = forwardRef<IndicatorTreePanelRef, IndicatorTreePanelP
     (op: Operation) => {
       handleOperation(op as { name: string; obj?: { id: string; topic?: string; [key: string]: unknown }; origin?: { id?: string; [key: string]: unknown } }, {
         rename: (id, name) => renameIndicator(id, name),
-        add: (name, parentId) => { addIndicator(name, parentId); return 'new-id'; },
+        add: (name, parentId) => { const created = addIndicator(name, parentId); return created?.id ?? 'new-id'; },
         remove: (id) => deleteIndicator(id),
         setParent: (id, newParentId) => {
           setIndicators(
