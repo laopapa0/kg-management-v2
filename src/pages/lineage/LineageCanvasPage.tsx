@@ -61,6 +61,7 @@ interface Relation {
   confidence: number;
   correlation?: 'positive' | 'negative';
   description: string;
+  lastModifiedBy: string;
 }
 
 type RelationType = 'DEPENDS_ON' | 'CAUSES' | 'AGGREGATES' | 'DERIVED_FROM';
@@ -81,34 +82,34 @@ interface CanvasNode {
 const relationListData: Relation[] = [
   { id: 'REL-001', source: '5G用户渗透率', sourceId: 'n1', sourceLevel1: '发展',
     target: '移动业务收入', targetId: 'n2', targetLevel1: '经营',
-    type: 'DEPENDS_ON', correlation: 'positive', confidence: 95, description: '5G用户增长直接带动移动业务收入提升' },
+    type: 'DEPENDS_ON', correlation: 'positive', confidence: 95, description: '5G用户增长直接带动移动业务收入提升', lastModifiedBy: '张三' },
   { id: 'REL-002', source: '移动业务收入', sourceId: 'n2', sourceLevel1: '经营',
     target: '总营收', targetId: 'n3', targetLevel1: '经营',
-    type: 'AGGREGATES', correlation: 'positive', confidence: 100, description: '移动业务收入汇总至总营收' },
+    type: 'AGGREGATES', correlation: 'positive', confidence: 100, description: '移动业务收入汇总至总营收', lastModifiedBy: '李四' },
   { id: 'REL-003', source: '5G用户渗透率', sourceId: 'n1', sourceLevel1: '发展',
     target: '5G流量占比', targetId: 'n4', targetLevel1: '发展',
-    type: 'CAUSES', confidence: 85, description: '5G用户增长推动流量结构变化' },
+    type: 'CAUSES', confidence: 85, description: '5G用户增长推动流量结构变化', lastModifiedBy: '王五' },
   { id: 'REL-004', source: '5G流量占比', sourceId: 'n4', sourceLevel1: '发展',
     target: '网络负荷', targetId: 'n5', targetLevel1: '交付',
-    type: 'CAUSES', confidence: 80, description: '5G流量增长导致网络负荷上升' },
+    type: 'CAUSES', confidence: 80, description: '5G流量增长导致网络负荷上升', lastModifiedBy: 'AI' },
   { id: 'REL-005', source: '网络负荷', sourceId: 'n5', sourceLevel1: '交付',
     target: '扩容需求', targetId: 'n6', targetLevel1: '交付',
-    type: 'DEPENDS_ON', confidence: 90, description: '网络高负荷触发扩容需求' },
+    type: 'DEPENDS_ON', confidence: 90, description: '网络高负荷触发扩容需求', lastModifiedBy: '张三' },
   { id: 'REL-006', source: '5G用户渗透率', sourceId: 'n1', sourceLevel1: '发展',
     target: '用户ARPU', targetId: 'n7', targetLevel1: '经营',
-    type: 'DEPENDS_ON', confidence: 88, description: '5G用户渗透率提升带动ARPU增长' },
+    type: 'DEPENDS_ON', confidence: 88, description: '5G用户渗透率提升带动ARPU增长', lastModifiedBy: '李四' },
   { id: 'REL-007', source: '用户ARPU', sourceId: 'n7', sourceLevel1: '经营',
     target: '移动业务收入', targetId: 'n2', targetLevel1: '经营',
-    type: 'DEPENDS_ON', confidence: 92, description: 'ARPU提升带动移动业务收入增长' },
+    type: 'DEPENDS_ON', confidence: 92, description: 'ARPU提升带动移动业务收入增长', lastModifiedBy: '王五' },
   { id: 'REL-008', source: '客户满意度', sourceId: 'n8', sourceLevel1: '服务',
     target: '5G用户渗透率', targetId: 'n1', targetLevel1: '发展',
-    type: 'CAUSES', confidence: 75, description: '客户满意度影响用户留存与发展' },
+    type: 'CAUSES', confidence: 75, description: '客户满意度影响用户留存与发展', lastModifiedBy: 'AI' },
   { id: 'REL-009', source: '总营收', sourceId: 'n3', sourceLevel1: '经营',
     target: '净利润', targetId: 'n9', targetLevel1: '经营',
-    type: 'DEPENDS_ON', confidence: 98, description: '总营收扣除成本后形成净利润' },
+    type: 'DEPENDS_ON', confidence: 98, description: '总营收扣除成本后形成净利润', lastModifiedBy: '张三' },
   { id: 'REL-010', source: '宽带用户数', sourceId: 'n10', sourceLevel1: '发展',
     target: '家庭业务收入', targetId: 'n11', targetLevel1: '经营',
-    type: 'DEPENDS_ON', confidence: 87, description: '宽带用户增长带动家庭业务收入' },
+    type: 'DEPENDS_ON', confidence: 87, description: '宽带用户增长带动家庭业务收入', lastModifiedBy: '李四' },
 ];
 
 const canvasNodesData: CanvasNode[] = [
@@ -636,6 +637,7 @@ export default function LineageCanvasPage() {
   const [searchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
   const [filterType, setFilterType] = useState<string>('全部');
+  const [modifiedByFilter, setModifiedByFilter] = useState<string>('ALL');
   const [selectedRelationId, setSelectedRelationId] = useState<string | null>(null);
 
   // 画布状态
@@ -671,14 +673,18 @@ export default function LineageCanvasPage() {
   const filteredRelations = useMemo(() => {
     return relations.filter((rel) => {
       const matchType = filterType === '全部' || rel.type === filterType;
+      const matchModifiedBy =
+        modifiedByFilter === 'ALL' ||
+        (modifiedByFilter === 'HUMAN' && rel.lastModifiedBy !== 'AI') ||
+        (modifiedByFilter === 'AI' && rel.lastModifiedBy === 'AI');
       const matchSearch =
         !searchQuery ||
         rel.source.includes(searchQuery) ||
         rel.target.includes(searchQuery) ||
         rel.description.includes(searchQuery);
-      return matchType && matchSearch;
+      return matchType && matchModifiedBy && matchSearch;
     });
-  }, [relations, filterType, searchQuery]);
+  }, [relations, filterType, modifiedByFilter, searchQuery]);
 
   // 统计
   const stats = useMemo(() => {
@@ -773,6 +779,7 @@ export default function LineageCanvasPage() {
       correlation: createForm.correlation || undefined,
       confidence: createForm.confidence,
       description: createForm.description,
+      lastModifiedBy: '张三',
     };
 
     setRelations((prev) => [...prev, newRelation]);
@@ -891,6 +898,23 @@ export default function LineageCanvasPage() {
                 </button>
               ))}
             </div>
+            <span className="text-[11px] text-dark-text-tertiary">BY</span>
+            <div className="flex flex-wrap gap-1.5">
+              {['ALL', 'HUMAN', 'AI'].map((by) => (
+                <button
+                  key={by}
+                  onClick={() => setModifiedByFilter(by)}
+                  className={cn(
+                    'px-2 py-1 rounded text-[11px] font-medium transition-colors',
+                    modifiedByFilter === by
+                      ? 'bg-dark-accent-primary text-white'
+                      : 'bg-dark-page text-dark-text-secondary hover:bg-dark-tree-hover-bg'
+                  )}
+                >
+                  {by}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* 关系列表 */}
@@ -981,10 +1005,13 @@ export default function LineageCanvasPage() {
                           handleDeleteRelation(rel.id);
                         }}
                       >
-                        <Trash2 size={10} className="mr-1" />
-                        删除
+                          <Trash2 size={10} className="mr-1" />
+                          删除
                       </Button>
                     </div>
+                    <span className="text-[10px] text-dark-text-tertiary" data-testid="last-modified-by">
+                      BY {rel.lastModifiedBy}
+                    </span>
                   </motion.div>
                 ))}
               </div>

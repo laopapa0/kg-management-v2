@@ -72,7 +72,6 @@ export default function LinkRelationManagePage() {
   const [search, setSearch] = useState('')
   const [directionFilter, setDirectionFilter] = useState('全部')
   const [sourceTypeFilter, setSourceTypeFilter] = useState('全部')
-  const [modifiedByFilter, setModifiedByFilter] = useState('ALL')
   const [page, setPage] = useState(1)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editingRelation, setEditingRelation] = useState<LinkRelation | undefined>(undefined)
@@ -106,14 +105,8 @@ export default function LinkRelationManagePage() {
       result = result.filter((r) => r.sourceTypes.includes(sourceTypeFilter))
     }
 
-    if (modifiedByFilter === 'HUMAN') {
-      result = result.filter((r) => r.lastModifiedBy !== 'AI')
-    } else if (modifiedByFilter === 'AI') {
-      result = result.filter((r) => r.lastModifiedBy === 'AI')
-    }
-
     return result
-  }, [relations, search, directionFilter, sourceTypeFilter, modifiedByFilter])
+  }, [relations, search, directionFilter, sourceTypeFilter])
 
   const paginated = useMemo(() => {
     const start = (page - 1) * pageSize
@@ -124,7 +117,6 @@ export default function LinkRelationManagePage() {
     setSearch('')
     setDirectionFilter('全部')
     setSourceTypeFilter('全部')
-    setModifiedByFilter('ALL')
     setPage(1)
   }, [])
 
@@ -270,28 +262,23 @@ export default function LinkRelationManagePage() {
         width: 'w-28',
         align: 'center',
         render: (r: LinkRelation) => (
-          <div className="flex flex-col items-center gap-1">
-            <div className="flex items-center justify-center gap-2">
-              <button
-                data-testid="edit-relation-btn"
-                className="text-xs text-blue-400 hover:underline"
-                onClick={() => {
-                  setEditingRelation(r)
-                  setDialogOpen(true)
-                }}
-              >
-                编辑
-              </button>
-              <button
-                className="text-xs text-blue-400 hover:underline"
-                onClick={() => setExpandedId((prev) => (prev === r.id ? null : r.id))}
-              >
-                查看详情
-              </button>
-            </div>
-            <span className="text-[11px] text-dark-text-tertiary" data-testid="last-modified-by">
-              BY {r.lastModifiedBy}
-            </span>
+          <div className="flex items-center justify-center gap-2">
+            <button
+              data-testid="edit-relation-btn"
+              className="text-xs text-blue-400 hover:underline"
+              onClick={() => {
+                setEditingRelation(r)
+                setDialogOpen(true)
+              }}
+            >
+              编辑
+            </button>
+            <button
+              className="text-xs text-blue-400 hover:underline"
+              onClick={() => setExpandedId((prev) => (prev === r.id ? null : r.id))}
+            >
+              查看详情
+            </button>
           </div>
         ),
       },
@@ -381,16 +368,6 @@ export default function LinkRelationManagePage() {
         >
           重置
         </Button>
-        <select
-          data-testid="modified-by-filter"
-          value={modifiedByFilter}
-          onChange={(e) => { setModifiedByFilter(e.target.value); setPage(1) }}
-          className="h-9 w-24 rounded-md border border-dark-border bg-dark-card-l1 px-2 text-sm text-dark-text-primary focus:border-dark-accent-primary-hover focus:outline-none"
-        >
-          <option value="ALL">ALL</option>
-          <option value="HUMAN">HUMAN</option>
-          <option value="AI">AI</option>
-        </select>
       </div>
       <LinkRelationFormDialog
         open={dialogOpen}

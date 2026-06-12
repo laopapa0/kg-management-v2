@@ -12,7 +12,6 @@ export interface LinkRelation {
   enabled: boolean
   usageCount: number
   createdAt: string
-  lastModifiedBy: string
 }
 
 /** 关系类型在某条连线上的使用记录 */
@@ -60,7 +59,6 @@ export const mockLinkRelations: LinkRelation[] = [
     enabled: true,
     usageCount: 12,
     createdAt: '2026-01-15',
-    lastModifiedBy: '张三',
   },
   {
     id: 'LKT-002',
@@ -76,7 +74,6 @@ export const mockLinkRelations: LinkRelation[] = [
     enabled: true,
     usageCount: 34,
     createdAt: '2026-01-20',
-    lastModifiedBy: '李四',
   },
   {
     id: 'LKT-003',
@@ -92,7 +89,6 @@ export const mockLinkRelations: LinkRelation[] = [
     enabled: false,
     usageCount: 8,
     createdAt: '2026-02-01',
-    lastModifiedBy: '王五',
   },
   {
     id: 'LKT-004',
@@ -108,7 +104,6 @@ export const mockLinkRelations: LinkRelation[] = [
     enabled: true,
     usageCount: 21,
     createdAt: '2026-02-10',
-    lastModifiedBy: 'AI',
   },
   {
     id: 'LKT-005',
@@ -124,7 +119,6 @@ export const mockLinkRelations: LinkRelation[] = [
     enabled: false,
     usageCount: 5,
     createdAt: '2026-03-01',
-    lastModifiedBy: '张三',
   },
   {
     id: 'LKT-006',
@@ -140,7 +134,6 @@ export const mockLinkRelations: LinkRelation[] = [
     enabled: true,
     usageCount: 17,
     createdAt: '2026-03-15',
-    lastModifiedBy: '李四',
   },
   {
     id: 'LKT-007',
@@ -156,7 +149,6 @@ export const mockLinkRelations: LinkRelation[] = [
     enabled: true,
     usageCount: 29,
     createdAt: '2026-04-01',
-    lastModifiedBy: '王五',
   },
   {
     id: 'LKT-008',
@@ -172,7 +164,6 @@ export const mockLinkRelations: LinkRelation[] = [
     enabled: true,
     usageCount: 15,
     createdAt: '2026-04-10',
-    lastModifiedBy: 'AI',
   },
   {
     id: 'LKT-009',
@@ -188,7 +179,6 @@ export const mockLinkRelations: LinkRelation[] = [
     enabled: true,
     usageCount: 6,
     createdAt: '2026-04-20',
-    lastModifiedBy: '张三',
   },
   {
     id: 'LKT-010',
@@ -204,7 +194,6 @@ export const mockLinkRelations: LinkRelation[] = [
     enabled: true,
     usageCount: 11,
     createdAt: '2026-05-01',
-    lastModifiedBy: '李四',
   },
 ]
 
