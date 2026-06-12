@@ -72,13 +72,14 @@ describe('IndicatorGrid', () => {
     expect(grid).toHaveClass('grid')
   })
 
-  it('has responsive breakpoints', () => {
+  it('has auto-fill responsive columns instead of fixed breakpoints', () => {
     const { container } = render(<IndicatorGrid indicators={mockIndicators} />)
 
     const grid = container.firstChild as HTMLElement
-    expect(grid).toHaveClass('md:grid-cols-2')
-    expect(grid).toHaveClass('lg:grid-cols-3')
-    expect(grid).toHaveClass('min-[1440px]:grid-cols-4')
+    expect(grid).toHaveClass('grid-cols-[repeat(auto-fill,minmax(180px,1fr))]')
+    // 不再使用固定断点
+    expect(grid).not.toHaveClass('md:grid-cols-2')
+    expect(grid).not.toHaveClass('lg:grid-cols-3')
   })
 
   it('renders EmptyState when no indicators are provided', () => {
@@ -171,6 +172,45 @@ describe('IndicatorGrid', () => {
       render(<IndicatorGrid indicators={items} searchQuery="uppercasename" />)
 
       expect(screen.getByText('UpperCaseName')).toBeInTheDocument()
+    })
+  })
+
+  describe('compact mode', () => {
+    it('compact 模式使用单列布局', () => {
+      const { container } = render(
+        <IndicatorGrid indicators={mockIndicators} compact />
+      )
+
+      const grid = container.firstChild as HTMLElement
+      expect(grid).toHaveClass('grid-cols-1')
+      expect(grid).not.toHaveClass('md:grid-cols-2')
+      expect(grid).not.toHaveClass('lg:grid-cols-3')
+    })
+
+    it('compact 模式缩减间距和内边距', () => {
+      const { container } = render(
+        <IndicatorGrid indicators={mockIndicators} compact />
+      )
+
+      const grid = container.firstChild as HTMLElement
+      expect(grid).toHaveClass('gap-2')
+      expect(grid).toHaveClass('p-2')
+    })
+
+    it('非 compact 模式使用 auto-fill 自适应列布局', () => {
+      const { container } = render(
+        <IndicatorGrid indicators={mockIndicators} />
+      )
+
+      const grid = container.firstChild as HTMLElement
+      expect(grid).toHaveClass('grid-cols-[repeat(auto-fill,minmax(180px,1fr))]')
+      expect(grid).toHaveClass('gap-4')
+    })
+
+    it('compact 模式下空状态仍正常渲染', () => {
+      render(<IndicatorGrid indicators={[]} compact />)
+
+      expect(screen.getByTestId('empty-state-wrapper')).toBeInTheDocument()
     })
   })
 })

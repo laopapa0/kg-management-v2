@@ -20,9 +20,11 @@ import { useTargetBounce } from '@/hooks/useTargetBounce'
 import { useConnectionDelete } from '@/hooks/useConnectionDelete'
 import { initializeAttachmentStore, selectPendingIndicators, useAttachmentStore } from '@/stores/attachmentStore'
 
-const PANEL_MIN_WIDTH_LEFT = 240
-const PANEL_MIN_WIDTH_CENTER = 400
-const PANEL_MIN_WIDTH_RIGHT = 240
+type PanelViewMode = 'tree' | 'mindmap'
+
+const PANEL_MIN_WIDTH_LEFT = 200
+const PANEL_MIN_WIDTH_CENTER = 200
+const PANEL_MIN_WIDTH_RIGHT = 200
 
 function getFocusZoneHint(zone: ReturnType<typeof useFocusZone>): string | null {
   switch (zone) {
@@ -46,6 +48,11 @@ export default function IndicatorAttachmentPage() {
   const { state, start, setHoverTarget, confirm, cancel, resetMisfireCount } = useConnectionMode()
   const focusZone = useFocusZone()
   const focusZoneHint = useMemo(() => getFocusZoneHint(focusZone), [focusZone])
+  const [viewMode, setViewMode] = useState<PanelViewMode>('tree')
+
+  const panelSizeLeft = viewMode === 'tree' ? 35 : 50
+  const panelSizeCenter = viewMode === 'tree' ? 30 : 25
+  const panelSizeRight = 25
 
   // Command palette state
   const [paletteOpen, setPaletteOpen] = useState(false)
@@ -438,10 +445,10 @@ export default function IndicatorAttachmentPage() {
       <Group orientation="horizontal" className="h-full gap-2">
         <Panel
           id="indicator-tree"
-          defaultSize={25}
+          defaultSize={panelSizeLeft}
           minSize={15}
           style={{ minWidth: PANEL_MIN_WIDTH_LEFT }}
-          className="min-h-0"
+          className="min-h-0 transition-all duration-300"
         >
           <div
             data-testid="panel-indicator-tree"
@@ -454,7 +461,7 @@ export default function IndicatorAttachmentPage() {
                 treePanelRef.current?.openAddDialog()
               }}
             />
-            <IndicatorTreePanel ref={treePanelRef} />
+            <IndicatorTreePanel ref={treePanelRef} onViewModeChange={setViewMode} />
           </div>
         </Panel>
 
@@ -462,10 +469,10 @@ export default function IndicatorAttachmentPage() {
 
         <Panel
           id="pending-indicators"
-          defaultSize={50}
-          minSize={30}
+          defaultSize={panelSizeCenter}
+          minSize={15}
           style={{ minWidth: PANEL_MIN_WIDTH_CENTER }}
-          className="min-h-0"
+          className="min-h-0 transition-all duration-300"
         >
           <div
             data-testid="panel-pending-indicators"
@@ -497,6 +504,7 @@ export default function IndicatorAttachmentPage() {
             <IndicatorGrid
               indicators={indicatorsWithClick}
               searchQuery={gridSearchQuery}
+              compact={viewMode === 'mindmap'}
             />
           </div>
         </Panel>
@@ -505,10 +513,10 @@ export default function IndicatorAttachmentPage() {
 
         <Panel
           id="right-column"
-          defaultSize={25}
+          defaultSize={panelSizeRight}
           minSize={15}
           style={{ minWidth: PANEL_MIN_WIDTH_RIGHT }}
-          className="min-h-0"
+          className="min-h-0 transition-all duration-300"
         >
           <div ref={rightColumnRef} className="h-full">
             <Group orientation="vertical" className="h-full gap-2">

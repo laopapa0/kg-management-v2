@@ -39,6 +39,11 @@
 | **反哺（Feedback Loop）** | 从报告中直接修改关联关系或更新知识库，修改后重新跑报告生成新版本 |
 | **分权分域（Department Scope）** | 账号登录后自动切换到对应部门的指标树和标签集。规则配置全局可见 |
 | **主题（Theme）** | 深色/浅色切换。演示优先用深色（蓝黑）。画布图表颜色跟随主题联动 |
+| **指标脑图（Indicator Mind Map）** | 指标树的思维导图可视化视图。使用 Mind Elixir 5 渲染，与列表树视图通过 Toggle 切换。同一份 attachmentStore 数据，两种渲染方式 |
+| **默认虚拟分组（Default Virtual Group）** | 指标树和脑图共享的根级虚拟分组节点。在脑图视图中作为连线挂靠投递的目标区域，接收从候选指标池投递来的指标，用户再从此处拖拽指标挂入主树 |
+| **AI 推荐管理（AI Recommendation）** | 关系管理页的第二个 Tab。展示 AI 推荐的关系列表，按置信度排序。支持的交互：勾选应用到血缘画布、置信度筛选。前端与模型解耦，先用 mock 数据验证验收流程 |
+| **发散分析（Divergence Analysis）** | 报告计划的附加选项。启用后报告生成时执行发散文案分析，结果与主报告物理隔离，放在报告末尾。UI 上通过提示词控制分析方向 |
+| **菜单三大模块** | v2 新菜单结构。一级手风琴折叠分组：指标图谱（指标管理+血缘画布）、报告管理（报告计划+历史+模板）、基础维护（规则管理+关联关系管理[含AI推荐]+知识库管理）。首页在分组之外独立展示 |
 
 ## 已确认的关键决策
 
@@ -139,3 +144,4 @@ interface Indicator {
 - 模型文件：`src/models/<model>.ts`
 - localStorage key 前缀：`kgv2-`（与 v1 区分）
 - **sticky 搜索栏/统计行**：使用 `bg-dark-card-l1/95 backdrop-blur-sm z-20`，确保滚动时遮挡下方内容不穿透、不被树节点动画层级覆盖
+- **GitHub Pages 自动部署**：push 到 `main` 分支后，`.github/workflows/deploy.yml` 自动触发（vite build → upload-pages-artifact → deploy-pages）。`vite.config.ts` 中 `base: '/kg-management-v2/'`，因此生产 URL 为 `https://laopapa0.github.io/kg-management-v2/`。部署约需 1-2 分钟，用户说的"生成新页面"即指此流程。

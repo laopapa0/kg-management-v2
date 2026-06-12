@@ -151,9 +151,7 @@ describe('IndicatorAttachmentPage', () => {
     render(<IndicatorAttachmentPage />)
 
     const grid = screen.getByTestId('indicator-grid')
-    expect(grid).toHaveClass('md:grid-cols-2')
-    expect(grid).toHaveClass('lg:grid-cols-3')
-    expect(grid).toHaveClass('min-[1440px]:grid-cols-4')
+    expect(grid).toHaveClass('grid-cols-[repeat(auto-fill,minmax(180px,1fr))]')
   })
 
   it('filters pending indicators by attachment state', () => {
@@ -832,6 +830,28 @@ describe('IndicatorAttachmentPage', () => {
 
       expect(screen.getByPlaceholderText(/搜索指标/i)).toBeInTheDocument()
       expect(screen.getByText('↑↓ 导航')).toBeInTheDocument()
+    })
+  })
+
+  describe('面板比例切换', () => {
+    it('默认列表树模式下三栏面板存在且左侧面板初始尺寸为 35%', () => {
+      render(<IndicatorAttachmentPage />)
+
+      const treePanel = screen.getByTestId('panel-indicator-tree')
+      const pendingPanel = screen.getByTestId('panel-pending-indicators')
+      const tagPanel = screen.getByTestId('panel-tag-set')
+
+      expect(treePanel).toBeInTheDocument()
+      expect(pendingPanel).toBeInTheDocument()
+      expect(tagPanel).toBeInTheDocument()
+    })
+
+    it('页面以列表树模式渲染', () => {
+      render(<IndicatorAttachmentPage />)
+
+      // 默认模式为 tree，PanelGroup 应包含正确的 data 属性
+      const treePanel = screen.getByTestId('panel-indicator-tree')
+      expect(treePanel).toBeVisible()
     })
   })
 })

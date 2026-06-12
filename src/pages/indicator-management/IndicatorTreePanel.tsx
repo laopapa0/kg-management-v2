@@ -44,12 +44,17 @@ export interface IndicatorTreePanelRef {
   expandAndSelectNode: (indicatorId: string) => void
 }
 
+interface IndicatorTreePanelProps {
+  onViewModeChange?: (mode: 'tree' | 'mindmap') => void
+}
+
 interface RenderTreeNode extends TreeNode {
   indicator: IndicatorAttachment
   children?: RenderTreeNode[]
 }
 
-const IndicatorTreePanel = forwardRef<IndicatorTreePanelRef>(function IndicatorTreePanel(_props, ref) {
+const IndicatorTreePanel = forwardRef<IndicatorTreePanelRef, IndicatorTreePanelProps>(
+  function IndicatorTreePanel({ onViewModeChange }, ref) {
   const indicators = useAttachmentStore((state) => state.indicators)
   const addIndicator = useAttachmentStore((state) => state.addIndicator)
   const renameIndicator = useAttachmentStore((state) => state.renameIndicator)

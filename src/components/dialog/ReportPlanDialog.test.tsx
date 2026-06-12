@@ -173,6 +173,7 @@ describe('ReportPlanDialog — 三步向导', () => {
     await user.type(screen.getByTestId('report-plan-name-input'), '测试计划')
     await user.click(screen.getByTestId('report-plan-next-button'))
     await user.click(screen.getByTestId('report-plan-next-button'))
+    await user.click(screen.getByTestId('report-plan-next-button'))
     await user.click(screen.getByTestId('report-plan-save-generate-button'))
 
     expect(onSaveAndGenerate).toHaveBeenCalledWith(expect.objectContaining({
@@ -214,7 +215,65 @@ describe('ReportPlanDialog — 三步向导', () => {
 
     await user.click(screen.getByTestId('report-plan-next-button'))
     await user.click(screen.getByTestId('report-plan-next-button'))
+    await user.click(screen.getByTestId('report-plan-next-button'))
 
     expect(screen.getByTestId('report-plan-save-generate-button')).toHaveTextContent('保存并重新生成')
+  })
+
+  describe('发散分析', () => {
+    it('Step 4 模板选择下方有分割线和发散分析区块', async () => {
+      const user = userEvent.setup()
+      render(<ReportPlanDialog open={true} onOpenChange={vi.fn()} onConfirm={vi.fn()} />)
+
+      await user.type(screen.getByTestId('report-plan-name-input'), '测试')
+      for (let i = 0; i < 3; i++) {
+        await user.click(screen.getByTestId('report-plan-next-button'))
+      }
+
+      expect(screen.getByTestId('divergence-section')).toBeInTheDocument()
+      expect(screen.getByText('发散分析')).toBeInTheDocument()
+    })
+
+    it('Switch 默认关闭，打开后提示词输入框显示', async () => {
+      const user = userEvent.setup()
+      render(<ReportPlanDialog open={true} onOpenChange={vi.fn()} onConfirm={vi.fn()} />)
+
+      await user.type(screen.getByTestId('report-plan-name-input'), '测试')
+      for (let i = 0; i < 3; i++) {
+        await user.click(screen.getByTestId('report-plan-next-button'))
+      }
+
+      const switchEl = screen.getByTestId('divergence-switch')
+      expect(switchEl).not.toBeChecked()
+
+      await user.click(switchEl)
+      expect(switchEl).toBeChecked()
+
+      expect(screen.getByTestId('divergence-prompt-textarea')).toBeInTheDocument()
+    })
+
+    it('保存时发散分析字段包含在表单数据中', async () => {
+      const user = userEvent.setup()
+      const onConfirm = vi.fn()
+      render(<ReportPlanDialog open={true} onOpenChange={vi.fn()} onConfirm={onConfirm} />)
+
+      // Step 1: 填写名称
+      await user.type(screen.getByTestId('report-plan-name-input'), '测试')
+      // Step 1→2→3→4
+      for (let i = 0; i < 3; i++) {
+        await user.click(screen.getByTestId('report-plan-next-button'))
+      }
+
+      // 开启发散分析
+      await user.click(screen.getByTestId('divergence-switch'))
+      await user.type(screen.getByTestId('divergence-prompt-textarea'), '分析营收趋势')
+
+      await user.click(screen.getByTestId('report-plan-save-button'))
+
+      expect(onConfirm).toHaveBeenCalledWith(expect.objectContaining({
+        divergenceEnabled: true,
+        divergencePrompt: '分析营收趋势',
+      }))
+    })
   })
 })

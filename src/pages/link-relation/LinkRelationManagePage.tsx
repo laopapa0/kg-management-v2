@@ -19,6 +19,8 @@ import {
   mockLinkChangeLogs,
 } from '@/models/linkRelationModel'
 import type { LinkRelation, LinkChangeLog, ChangeLogEntry, LinkUsageConnection } from '@/models/linkRelationModel'
+import { mockAiRecommendations } from '@/models/linkRelationModel'
+import AiRecommendationList from '@/components/link-relation/AiRecommendationList'
 import { IconRenderer } from '@/utils/icons.tsx'
 
 const SOURCE_TYPE_OPTIONS = ['全部', '指标', '虚拟分组', '外部因素']
@@ -64,6 +66,7 @@ function getDeptOptions(_connections?: LinkUsageConnection[]): string[] {
 }
 
 export default function LinkRelationManagePage() {
+  const [tab, setTab] = useState<'relations' | 'ai'>('relations')
   const [relations, setRelations] = useState<LinkRelation[]>(mockLinkRelations)
   const [expandedId, setExpandedId] = useState<string | null>(null)
   const [search, setSearch] = useState('')
@@ -285,7 +288,39 @@ export default function LinkRelationManagePage() {
 
   return (
     <div data-testid="link-relation-manage-page" className="h-full text-dark-text-primary">
-      <h1 className="mb-6 text-xl font-semibold">关联关系类型管理</h1>
+      <h1 className="mb-4 text-xl font-semibold">基础维护</h1>
+      {/* Tab 导航 */}
+      <div data-testid="link-relation-tabs" className="mb-4 flex gap-0 border-b border-dark-border">
+        <button
+          data-testid="tab-relations"
+          onClick={() => setTab('relations')}
+          className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+            tab === 'relations'
+              ? 'border-dark-accent-primary text-dark-accent-primary'
+              : 'border-transparent text-dark-text-secondary hover:text-dark-text-primary'
+          }`}
+        >
+          关联关系管理
+        </button>
+        <button
+          data-testid="tab-ai"
+          onClick={() => setTab('ai')}
+          className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+            tab === 'ai'
+              ? 'border-dark-accent-primary text-dark-accent-primary'
+              : 'border-transparent text-dark-text-secondary hover:text-dark-text-primary'
+          }`}
+        >
+          AI推荐管理
+        </button>
+      </div>
+
+      {tab === 'ai' && (
+        <AiRecommendationList recommendations={mockAiRecommendations} />
+      )}
+
+      {tab === 'relations' && (
+      <>
       <div className="mb-4 flex items-center gap-3 flex-wrap">
         <Button
           data-testid="add-relation-btn"
@@ -366,7 +401,7 @@ export default function LinkRelationManagePage() {
           setEditingRelation(undefined)
         }}
       />
-      <div className="rounded-md border border-dark-border bg-dark-card">
+      <div className="rounded-md border border-dark-border bg-dark-card-l1">
         <DataTable
           columns={columns}
           data={paginated}
@@ -508,6 +543,8 @@ export default function LinkRelationManagePage() {
           )
         })}
       </div>
+      </>
+      )}
     </div>
   )
 }

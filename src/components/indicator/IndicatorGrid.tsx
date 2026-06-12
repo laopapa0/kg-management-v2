@@ -9,14 +9,20 @@ export interface IndicatorGridProps {
   indicators: (IndicatorCardProps | IndicatorAttachment)[]
   searchQuery?: string
   forceDisableVirtualization?: boolean
+  compact?: boolean
 }
 
 const GRID_CLASSES =
-  'grid flex-1 grid-cols-1 gap-4 overflow-y-auto p-4 md:grid-cols-2 lg:grid-cols-3 min-[1440px]:grid-cols-4'
+  'grid flex-1 gap-4 overflow-y-auto p-4'
+const GRID_COLUMNS_AUTO =
+  'grid-cols-[repeat(auto-fill,minmax(180px,1fr))]'
+
+const GRID_CLASSES_COMPACT =
+  'grid flex-1 grid-cols-1 gap-2 overflow-y-auto p-2'
 
 const GridList = forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-  ({ children, ...props }, ref) => (
-    <div ref={ref} {...props} className={GRID_CLASSES}>
+  ({ children, className, ...props }, ref) => (
+    <div ref={ref} {...props} className={`${GRID_CLASSES} ${GRID_COLUMNS_AUTO} ${className ?? ''}`}>
       {children}
     </div>
   ),
@@ -47,11 +53,14 @@ export default function IndicatorGrid({
   indicators,
   searchQuery,
   forceDisableVirtualization,
+  compact,
 }: IndicatorGridProps) {
   const filtered = useMemo(
     () => (searchQuery ? filterIndicators(indicators, searchQuery) : indicators),
     [indicators, searchQuery],
   )
+
+  const gridClasses = `${compact ? GRID_CLASSES_COMPACT : `${GRID_CLASSES} ${GRID_COLUMNS_AUTO}`}`
 
   const useVirtual = !forceDisableVirtualization && filtered.length >= 100
 
@@ -67,7 +76,7 @@ export default function IndicatorGrid({
 
   if (!useVirtual) {
     return (
-      <div data-testid="indicator-grid" className={GRID_CLASSES}>
+      <div data-testid="indicator-grid" className={gridClasses}>
         {filtered.map((indicator) => (
           <IndicatorCard key={indicator.id} {...(indicator as IndicatorCardProps)} />
         ))}
@@ -80,7 +89,7 @@ export default function IndicatorGrid({
       data-testid="indicator-grid"
       totalCount={filtered.length}
       components={{
-        List: GridList,
+        List: (props) => <GridList {...props} className={gridClasses} />,
         Item: GridItem,
       }}
       itemContent={(index) => (

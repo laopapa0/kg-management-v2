@@ -24,6 +24,10 @@ export interface ReportPlan {
   filterScope?: FilterScopeValue
   /** 绑定的模板 ID */
   templateId?: string
+  /** 是否启用发散分析 */
+  divergenceEnabled?: boolean
+  /** 发散分析提示词 */
+  divergencePrompt?: string
 }
 
 /** 执行周期中文映射 */

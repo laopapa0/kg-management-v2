@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import {
   Dialog,
   DialogContent,
@@ -11,6 +12,7 @@ import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
+import { Switch } from '@/components/ui/switch'
 import type { ReportPlan } from '@/models/reportModel'
 import FilterScopeSelector, { type FilterScopeValue } from '@/components/report/FilterScopeSelector'
 import { getReportTemplates } from '@/utils/reportTemplateStorage'
@@ -23,6 +25,8 @@ export interface ReportPlanFormData {
   autoSchedule: boolean
   filterScope?: FilterScopeValue
   templateId?: string
+  divergenceEnabled?: boolean
+  divergencePrompt?: string
 }
 
 export interface ReportPlanDialogProps {
@@ -57,6 +61,8 @@ export default function ReportPlanDialog({
     excludedLinkRelationIds: [],
   })
   const [templateId, setTemplateId] = useState<string | undefined>(undefined)
+  const [divergenceEnabled, setDivergenceEnabled] = useState(false)
+  const [divergencePrompt, setDivergencePrompt] = useState('')
 
   useEffect(() => {
     if (open) {
@@ -71,6 +77,8 @@ export default function ReportPlanDialog({
         excludedLinkRelationIds: [],
       })
       setTemplateId(initialData?.templateId)
+      setDivergenceEnabled(initialData?.divergenceEnabled ?? false)
+      setDivergencePrompt(initialData?.divergencePrompt ?? '')
     }
   }, [open, initialData])
 
@@ -87,6 +95,8 @@ export default function ReportPlanDialog({
       autoSchedule,
       filterScope,
       templateId,
+      divergenceEnabled,
+      divergencePrompt: divergencePrompt.trim(),
     })
     onOpenChange(false)
   }
@@ -101,6 +111,8 @@ export default function ReportPlanDialog({
       autoSchedule,
       filterScope,
       templateId,
+      divergenceEnabled,
+      divergencePrompt: divergencePrompt.trim(),
     }
     if (onSaveAndGenerate) {
       onSaveAndGenerate(data)
@@ -228,6 +240,38 @@ export default function ReportPlanDialog({
                     </label>
                   ))}
               </div>
+            </div>
+
+            {/* 发散分析 */}
+            <div data-testid="divergence-section" className="border-t border-dark-border pt-4">
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-medium text-dark-text-primary">发散分析</h3>
+                <Switch
+                  data-testid="divergence-switch"
+                  checked={divergenceEnabled}
+                  onCheckedChange={setDivergenceEnabled}
+                />
+              </div>
+              <AnimatePresence>
+                {divergenceEnabled && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.15 }}
+                    className="overflow-hidden"
+                  >
+                    <Textarea
+                      data-testid="divergence-prompt-textarea"
+                      value={divergencePrompt}
+                      onChange={(e) => setDivergencePrompt(e.target.value)}
+                      placeholder="请输入分析方向提示词..."
+                      className="mt-3 max-h-24"
+                      rows={3}
+                    />
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </div>
         )}

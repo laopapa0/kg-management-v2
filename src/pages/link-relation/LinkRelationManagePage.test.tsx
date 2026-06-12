@@ -7,7 +7,7 @@ import { mockLinkRelations } from '@/models/linkRelationModel'
 describe('LinkRelationManagePage', () => {
   it('renders page title', () => {
     render(<LinkRelationManagePage />)
-    expect(screen.getByText('关联关系类型管理')).toBeInTheDocument()
+    expect(screen.getByText('基础维护')).toBeInTheDocument()
   })
 
   it('renders DataTable with all new columns', () => {
