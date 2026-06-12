@@ -636,7 +636,7 @@ export default function LineageCanvasPage() {
   // 左侧面板状态
   const [searchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
-  const [filterType, setFilterType] = useState<string>('全部');
+  const [filterType, setFilterType] = useState<string>('ALL');
   const [modifiedByFilter, setModifiedByFilter] = useState<string>('ALL');
   const [selectedRelationId, setSelectedRelationId] = useState<string | null>(null);
 
@@ -672,7 +672,7 @@ export default function LineageCanvasPage() {
   // 过滤后的关系列表
   const filteredRelations = useMemo(() => {
     return relations.filter((rel) => {
-      const matchType = filterType === '全部' || rel.type === filterType;
+      const matchType = filterType === 'ALL' || rel.type === filterType;
       const matchModifiedBy =
         modifiedByFilter === 'ALL' ||
         (modifiedByFilter === 'HUMAN' && rel.lastModifiedBy !== 'AI') ||
@@ -882,8 +882,9 @@ export default function LineageCanvasPage() {
               onChange={setSearchQuery}
               width="w-full"
             />
-            <div className="flex flex-wrap gap-1 mt-3">
-              {['全部', 'DEPENDS_ON', 'CAUSES', 'AGGREGATES', 'DERIVED_FROM'].map((type) => (
+            <span className="text-[11px] text-dark-text-tertiary">TYPE</span>
+            <div className="flex flex-wrap gap-1.5">
+              {['ALL', 'DEPENDS_ON', 'CAUSES', 'AGGREGATES', 'DERIVED_FROM'].map((type) => (
                 <button
                   key={type}
                   onClick={() => setFilterType(type)}
@@ -894,11 +895,11 @@ export default function LineageCanvasPage() {
                       : 'bg-dark-page text-dark-text-secondary hover:bg-dark-tree-hover-bg'
                   )}
                 >
-                  {type === '全部' ? '全部' : type}
+                  {type}
                 </button>
               ))}
             </div>
-            <span className="text-[11px] text-dark-text-tertiary">BY</span>
+            <span className="text-[11px] text-dark-text-tertiary mt-2 block">BY</span>
             <div className="flex flex-wrap gap-1.5">
               {['ALL', 'HUMAN', 'AI'].map((by) => (
                 <button
