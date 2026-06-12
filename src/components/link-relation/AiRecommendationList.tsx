@@ -40,11 +40,24 @@ function confidencePct(c: number): string {
 
 export default function AiRecommendationList({ recommendations, onApply }: Props) {
   const [filter, setFilter] = useState<'all' | 'high' | 'mid' | 'low'>('all')
+  const [sourceDept, setSourceDept] = useState('全部')
+  const [targetDept, setTargetDept] = useState('全部')
+  const [relationType, setRelationType] = useState('全部')
   const [page, setPage] = useState(1)
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
   const [appliedIds, setAppliedIds] = useState<Set<string>>(new Set())
   const [showConfirm, setShowConfirm] = useState(false)
   const pendingApplyRef = useRef<string[]>([])
+
+  const deptOptions = useMemo(
+    () => ['全部', '财务部', '市场部', '网络部', '客服部'],
+    [],
+  )
+
+  const relationTypeOptions = useMemo(
+    () => ['全部', ...new Set(recommendations.map((r) => r.relationTypeName))],
+    [recommendations],
+  )
 
   const sorted = useMemo(
     () => [...recommendations].sort((a, b) => b.confidence - a.confidence),
@@ -52,11 +65,17 @@ export default function AiRecommendationList({ recommendations, onApply }: Props
   )
 
   const filtered = useMemo(() => {
-    if (filter === 'all') return sorted
-    if (filter === 'high') return sorted.filter((r) => r.confidence >= 0.8)
-    if (filter === 'mid') return sorted.filter((r) => r.confidence >= 0.5 && r.confidence < 0.8)
-    return sorted.filter((r) => r.confidence < 0.5)
-  }, [sorted, filter])
+    let result = sorted
+    if (filter === 'high') result = result.filter((r) => r.confidence >= 0.8)
+    else if (filter === 'mid') result = result.filter((r) => r.confidence >= 0.5 && r.confidence < 0.8)
+    else if (filter === 'low') result = result.filter((r) => r.confidence < 0.5)
+
+    if (sourceDept !== '全部') result = result.filter((r) => r.sourceDepartment === sourceDept)
+    if (targetDept !== '全部') result = result.filter((r) => r.targetDepartment === targetDept)
+    if (relationType !== '全部') result = result.filter((r) => r.relationTypeName === relationType)
+
+    return result
+  }, [sorted, filter, sourceDept, targetDept, relationType])
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
   const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
@@ -124,7 +143,7 @@ export default function AiRecommendationList({ recommendations, onApply }: Props
 
   return (
     <div data-testid="ai-recommendation-list">
-      <div className="mb-4 flex items-center gap-3">
+      <div className="mb-4 flex items-center gap-3 flex-wrap">
         <Select
           value={filter}
           onValueChange={(v) => { setFilter(v as typeof filter); setPage(1) }}
@@ -137,6 +156,36 @@ export default function AiRecommendationList({ recommendations, onApply }: Props
             <SelectItem value="high">{'>'}80%</SelectItem>
             <SelectItem value="mid">50-80%</SelectItem>
             <SelectItem value="low">{'<'}50%</SelectItem>
+          </SelectContent>
+        </Select>
+        <Select value={sourceDept} onValueChange={(v) => { setSourceDept(v); setPage(1) }}>
+          <SelectTrigger data-testid="ai-src-dept-filter" className="h-9 w-36">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {deptOptions.map((d) => (
+              <SelectItem key={d} value={d}>{d === '全部' ? '来源指标部门' : d}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Select value={targetDept} onValueChange={(v) => { setTargetDept(v); setPage(1) }}>
+          <SelectTrigger data-testid="ai-tgt-dept-filter" className="h-9 w-36">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {deptOptions.map((d) => (
+              <SelectItem key={d} value={d}>{d === '全部' ? '目标指标部门' : d}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Select value={relationType} onValueChange={(v) => { setRelationType(v); setPage(1) }}>
+          <SelectTrigger data-testid="ai-relation-type-filter" className="h-9 w-36">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {relationTypeOptions.map((t) => (
+              <SelectItem key={t} value={t}>{t === '全部' ? '关系类型' : t}</SelectItem>
+            ))}
           </SelectContent>
         </Select>
         <span className="text-sm text-dark-text-secondary">
