@@ -1,9 +1,12 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import {
   createDefaultGroupId,
   isDefaultGroupId,
   indicatorsToMindElixirData,
   mindElixirDataToIndicators,
+  handleOperation,
+  findParentId,
+  type HandleOperationDeps,
 } from './mindMapAdapter';
 import type { IndicatorAttachment } from '@/models/indicatorAttachmentModel';
 
@@ -214,5 +217,98 @@ describe('mindMapAdapter', () => {
       // 原本 treeParentId 为 undefined 的根节点，还原后保持 undefined
       expect(restored[0].treeParentId).toBeUndefined();
     });
+  });
+});
+
+describe('findParentId', () => {
+  const n = (id: string, children?: Record<string, unknown>[]): { id: string; children?: Record<string, unknown>[] } => ({ id, children });
+
+  it('returns parent id for a direct child', () => {
+    const tree = n('root', [n('a')]);
+    expect(findParentId(tree, 'a')).toBe('root');
+  });
+
+  it('returns parent id for a nested child', () => {
+    const tree = n('root', [n('a', [n('b')])]);
+    expect(findParentId(tree, 'b')).toBe('a');
+  });
+
+  it('returns undefined for the root node', () => {
+    const tree = n('root', [n('a')]);
+    expect(findParentId(tree, 'root')).toBeUndefined();
+  });
+
+  it('returns undefined for a non-existent child', () => {
+    const tree = n('root', [n('a')]);
+    expect(findParentId(tree, 'missing')).toBeUndefined();
+  });
+});
+
+describe('handleOperation', () => {
+  const makeDeps = () => {
+    const rename = vi.fn<(id: string, name: string) => void>();
+    const add = vi.fn<(name: string, parentId?: string) => string | null>();
+    add.mockReturnValue('new-id');
+    const remove = vi.fn<(id: string) => void>();
+    const setParent = vi.fn<(id: string, newParentId: string | undefined) => void>();
+    const resolveParent = vi.fn<(id: string) => string | undefined>();
+    return { rename, add, remove, setParent, resolveParent };
+  };
+
+  it('finishEdit calls rename with node id and new topic', () => {
+    const deps = makeDeps();
+    handleOperation({ name: 'finishEdit', obj: { id: 'ind-1', topic: '新名称' } }, deps);
+    expect(deps.rename).toHaveBeenCalledWith('ind-1', '新名称');
+    expect(deps.add).not.toHaveBeenCalled();
+    expect(deps.remove).not.toHaveBeenCalled();
+  });
+
+  it('addChild calls add with topic and parent id from origin', () => {
+    const deps = makeDeps();
+    handleOperation(
+      { name: 'addChild', obj: { id: 'ind-1', topic: '新节点' }, origin: { id: 'parent-id' } },
+      deps,
+    );
+    expect(deps.add).toHaveBeenCalledWith('新节点', 'parent-id');
+    expect(deps.rename).not.toHaveBeenCalled();
+    expect(deps.remove).not.toHaveBeenCalled();
+  });
+
+  it('insertSibling calls add with topic and parent of origin', () => {
+    const deps = makeDeps();
+    deps.resolveParent.mockReturnValue('grandparent-id');
+    handleOperation(
+      {
+        name: 'insertSibling',
+        obj: { id: 'ind-2', topic: '兄弟节点' },
+        origin: { id: 'sibling-id' },
+      },
+      deps,
+    );
+    expect(deps.resolveParent).toHaveBeenCalledWith('sibling-id');
+    expect(deps.add).toHaveBeenCalledWith('兄弟节点', 'grandparent-id');
+  });
+
+  it('removeNode calls remove with node id', () => {
+    const deps = makeDeps();
+    handleOperation({ name: 'removeNode', obj: { id: 'ind-3' } }, deps);
+    expect(deps.remove).toHaveBeenCalledWith('ind-3');
+  });
+
+  it('moveNode resolves new parent and calls setParent', () => {
+    const deps = makeDeps();
+    deps.resolveParent.mockReturnValue('new-parent-id');
+    handleOperation({ name: 'moveNode', obj: { id: 'ind-4' } }, deps);
+    expect(deps.resolveParent).toHaveBeenCalledWith('ind-4');
+    expect(deps.setParent).toHaveBeenCalledWith('ind-4', 'new-parent-id');
+  });
+
+  it('unknown operation does not call any handler', () => {
+    const deps = makeDeps();
+    handleOperation({ name: 'unknownOp', obj: { id: 'ind-5' } }, deps);
+    expect(deps.rename).not.toHaveBeenCalled();
+    expect(deps.add).not.toHaveBeenCalled();
+    expect(deps.remove).not.toHaveBeenCalled();
+    expect(deps.setParent).not.toHaveBeenCalled();
   });
 });

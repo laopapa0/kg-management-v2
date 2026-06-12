@@ -1,5 +1,5 @@
-import { forwardRef, useImperativeHandle, useMemo, useRef, useState, useEffect } from 'react'
-import type { MindElixirInstance } from 'mind-elixir'
+import { forwardRef, useCallback, useImperativeHandle, useMemo, useRef, useState, useEffect } from 'react'
+import type { MindElixirInstance, Operation } from 'mind-elixir'
 import { motion } from 'framer-motion'
 import { TreePine } from 'lucide-react'
 import { toast } from 'sonner'
@@ -14,7 +14,7 @@ import AttachedBadge from '@/components/connection/AttachedBadge'
 import { useAttachmentStore } from '@/stores/attachmentStore'
 import type { IndicatorAttachment } from '@/models/indicatorAttachmentModel'
 import { buildIndicatorTree, type IndicatorTreeNode } from '@/utils/attachmentTree'
-import { indicatorsToMindElixirData } from '@/utils/mindMapAdapter'
+import { indicatorsToMindElixirData, handleOperation, findParentId } from '@/utils/mindMapAdapter'
 import MindMapWrapper from '@/components/mindmap/MindMapWrapper'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
@@ -101,6 +101,29 @@ const IndicatorTreePanel = forwardRef<IndicatorTreePanelRef, IndicatorTreePanelP
   const handleMindMapInit = (instance: MindElixirInstance) => {
     mindMapInstanceRef.current = instance
   }
+
+  const handleMindMapOperation = useCallback(
+    (op: Operation) => {
+      handleOperation(op as { name: string; obj?: { id: string; topic?: string; [key: string]: unknown }; origin?: { id?: string; [key: string]: unknown } }, {
+        rename: (id, name) => renameIndicator(id, name),
+        add: (name, parentId) => { addIndicator(name, parentId); return 'new-id'; },
+        remove: (id) => deleteIndicator(id),
+        setParent: (id, newParentId) => {
+          setIndicators(
+            indicators.map((i) => (i.id === id ? { ...i, treeParentId: newParentId } : i)),
+          )
+        },
+        resolveParent: (id) => {
+          const mindInstance = mindMapInstanceRef.current
+          if (!mindInstance) return undefined
+          const mindData = mindInstance.getData()
+          const rootNode = mindData.nodeData as { id: string; children?: Record<string, unknown>[] }
+          return findParentId(rootNode, id)
+        },
+      })
+    },
+    [indicators, renameIndicator, addIndicator, deleteIndicator, setIndicators],
+  )
 
   useEffect(() => {
     if (viewMode === 'mindmap' && mindMapInstanceRef.current) {
@@ -416,6 +439,7 @@ const IndicatorTreePanel = forwardRef<IndicatorTreePanelRef, IndicatorTreePanelP
                     data={indicators}
                     defaultGroupName={currentDepartmentName}
                     onInit={handleMindMapInit}
+                    onOperation={handleMindMapOperation}
                   />
                 </div>
               )}

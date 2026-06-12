@@ -143,3 +143,61 @@ export function mindElixirDataToIndicators(
   walk(data, undefined);
   return result;
 }
+
+export interface HandleOperationDeps {
+  rename: (id: string, name: string) => void;
+  add: (name: string, parentId?: string) => string | null;
+  remove: (id: string) => void;
+  setParent: (id: string, newParentId: string | undefined) => void;
+  resolveParent: (id: string) => string | undefined;
+}
+
+export function handleOperation(
+  op: { name: string; obj?: { id: string; topic?: string; [key: string]: unknown }; origin?: { id?: string } },
+  deps: HandleOperationDeps,
+): void {
+  switch (op.name) {
+    case 'finishEdit': {
+      if (op.obj?.id && op.obj?.topic) {
+        deps.rename(op.obj.id, op.obj.topic);
+      }
+      break;
+    }
+    case 'addChild': {
+      const parentId = op.origin?.id;
+      if (op.obj?.topic) {
+        deps.add(op.obj.topic, parentId);
+      }
+      break;
+    }
+    case 'insertSibling': {
+      const siblingId = op.origin?.id;
+      const parentId = siblingId ? deps.resolveParent(siblingId) : undefined;
+      if (op.obj?.topic) {
+        deps.add(op.obj.topic, parentId);
+      }
+      break;
+    }
+    case 'removeNode': {
+      if (op.obj?.id) {
+        deps.remove(op.obj.id);
+      }
+      break;
+    }
+    case 'moveNode': {
+      if (op.obj?.id) {
+        deps.setParent(op.obj.id, deps.resolveParent(op.obj.id));
+      }
+      break;
+    }
+  }
+}
+
+export function findParentId(data: { id: string; children?: Record<string, unknown>[] }, childId: string): string | undefined {
+  for (const child of (data.children ?? []) as { id: string; children?: Record<string, unknown>[] }[]) {
+    if (child.id === childId) return data.id;
+    const found = findParentId(child, childId);
+    if (found !== undefined) return found;
+  }
+  return undefined;
+}
