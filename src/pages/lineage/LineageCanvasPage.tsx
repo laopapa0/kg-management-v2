@@ -973,7 +973,8 @@ export default function LineageCanvasPage() {
                     {rel.description && (
                       <p className="text-[11px] text-dark-text-tertiary mt-1 truncate">{rel.description}</p>
                     )}
-                    <div className="flex items-center gap-1 mt-2">
+                    <div className="flex items-center justify-between gap-1 mt-2">
+                      <div className="flex items-center gap-1">
                       <Button
                         variant="ghost"
                         size="sm"
@@ -1008,10 +1009,11 @@ export default function LineageCanvasPage() {
                           <Trash2 size={10} className="mr-1" />
                           删除
                       </Button>
+                      </div>
+                      <span className="text-[10px] text-dark-text-tertiary shrink-0" data-testid="last-modified-by">
+                        【{rel.lastModifiedBy}】
+                      </span>
                     </div>
-                    <span className="text-[10px] text-dark-text-tertiary" data-testid="last-modified-by">
-                      BY {rel.lastModifiedBy}
-                    </span>
                   </motion.div>
                 ))}
               </div>
