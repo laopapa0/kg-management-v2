@@ -100,5 +100,12 @@ export default function MindMapWrapper({
     mind.refresh({ nodeData });
   }, [data, defaultGroupName]);
 
-  return <div ref={containerRef} data-testid="mind-map-wrapper" className="w-full h-full" />;
+  return (
+    <div
+      ref={containerRef}
+      data-testid="mind-map-wrapper"
+      data-connection-target="mindmap-default"
+      className="w-full h-full"
+    />
+  );
 }

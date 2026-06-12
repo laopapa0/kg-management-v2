@@ -13,7 +13,8 @@ import PulseRing from '@/components/connection/PulseRing'
 import MiniToast from '@/components/connection/MiniToast'
 import FocusModeOverlay from '@/components/connection/FocusModeOverlay'
 import AttachmentCommandPalette from '@/components/command/AttachmentCommandPalette'
-import { useConnectionMode } from '@/hooks/useConnectionMode'
+import { useConnectionMode, MINDMAP_DROP_ZONE_ID } from '@/hooks/useConnectionMode'
+import { createDefaultGroupId } from '@/utils/mindMapAdapter'
 import { useFocusZone } from '@/hooks/useFocusZone'
 import { useFocusTrap } from '@/hooks/useFocusTrap'
 import { useTargetBounce } from '@/hooks/useTargetBounce'
@@ -45,10 +46,18 @@ export default function IndicatorAttachmentPage() {
   const treePanelRef = useRef<IndicatorTreePanelRef>(null)
   const pageRef = useRef<HTMLDivElement>(null)
   const rightColumnRef = useRef<HTMLDivElement>(null)
-  const { state, start, setHoverTarget, confirm, cancel, resetMisfireCount } = useConnectionMode()
+
+  const [viewMode, setViewMode] = useState<PanelViewMode>('tree')
+
+  const deptName = useAttachmentStore((s) => s.departments.find((d) => d.id === s.currentDepartmentId)?.name ?? '默认分组')
+  const mindMapOpts = useMemo(
+    () => ({ isActive: viewMode === 'mindmap', defaultGroupId: createDefaultGroupId(deptName) }),
+    [viewMode, deptName],
+  )
+
+  const { state, start, setHoverTarget, confirm, cancel, resetMisfireCount } = useConnectionMode(mindMapOpts)
   const focusZone = useFocusZone()
   const focusZoneHint = useMemo(() => getFocusZoneHint(focusZone), [focusZone])
-  const [viewMode, setViewMode] = useState<PanelViewMode>('tree')
 
   const panelSizeLeft = viewMode === 'tree' ? 35 : 50
   const panelSizeCenter = viewMode === 'tree' ? 30 : 25
@@ -269,6 +278,9 @@ export default function IndicatorAttachmentPage() {
       const ruleEl = target.closest('[data-rule-id]')
       if (ruleEl) hoveredId = ruleEl.getAttribute('data-rule-id')
 
+      const connTargetEl = target.closest('[data-connection-target]')
+      if (connTargetEl) hoveredId = MINDMAP_DROP_ZONE_ID
+
       if (hoveredId) {
         setHoverTarget(hoveredId)
       } else {
@@ -455,7 +467,7 @@ export default function IndicatorAttachmentPage() {
             data-focus-zone="tree"
             className="flex h-full flex-col rounded-lg border border-dark-border bg-dark-card-l1"
           >
-            <IndicatorTreePanel ref={treePanelRef} onViewModeChange={setViewMode} />
+            <IndicatorTreePanel ref={treePanelRef} onViewModeChange={setViewMode} isConnectionMode={state.isConnecting} />
           </div>
         </Panel>
 

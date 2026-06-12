@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { renderHook, act, fireEvent } from '@testing-library/react'
 import { __resetAttachmentStorageCache } from '@/utils/attachmentStorage'
 import { useAttachmentStore } from '@/stores/attachmentStore'
-import { useConnectionMode } from './useConnectionMode'
+import { useConnectionMode, MINDMAP_DROP_ZONE_ID } from './useConnectionMode'
 
 describe('useConnectionMode', () => {
   beforeEach(() => {
@@ -876,6 +876,110 @@ describe('useConnectionMode', () => {
       expect(eventSpy).not.toHaveBeenCalled()
 
       window.removeEventListener('connection-confirmed', eventSpy)
+    })
+  })
+
+  describe('mind map connection', () => {
+    beforeEach(() => {
+      localStorage.clear()
+      __resetAttachmentStorageCache()
+      useAttachmentStore.setState(useAttachmentStore.getInitialState())
+    })
+
+    const mindMapOpts = {
+      isActive: true,
+      defaultGroupId: 'mindmap-default-group-财务部',
+    }
+
+    it('adds mind map drop zone to valid targets when mind map is active', () => {
+      useAttachmentStore.setState({
+        indicators: [
+          { id: 'ind-real', name: '真实指标', indicatorType: '原子指标', tagIds: [], ruleIds: [], treeParentId: undefined } as any,
+          { id: 'ind-group', name: '分组', indicatorType: '虚拟分组', tagIds: [], ruleIds: [], treeParentId: undefined } as any,
+        ],
+      })
+
+      const { result } = renderHook(() => useConnectionMode(mindMapOpts))
+
+      act(() => { result.current.start('ind-real') })
+
+      expect(result.current.state.validTargetIds.has(MINDMAP_DROP_ZONE_ID)).toBe(true)
+    })
+
+    it('adds default group id to valid targets for mind map confirm', () => {
+      useAttachmentStore.setState({
+        indicators: [
+          { id: 'ind-real', name: '真实指标', indicatorType: '原子指标', tagIds: [], ruleIds: [], treeParentId: undefined } as any,
+        ],
+      })
+
+      const { result } = renderHook(() => useConnectionMode(mindMapOpts))
+
+      act(() => { result.current.start('ind-real') })
+
+      expect(result.current.state.validTargetIds.has('mindmap-default-group-财务部')).toBe(true)
+    })
+
+    it('confirm with mind map target sets treeParentId to default group', () => {
+      useAttachmentStore.setState({
+        indicators: [
+          { id: 'ind-real', name: '真实指标', indicatorType: '原子指标', tagIds: [], ruleIds: [], treeParentId: undefined } as any,
+        ],
+      })
+
+      const { result } = renderHook(() => useConnectionMode(mindMapOpts))
+
+      act(() => {
+        result.current.start('ind-real')
+        result.current.setHoverTarget(MINDMAP_DROP_ZONE_ID)
+      })
+
+      act(() => { result.current.confirm() })
+
+      const updated = useAttachmentStore.getState().indicators.find((i) => i.id === 'ind-real') as any
+      expect(updated.treeParentId).toBe('mindmap-default-group-财务部')
+    })
+
+    it('dispatches connection-confirmed with targetType mindmap', () => {
+      useAttachmentStore.setState({
+        indicators: [
+          { id: 'ind-real', name: '真实指标', indicatorType: '原子指标', tagIds: [], ruleIds: [], treeParentId: undefined } as any,
+        ],
+      })
+
+      const eventSpy = vi.fn()
+      window.addEventListener('connection-confirmed', eventSpy)
+
+      const { result } = renderHook(() => useConnectionMode(mindMapOpts))
+
+      act(() => {
+        result.current.start('ind-real')
+        result.current.setHoverTarget(MINDMAP_DROP_ZONE_ID)
+      })
+
+      act(() => { result.current.confirm() })
+
+      expect(eventSpy).toHaveBeenCalled()
+      const detail = (eventSpy.mock.calls[0][0] as CustomEvent).detail
+      expect(detail.targetType).toBe('mindmap')
+      expect(detail.targetId).toBe('mindmap-default-group-财务部')
+
+      window.removeEventListener('connection-confirmed', eventSpy)
+    })
+
+    it('without mind map options, drop zone is not in valid targets', () => {
+      useAttachmentStore.setState({
+        indicators: [
+          { id: 'ind-real', name: '真实指标', indicatorType: '原子指标', tagIds: [], ruleIds: [], treeParentId: undefined } as any,
+          { id: 'ind-group', name: '分组', indicatorType: '虚拟分组', tagIds: [], ruleIds: [], treeParentId: undefined } as any,
+        ],
+      })
+
+      const { result } = renderHook(() => useConnectionMode())
+
+      act(() => { result.current.start('ind-real') })
+
+      expect(result.current.state.validTargetIds.has(MINDMAP_DROP_ZONE_ID)).toBe(false)
     })
   })
 })

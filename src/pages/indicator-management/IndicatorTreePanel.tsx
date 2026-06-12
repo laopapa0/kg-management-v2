@@ -51,6 +51,7 @@ export interface IndicatorTreePanelRef {
 
 interface IndicatorTreePanelProps {
   onViewModeChange?: (mode: 'tree' | 'mindmap') => void
+  isConnectionMode?: boolean
 }
 
 interface RenderTreeNode extends TreeNode {
@@ -59,7 +60,7 @@ interface RenderTreeNode extends TreeNode {
 }
 
 const IndicatorTreePanel = forwardRef<IndicatorTreePanelRef, IndicatorTreePanelProps>(
-  function IndicatorTreePanel({ onViewModeChange }, ref) {
+  function IndicatorTreePanel({ onViewModeChange, isConnectionMode = false }, ref) {
   const indicators = useAttachmentStore((state) => state.indicators)
   const addIndicator = useAttachmentStore((state) => state.addIndicator)
   const renameIndicator = useAttachmentStore((state) => state.renameIndicator)
@@ -440,6 +441,7 @@ const IndicatorTreePanel = forwardRef<IndicatorTreePanelRef, IndicatorTreePanelP
                     defaultGroupName={currentDepartmentName}
                     onInit={handleMindMapInit}
                     onOperation={handleMindMapOperation}
+                    isConnectionMode={isConnectionMode}
                   />
                 </div>
               )}

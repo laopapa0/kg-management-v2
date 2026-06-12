@@ -1,6 +1,8 @@
 import { useState, useCallback, useEffect, useRef } from 'react'
 import { useAttachmentStore } from '@/stores/attachmentStore'
 
+export const MINDMAP_DROP_ZONE_ID = '__mindmap_drop_zone__'
+
 export interface ConnectionState {
   isConnecting: boolean
   sourceId: string | null
@@ -10,7 +12,12 @@ export interface ConnectionState {
   misfireCount: number
 }
 
-export function useConnectionMode() {
+export interface MindMapOpts {
+  isActive: boolean
+  defaultGroupId: string
+}
+
+export function useConnectionMode(mindMapOpts?: MindMapOpts) {
   const indicators = useAttachmentStore((state) => state.indicators)
 
   const [state, setState] = useState<ConnectionState>({
@@ -48,16 +55,22 @@ export function useConnectionMode() {
       const source = indicators.find((i) => i.id === sourceId)
       if (!source || source.indicatorType === '虚拟分组') return
 
+      const validTargets = computeValidTreeTargets(sourceId)
+      if (mindMapOpts?.isActive) {
+        validTargets.add(MINDMAP_DROP_ZONE_ID)
+        validTargets.add(mindMapOpts.defaultGroupId)
+      }
+
       setState({
         isConnecting: true,
         sourceId,
-        validTargetIds: computeValidTreeTargets(sourceId),
+        validTargetIds: validTargets,
         hoverTargetId: null,
         isContinuous: isContinuousRef.current,
         misfireCount: 0,
       })
     },
-    [computeValidTreeTargets, indicators],
+    [computeValidTreeTargets, indicators, mindMapOpts],
   )
 
   const cancel = useCallback(() => {
@@ -81,10 +94,13 @@ export function useConnectionMode() {
   }, [state.sourceId])
 
   const confirm = useCallback((): boolean => {
+    const isMindMapTarget = mindMapOpts?.isActive && state.hoverTargetId === MINDMAP_DROP_ZONE_ID
+
     const isValid =
-      state.hoverTargetId !== null &&
+      (isMindMapTarget) ||
+      (state.hoverTargetId !== null &&
       state.validTargetIds.has(state.hoverTargetId) &&
-      indicators.find((i) => i.id === state.hoverTargetId)?.indicatorType === '虚拟分组'
+      indicators.find((i) => i.id === state.hoverTargetId)?.indicatorType === '虚拟分组')
 
     if (!isValid) {
       setState((prev) => ({ ...prev, misfireCount: prev.misfireCount + 1 }))
@@ -92,9 +108,12 @@ export function useConnectionMode() {
     }
 
     const store = useAttachmentStore.getState()
+    const targetId = isMindMapTarget ? mindMapOpts!.defaultGroupId : state.hoverTargetId
+    const targetType: 'tree' | 'rule' | 'tag' | 'mindmap' = isMindMapTarget ? 'mindmap' : 'tree'
+
     const nextIndicators = indicators.map((i) => {
       if (i.id !== state.sourceId) return i
-      return { ...i, treeParentId: state.hoverTargetId! }
+      return { ...i, treeParentId: targetId! }
     })
     store.setIndicators(nextIndicators)
 
@@ -102,8 +121,8 @@ export function useConnectionMode() {
       new CustomEvent('connection-confirmed', {
         detail: {
           sourceId: state.sourceId,
-          targetId: state.hoverTargetId,
-          targetType: 'tree',
+          targetId: targetId,
+          targetType,
         },
       }),
     )
