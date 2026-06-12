@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import KnowledgeAuditList, { filterDocuments } from './KnowledgeAuditList';
 
@@ -108,6 +108,12 @@ function renderList() {
 describe('KnowledgeAuditList', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-06-06T12:00:00.000Z'));
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   it('renders document names in the table', () => {
@@ -226,6 +232,14 @@ describe('KnowledgeAuditList', () => {
 });
 
 describe('filterDocuments', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-06-06T12:00:00.000Z'));
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
   const docs = [
     { id: 'd1', targetKnowledgeBaseId: 'default', status: 'pending' as const, uploadTime: '2026-06-04T10:00:00.000Z' },
     { id: 'd2', targetKnowledgeBaseId: 'kb-1', status: 'approved' as const, uploadTime: '2026-04-17T08:00:00.000Z' },

@@ -11,19 +11,24 @@
 
 对 GitHub Issues 的读写操作按以下优先级选择工具：
 
-1. **首选：`scripts/github_issues_api.py`**  
-   使用 REST API 执行 create / update / list / comment / search。  
-   自动从 `git remote` 推断 owner/repo，从 `GITHUB_TOKEN` 环境变量获取认证（不硬编码）。  
+1. **首选：GitHub MCP 工具**（`github_create_issue`、`github_update_issue`、`github_list_issues`、`github_get_issue`、`github_search_issues`、`github_add_issue_comment`）  
+   前提：opencode 已配置 `github` MCP server 且 `enabled: true`。  
+   MCP 工具直接与 GitHub API 通信，无需中间脚本，速度更快且无编码风险。
+   - `github_create_issue` (owner, repo, title, body, labels) — 创建 issue  
+   - `github_update_issue` (owner, repo, issue_number, state, labels, ...) — 更新 issue  
+   - `github_list_issues` (owner, repo, state, labels, sort, direction) — 列出 issues  
+   - `github_get_issue` (owner, repo, issue_number) — 获取单个 issue  
+   - `github_search_issues` (q) — 搜索 issues  
+   - `github_add_issue_comment` (owner, repo, issue_number, body) — 添加评论  
+
+2. **降级：`scripts/github_issues_api.py`（Python REST API）**  
+   当 MCP 不可用（GitHub MCP server 未配置/disabled/连接失败）时，回退到 Python 脚本。
+   自动从 `git remote` 推断 owner/repo，从 `GITHUB_TOKEN` 或 `GITHUB_PERSONAL_ACCESS_TOKEN` 环境变量获取认证（不硬编码）。  
    - `python scripts/github_issues_api.py list` — 列出 open issues  
    - `python scripts/github_issues_api.py get <N>` — 获取单个 issue  
    - `python scripts/github_issues_api.py create "<title>" "<body>" "label1,label2"`  
    - `python scripts/github_issues_api.py update <N> "<title>" "<body>"`  
-   - `python scripts/github_issues_api.py comment <N> "<body>"`  
-
-2. **备选：GitHub MCP 工具** (`github_create_issue`、`github_update_issue` 等)  
-   当 `.py` 脚本不可用或返回失败时使用。
-
-3. **手动 fallback**：`curl` 或 `Invoke-RestMethod` 直接调用 `https://api.github.com/repos/` 端点，Header 传入 `Authorization: Bearer $env:GITHUB_TOKEN`。
+   - `python scripts/github_issues_api.py comment <N> "<body>"`
 
 ### 认证
 

@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
-GitHub Issues REST API — 可复用模块。
+GitHub Issues REST API — 降级方案（可复用模块）。
 
+首选方案是使用 GitHub MCP 工具（github_create_issue 等），更快且更安全。
 当 GitHub MCP server 不可用时，用此模块通过 REST API 操作 GitHub Issues。
 所有请求自动处理 UTF-8 编码，避免中文乱码。
 
