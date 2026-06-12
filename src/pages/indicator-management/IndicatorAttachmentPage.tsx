@@ -455,12 +455,6 @@ export default function IndicatorAttachmentPage() {
             data-focus-zone="tree"
             className="flex h-full flex-col rounded-lg border border-dark-border bg-dark-card-l1"
           >
-            <PanelHeader
-              title="指标树"
-              onAdd={() => {
-                treePanelRef.current?.openAddDialog()
-              }}
-            />
             <IndicatorTreePanel ref={treePanelRef} onViewModeChange={setViewMode} />
           </div>
         </Panel>

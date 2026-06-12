@@ -32,6 +32,7 @@ export interface MindMapWrapperProps {
   onOperation?: (op: Operation) => void;
   onNodeSelect?: (nodeId: string) => void;
   isConnectionMode?: boolean;
+  onInit?: (instance: MindElixirInstance) => void;
 }
 
 export default function MindMapWrapper({
@@ -44,6 +45,7 @@ export default function MindMapWrapper({
   onOperation,
   onNodeSelect,
   isConnectionMode = false,
+  onInit,
 }: MindMapWrapperProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mindRef = useRef<MindElixirInstance | null>(null);
@@ -69,6 +71,7 @@ export default function MindMapWrapper({
 
     const nodeData = indicatorsToMindElixirData(data, defaultGroupName);
     mind.init({ nodeData });
+    onInit?.(mind);
 
     const handleOperation = (op: Operation) => onOperation?.(op);
     const handleSelectNewNode = (nodeObj: NodeObj) => onNodeSelect?.(nodeObj.id);

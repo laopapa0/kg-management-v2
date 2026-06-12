@@ -124,6 +124,16 @@ describe('MindMapWrapper', () => {
     expect(options.theme.palette[0]).toBe('var(--dark-accent-primary)');
   });
 
+  it('calls onInit with the Mind Elixir instance after initialization', () => {
+    const onInit = vi.fn();
+    render(<MindMapWrapper data={[]} defaultGroupName="默认分组" onInit={onInit} />);
+
+    expect(onInit).toHaveBeenCalledTimes(1);
+    const instance = onInit.mock.calls[0][0] as { init: unknown; refresh: unknown };
+    expect(instance.init).toBe(mockInit);
+    expect(instance.refresh).toBe(mockRefresh);
+  });
+
   it('renders the default group root when data is empty', () => {
     render(<MindMapWrapper data={[]} defaultGroupName="财务部指标树" />);
 

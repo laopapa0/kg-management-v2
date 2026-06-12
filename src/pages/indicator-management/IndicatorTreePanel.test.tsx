@@ -13,12 +13,38 @@ vi.mock('sonner', () => ({
   toast: (...args: unknown[]) => mockToast(...args),
 }))
 
+const { mockMindMapInstance, mockOnInit } = vi.hoisted(() => ({
+  mockMindMapInstance: {
+    refresh: vi.fn(),
+    destroy: vi.fn(),
+    bus: { addListener: vi.fn(), removeListener: vi.fn(), fire: vi.fn() },
+  },
+  mockOnInit: vi.fn(),
+}))
+
+vi.mock('@/components/mindmap/MindMapWrapper', async () => {
+  const React = await import('react')
+  return {
+    __esModule: true,
+    default: function MindMapWrapperMock(props: { onInit?: (instance: typeof mockMindMapInstance) => void }) {
+      React.useEffect(() => {
+        props.onInit?.(mockMindMapInstance)
+        mockOnInit()
+      }, [])
+      return React.createElement('div', { 'data-testid': 'mind-map-wrapper' }, 'MindMap')
+    },
+  }
+})
+
 describe('IndicatorTreePanel', () => {
   beforeEach(() => {
     localStorage.clear()
     __resetAttachmentStorageCache()
     useAttachmentStore.setState(useAttachmentStore.getInitialState())
     mockToast.mockClear()
+    mockMindMapInstance.refresh.mockClear()
+    mockMindMapInstance.destroy.mockClear()
+    mockOnInit.mockClear()
   })
 
   it('renders tree view with indicator names', () => {
@@ -733,6 +759,96 @@ describe('IndicatorTreePanel', () => {
       expect(cRow).toHaveAttribute('aria-selected', 'true')
 
       vi.useRealTimers()
+    })
+  })
+
+  describe('view mode toggle', () => {
+    it('renders tree view by default with toggle buttons', () => {
+      initializeAttachmentStore()
+      render(<IndicatorTreePanel />)
+
+      expect(screen.getByTestId('tree-view')).toBeVisible()
+      expect(screen.queryByTestId('mind-map-wrapper')).not.toBeInTheDocument()
+      expect(screen.getByTestId('tree-view-toggle-tree')).toHaveAttribute('data-state', 'active')
+      expect(screen.getByTestId('tree-view-toggle-mindmap')).not.toHaveAttribute('data-state', 'active')
+    })
+
+    it('switches to mindmap view and initializes MindMapWrapper', async () => {
+      initializeAttachmentStore()
+      const user = userEvent.setup()
+      render(<IndicatorTreePanel />)
+
+      await user.click(screen.getByTestId('tree-view-toggle-mindmap'))
+
+      expect(screen.getByTestId('tree-view-wrapper')).toHaveClass('hidden')
+      expect(screen.getByTestId('mind-map-container')).not.toHaveClass('hidden')
+      expect(screen.getByTestId('mind-map-container')).toHaveClass('flex')
+      expect(screen.getByTestId('tree-view-toggle-mindmap')).toHaveAttribute('data-state', 'active')
+      expect(mockOnInit).toHaveBeenCalledTimes(1)
+      expect(mockMindMapInstance.refresh).toHaveBeenCalledTimes(1)
+    })
+
+    it('keeps MindMapWrapper mounted but hidden when switching back to tree', async () => {
+      initializeAttachmentStore()
+      const user = userEvent.setup()
+      render(<IndicatorTreePanel />)
+
+      await user.click(screen.getByTestId('tree-view-toggle-mindmap'))
+      await user.click(screen.getByTestId('tree-view-toggle-tree'))
+
+      expect(screen.getByTestId('mind-map-wrapper')).toBeInTheDocument()
+      expect(screen.getByTestId('mind-map-container')).toHaveClass('hidden')
+      expect(screen.getByTestId('tree-view-wrapper')).not.toHaveClass('hidden')
+    })
+
+    it('does not reinitialize MindMapWrapper when toggling multiple times', async () => {
+      initializeAttachmentStore()
+      const user = userEvent.setup()
+      render(<IndicatorTreePanel />)
+
+      await user.click(screen.getByTestId('tree-view-toggle-mindmap'))
+      await user.click(screen.getByTestId('tree-view-toggle-tree'))
+      await user.click(screen.getByTestId('tree-view-toggle-mindmap'))
+      await user.click(screen.getByTestId('tree-view-toggle-tree'))
+
+      expect(mockOnInit).toHaveBeenCalledTimes(1)
+    })
+
+    it('refreshes mind map with latest data when returning to mindmap', async () => {
+      initializeAttachmentStore()
+      const user = userEvent.setup()
+      const state = useAttachmentStore.getState()
+      render(<IndicatorTreePanel />)
+
+      await user.click(screen.getByTestId('tree-view-toggle-mindmap'))
+      expect(mockMindMapInstance.refresh).toHaveBeenCalledTimes(1)
+
+      mockMindMapInstance.refresh.mockClear()
+      await user.click(screen.getByTestId('tree-view-toggle-tree'))
+      // add a new node while in tree mode
+      const parent = state.indicators[0]
+      act(() => {
+        state.setIndicators([
+          ...state.indicators,
+          createMinimalIndicatorAttachment('脑图新节点', { parentId: parent.id }),
+        ])
+      })
+
+      await user.click(screen.getByTestId('tree-view-toggle-mindmap'))
+      expect(mockMindMapInstance.refresh).toHaveBeenCalledTimes(1)
+    })
+
+    it('notifies parent via onViewModeChange when toggled', async () => {
+      initializeAttachmentStore()
+      const user = userEvent.setup()
+      const onViewModeChange = vi.fn()
+      render(<IndicatorTreePanel onViewModeChange={onViewModeChange} />)
+
+      await user.click(screen.getByTestId('tree-view-toggle-mindmap'))
+      expect(onViewModeChange).toHaveBeenCalledWith('mindmap')
+
+      await user.click(screen.getByTestId('tree-view-toggle-tree'))
+      expect(onViewModeChange).toHaveBeenCalledWith('tree')
     })
   })
 })

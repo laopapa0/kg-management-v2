@@ -1,10 +1,12 @@
 import { forwardRef, useImperativeHandle, useMemo, useRef, useState, useEffect } from 'react'
+import type { MindElixirInstance } from 'mind-elixir'
 import { motion } from 'framer-motion'
 import { TreePine } from 'lucide-react'
 import { toast } from 'sonner'
 import TreeView, { type TreeNode } from '@/components/tree/TreeView'
 import TreeNodeInlineEdit from '@/components/tree/TreeNodeInlineEdit'
 import EmptyState from '@/components/empty-state/EmptyState'
+import PanelHeader from '@/components/panel/PanelHeader'
 import AddTreeNodeDialog from '@/components/dialog/AddTreeNodeDialog'
 import DeleteTreeNodeWarningDialog from '@/components/dialog/DeleteTreeNodeWarningDialog'
 import DeleteTreeNodeSpecialDialog from '@/components/dialog/DeleteTreeNodeSpecialDialog'
@@ -12,6 +14,9 @@ import AttachedBadge from '@/components/connection/AttachedBadge'
 import { useAttachmentStore } from '@/stores/attachmentStore'
 import type { IndicatorAttachment } from '@/models/indicatorAttachmentModel'
 import { buildIndicatorTree, type IndicatorTreeNode } from '@/utils/attachmentTree'
+import { indicatorsToMindElixirData } from '@/utils/mindMapAdapter'
+import MindMapWrapper from '@/components/mindmap/MindMapWrapper'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 /** 递归检查某个节点下是否有已挂靠（有 tagIds/ruleIds）的真实指标 */
 function hasAttachedDescendantIndicators(indicators: IndicatorAttachment[], parentId: string): boolean {
@@ -76,7 +81,33 @@ const IndicatorTreePanel = forwardRef<IndicatorTreePanelRef, IndicatorTreePanelP
   const [deletingNodeId, setDeletingNodeId] = useState<string | null>(null)
   const [highlightedId, setHighlightedId] = useState<string | null>(null)
   const [expanded, setExpanded] = useState<Set<string>>(() => new Set(initialExpandedIds))
+  const [viewMode, setViewMode] = useState<'tree' | 'mindmap'>('tree')
+  const [hasEverBeenMindMap, setHasEverBeenMindMap] = useState(false)
+  const mindMapInstanceRef = useRef<MindElixirInstance | null>(null)
   const highlightTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const currentDepartmentName = useAttachmentStore(
+    (state) => state.departments.find((d) => d.id === state.currentDepartmentId)?.name ?? '默认分组',
+  )
+
+  const handleViewModeChange = (mode: 'tree' | 'mindmap') => {
+    setViewMode(mode)
+    if (mode === 'mindmap') {
+      setHasEverBeenMindMap(true)
+    }
+    onViewModeChange?.(mode)
+  }
+
+  const handleMindMapInit = (instance: MindElixirInstance) => {
+    mindMapInstanceRef.current = instance
+  }
+
+  useEffect(() => {
+    if (viewMode === 'mindmap' && mindMapInstanceRef.current) {
+      const nodeData = indicatorsToMindElixirData(indicators, currentDepartmentName)
+      mindMapInstanceRef.current.refresh({ nodeData })
+    }
+  }, [viewMode, indicators, currentDepartmentName])
 
   useEffect(() => {
     return () => {
@@ -265,99 +296,132 @@ const IndicatorTreePanel = forwardRef<IndicatorTreePanelRef, IndicatorTreePanelP
     }
   }
 
-  if (tree.length === 0) {
-    return (
-      <div className="flex-1 overflow-y-auto px-2 pb-2" data-testid="indicator-tree-panel">
-        <EmptyState
-          icon={<TreePine className="size-6" />}
-          title="暂无指标树节点"
-          description="当前部门下还没有构建指标树"
-        />
-      </div>
-    )
-  }
+  const toggleTabs = (
+    <Tabs value={viewMode} onValueChange={(v) => handleViewModeChange(v as 'tree' | 'mindmap')}>
+      <TabsList className="h-7 bg-dark-elevated border border-dark-border" data-testid="tree-view-toggle">
+        <TabsTrigger
+          value="tree"
+          data-testid="tree-view-toggle-tree"
+          className="text-xs data-[state=active]:text-dark-accent-primary data-[state=active]:border-b-2 data-[state=active]:border-dark-accent-primary"
+        >
+          列表
+        </TabsTrigger>
+        <TabsTrigger
+          value="mindmap"
+          data-testid="tree-view-toggle-mindmap"
+          className="text-xs data-[state=active]:text-dark-accent-primary data-[state=active]:border-b-2 data-[state=active]:border-dark-accent-primary"
+        >
+          脑图
+        </TabsTrigger>
+      </TabsList>
+    </Tabs>
+  )
 
   return (
     <>
-      <div className="flex-1 overflow-y-auto px-2 pb-2" data-testid="indicator-tree-panel">
-        <TreeView
-          nodes={tree as RenderTreeNode[]}
-          expanded={expanded}
-          onExpandedChange={setExpanded}
-          selectedId={selectedId}
-          onSelect={setSelectedId}
-          onEditNode={setEditingId}
-          canEditNode={(node) => node.indicator.indicatorType === '虚拟分组'}
-          onDeleteNode={handleDeleteNode}
-          onDragNode={handleDragNode}
-          renderNode={(node, { isSelected, isHovered }) => {
-            const isEditing = editingId === node.id
-            const isHighlighted = highlightedId === node.id
-            const attachedList = attachedIndicatorsByTreeNode.get(node.id) ?? []
-            const attachedCount = attachedList.length
+      <div className="flex flex-col flex-1 overflow-hidden" data-testid="indicator-tree-panel">
+        <PanelHeader title="指标树" onAdd={() => setDialogOpen(true)} extra={toggleTabs} />
+        <div className={viewMode === 'mindmap' ? 'flex-1 overflow-hidden min-h-0' : 'flex-1 overflow-y-auto px-2 pb-2 min-h-0'}>
+          {tree.length === 0 ? (
+            <EmptyState
+              icon={<TreePine className="size-6" />}
+              title="暂无指标树节点"
+              description="当前部门下还没有构建指标树"
+            />
+          ) : (
+            <>
+              <div className={viewMode === 'tree' ? 'flex h-full flex-col' : 'hidden'} data-testid="tree-view-wrapper">
+                <TreeView
+                  nodes={tree as RenderTreeNode[]}
+                  expanded={expanded}
+                  onExpandedChange={setExpanded}
+                  selectedId={selectedId}
+                  onSelect={setSelectedId}
+                  onEditNode={setEditingId}
+                  canEditNode={(node) => node.indicator.indicatorType === '虚拟分组'}
+                  onDeleteNode={handleDeleteNode}
+                  onDragNode={handleDragNode}
+                  renderNode={(node, { isSelected, isHovered }) => {
+                    const isEditing = editingId === node.id
+                    const isHighlighted = highlightedId === node.id
+                    const attachedList = attachedIndicatorsByTreeNode.get(node.id) ?? []
+                    const attachedCount = attachedList.length
 
-            return (
-                <motion.div
-                  data-testid={`indicator-tree-node-content-${node.id}`}
-                  className="flex flex-col justify-center"
-                  animate={isHighlighted ? { backgroundColor: ['rgba(219, 234, 254, 0)', 'rgba(219, 234, 254, 1)', 'rgba(219, 234, 254, 0)'] } : {}}
-                  transition={{ duration: 0.5, ease: 'easeOut' }}
-                >
-                  {isEditing ? (
-                    <TreeNodeInlineEdit
-                      initialName={node.indicator.name}
-                      existingNames={existingNames}
-                      onSave={(name) => handleEditSave(node.id, name)}
-                      onCancel={handleEditCancel}
-                    />
-                  ) : (
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="flex flex-col justify-center min-w-0">
-                        <span
-                          className={[
-                            'text-body leading-tight truncate',
-                            isSelected ? 'font-medium text-dark-text-primary' : 'text-dark-text-primary',
-                            isHovered && !isSelected ? 'text-dark-text-primary' : '',
-                          ].join(' ')}
+                    return (
+                        <motion.div
+                          data-testid={`indicator-tree-node-content-${node.id}`}
+                          className="flex flex-col justify-center"
+                          animate={isHighlighted ? { backgroundColor: ['rgba(219, 234, 254, 0)', 'rgba(219, 234, 254, 1)', 'rgba(219, 234, 254, 0)'] } : {}}
+                          transition={{ duration: 0.5, ease: 'easeOut' }}
                         >
-                          {node.indicator.name}
-                        </span>
-                        <span
-                          className={[
-                            'text-caption font-mono leading-tight',
-                            isSelected ? 'text-dark-text-secondary' : 'text-dark-text-tertiary',
-                          ].join(' ')}
-                        >
-                          {node.indicator.code}
-                        </span>
-                      </div>
-                      {isHovered && attachedCount > 0 ? (
-                        <AttachedBadge
-                          count={attachedCount}
-                          indicators={attachedList}
-                          onDeleteOne={(indicatorId) => {
-                            setIndicators(
-                              indicators.map((i) =>
-                                i.id === indicatorId ? { ...i, treeParentId: undefined } : i,
-                              ),
-                            )
-                          }}
-                          onDeleteAll={() => {
-                            setIndicators(
-                              indicators.map((i) =>
-                                i.treeParentId === node.id ? { ...i, treeParentId: undefined } : i,
-                              ),
-                            )
-                          }}
-                        />
-                      ) : null}
-                    </div>
-                  )}
-                </motion.div>
-            )
-          }}
-          initialExpanded={initialExpandedIds}
-        />
+                          {isEditing ? (
+                            <TreeNodeInlineEdit
+                              initialName={node.indicator.name}
+                              existingNames={existingNames}
+                              onSave={(name) => handleEditSave(node.id, name)}
+                              onCancel={handleEditCancel}
+                            />
+                          ) : (
+                            <div className="flex items-center justify-between gap-2">
+                              <div className="flex flex-col justify-center min-w-0">
+                                <span
+                                  className={[
+                                    'text-body leading-tight truncate',
+                                    isSelected ? 'font-medium text-dark-text-primary' : 'text-dark-text-primary',
+                                    isHovered && !isSelected ? 'text-dark-text-primary' : '',
+                                  ].join(' ')}
+                                >
+                                  {node.indicator.name}
+                                </span>
+                                <span
+                                  className={[
+                                    'text-caption font-mono leading-tight',
+                                    isSelected ? 'text-dark-text-secondary' : 'text-dark-text-tertiary',
+                                  ].join(' ')}
+                                >
+                                  {node.indicator.code}
+                                </span>
+                              </div>
+                              {isHovered && attachedCount > 0 ? (
+                                <AttachedBadge
+                                  count={attachedCount}
+                                  indicators={attachedList}
+                                  onDeleteOne={(indicatorId) => {
+                                    setIndicators(
+                                      indicators.map((i) =>
+                                        i.id === indicatorId ? { ...i, treeParentId: undefined } : i,
+                                      ),
+                                    )
+                                  }}
+                                  onDeleteAll={() => {
+                                    setIndicators(
+                                      indicators.map((i) =>
+                                        i.treeParentId === node.id ? { ...i, treeParentId: undefined } : i,
+                                      ),
+                                    )
+                                  }}
+                                />
+                              ) : null}
+                            </div>
+                          )}
+                        </motion.div>
+                    )
+                  }}
+                  initialExpanded={initialExpandedIds}
+                />
+              </div>
+              {hasEverBeenMindMap && (
+                <div className={viewMode === 'mindmap' ? 'flex h-full' : 'hidden'} data-testid="mind-map-container">
+                  <MindMapWrapper
+                    data={indicators}
+                    defaultGroupName={currentDepartmentName}
+                    onInit={handleMindMapInit}
+                  />
+                </div>
+              )}
+            </>
+          )}
+        </div>
       </div>
 
       <AddTreeNodeDialog
