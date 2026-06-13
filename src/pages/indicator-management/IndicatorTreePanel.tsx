@@ -68,14 +68,30 @@ const IndicatorTreePanel = forwardRef<IndicatorTreePanelRef, IndicatorTreePanelP
   const deleteIndicatorTree = useAttachmentStore((state) => state.deleteIndicatorTree)
   const setIndicators = useAttachmentStore((state) => state.setIndicators)
   const undo = useAttachmentStore((state) => state.undo)
+
+  // 候选池指标（treeParentId=undefined）视觉上映射到"默认" L1 节点
+  const pendingNodeId = useMemo(() => {
+    const dept = indicators[0]?.department ?? '默认'
+    return `ui-pending-${dept}`
+  }, [indicators])
+
+  const mappedIndicators = useMemo(() => {
+    const hasPending = indicators.some((i) => !i.treeParentId && i.indicatorType !== '虚拟分组')
+    if (!hasPending) return indicators
+    return indicators.map((i) => {
+      if (!i.treeParentId && i.indicatorType !== '虚拟分组') {
+        return { ...i, treeParentId: pendingNodeId }
+      }
+      return i
+    })
+  }, [indicators, pendingNodeId])
+
   const tree = useMemo(() => {
-    // 候选池指标（treeParentId=undefined）视觉上映射到"默认" L1 节点
     const pendingIndicators = indicators.filter(
       (i) => !i.treeParentId && i.indicatorType !== '虚拟分组',
     )
     if (pendingIndicators.length === 0) return buildIndicatorTree(indicators)
 
-    const pendingNodeId = `ui-pending-${indicators[0]?.department ?? '默认'}`
     const pendingNode: IndicatorAttachment = {
       id: pendingNodeId,
       name: '默认',
@@ -484,7 +500,7 @@ const IndicatorTreePanel = forwardRef<IndicatorTreePanelRef, IndicatorTreePanelP
               {hasEverBeenMindMap && (
                 <div className={viewMode === 'mindmap' ? 'flex h-full' : 'hidden'} data-testid="mind-map-container">
                   <MindMapWrapper
-                    data={indicators}
+                    data={mappedIndicators}
                     defaultGroupName={currentDepartmentName}
                     onInit={handleMindMapInit}
                     onOperation={handleMindMapOperation}
