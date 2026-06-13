@@ -2136,6 +2136,18 @@ export function generateMockIndicators(departmentId: string): IndicatorAttachmen
       break
     }
     case 'dept-财务部': {
+      // ── L1: 默认 ──
+      const pendingNodeId = `${departmentId}-pending`
+      result.push({
+        id: pendingNodeId, name: '默认', code: `GROUP-${pendingNodeId}`,
+        indicatorCode: '', indicatorDisplayName: '默认',
+        indicatorShowName: '默认', indicatorType: '虚拟分组',
+        level1: '', level2: '', granularity: '', frequency: '', unit: '',
+        isBigScreen: false, department: deptName,
+        businessCaliber: '', techCaliber: '', tags: [],
+        treeParentId: undefined,
+        tagIds: [], ruleIds: [],
+      } as IndicatorAttachment)
       // ── 效能 ──
       result.push({
         id: 'dept-财务部-l1-0', name: '效能', code: 'GROUP-dept-财务部-l1-0',
@@ -2513,7 +2525,7 @@ export function generateMockIndicators(departmentId: string): IndicatorAttachmen
         businessCaliber: '', techCaliber: '', tags: [],
         treeParentId: 'dept-财务部-l2-33', tagIds: [], ruleIds: [],
       } as IndicatorAttachment)
-      // 待挂靠指标（未挂入指标树）
+      // 待挂靠指标（归入"默认"）
       result.push({
         id: 'dept-财务部-ind-new-1', name: '分单位可量化比例', code: 'M_DXT_00002117',
         indicatorCode: 'M_DXT_00002117', indicatorDisplayName: '外包人员可量化评价占比',
@@ -2522,7 +2534,7 @@ export function generateMockIndicators(departmentId: string): IndicatorAttachmen
         granularity: '单位', frequency: '月',
         unit: '%', isBigScreen: false, department: deptName,
         businessCaliber: '', techCaliber: '', tags: [],
-        treeParentId: undefined,
+        treeParentId: pendingNodeId,
         tagIds: [], ruleIds: [],
       } as IndicatorAttachment)
       result.push({
@@ -2533,7 +2545,7 @@ export function generateMockIndicators(departmentId: string): IndicatorAttachmen
         granularity: '区局', frequency: '月',
         unit: '%', isBigScreen: false, department: deptName,
         businessCaliber: '', techCaliber: '', tags: [],
-        treeParentId: undefined,
+        treeParentId: pendingNodeId,
         tagIds: [], ruleIds: [],
       } as IndicatorAttachment)
       result.push({
