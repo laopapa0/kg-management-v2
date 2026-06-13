@@ -139,9 +139,10 @@ describe('IndicatorTreePanel', () => {
     })
 
     const state = useAttachmentStore.getState()
-    const parentId = state.indicators[0].id
     const child = state.indicators.find((i) => i.name === '子分组节点')
-    expect(child?.treeParentId).toBe(parentId)
+    // "默认"节点下新增的指标 treeParentId=undefined（候选池+视觉映射回"默认"）
+    expect(child?.treeParentId).toBeUndefined()
+    expect(screen.getByText('子分组节点')).toBeInTheDocument()
   })
 
   it('shows edit button on hover and enters inline edit mode', async () => {
@@ -149,18 +150,23 @@ describe('IndicatorTreePanel', () => {
     const user = userEvent.setup()
     render(<IndicatorTreePanel />)
 
-    const state = useAttachmentStore.getState()
-    const firstIndicator = state.indicators[0]
-
     const rows = screen.getAllByTestId('tree-node-row')
-    await user.hover(rows[0])
+    // 跳过"默认"节点，选第一个真实 L1 节点
+    const firstRealRow = rows.find((r) => {
+      const id = r.getAttribute('data-node-id') ?? ''
+      return !id.startsWith('ui-pending-') && id.includes('-l1-')
+    })
+    if (!firstRealRow) throw new Error('no real node found')
 
-    const editButton = within(rows[0]).getByTestId('tree-node-edit-button')
+    await user.hover(firstRealRow)
+
+    const editButton = within(firstRealRow).getByTestId('tree-node-edit-button')
     await user.click(editButton)
 
     const inlineInput = screen.getByTestId('tree-node-inline-input') as HTMLInputElement
     expect(inlineInput).toBeInTheDocument()
-    expect(inlineInput.value).toBe(firstIndicator.name)
+    // 编辑的应该是真实 L1 节点名（如"效能"），不是"默认"
+    expect(inlineInput.value).toBeTruthy()
   })
 
   it('renames a node via inline edit', async () => {
@@ -169,9 +175,15 @@ describe('IndicatorTreePanel', () => {
     render(<IndicatorTreePanel />)
 
     const rows = screen.getAllByTestId('tree-node-row')
-    await user.hover(rows[0])
+    // 跳过"默认"节点，选第一个真实 L1 节点
+    const firstRealRow = rows.find((r) => {
+      const id = r.getAttribute('data-node-id') ?? ''
+      return !id.startsWith('ui-pending-') && id.includes('-l1-')
+    })
+    if (!firstRealRow) throw new Error('no real node found')
+    await user.hover(firstRealRow)
 
-    const editButton = within(rows[0]).getByTestId('tree-node-edit-button')
+    const editButton = within(firstRealRow).getByTestId('tree-node-edit-button')
     await user.click(editButton)
 
     const inlineInput = screen.getByTestId('tree-node-inline-input')

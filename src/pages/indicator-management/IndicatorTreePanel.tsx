@@ -68,13 +68,53 @@ const IndicatorTreePanel = forwardRef<IndicatorTreePanelRef, IndicatorTreePanelP
   const deleteIndicatorTree = useAttachmentStore((state) => state.deleteIndicatorTree)
   const setIndicators = useAttachmentStore((state) => state.setIndicators)
   const undo = useAttachmentStore((state) => state.undo)
-  const tree = useMemo(() => buildIndicatorTree(indicators), [indicators])
+  const tree = useMemo(() => {
+    // 候选池指标（treeParentId=undefined）视觉上映射到"默认" L1 节点
+    const pendingIndicators = indicators.filter(
+      (i) => !i.treeParentId && i.indicatorType !== '虚拟分组',
+    )
+    if (pendingIndicators.length === 0) return buildIndicatorTree(indicators)
+
+    const pendingNodeId = `ui-pending-${indicators[0]?.department ?? '默认'}`
+    const pendingNode: IndicatorAttachment = {
+      id: pendingNodeId,
+      name: '默认',
+      code: `GROUP-${pendingNodeId}`,
+      indicatorCode: '',
+      indicatorDisplayName: '默认',
+      indicatorShowName: '默认',
+      indicatorType: '虚拟分组',
+      level1: '', level2: '',
+      granularity: '', frequency: '', unit: '',
+      isBigScreen: false,
+      department: pendingIndicators[0]?.department ?? '',
+      businessCaliber: '', techCaliber: '',
+      tags: [],
+      treeParentId: undefined,
+      tagIds: [], ruleIds: [],
+    } as IndicatorAttachment
+
+    const mapped = indicators.map((i) => {
+      if (!i.treeParentId && i.indicatorType !== '虚拟分组') {
+        return { ...i, treeParentId: pendingNodeId }
+      }
+      return i
+    })
+    return buildIndicatorTree([pendingNode, ...mapped])
+  }, [indicators])
   // 初始展开所有虚拟分组节点（L1+L2+"默认"），叶子节点默认折叠
   const initialExpandedIds = useMemo(() => {
-    return indicators
-      .filter((i) => i.indicatorType === '虚拟分组')
-      .map((i) => i.id)
-  }, [indicators])
+    const ids = new Set<string>()
+    for (const node of tree) {
+      if (node.indicator.indicatorType === '虚拟分组') ids.add(node.id)
+      if (node.children) {
+        for (const child of node.children) {
+          if (child.indicator?.indicatorType === '虚拟分组') ids.add(child.id)
+        }
+      }
+    }
+    return [...ids]
+  }, [tree])
 
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -184,7 +224,9 @@ const IndicatorTreePanel = forwardRef<IndicatorTreePanelRef, IndicatorTreePanelP
   }))
 
   const handleAddConfirm = (name: string, parentId?: string) => {
-    const newIndicator = addIndicator(name, parentId)
+    // 在"默认"节点下新增时，treeParentId 设为 undefined（存入候选池+视觉映射回"默认"）
+    const effectiveParentId = parentId?.startsWith('ui-pending-') ? undefined : parentId
+    const newIndicator = addIndicator(name, effectiveParentId)
     if (newIndicator) {
       if (parentId) {
         setExpanded((prev) => new Set([...prev, parentId]))
