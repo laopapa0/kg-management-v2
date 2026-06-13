@@ -69,9 +69,11 @@ const IndicatorTreePanel = forwardRef<IndicatorTreePanelRef, IndicatorTreePanelP
   const setIndicators = useAttachmentStore((state) => state.setIndicators)
   const undo = useAttachmentStore((state) => state.undo)
   const tree = useMemo(() => buildIndicatorTree(indicators), [indicators])
-  // Expand all nodes that have children (L1 + L2) so the full tree is initially visible
+  // 初始只展开 L1 根节点，L2（含"默认"节点）和叶子默认折叠
   const initialExpandedIds = useMemo(() => {
-    return indicators.filter((i) => indicators.some((c) => c.treeParentId === i.id)).map((i) => i.id)
+    return indicators
+      .filter((i) => !i.treeParentId && indicators.some((c) => c.treeParentId === i.id))
+      .map((i) => i.id)
   }, [indicators])
 
   const [selectedId, setSelectedId] = useState<string | null>(null)

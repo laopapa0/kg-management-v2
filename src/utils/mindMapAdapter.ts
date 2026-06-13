@@ -33,13 +33,17 @@ export function isDefaultGroupId(id: string): boolean {
   return id.startsWith(`${DEFAULT_GROUP_ID_PREFIX}-`);
 }
 
-function convertIndicatorTreeNode(node: IndicatorTreeNode): MindElixirNodeData {
+function convertIndicatorTreeNode(node: IndicatorTreeNode, depth: number): MindElixirNodeData {
   return {
     id: node.id,
     topic: node.indicator.name,
-    expanded: true,
-    children: node.children?.map(convertIndicatorTreeNode),
+    expanded: depth < 3,
+    children: node.children?.map((c) => convertIndicatorTreeNode(c, depth + 1)),
   };
+}
+
+function toplevelConvert(node: IndicatorTreeNode): MindElixirNodeData {
+  return convertIndicatorTreeNode(node, 1);
 }
 
 /**
@@ -78,7 +82,7 @@ export function indicatorsToMindElixirData(
       id: defaultGroupId,
       topic: defaultGroupName,
       expanded: true,
-      children: orphanRoots.map(convertIndicatorTreeNode),
+      children: orphanRoots.map(toplevelConvert),
     };
   }
 
@@ -86,7 +90,7 @@ export function indicatorsToMindElixirData(
   // 保证 Mind Elixir 只有一个根节点。
   defaultGroupNode.children = [...(defaultGroupNode.children ?? []), ...orphanRoots];
 
-  return convertIndicatorTreeNode(defaultGroupNode);
+  return convertIndicatorTreeNode(defaultGroupNode, 0);
 }
 
 /**
