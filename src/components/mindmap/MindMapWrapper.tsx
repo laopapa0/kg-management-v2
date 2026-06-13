@@ -19,6 +19,9 @@ function mapDarkThemeToMindElixir(): Record<string, string> {
     '--main-color': 'var(--dark-color)',
     '--main-bgcolor': 'var(--dark-bg)',
     '--bgcolor': 'var(--dark-card-l1)',
+    '--panel-color': 'var(--dark-text-secondary)',
+    '--panel-bgcolor': 'var(--dark-elevated)',
+    '--panel-border-color': 'var(--dark-border)',
   };
 }
 
