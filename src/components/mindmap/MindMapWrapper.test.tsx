@@ -9,6 +9,7 @@ const {
   mockInit,
   mockRefresh,
   mockDestroy,
+  mockToCenter,
   mockAddListener,
   mockRemoveListener,
   constructorCalls,
@@ -16,6 +17,7 @@ const {
   mockInit: vi.fn(),
   mockRefresh: vi.fn(),
   mockDestroy: vi.fn(),
+  mockToCenter: vi.fn(),
   mockAddListener: vi.fn(),
   mockRemoveListener: vi.fn(),
   constructorCalls: [] as unknown[],
@@ -38,6 +40,7 @@ vi.mock('mind-elixir', async (importOriginal) => {
     init = mockInit;
     refresh = mockRefresh;
     destroy = mockDestroy;
+    toCenter = mockToCenter;
     clearHistory = vi.fn();
 
     bus = {
@@ -87,7 +90,7 @@ describe('MindMapWrapper', () => {
       keypress: boolean;
     };
     expect(options.el).toBeInstanceOf(HTMLDivElement);
-    expect(options.direction).toBe(0);
+    expect(options.direction).toBe(2);
     expect(options.toolBar).toBe(true);
     expect(options.editable).toBe(true);
     expect(options.keypress).toBe(false);

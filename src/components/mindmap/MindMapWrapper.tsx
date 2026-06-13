@@ -41,7 +41,7 @@ export interface MindMapWrapperProps {
 export default function MindMapWrapper({
   data,
   defaultGroupName,
-  direction = MindElixir.LEFT,
+  direction = MindElixir.SIDE,
   toolbar = true,
   draggable = true,
   keypress = false,
@@ -77,6 +77,7 @@ export default function MindMapWrapper({
 
     const nodeData = indicatorsToMindElixirData(data, defaultGroupName);
     mind.init({ nodeData });
+    mind.toCenter();
     onInit?.(mind);
 
     const handleOperation = (op: Operation) => onOperationRef.current?.(op);
