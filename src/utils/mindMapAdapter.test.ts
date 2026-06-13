@@ -106,6 +106,39 @@ describe('mindMapAdapter', () => {
       expect(data.children![0].id).toBe('ind-1');
     });
 
+    // 模拟 IndicatorTreePanel.mappedIndicators 的输出：合成"默认"节点 + 挂靠指标
+    it('includes synthetic pending-node with children under default group', () => {
+      const pendingNode = makeIndicator('ui-pending-财务部', '默认');
+      const mapped = [
+        pendingNode,
+        makeIndicator('ind-new-1', '待挂靠指标1', 'ui-pending-财务部'),
+        makeIndicator('ind-new-2', '待挂靠指标2', 'ui-pending-财务部'),
+        makeIndicator('ind-1', '已有指标'),
+      ];
+
+      const data = indicatorsToMindElixirData(mapped, '财务部');
+
+      // 根节点是 mindmap-default-group-财务部
+      expect(data.id).toBe('mindmap-default-group-财务部');
+      expect(data.topic).toBe('财务部');
+      expect(data.expanded).toBe(true);
+
+      // 应有 2 个根级子节点：ui-pending-财务部 和 ind-1
+      expect(data.children).toHaveLength(2);
+
+      const pendingChild = data.children!.find((c) => c.id === 'ui-pending-财务部');
+      expect(pendingChild).toBeDefined();
+      expect(pendingChild!.topic).toBe('默认');
+      expect(pendingChild!.expanded).toBe(true);
+      expect(pendingChild!.children).toHaveLength(2);
+      expect(pendingChild!.children![0].id).toBe('ind-new-1');
+      expect(pendingChild!.children![1].id).toBe('ind-new-2');
+
+      const rootChild = data.children!.find((c) => c.id === 'ind-1');
+      expect(rootChild).toBeDefined();
+      expect(rootChild!.topic).toBe('已有指标');
+    });
+
     it('handles 100+ nodes efficiently', () => {
       const indicators: IndicatorAttachment[] = [];
       for (let i = 1; i <= 150; i++) {

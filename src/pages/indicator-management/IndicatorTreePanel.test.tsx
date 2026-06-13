@@ -812,7 +812,6 @@ describe('IndicatorTreePanel', () => {
       expect(screen.getByTestId('mind-map-container')).toHaveClass('flex')
       expect(screen.getByTestId('tree-view-toggle-mindmap')).toHaveAttribute('data-state', 'active')
       expect(mockOnInit).toHaveBeenCalledTimes(1)
-      expect(mockMindMapInstance.refresh).toHaveBeenCalledTimes(1)
     })
 
     it('keeps MindMapWrapper mounted but hidden when switching back to tree', async () => {
@@ -841,14 +840,14 @@ describe('IndicatorTreePanel', () => {
       expect(mockOnInit).toHaveBeenCalledTimes(1)
     })
 
-    it('refreshes mind map with latest data when returning to mindmap', async () => {
+    it('does not re-initialize MindMapWrapper when data changes and returning to mindmap', async () => {
       initializeAttachmentStore()
       const user = userEvent.setup()
       const state = useAttachmentStore.getState()
       render(<IndicatorTreePanel />)
 
       await user.click(screen.getByTestId('tree-view-toggle-mindmap'))
-      expect(mockMindMapInstance.refresh).toHaveBeenCalledTimes(1)
+      expect(mockOnInit).toHaveBeenCalledTimes(1)
 
       mockMindMapInstance.refresh.mockClear()
       await user.click(screen.getByTestId('tree-view-toggle-tree'))
@@ -862,7 +861,8 @@ describe('IndicatorTreePanel', () => {
       })
 
       await user.click(screen.getByTestId('tree-view-toggle-mindmap'))
-      expect(mockMindMapInstance.refresh).toHaveBeenCalledTimes(1)
+      // MindMapWrapper 仍挂载未重新创建，onInit 不重复调用
+      expect(mockOnInit).toHaveBeenCalledTimes(1)
     })
 
     it('notifies parent via onViewModeChange when toggled', async () => {

@@ -52,7 +52,7 @@ export default function MindMapWrapper({
 }: MindMapWrapperProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mindRef = useRef<MindElixirInstance | null>(null);
-  const prevDataRef = useRef(data);
+  const initDataRef = useRef(data);
   const onOperationRef = useRef(onOperation);
   onOperationRef.current = onOperation;
 
@@ -97,8 +97,8 @@ export default function MindMapWrapper({
 
   useEffect(() => {
     if (!mindRef.current) return;
-    if (data === prevDataRef.current) return;
-    prevDataRef.current = data;
+    // 跳过与 init 时间一张 data 的更新（初始化已由 init effect 处理）
+    if (data === initDataRef.current) return;
     const nodeData = indicatorsToMindElixirData(data, defaultGroupName);
     mindRef.current.refresh({ nodeData });
   }, [data, defaultGroupName]);
