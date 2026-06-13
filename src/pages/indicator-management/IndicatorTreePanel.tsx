@@ -179,6 +179,13 @@ const IndicatorTreePanel = forwardRef<IndicatorTreePanelRef, IndicatorTreePanelP
 
   const handleMindMapOperation = useCallback(
     (op: Operation) => {
+      // 只允许虚拟分组节点的编辑操作，叶子指标的双击编辑禁用
+      if (op.name === 'finishEdit') {
+        const nodeId = (op as { obj?: { id?: string } }).obj?.id
+        if (!nodeId || indicators.find((i) => i.id === nodeId)?.indicatorType !== '虚拟分组') {
+          return
+        }
+      }
       handleOperation(op as { name: string; obj?: { id: string; topic?: string; [key: string]: unknown }; origin?: { id?: string; [key: string]: unknown } }, {
         rename: (id, name) => renameIndicator(id, name),
         add: (name, parentId) => { const created = addIndicator(name, parentId); return created?.id ?? 'new-id'; },
