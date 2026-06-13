@@ -2556,7 +2556,7 @@ export function generateMockIndicators(departmentId: string): IndicatorAttachmen
         granularity: '区局', frequency: '月',
         unit: '%', isBigScreen: false, department: deptName,
         businessCaliber: '', techCaliber: '', tags: [],
-        treeParentId: pendingNodeId,
+        treeParentId: undefined,
         tagIds: [], ruleIds: [],
       } as IndicatorAttachment)
       result.push({
@@ -2567,7 +2567,7 @@ export function generateMockIndicators(departmentId: string): IndicatorAttachmen
         granularity: '全局', frequency: '月',
         unit: '%', isBigScreen: false, department: deptName,
         businessCaliber: '', techCaliber: '', tags: [],
-        treeParentId: pendingNodeId,
+        treeParentId: undefined,
         tagIds: [], ruleIds: [],
       } as IndicatorAttachment)
       result.push({
@@ -2578,7 +2578,7 @@ export function generateMockIndicators(departmentId: string): IndicatorAttachmen
         granularity: '单位', frequency: '月',
         unit: '%', isBigScreen: false, department: deptName,
         businessCaliber: '', techCaliber: '', tags: [],
-        treeParentId: pendingNodeId,
+        treeParentId: undefined,
         tagIds: [], ruleIds: [],
       } as IndicatorAttachment)
       result.push({
@@ -2589,7 +2589,7 @@ export function generateMockIndicators(departmentId: string): IndicatorAttachmen
         granularity: '区局', frequency: '月',
         unit: '%', isBigScreen: false, department: deptName,
         businessCaliber: '', techCaliber: '', tags: [],
-        treeParentId: pendingNodeId,
+        treeParentId: undefined,
         tagIds: [], ruleIds: [],
       } as IndicatorAttachment)
       result.push({
@@ -2600,7 +2600,7 @@ export function generateMockIndicators(departmentId: string): IndicatorAttachmen
         granularity: '区局', frequency: '月',
         unit: '平方米', isBigScreen: false, department: deptName,
         businessCaliber: '', techCaliber: '', tags: [],
-        treeParentId: pendingNodeId,
+        treeParentId: undefined,
         tagIds: [], ruleIds: [],
       } as IndicatorAttachment)
       result.push({
@@ -2611,7 +2611,7 @@ export function generateMockIndicators(departmentId: string): IndicatorAttachmen
         granularity: '全局', frequency: '月',
         unit: '%', isBigScreen: false, department: deptName,
         businessCaliber: '', techCaliber: '', tags: [],
-        treeParentId: pendingNodeId,
+        treeParentId: undefined,
         tagIds: [], ruleIds: [],
       } as IndicatorAttachment)
       result.push({
@@ -2622,7 +2622,7 @@ export function generateMockIndicators(departmentId: string): IndicatorAttachmen
         granularity: 'BD', frequency: '月',
         unit: '万元', isBigScreen: false, department: deptName,
         businessCaliber: '', techCaliber: '', tags: [],
-        treeParentId: pendingNodeId,
+        treeParentId: undefined,
         tagIds: [], ruleIds: [],
       } as IndicatorAttachment)
       result.push({
@@ -2633,7 +2633,7 @@ export function generateMockIndicators(departmentId: string): IndicatorAttachmen
         granularity: '区局', frequency: '月',
         unit: '%', isBigScreen: false, department: deptName,
         businessCaliber: '', techCaliber: '', tags: [],
-        treeParentId: pendingNodeId,
+        treeParentId: undefined,
         tagIds: [], ruleIds: [],
       } as IndicatorAttachment)
       result.push({
@@ -2644,7 +2644,7 @@ export function generateMockIndicators(departmentId: string): IndicatorAttachmen
         granularity: '全局', frequency: '月',
         unit: '%', isBigScreen: false, department: deptName,
         businessCaliber: '', techCaliber: '', tags: [],
-        treeParentId: pendingNodeId,
+        treeParentId: undefined,
         tagIds: [], ruleIds: [],
       } as IndicatorAttachment)
       result.push({
@@ -2655,7 +2655,7 @@ export function generateMockIndicators(departmentId: string): IndicatorAttachmen
         granularity: '区局', frequency: '月',
         unit: '万元/人', isBigScreen: false, department: deptName,
         businessCaliber: '', techCaliber: '', tags: [],
-        treeParentId: pendingNodeId,
+        treeParentId: undefined,
         tagIds: [], ruleIds: [],
       } as IndicatorAttachment)
       result.push({
@@ -2666,7 +2666,7 @@ export function generateMockIndicators(departmentId: string): IndicatorAttachmen
         granularity: '区局', frequency: '月',
         unit: '万元', isBigScreen: false, department: deptName,
         businessCaliber: '', techCaliber: '', tags: [],
-        treeParentId: pendingNodeId,
+        treeParentId: undefined,
         tagIds: [], ruleIds: [],
       } as IndicatorAttachment)
       result.push({
@@ -2677,7 +2677,7 @@ export function generateMockIndicators(departmentId: string): IndicatorAttachmen
         granularity: '全局', frequency: '月',
         unit: '%', isBigScreen: false, department: deptName,
         businessCaliber: '', techCaliber: '', tags: [],
-        treeParentId: pendingNodeId,
+        treeParentId: undefined,
         tagIds: [], ruleIds: [],
       } as IndicatorAttachment)
       result.push({
@@ -2688,7 +2688,7 @@ export function generateMockIndicators(departmentId: string): IndicatorAttachmen
         granularity: '全局', frequency: '月',
         unit: '/', isBigScreen: false, department: deptName,
         businessCaliber: '', techCaliber: '', tags: [],
-        treeParentId: pendingNodeId,
+        treeParentId: undefined,
         tagIds: [], ruleIds: [],
       } as IndicatorAttachment)
       result.push({
@@ -2699,7 +2699,7 @@ export function generateMockIndicators(departmentId: string): IndicatorAttachmen
         granularity: '区局', frequency: '月',
         unit: '万元', isBigScreen: false, department: deptName,
         businessCaliber: '', techCaliber: '', tags: [],
-        treeParentId: pendingNodeId,
+        treeParentId: undefined,
         tagIds: [], ruleIds: [],
       } as IndicatorAttachment)
       result.push({
@@ -2710,7 +2710,7 @@ export function generateMockIndicators(departmentId: string): IndicatorAttachmen
         granularity: '全局', frequency: '月',
         unit: '%', isBigScreen: false, department: deptName,
         businessCaliber: '', techCaliber: '', tags: [],
-        treeParentId: pendingNodeId,
+        treeParentId: undefined,
         tagIds: [], ruleIds: [],
       } as IndicatorAttachment)
       result.push({
@@ -2721,7 +2721,7 @@ export function generateMockIndicators(departmentId: string): IndicatorAttachmen
         granularity: '全局', frequency: '月',
         unit: '%', isBigScreen: false, department: deptName,
         businessCaliber: '', techCaliber: '', tags: [],
-        treeParentId: pendingNodeId,
+        treeParentId: undefined,
         tagIds: [], ruleIds: [],
       } as IndicatorAttachment)
       result.push({
@@ -2732,7 +2732,7 @@ export function generateMockIndicators(departmentId: string): IndicatorAttachmen
         granularity: '区局', frequency: '月',
         unit: '%', isBigScreen: false, department: deptName,
         businessCaliber: '', techCaliber: '', tags: [],
-        treeParentId: pendingNodeId,
+        treeParentId: undefined,
         tagIds: [], ruleIds: [],
       } as IndicatorAttachment)
       result.push({
@@ -2743,7 +2743,7 @@ export function generateMockIndicators(departmentId: string): IndicatorAttachmen
         granularity: '全局', frequency: '月',
         unit: '%', isBigScreen: false, department: deptName,
         businessCaliber: '', techCaliber: '', tags: [],
-        treeParentId: pendingNodeId,
+        treeParentId: undefined,
         tagIds: [], ruleIds: [],
       } as IndicatorAttachment)
       result.push({
@@ -2754,7 +2754,7 @@ export function generateMockIndicators(departmentId: string): IndicatorAttachmen
         granularity: '区局', frequency: '月',
         unit: '%', isBigScreen: false, department: deptName,
         businessCaliber: '', techCaliber: '', tags: [],
-        treeParentId: pendingNodeId,
+        treeParentId: undefined,
         tagIds: [], ruleIds: [],
       } as IndicatorAttachment)
       result.push({
@@ -2765,7 +2765,7 @@ export function generateMockIndicators(departmentId: string): IndicatorAttachmen
         granularity: '全局', frequency: '月',
         unit: '%', isBigScreen: false, department: deptName,
         businessCaliber: '', techCaliber: '', tags: [],
-        treeParentId: pendingNodeId,
+        treeParentId: undefined,
         tagIds: [], ruleIds: [],
       } as IndicatorAttachment)
       result.push({
@@ -2776,7 +2776,7 @@ export function generateMockIndicators(departmentId: string): IndicatorAttachmen
         granularity: '单位', frequency: '月',
         unit: '%', isBigScreen: false, department: deptName,
         businessCaliber: '', techCaliber: '', tags: [],
-        treeParentId: pendingNodeId,
+        treeParentId: undefined,
         tagIds: [], ruleIds: [],
       } as IndicatorAttachment)
       result.push({
@@ -2787,7 +2787,7 @@ export function generateMockIndicators(departmentId: string): IndicatorAttachmen
         granularity: '区局', frequency: '月',
         unit: '万元', isBigScreen: false, department: deptName,
         businessCaliber: '', techCaliber: '', tags: [],
-        treeParentId: pendingNodeId,
+        treeParentId: undefined,
         tagIds: [], ruleIds: [],
       } as IndicatorAttachment)
       result.push({
@@ -2798,7 +2798,7 @@ export function generateMockIndicators(departmentId: string): IndicatorAttachmen
         granularity: '全局', frequency: '月',
         unit: '%', isBigScreen: false, department: deptName,
         businessCaliber: '', techCaliber: '', tags: [],
-        treeParentId: pendingNodeId,
+        treeParentId: undefined,
         tagIds: [], ruleIds: [],
       } as IndicatorAttachment)
       break
