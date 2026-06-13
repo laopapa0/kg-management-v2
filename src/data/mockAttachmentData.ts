@@ -21,6 +21,19 @@ export const mockDepartments: Department[] = [
 export function generateMockIndicators(departmentId: string): IndicatorAttachment[] {
   const deptName = mockDepartments.find(d => d.id === departmentId)?.name ?? ''
   const result: IndicatorAttachment[] = []
+  
+  // 顶层"默认"待挂靠节点，挂在根级
+  const pendingNodeId = `${departmentId}-pending`
+  result.push({
+    id: pendingNodeId, name: '默认', code: `GROUP-${pendingNodeId}`,
+    indicatorCode: '', indicatorDisplayName: '默认',
+    indicatorShowName: '默认', indicatorType: '虚拟分组',
+    level1: '', level2: '', granularity: '', frequency: '', unit: '',
+    isBigScreen: false, department: deptName,
+    businessCaliber: '', techCaliber: '', tags: [],
+    treeParentId: undefined,
+    tagIds: [], ruleIds: [],
+  } as IndicatorAttachment)
   switch (departmentId) {
     case 'dept-P2': {
       // ── 战略执行 ──

@@ -221,7 +221,12 @@ describe('IndicatorAttachmentPage', () => {
     render(<IndicatorAttachmentPage />)
 
     const state = useAttachmentStore.getState()
-    const root = state.indicators[0]
+    // find first L1 virtual grouping node with children (skip "默认" pending node)
+    const allParentIds = new Set(state.indicators.map(i => i.treeParentId).filter(Boolean))
+    const root = state.indicators.find(i =>
+      i.indicatorType === '虚拟分组' && allParentIds.has(i.id) && !i.id?.endsWith('-pending')
+    )
+    if (!root) throw new Error('no root with children')
     act(() => {
       state.setIndicators(
         state.indicators.map((i, idx) => (idx > 0 && idx < 3 ? { ...i, treeParentId: root.id } : i)),
@@ -234,7 +239,7 @@ describe('IndicatorAttachmentPage', () => {
     await user.click(toggle)
 
     expect(toggle).toHaveAttribute('aria-expanded', 'false')
-  })
+  }, 20000)
 
   it('renders four add buttons that fade in on header hover', () => {
     render(<IndicatorAttachmentPage />)

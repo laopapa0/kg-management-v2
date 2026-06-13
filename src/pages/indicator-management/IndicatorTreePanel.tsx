@@ -69,10 +69,10 @@ const IndicatorTreePanel = forwardRef<IndicatorTreePanelRef, IndicatorTreePanelP
   const setIndicators = useAttachmentStore((state) => state.setIndicators)
   const undo = useAttachmentStore((state) => state.undo)
   const tree = useMemo(() => buildIndicatorTree(indicators), [indicators])
-  // 初始只展开 L1 根节点，L2（含"默认"节点）和叶子默认折叠
+  // 初始展开所有虚拟分组节点（L1+L2+"默认"），叶子节点默认折叠
   const initialExpandedIds = useMemo(() => {
     return indicators
-      .filter((i) => !i.treeParentId && indicators.some((c) => c.treeParentId === i.id))
+      .filter((i) => i.indicatorType === '虚拟分组')
       .map((i) => i.id)
   }, [indicators])
 
@@ -186,6 +186,9 @@ const IndicatorTreePanel = forwardRef<IndicatorTreePanelRef, IndicatorTreePanelP
   const handleAddConfirm = (name: string, parentId?: string) => {
     const newIndicator = addIndicator(name, parentId)
     if (newIndicator) {
+      if (parentId) {
+        setExpanded((prev) => new Set([...prev, parentId]))
+      }
       setHighlightedId(newIndicator.id)
       if (highlightTimerRef.current) clearTimeout(highlightTimerRef.current)
       highlightTimerRef.current = setTimeout(() => setHighlightedId((current) => (current === newIndicator.id ? null : current)), 500)

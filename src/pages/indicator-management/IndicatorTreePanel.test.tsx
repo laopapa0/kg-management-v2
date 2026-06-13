@@ -240,7 +240,11 @@ describe('IndicatorTreePanel', () => {
     render(<IndicatorTreePanel />)
 
     const state = useAttachmentStore.getState()
-    const leafIndicator = state.indicators[5]
+    const allParentIds = new Set(state.indicators.map(i => i.treeParentId).filter(Boolean))
+    const leafIndicator = state.indicators.find(i =>
+      i.treeParentId && !i.code?.startsWith('GROUP-') && !allParentIds.has(i.id)
+    )
+    if (!leafIndicator) throw new Error('no leaf found')
 
     const rows = screen.getAllByTestId('tree-node-row')
     const leafRow = rows.find((r) => r.getAttribute('data-node-id') === leafIndicator.id)
@@ -296,7 +300,12 @@ describe('IndicatorTreePanel', () => {
     render(<IndicatorTreePanel />)
 
     const state = useAttachmentStore.getState()
-    const parent = state.indicators[0]
+    // find first virtual grouping node that has children (skip "默认" node)
+    const allParentIds = new Set(state.indicators.map(i => i.treeParentId).filter(Boolean))
+    const parent = state.indicators.find(i =>
+      i.indicatorType === '虚拟分组' && allParentIds.has(i.id) && !i.name?.startsWith('默认')
+    )
+    if (!parent) throw new Error('no parent with children')
 
     const rows = screen.getAllByTestId('tree-node-row')
     const parentRow = rows.find((r) => r.getAttribute('data-node-id') === parent.id)
@@ -321,8 +330,14 @@ describe('IndicatorTreePanel', () => {
     render(<IndicatorTreePanel />)
 
     const state = useAttachmentStore.getState()
-    const parent = state.indicators[0]
-    const child = state.indicators[1]
+    // find first virtual grouping node that has children (skip "默认")
+    const allParentIds = new Set(state.indicators.map(i => i.treeParentId).filter(Boolean))
+    const parent = state.indicators.find(i =>
+      i.indicatorType === '虚拟分组' && allParentIds.has(i.id) && !i.id?.endsWith('-pending')
+    )
+    if (!parent) throw new Error('no parent with children')
+    const child = state.indicators.find(i => i.treeParentId === parent.id)
+    if (!child) throw new Error('no child found')
 
     const rows = screen.getAllByTestId('tree-node-row')
     const parentRow = rows.find((r) => r.getAttribute('data-node-id') === parent.id)
