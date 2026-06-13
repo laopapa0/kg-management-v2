@@ -21,19 +21,6 @@ export const mockDepartments: Department[] = [
 export function generateMockIndicators(departmentId: string): IndicatorAttachment[] {
   const deptName = mockDepartments.find(d => d.id === departmentId)?.name ?? ''
   const result: IndicatorAttachment[] = []
-  
-  // 顶层"默认"待挂靠节点，挂在根级
-  const pendingNodeId = `${departmentId}-pending`
-  result.push({
-    id: pendingNodeId, name: '默认', code: `GROUP-${pendingNodeId}`,
-    indicatorCode: '', indicatorDisplayName: '默认',
-    indicatorShowName: '默认', indicatorType: '虚拟分组',
-    level1: '', level2: '', granularity: '', frequency: '', unit: '',
-    isBigScreen: false, department: deptName,
-    businessCaliber: '', techCaliber: '', tags: [],
-    treeParentId: undefined,
-    tagIds: [], ruleIds: [],
-  } as IndicatorAttachment)
   switch (departmentId) {
     case 'dept-P2': {
       // ── 战略执行 ──
@@ -45,6 +32,18 @@ export function generateMockIndicators(departmentId: string): IndicatorAttachmen
         isBigScreen: false, department: deptName,
         businessCaliber: '', techCaliber: '', tags: [],
         treeParentId: undefined,
+        tagIds: [], ruleIds: [],
+      } as IndicatorAttachment)
+      // ── L2 默认 ──
+      const pendingNodeId = `${departmentId}-pending`
+      result.push({
+        id: pendingNodeId, name: '默认', code: `GROUP-${pendingNodeId}`,
+        indicatorCode: '', indicatorDisplayName: '默认',
+        indicatorShowName: '默认', indicatorType: '虚拟分组',
+        level1: '', level2: '', granularity: '', frequency: '', unit: '',
+        isBigScreen: false, department: deptName,
+        businessCaliber: '', techCaliber: '', tags: [],
+        treeParentId: 'dept-P2-l1-0',
         tagIds: [], ruleIds: [],
       } as IndicatorAttachment)
       result.push({
@@ -66,7 +65,7 @@ export function generateMockIndicators(departmentId: string): IndicatorAttachmen
         granularity: '全局/区局', frequency: '月',
         unit: '%', isBigScreen: false, department: deptName,
         businessCaliber: '', techCaliber: '', tags: [],
-        treeParentId: 'dept-P2-l2-1', tagIds: [], ruleIds: [],
+        treeParentId: pendingNodeId, tagIds: [], ruleIds: [],
       } as IndicatorAttachment)
       result.push({
         id: 'dept-P2-ind-3', name: '月_人力_费效相关性-客户经理', code: 'M_DXT_00003828',
@@ -77,7 +76,7 @@ export function generateMockIndicators(departmentId: string): IndicatorAttachmen
         granularity: '全局/区局', frequency: '月',
         unit: '/', isBigScreen: false, department: deptName,
         businessCaliber: '', techCaliber: '', tags: [],
-        treeParentId: 'dept-P2-l2-1', tagIds: [], ruleIds: [],
+        treeParentId: pendingNodeId, tagIds: [], ruleIds: [],
       } as IndicatorAttachment)
       result.push({
         id: 'dept-P2-ind-4', name: '月_人力_费效相关性-社区装维', code: 'M_DXT_00003826',
