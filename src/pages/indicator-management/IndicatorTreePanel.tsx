@@ -76,14 +76,30 @@ const IndicatorTreePanel = forwardRef<IndicatorTreePanelRef, IndicatorTreePanelP
   }, [indicators])
 
   const mappedIndicators = useMemo(() => {
-    const hasPending = indicators.some((i) => !i.treeParentId && i.indicatorType !== '虚拟分组')
-    if (!hasPending) return indicators
-    return indicators.map((i) => {
+    const pendingItems = indicators.filter((i) => !i.treeParentId && i.indicatorType !== '虚拟分组')
+    if (pendingItems.length === 0) return indicators
+
+    const pendingNode: IndicatorAttachment = {
+      id: pendingNodeId,
+      name: '默认',
+      code: `GROUP-${pendingNodeId}`,
+      indicatorCode: '', indicatorDisplayName: '默认', indicatorShowName: '默认',
+      indicatorType: '虚拟分组',
+      level1: '', level2: '', granularity: '', frequency: '', unit: '',
+      isBigScreen: false,
+      department: pendingItems[0]?.department ?? '',
+      businessCaliber: '', techCaliber: '', tags: [],
+      treeParentId: undefined,
+      tagIds: [], ruleIds: [],
+    } as IndicatorAttachment
+
+    const mapped = indicators.map((i) => {
       if (!i.treeParentId && i.indicatorType !== '虚拟分组') {
         return { ...i, treeParentId: pendingNodeId }
       }
       return i
     })
+    return [pendingNode, ...mapped]
   }, [indicators, pendingNodeId])
 
   const tree = useMemo(() => {
