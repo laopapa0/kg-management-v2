@@ -52,7 +52,7 @@ export default function MindMapWrapper({
 }: MindMapWrapperProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mindRef = useRef<MindElixirInstance | null>(null);
-  const isFirstDataEffect = useRef(true);
+  const prevDataRef = useRef(data);
   const onOperationRef = useRef(onOperation);
   onOperationRef.current = onOperation;
 
@@ -96,15 +96,11 @@ export default function MindMapWrapper({
   }, []);
 
   useEffect(() => {
-    const mind = mindRef.current;
-    if (!mind) return;
-    if (isFirstDataEffect.current) {
-      isFirstDataEffect.current = false;
-      return;
-    }
-
+    if (!mindRef.current) return;
+    if (data === prevDataRef.current) return;
+    prevDataRef.current = data;
     const nodeData = indicatorsToMindElixirData(data, defaultGroupName);
-    mind.refresh({ nodeData });
+    mindRef.current.refresh({ nodeData });
   }, [data, defaultGroupName]);
 
   return (
