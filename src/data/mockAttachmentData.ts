@@ -23,6 +23,18 @@ export function generateMockIndicators(departmentId: string): IndicatorAttachmen
   const result: IndicatorAttachment[] = []
   switch (departmentId) {
     case 'dept-P2': {
+      // ── L1: 默认 ──
+      const pendingNodeId = `${departmentId}-pending`
+      result.push({
+        id: pendingNodeId, name: '默认', code: `GROUP-${pendingNodeId}`,
+        indicatorCode: '', indicatorDisplayName: '默认',
+        indicatorShowName: '默认', indicatorType: '虚拟分组',
+        level1: '', level2: '', granularity: '', frequency: '', unit: '',
+        isBigScreen: false, department: deptName,
+        businessCaliber: '', techCaliber: '', tags: [],
+        treeParentId: undefined,
+        tagIds: [], ruleIds: [],
+      } as IndicatorAttachment)
       // ── 战略执行 ──
       result.push({
         id: 'dept-P2-l1-0', name: '战略执行', code: 'GROUP-dept-P2-l1-0',
@@ -32,18 +44,6 @@ export function generateMockIndicators(departmentId: string): IndicatorAttachmen
         isBigScreen: false, department: deptName,
         businessCaliber: '', techCaliber: '', tags: [],
         treeParentId: undefined,
-        tagIds: [], ruleIds: [],
-      } as IndicatorAttachment)
-      // ── L2 默认 ──
-      const pendingNodeId = `${departmentId}-pending`
-      result.push({
-        id: pendingNodeId, name: '默认', code: `GROUP-${pendingNodeId}`,
-        indicatorCode: '', indicatorDisplayName: '默认',
-        indicatorShowName: '默认', indicatorType: '虚拟分组',
-        level1: '', level2: '', granularity: '', frequency: '', unit: '',
-        isBigScreen: false, department: deptName,
-        businessCaliber: '', techCaliber: '', tags: [],
-        treeParentId: 'dept-P2-l1-0',
         tagIds: [], ruleIds: [],
       } as IndicatorAttachment)
       result.push({
