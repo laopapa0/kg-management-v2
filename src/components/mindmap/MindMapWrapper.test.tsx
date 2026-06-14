@@ -10,6 +10,7 @@ const {
   mockRefresh,
   mockDestroy,
   mockToCenter,
+  mockScaleFit,
   mockAddListener,
   mockRemoveListener,
   constructorCalls,
@@ -18,6 +19,7 @@ const {
   mockRefresh: vi.fn(),
   mockDestroy: vi.fn(),
   mockToCenter: vi.fn(),
+  mockScaleFit: vi.fn(),
   mockAddListener: vi.fn(),
   mockRemoveListener: vi.fn(),
   constructorCalls: [] as unknown[],
@@ -41,6 +43,7 @@ vi.mock('mind-elixir', async (importOriginal) => {
     refresh = mockRefresh;
     destroy = mockDestroy;
     toCenter = mockToCenter;
+    scaleFit = mockScaleFit;
     clearHistory = vi.fn();
 
     bus = {

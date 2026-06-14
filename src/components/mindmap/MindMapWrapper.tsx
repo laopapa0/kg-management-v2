@@ -66,6 +66,7 @@ export default function MindMapWrapper({
       toolBar: toolbar,
       keypress,
       allowUndo: false,
+      scaleMin: 0.1,
       theme: {
         name: 'project-dark',
         cssVar: mapDarkThemeToMindElixir(),
@@ -78,6 +79,12 @@ export default function MindMapWrapper({
     const nodeData = indicatorsToMindElixirData(data, defaultGroupName);
     mind.init({ nodeData });
     mind.toCenter();
+    // init 后延迟做 scaleFit，等 Mind Elixir 完成 DOM 布局后再计算缩放
+    requestAnimationFrame(() => {
+      if (mindRef.current === mind) {
+        mind.scaleFit();
+      }
+    });
     onInit?.(mind);
 
     const handleOperation = (op: Operation) => onOperationRef.current?.(op);
