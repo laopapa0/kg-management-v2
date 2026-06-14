@@ -11,7 +11,22 @@ export interface MindElixirNodeData {
   topic: string;
   expanded?: boolean;
   children?: MindElixirNodeData[];
+  style?: Record<string, string>;
+  branchColor?: string;
+  dangerouslySetInnerHTML?: string;
 }
+
+/** 二级节点分支调色板（8 色高对比，用于 branchColor + 连线） */
+const BRANCH_PALETTE = [
+  '#eab308', '#8b5cf6', '#22c55e', '#ef4444',
+  '#3b82f6', '#f97316', '#ec4899', '#06b6d4',
+];
+
+/** 二级节点背景浅色版（Tailwind 200 级，黑字清晰可读） */
+const BG_PALETTE = [
+  '#fef08a', '#ddd6fe', '#bbf7d0', '#fecaca',
+  '#bfdbfe', '#fed7aa', '#fbcfe8', '#a5f3fc',
+];
 
 /** 默认虚拟分组节点 ID 的固定前缀 */
 export const DEFAULT_GROUP_ID_PREFIX = 'mindmap-default-group';
@@ -33,17 +48,68 @@ export function isDefaultGroupId(id: string): boolean {
   return id.startsWith(`${DEFAULT_GROUP_ID_PREFIX}-`);
 }
 
-function convertIndicatorTreeNode(node: IndicatorTreeNode, depth: number): MindElixirNodeData {
+function convertIndicatorTreeNode(
+  node: IndicatorTreeNode,
+  depth: number,
+  siblingIndex?: number,
+): MindElixirNodeData {
+  const isPending = node.id.startsWith('ui-pending-');
+  const isVirtualGroup = node.indicator.indicatorType === '虚拟分组';
+
+  let style: Record<string, string> | undefined;
+  let branchColor: string | undefined;
+
+  if (depth === 0) {
+    // 根节点（部门名）
+    style = {
+      background: '#f5f5f0',
+      color: '#1a1a1a',
+      fontSize: '18px',
+      fontWeight: '700',
+    };
+  } else if (depth === 1) {
+    if (isPending) {
+      // "默认"待挂靠分组
+      branchColor = '#eab308';
+      style = {
+        background: 'rgba(234,179,8,0.2)',
+        color: '#f5f5f0',
+        fontSize: '16px',
+        fontWeight: '700',
+        border: '1px dashed #eab308',
+      };
+    } else {
+      // 其他二级分组：浅色背景 + 黑色字体 + 椭圆
+      const idx = (siblingIndex ?? 0) % BRANCH_PALETTE.length;
+      branchColor = BRANCH_PALETTE[idx];
+      style = {
+        background: BG_PALETTE[idx],
+        color: '#1a1a1a',
+        fontSize: '16px',
+        fontWeight: '700',
+        borderRadius: '24px',
+      };
+    }
+  } else if (depth >= 2) {
+    // 三级及以上叶子
+    style = {
+      color: '#ffffff',
+      fontSize: '12px',
+    };
+  }
+
   return {
     id: node.id,
     topic: node.indicator.name,
     expanded: depth < 3,
-    children: node.children?.map((c) => convertIndicatorTreeNode(c, depth + 1)),
+    style,
+    branchColor,
+    children: node.children?.map((c, i) => convertIndicatorTreeNode(c, depth + 1, i)),
   };
 }
 
-function toplevelConvert(node: IndicatorTreeNode): MindElixirNodeData {
-  return convertIndicatorTreeNode(node, 1);
+function toplevelConvert(node: IndicatorTreeNode, index: number): MindElixirNodeData {
+  return convertIndicatorTreeNode(node, 1, index);
 }
 
 /**
@@ -82,7 +148,7 @@ export function indicatorsToMindElixirData(
       id: defaultGroupId,
       topic: defaultGroupName,
       expanded: true,
-      children: orphanRoots.map(toplevelConvert),
+      children: orphanRoots.map((node, i) => toplevelConvert(node, i)),
     };
   }
 

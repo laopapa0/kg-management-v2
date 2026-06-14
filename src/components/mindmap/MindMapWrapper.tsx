@@ -6,12 +6,8 @@ import { indicatorsToMindElixirData } from '@/utils/mindMapAdapter';
 import type { IndicatorAttachment } from '@/models/indicatorAttachmentModel';
 
 const DEFAULT_PALETTE = [
-  'var(--dark-accent-primary)',
-  'var(--dark-accent-secondary)',
-  'var(--dark-accent-gold)',
-  'var(--dark-text-secondary)',
-  'var(--dark-accent-primary-hover)',
-  'var(--dark-text-tertiary)',
+  '#eab308', '#8b5cf6', '#22c55e', '#ef4444',
+  '#3b82f6', '#f97316', '#ec4899', '#06b6d4',
 ];
 
 function mapDarkThemeToMindElixir(): Record<string, string> {
@@ -22,6 +18,15 @@ function mapDarkThemeToMindElixir(): Record<string, string> {
     '--panel-color': 'var(--dark-text-secondary)',
     '--panel-bgcolor': 'var(--dark-elevated)',
     '--panel-border-color': 'var(--dark-border)',
+    '--root-color': '#ffffff',
+    '--root-bgcolor': '#2d3748',
+    '--root-border-color': 'rgba(255,255,255,0.1)',
+    '--root-radius': '16px',
+    '--main-radius': '12px',
+    '--color': '#cccccc',
+    '--selected': '#fbbf24',
+    '--topic-padding': '6px 12px',
+    '--main-bgcolor-transparent': 'rgba(76,79,105,0.8)',
   };
 }
 

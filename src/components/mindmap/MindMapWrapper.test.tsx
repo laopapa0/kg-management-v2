@@ -113,13 +113,17 @@ describe('MindMapWrapper', () => {
       theme: { name: string; cssVar: Record<string, string>; palette: string[] };
     };
     expect(options.theme.name).toBe('project-dark');
-    expect(options.theme.cssVar).toEqual({
+    expect(options.theme.cssVar).toMatchObject({
       '--main-color': 'var(--dark-color)',
       '--main-bgcolor': 'var(--dark-bg)',
       '--bgcolor': 'var(--dark-card-l1)',
       '--panel-color': 'var(--dark-text-secondary)',
       '--panel-bgcolor': 'var(--dark-elevated)',
       '--panel-border-color': 'var(--dark-border)',
+      '--root-color': '#ffffff',
+      '--root-bgcolor': '#2d3748',
+      '--root-radius': '16px',
+      '--selected': '#fbbf24',
     });
   });
 
@@ -129,8 +133,9 @@ describe('MindMapWrapper', () => {
     const options = constructorCalls[0] as {
       theme: { palette: string[] };
     };
-    expect(options.theme.palette).toHaveLength(6);
-    expect(options.theme.palette[0]).toBe('var(--dark-accent-primary)');
+    expect(options.theme.palette).toHaveLength(8);
+    expect(options.theme.palette[0]).toBe('#eab308');
+    expect(options.theme.palette[1]).toBe('#8b5cf6');
   });
 
   it('calls onInit with the Mind Elixir instance after initialization', () => {

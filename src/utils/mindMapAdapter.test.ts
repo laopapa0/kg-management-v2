@@ -160,6 +160,76 @@ describe('mindMapAdapter', () => {
       expect(data.children).toHaveLength(1);
       expect(data.children![0].id).toBe('ind-1');
     });
+
+    it('applies root style to depth=0 (米白背景 黑字 18px bold)', () => {
+      const data = indicatorsToMindElixirData([], '财务部');
+
+      expect(data.style).toBeDefined();
+      expect(data.style!.background).toBe('#f5f5f0');
+      expect(data.style!.color).toBe('#1a1a1a');
+      expect(data.style!.fontSize).toBe('18px');
+      expect(data.style!.fontWeight).toBe('700');
+      expect(data.branchColor).toBeUndefined();
+    });
+
+    it('applies pending-node style and branchColor to ui-pending-* at depth=1', () => {
+      const pendingNode = makeIndicator('ui-pending-财务部', '默认');
+      const mapped = [
+        pendingNode,
+        makeIndicator('ind-new-1', '待挂靠指标1', 'ui-pending-财务部'),
+      ];
+
+      const data = indicatorsToMindElixirData(mapped, '财务部');
+      const pendingChild = data.children!.find((c) => c.id === 'ui-pending-财务部')!;
+
+      expect(pendingChild.branchColor).toBe('#eab308');
+      expect(pendingChild.style).toBeDefined();
+      expect(pendingChild.style!.background).toBe('rgba(234,179,8,0.2)');
+      expect(pendingChild.style!.color).toBe('#f5f5f0');
+      expect(pendingChild.style!.fontSize).toBe('16px');
+      expect(pendingChild.style!.fontWeight).toBe('700');
+      expect(pendingChild.style!.border).toBe('1px dashed #eab308');
+    });
+
+    it('applies palette branchColor to non-pending depth=1 nodes', () => {
+      const indicators: IndicatorAttachment[] = [
+        makeIndicator('group-a', '营收分析'),
+        makeIndicator('group-b', '成本分析'),
+        makeIndicator('ind-1', '指标', 'group-a'),
+      ];
+
+      const data = indicatorsToMindElixirData(indicators, '财务部');
+      const children = data.children!;
+
+      // group-a at index 0 → branchColor=#eab308, background=#fef08a
+      expect(children[0].branchColor).toBe('#eab308');
+      expect(children[0].style!.background).toBe('#fef08a');
+      expect(children[0].style!.color).toBe('#1a1a1a');
+      expect(children[0].style!.borderRadius).toBe('24px');
+
+      // group-b at index 1 → branchColor=#8b5cf6, background=#ddd6fe
+      expect(children[1].branchColor).toBe('#8b5cf6');
+      expect(children[1].style!.background).toBe('#ddd6fe');
+      expect(children[1].style!.borderRadius).toBe('24px');
+    });
+
+    it('applies leaf style to depth>=2 (纯白字 12px 无背景)', () => {
+      const indicators: IndicatorAttachment[] = [
+        makeIndicator('group', '分组'),
+        makeIndicator('leaf', '叶子指标', 'group'),
+      ];
+
+      const data = indicatorsToMindElixirData(indicators, '财务部');
+      const groupChild = data.children![0];
+      const leafChild = groupChild.children![0];
+
+      expect(leafChild.style!.color).toBe('#ffffff');
+      expect(leafChild.style!.fontSize).toBe('12px');
+      expect(leafChild.style!.background).toBeUndefined();
+      // 叶子继承父的 branchColor palette 分配
+      expect(leafChild.branchColor).toBeUndefined();
+      expect(groupChild.branchColor).toBeDefined();
+    });
   });
 
   describe('mindElixirDataToIndicators', () => {
