@@ -60,7 +60,8 @@ export default function PersistentConnectionLayer({
     const prevKeys = renderedKeysRef.current
     const nextKeys = new Set(connections.map((c) => `${c.sourceId}::${c.targetId}`))
     // 跳过无实际变化的更新，避免不必要的 SVG 重绘触发"奇怪连线"
-    if (prevKeys.size === nextKeys.size && [...prevKeys].every((k) => nextKeys.has(k))) return
+    const same = prevKeys.size === nextKeys.size && [...prevKeys].every((k) => nextKeys.has(k))
+    if (same) return
     renderedKeysRef.current = nextKeys
     updateLines()
   }, [connections, updateLines])

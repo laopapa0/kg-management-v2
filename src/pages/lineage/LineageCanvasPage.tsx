@@ -78,6 +78,7 @@ interface CanvasNode {
 
 import { mockAppliedConnections } from '@/data/aiRecommendations'
 import { indicatorDefinitions } from '@/data/indicatorDefinitions'
+import { addExcludedRelation, removeExcludedRelation, addCreatedRelation } from '@/utils/lineageExcludedStorage'
 
 const codeToName = new Map(indicatorDefinitions.map((d) => [d.code, d.name]))
 const codeToLevel1 = new Map(indicatorDefinitions.map((d) => [d.code, d.level1]))
@@ -748,6 +749,7 @@ export default function LineageCanvasPage() {
   const handleDeleteRelation = useCallback((relationId: string) => {
     setRelations((prev) => prev.filter((r) => r.id !== relationId));
     if (selectedRelationId === relationId) setSelectedRelationId(null);
+    addExcludedRelation(relationId);
     toast.success('关系已删除');
   }, [selectedRelationId]);
 
@@ -786,6 +788,12 @@ export default function LineageCanvasPage() {
     };
 
     setRelations((prev) => [...prev, newRelation]);
+    removeExcludedRelation(newRelation.id);
+    addCreatedRelation({
+      sourceName: newRelation.source,
+      targetName: newRelation.target,
+      relationType: newRelation.type,
+    });
     setShowCreateModal(false);
     setCreateForm({ sourceId: '', targetId: '', relationType: '', correlation: '', confidence: 70, description: '' });
     setSourceSearch('');

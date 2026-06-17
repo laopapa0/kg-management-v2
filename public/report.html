@@ -287,208 +287,899 @@ a.ind-link:hover { color: #7AA6F5; }
 <!-- 三、知识图谱归因分析 -->
 <div class="section">
   <h2>三、知识图谱归因分析</h2>
+<div id="section3-root"><p class="chart-note">加载中…</p></div>
+<script>
+const FINANCE_RELATIONS = [
+  {
+    "id": "REL-013",
+    "sourceName": "业务外包占收比同比",
+    "sourceLevel1": "效能",
+    "relationType": "DEPENDS_ON",
+    "targetName": "外包费用压降",
+    "targetLevel1": "效能"
+  },
+  {
+    "id": "REL-043",
+    "sourceName": "本月全量资金流入",
+    "sourceLevel1": "未分类",
+    "relationType": "TRANSMISSION",
+    "targetName": "当日全量资金流入",
+    "targetLevel1": "未分类"
+  },
+  {
+    "id": "REL-048",
+    "sourceName": "月_三方铁塔费效疑似异常模型-有租费无电费无流量",
+    "sourceLevel1": "未分类",
+    "relationType": "TRANSMISSION",
+    "targetName": "铁塔费效疑似异常模型-有租费无电费无流量",
+    "targetLevel1": "未分类"
+  },
+  {
+    "id": "REL-057",
+    "sourceName": "全口径人员成本占收比",
+    "sourceLevel1": "效能",
+    "relationType": "DEPENDS_ON",
+    "targetName": "全口径人员人均创利",
+    "targetLevel1": "效能"
+  },
+  {
+    "id": "REL-059",
+    "sourceName": "利润总额同比",
+    "sourceLevel1": "经营",
+    "relationType": "DEPENDS_ON",
+    "targetName": "利润总额（考核口径）",
+    "targetLevel1": "经营"
+  },
+  {
+    "id": "REL-066",
+    "sourceName": "月_铁塔分析_三方塔-单站电价",
+    "sourceLevel1": "未分类",
+    "relationType": "TRANSMISSION",
+    "targetName": "月_铁塔分析_三方塔-单站租金",
+    "targetLevel1": "未分类"
+  },
+  {
+    "id": "REL-072",
+    "sourceName": "目标-非核心网络业务实时监控与工单处理单价",
+    "sourceLevel1": "效能",
+    "relationType": "DEPENDS_ON",
+    "targetName": "非核心网络业务实时监控与工单处理单价",
+    "targetLevel1": "效能"
+  },
+  {
+    "id": "REL-078",
+    "sourceName": "月_预算执行进度-落地产品收入-政支中心结算-其他-分单位-合计",
+    "sourceLevel1": "未分类",
+    "relationType": "TRANSMISSION",
+    "targetName": "月_预算执行进度-落地产品收入-云结算-其他-分单位-合计",
+    "targetLevel1": "未分类"
+  },
+  {
+    "id": "REL-087",
+    "sourceName": "月_铁塔分析_三方塔-单站租金",
+    "sourceLevel1": "未分类",
+    "relationType": "DEPENDS_ON",
+    "targetName": "月_铁塔分析_三方塔-单站电费",
+    "targetLevel1": "未分类"
+  },
+  {
+    "id": "REL-088",
+    "sourceName": "月_预算执行进度-落地产品收入-数集部产品-其他-分单位-合计",
+    "sourceLevel1": "未分类",
+    "relationType": "DEPENDS_ON",
+    "targetName": "月_预算执行进度-ICT利润-分单位",
+    "targetLevel1": "未分类"
+  },
+  {
+    "id": "REL-090",
+    "sourceName": "月-财务-集团派单项目数量",
+    "sourceLevel1": "效能",
+    "relationType": "CAUSES",
+    "targetName": "月-财务-集团派单项目金额",
+    "targetLevel1": "效能"
+  },
+  {
+    "id": "REL-093",
+    "sourceName": "基础资源型业务毛利额",
+    "sourceLevel1": "经营",
+    "relationType": "TRANSMISSION",
+    "targetName": "产数资源型业务毛利额",
+    "targetLevel1": "经营"
+  },
+  {
+    "id": "REL-094",
+    "sourceName": "一年以上应收同比增量",
+    "sourceLevel1": "效能",
+    "relationType": "DEPENDS_ON",
+    "targetName": "一年以上长账龄应收余额",
+    "targetLevel1": "经营"
+  },
+  {
+    "id": "REL-096",
+    "sourceName": "单位甩单支撑单耗费成本",
+    "sourceLevel1": "效能",
+    "relationType": "DEPENDS_ON",
+    "targetName": "单位甩单支撑单耗费成本目标值",
+    "targetLevel1": "效能"
+  },
+  {
+    "id": "REL-101",
+    "sourceName": "前端占收比同比下降",
+    "sourceLevel1": "效能",
+    "relationType": "TRANSMISSION",
+    "targetName": "后端外包费压降",
+    "targetLevel1": "效能"
+  },
+  {
+    "id": "REL-102",
+    "sourceName": "月_预算执行进度-落地产品收入-互联网部产品-其他-分单位-合计",
+    "sourceLevel1": "未分类",
+    "relationType": "DEPENDS_ON",
+    "targetName": "月_预算执行进度-ICT利润-分单位",
+    "targetLevel1": "未分类"
+  },
+  {
+    "id": "REL-113",
+    "sourceName": "目标-开放渠道外包成本占收比",
+    "sourceLevel1": "效能",
+    "relationType": "DEPENDS_ON",
+    "targetName": "开放渠道外包成本占收比",
+    "targetLevel1": "效能"
+  },
+  {
+    "id": "REL-114",
+    "sourceName": "月_铁塔费效疑似异常模型-无租费有电费有流量",
+    "sourceLevel1": "未分类",
+    "relationType": "TRANSMISSION",
+    "targetName": "月_铁塔费效疑似异常模型-无租费有电费无流量",
+    "targetLevel1": "未分类"
+  },
+  {
+    "id": "REL-117",
+    "sourceName": "月_预算执行进度-落地产品收入-号百产品-其他-分单位-合计",
+    "sourceLevel1": "未分类",
+    "relationType": "DEPENDS_ON",
+    "targetName": "月_预算执行进度-ICT利润-分单位",
+    "targetLevel1": "未分类"
+  },
+  {
+    "id": "REL-140",
+    "sourceName": "月_预算执行进度-落地产品收入-号百产品-其他-分单位-合计",
+    "sourceLevel1": "未分类",
+    "relationType": "TRANSMISSION",
+    "targetName": "月_预算执行进度-落地产品收入-数集部产品-其他-分单位-合计",
+    "targetLevel1": "未分类"
+  },
+  {
+    "id": "REL-145",
+    "sourceName": "目标-外呼营销成功率",
+    "sourceLevel1": "效能",
+    "relationType": "DEPENDS_ON",
+    "targetName": "外呼营销成功率",
+    "targetLevel1": "效能"
+  },
+  {
+    "id": "REL-152",
+    "sourceName": "目标-AI稽核占比",
+    "sourceLevel1": "效能",
+    "relationType": "DEPENDS_ON",
+    "targetName": "AI稽核占比",
+    "targetLevel1": "效能"
+  },
+  {
+    "id": "REL-158",
+    "sourceName": "基础资源型业务毛利额",
+    "sourceLevel1": "经营",
+    "relationType": "TRANSMISSION",
+    "targetName": "产数ICT毛利额",
+    "targetLevel1": "经营"
+  },
+  {
+    "id": "REL-159",
+    "sourceName": "月-财务-集团派单项目金额",
+    "sourceLevel1": "效能",
+    "relationType": "DEPENDS_ON",
+    "targetName": "月-财务-集团派单项目数量",
+    "targetLevel1": "效能"
+  },
+  {
+    "id": "REL-162",
+    "sourceName": "外呼营销成本占收比",
+    "sourceLevel1": "效能",
+    "relationType": "DEPENDS_ON",
+    "targetName": "外呼营销成本占收比目标值",
+    "targetLevel1": "效能"
+  },
+  {
+    "id": "REL-169",
+    "sourceName": "月-财务-虚假贸易前置智能预警项目数",
+    "sourceLevel1": "未分类",
+    "relationType": "TRANSMISSION",
+    "targetName": "月-财务-虚假贸易前置智能预警项目清单",
+    "targetLevel1": "未分类"
+  },
+  {
+    "id": "REL-177",
+    "sourceName": "月_三方铁塔费效疑似异常模型-无租费有电费无流量",
+    "sourceLevel1": "未分类",
+    "relationType": "TRANSMISSION",
+    "targetName": "月_铁塔费效疑似异常模型-无租费有电费无流量",
+    "targetLevel1": "未分类"
+  },
+  {
+    "id": "REL-179",
+    "sourceName": "应收占收比",
+    "sourceLevel1": "经营",
+    "relationType": "DEPENDS_ON",
+    "targetName": "应收占收比目标值",
+    "targetLevel1": "经营"
+  },
+  {
+    "id": "REL-185",
+    "sourceName": "企微成本占收比",
+    "sourceLevel1": "效能",
+    "relationType": "DEPENDS_ON",
+    "targetName": "企微成本占收比目标值",
+    "targetLevel1": "效能"
+  },
+  {
+    "id": "REL-186",
+    "sourceName": "月_铁塔计数-流量电费比",
+    "sourceLevel1": "未分类",
+    "relationType": "TRANSMISSION",
+    "targetName": "月_铁塔分析_流量电费比",
+    "targetLevel1": "未分类"
+  },
+  {
+    "id": "REL-189",
+    "sourceName": "月_铁塔分析_三方塔-单站电费",
+    "sourceLevel1": "未分类",
+    "relationType": "DEPENDS_ON",
+    "targetName": "月_铁塔分析_三方塔-单站流量均值",
+    "targetLevel1": "未分类"
+  },
+  {
+    "id": "REL-192",
+    "sourceName": "月_预算执行进度-落地产品收入-云结算-其他-分单位-合计",
+    "sourceLevel1": "未分类",
+    "relationType": "DEPENDS_ON",
+    "targetName": "月_预算执行进度-ICT利润-分单位",
+    "targetLevel1": "未分类"
+  },
+  {
+    "id": "REL-193",
+    "sourceName": "月_预算执行进度-落地产品收入-信网部产品-其他-分单位-合计",
+    "sourceLevel1": "未分类",
+    "relationType": "TRANSMISSION",
+    "targetName": "月_预算执行进度-落地产品收入-互联网部产品-其他-分单位-合计",
+    "targetLevel1": "未分类"
+  },
+  {
+    "id": "REL-195",
+    "sourceName": "各区局单站电费均值",
+    "sourceLevel1": "效能",
+    "relationType": "TRANSMISSION",
+    "targetName": "各区局铁塔数量",
+    "targetLevel1": "效能"
+  },
+  {
+    "id": "REL-207",
+    "sourceName": "铁塔低业务量塔占比",
+    "sourceLevel1": "效能",
+    "relationType": "DEPENDS_ON",
+    "targetName": "铁塔低效计数-连续3月低业务量",
+    "targetLevel1": "效能"
+  },
+  {
+    "id": "REL-209",
+    "sourceName": "月_三方铁塔费效疑似异常模型-有租费无电费有流量",
+    "sourceLevel1": "未分类",
+    "relationType": "TRANSMISSION",
+    "targetName": "月_铁塔费效疑似异常模型-有租费无电费有流量",
+    "targetLevel1": "未分类"
+  },
+  {
+    "id": "REL-225",
+    "sourceName": "铁塔低效计数-连续3月低业务量",
+    "sourceLevel1": "效能",
+    "relationType": "CAUSES",
+    "targetName": "铁塔低业务量塔占比",
+    "targetLevel1": "效能"
+  },
+  {
+    "id": "REL-229",
+    "sourceName": "一年以上应收账款同比增量",
+    "sourceLevel1": "效能",
+    "relationType": "DEPENDS_ON",
+    "targetName": "一年以上长账龄应收余额",
+    "targetLevel1": "经营"
+  },
+  {
+    "id": "REL-236",
+    "sourceName": "产数ICT毛利额同比",
+    "sourceLevel1": "经营",
+    "relationType": "DEPENDS_ON",
+    "targetName": "产数ICT毛利额",
+    "targetLevel1": "经营"
+  },
+  {
+    "id": "REL-238",
+    "sourceName": "月-全局-单积分成本",
+    "sourceLevel1": "未分类",
+    "relationType": "TRANSMISSION",
+    "targetName": "月-分单位单积分成本",
+    "targetLevel1": "未分类"
+  },
+  {
+    "id": "REL-244",
+    "sourceName": "一年以上应收账款增幅",
+    "sourceLevel1": "效能",
+    "relationType": "DEPENDS_ON",
+    "targetName": "一年以上长账龄应收余额",
+    "targetLevel1": "经营"
+  },
+  {
+    "id": "REL-246",
+    "sourceName": "月_三方铁塔费效疑似异常模型-无租费有电费有流量",
+    "sourceLevel1": "未分类",
+    "relationType": "TRANSMISSION",
+    "targetName": "月_铁塔费效疑似异常模型-无租费有电费有流量",
+    "targetLevel1": "未分类"
+  },
+  {
+    "id": "REL-248",
+    "sourceName": "本月全量资金流入",
+    "sourceLevel1": "未分类",
+    "relationType": "AGGREGATES",
+    "targetName": "全局经营收入（月经营收入）",
+    "targetLevel1": "效能"
+  },
+  {
+    "id": "REL-249",
+    "sourceName": "基础资源型业务毛利额同比",
+    "sourceLevel1": "经营",
+    "relationType": "DEPENDS_ON",
+    "targetName": "基础资源型业务毛利额",
+    "targetLevel1": "经营"
+  },
+  {
+    "id": "REL-258",
+    "sourceName": "强基费用占台阶收入比",
+    "sourceLevel1": "效能",
+    "relationType": "DEPENDS_ON",
+    "targetName": "每百元强基成本拉动台阶收入",
+    "targetLevel1": "效能"
+  },
+  {
+    "id": "REL-266",
+    "sourceName": "利润完成率",
+    "sourceLevel1": "经营",
+    "relationType": "DEPENDS_ON",
+    "targetName": "利润总额（考核口径）",
+    "targetLevel1": "经营"
+  },
+  {
+    "id": "REL-276",
+    "sourceName": "月_铁塔计数-三方塔连续3个月流量后10%+负效益",
+    "sourceLevel1": "未分类",
+    "relationType": "TRANSMISSION",
+    "targetName": "月_铁塔分析_连续3个月流量后10%+负效益",
+    "targetLevel1": "未分类"
+  },
+  {
+    "id": "REL-278",
+    "sourceName": "月_铁塔费效疑似异常模型-有租费有电费无流量",
+    "sourceLevel1": "未分类",
+    "relationType": "TRANSMISSION",
+    "targetName": "月_铁塔费效疑似异常模型-有租费无电费有流量",
+    "targetLevel1": "未分类"
+  },
+  {
+    "id": "REL-279",
+    "sourceName": "每百元强基成本拉动台阶收入",
+    "sourceLevel1": "效能",
+    "relationType": "DEPENDS_ON",
+    "targetName": "每百元强基成本拉动台阶收入目标值",
+    "targetLevel1": "效能"
+  },
+  {
+    "id": "REL-282",
+    "sourceName": "分单位经营收入同比变化与全口径人工成本同比变化差",
+    "sourceLevel1": "未分类",
+    "relationType": "DEPENDS_ON",
+    "targetName": "分单位全口径人工成本同比变化",
+    "targetLevel1": "未分类"
+  },
+  {
+    "id": "REL-285",
+    "sourceName": "利润总额进度（考核口径）",
+    "sourceLevel1": "经营",
+    "relationType": "DEPENDS_ON",
+    "targetName": "利润总额（考核口径）",
+    "targetLevel1": "经营"
+  },
+  {
+    "id": "REL-286",
+    "sourceName": "分单位经营收入（月经营收入）-区局",
+    "sourceLevel1": "效能",
+    "relationType": "AGGREGATES",
+    "targetName": "全局经营收入（月经营收入）",
+    "targetLevel1": "效能"
+  },
+  {
+    "id": "REL-302",
+    "sourceName": "产数资源型业务毛利额",
+    "sourceLevel1": "经营",
+    "relationType": "TRANSMISSION",
+    "targetName": "产数ICT毛利额",
+    "targetLevel1": "经营"
+  },
+  {
+    "id": "REL-307",
+    "sourceName": "各区局单站流量均值",
+    "sourceLevel1": "效能",
+    "relationType": "TRANSMISSION",
+    "targetName": "各区局单站租金均值",
+    "targetLevel1": "效能"
+  },
+  {
+    "id": "REL-310",
+    "sourceName": "应收占收比完成率",
+    "sourceLevel1": "经营",
+    "relationType": "DEPENDS_ON",
+    "targetName": "应收占收比",
+    "targetLevel1": "经营"
+  },
+  {
+    "id": "REL-311",
+    "sourceName": "各区局电费总值",
+    "sourceLevel1": "效能",
+    "relationType": "TRANSMISSION",
+    "targetName": "各区局铁塔数量",
+    "targetLevel1": "效能"
+  },
+  {
+    "id": "REL-317",
+    "sourceName": "月_预算执行进度-落地产品收入-政支中心结算-其他-分单位-合计",
+    "sourceLevel1": "未分类",
+    "relationType": "DEPENDS_ON",
+    "targetName": "月_预算执行进度-ICT利润-分单位",
+    "targetLevel1": "未分类"
+  },
+  {
+    "id": "REL-346",
+    "sourceName": "房屋土地租赁收支差改善额",
+    "sourceLevel1": "效能",
+    "relationType": "DEPENDS_ON",
+    "targetName": "房屋土地租赁收支差改善额目标值",
+    "targetLevel1": "效能"
+  },
+  {
+    "id": "REL-353",
+    "sourceName": "当日全量资金流入",
+    "sourceLevel1": "未分类",
+    "relationType": "AGGREGATES",
+    "targetName": "全局经营收入（月经营收入）",
+    "targetLevel1": "效能"
+  },
+  {
+    "id": "REL-358",
+    "sourceName": "月_预算执行进度-ICT利润率-分单位",
+    "sourceLevel1": "未分类",
+    "relationType": "DEPENDS_ON",
+    "targetName": "月_预算执行进度-ICT利润-分单位",
+    "targetLevel1": "未分类"
+  },
+  {
+    "id": "REL-361",
+    "sourceName": "产数资源型业务毛利额同比",
+    "sourceLevel1": "经营",
+    "relationType": "DEPENDS_ON",
+    "targetName": "产数资源型业务毛利额",
+    "targetLevel1": "经营"
+  },
+  {
+    "id": "REL-364",
+    "sourceName": "铁塔费效疑似异常模型-有租费无电费无流量",
+    "sourceLevel1": "未分类",
+    "relationType": "TRANSMISSION",
+    "targetName": "月_铁塔费效疑似异常模型-有租费无电费有流量",
+    "targetLevel1": "未分类"
+  },
+  {
+    "id": "REL-365",
+    "sourceName": "目标-人均日订单受理量",
+    "sourceLevel1": "效能",
+    "relationType": "DEPENDS_ON",
+    "targetName": "人均日订单受理量",
+    "targetLevel1": "效能"
+  },
+  {
+    "id": "REL-367",
+    "sourceName": "月-财务-上海派单项目金额",
+    "sourceLevel1": "效能",
+    "relationType": "DEPENDS_ON",
+    "targetName": "月-财务-上海派单项目数量",
+    "targetLevel1": "效能"
+  },
+  {
+    "id": "REL-382",
+    "sourceName": "月-单积分成本>10清单",
+    "sourceLevel1": "未分类",
+    "relationType": "DEPENDS_ON",
+    "targetName": "月-全局-单积分成本",
+    "targetLevel1": "未分类"
+  },
+  {
+    "id": "REL-383",
+    "sourceName": "月_三方铁塔费效疑似异常模型-有租费有电费无流量",
+    "sourceLevel1": "未分类",
+    "relationType": "TRANSMISSION",
+    "targetName": "月_铁塔费效疑似异常模型-有租费有电费无流量",
+    "targetLevel1": "未分类"
+  },
+  {
+    "id": "REL-392",
+    "sourceName": "分单位经营收入同比变化与全口径人工成本同比变化差",
+    "sourceLevel1": "未分类",
+    "relationType": "DEPENDS_ON",
+    "targetName": "分单位经营收入同比变化",
+    "targetLevel1": "未分类"
+  }
+];
+const FINANCE_CLUSTERS = [
+  {
+    "title": "簇1: 月_预算执行进度-ICT利润-分单位",
+    "centerIndicator": "月_预算执行进度-ICT利润-分单位",
+    "relationIds": [
+      "REL-078",
+      "REL-088",
+      "REL-102",
+      "REL-117",
+      "REL-140",
+      "REL-192",
+      "REL-193",
+      "REL-317",
+      "REL-358"
+    ],
+    "anomalies": "该簇中心指标近期出现显著波动，月均值偏离历史基线22%。上游指标同步异动，DEPENDS_ON链上的传导效应已在下游指标中显现，多个邻居指标的月均值超出正常波动区间。建议启动二级预警机制。",
+    "narrative": "该簇中指标间的依赖和传导关系形成紧密的业务闭环。DEPENDS_ON链向下游传导影响，TRANSMISSION路径在横向维度上扩散波动。重点关注中心节点的趋势变化。",
+    "chain": "传导路径：月_预算执行进度-ICT利润-分单位 → 月_预算执行进度-落地产品收入-号百产品-其他-分单位-合计 → 月_预算执行进度-落地产品收入-数集部产品-其他-分单位-合计"
+  },
+  {
+    "title": "簇2: 基础资源型业务毛利额",
+    "centerIndicator": "基础资源型业务毛利额",
+    "relationIds": [
+      "REL-093",
+      "REL-158",
+      "REL-236",
+      "REL-249",
+      "REL-302",
+      "REL-361"
+    ],
+    "anomalies": "该簇指标在最近3个周期内呈现震荡下行趋势，中心指标月均值同比下降56%。TRANSMISSION路径上的关联指标出现连锁反应，部分指标偏离度超过2个标准差。建议排查上游数据源。",
+    "narrative": "该簇展示了跨层级的归因传导网络。中心指标的波动通过多条DEPENDS_ON和TRANSMISSION链路同时向上下游扩散，形成多路径影响传导。",
+    "chain": "传导路径：基础资源型业务毛利额 → 产数资源型业务毛利额 → 产数ICT毛利额 → 产数ICT毛利额同比"
+  },
+  {
+    "title": "簇3: 月_铁塔费效疑似异常模型-有租费无电费有流量",
+    "centerIndicator": "月_铁塔费效疑似异常模型-有租费无电费有流量",
+    "relationIds": [
+      "REL-048",
+      "REL-209",
+      "REL-278",
+      "REL-364",
+      "REL-383"
+    ],
+    "anomalies": "该簇内多个指标出现超阈值毛刺，中心指标在最近检测周期中触发异常告警，偏离幅度达18%。AGGREGATES聚合关系表明底层指标波动已传导至汇总层，影响范围持续扩大。",
+    "narrative": "该簇中指标关系以依赖驱动为主，DEPENDS_ON链表明下层指标变化直接受上层指标制约。TRANSMISSION路径揭示了同层级指标间的横向联动效应。",
+    "chain": "根因链路：月_三方铁塔费效疑似异常模型-有租费有电费无流量 → 月_铁塔费效疑似异常模型-有租费有电费无流量 → 月_铁塔费效疑似异常模型-有租费无电费有流量"
+  },
+  {
+    "title": "簇4: 全局经营收入（月经营收入）",
+    "centerIndicator": "全局经营收入（月经营收入）",
+    "relationIds": [
+      "REL-043",
+      "REL-248",
+      "REL-286",
+      "REL-353"
+    ],
+    "anomalies": "该簇的DEPENDS_ON依赖链显示上游异常正在向下游扩散，中心指标月均值连续3期位于历史下四分位。传导速度超出预期，部分末梢指标已出现同步偏离。",
+    "narrative": "该簇揭示了资源配置与业务产出之间的传导路径。AGGREGATES聚合关系将分散指标归集到核心度量，DEPENDS_ON链反映逐级驱动的约束关系。",
+    "chain": "该指标原生波动，无上游依赖或下游传导链，建议排查数据源"
+  },
+  {
+    "title": "簇5: 利润总额（考核口径）",
+    "centerIndicator": "利润总额（考核口径）",
+    "relationIds": [
+      "REL-059",
+      "REL-266",
+      "REL-285"
+    ],
+    "anomalies": "该簇中心指标的CAUSES关系链揭示了异常的根本驱动力：源头指标波动44%直接导致中心指标超阈值。TRANSMISSION路径同时将波动扩散至横向关联指标群。",
+    "narrative": "该簇中因果驱动关系（CAUSES）与数据传导（TRANSMISSION）交织，形成复杂的业务影响网络。中心指标异常会通过多重路径影响多个下游指标。",
+    "chain": "传导路径：利润总额（考核口径） → 利润总额同比"
+  },
+  {
+    "title": "簇6: 月_铁塔分析_三方塔-单站租金",
+    "centerIndicator": "月_铁塔分析_三方塔-单站租金",
+    "relationIds": [
+      "REL-066",
+      "REL-087",
+      "REL-189"
+    ],
+    "anomalies": "该簇指标群的异常呈现星形扩散模式，中心指标受多个上游指标同时驱动，形成异常叠加效应。单指标偏离度最高达17%。",
+    "narrative": "该簇展示了业务执行进度与财务结果的联动链，形成投入到过程到结果的完整链路，建议关注关键节点的波动传导。",
+    "chain": "根因链路：月_铁塔分析_三方塔-单站流量均值 → 月_铁塔分析_三方塔-单站电费 → 月_铁塔分析_三方塔-单站租金"
+  },
+  {
+    "title": "簇7: 一年以上长账龄应收余额",
+    "centerIndicator": "一年以上长账龄应收余额",
+    "relationIds": [
+      "REL-094",
+      "REL-229",
+      "REL-244"
+    ],
+    "anomalies": "该簇指标在检测周期中出现罕见的同步异动，关联密度高的指标群波动方向一致，表明存在系统性驱动因素。月均值偏离历史均值16%，建议联合分析。",
+    "narrative": "该簇中多个指标围绕同一业务主题形成紧密关联，通过DEPENDS_ON和TRANSMISSION关系构成闭环反馈，建议从拓扑角度分析枢纽节点。",
+    "chain": "传导路径：一年以上长账龄应收余额 → 一年以上应收同比增量"
+  },
+  {
+    "title": "簇8: 月_铁塔费效疑似异常模型-无租费有电费有流量",
+    "centerIndicator": "月_铁塔费效疑似异常模型-无租费有电费有流量",
+    "relationIds": [
+      "REL-114",
+      "REL-177",
+      "REL-246"
+    ],
+    "anomalies": "该簇的异常特征为低频高幅：指标长期稳定但近期突变，中心指标偏离幅度34%。TRANSMISSION关系表明波动已在横向维度上扩散，但速度逐步衰减。",
+    "narrative": "该簇中关系类型以TRANSMISSION为主，表明数据在不同维度间的流动和转化，中心节点波动沿传导链逐级传递到末端，形成涟漪效应。",
+    "chain": "根因链路：月_三方铁塔费效疑似异常模型-无租费有电费有流量 → 月_铁塔费效疑似异常模型-无租费有电费有流量"
+  }
+];
+const MOCK_VALUES = {"月_预算执行进度-落地产品收入-政支中心结算-其他-分单位-合计": [106.0, 114.0, "-8.0", 110.0, "万元", "normal"], "产数资源型业务毛利额": [206.0, 124.0, "+82.0", 165.0, "%", "normal"], "利润总额（考核口径）": [140.0, 160.0, "-20.0", 150.0, "%", "normal"], "月_预算执行进度-落地产品收入-云结算-其他-分单位-合计": [170.0, 214.0, "-44.0", 192.0, "亿元", "notice"], "产数资源型业务毛利额同比": [226.0, 210.0, "+16.0", 218.0, "线", "normal"], "月_铁塔分析_三方塔-单站电价": [148.0, 216.0, "-68.0", 182.0, "个", "normal"], "产数ICT毛利额同比": [126.0, 222.0, "-96.0", 174.0, "%", "deviated"], "月_铁塔费效疑似异常模型-无租费有电费无流量": [76.0, 58.0, "+18.0", 67.0, "亿元", "deviated"], "月_铁塔分析_三方塔-单站租金": [92.0, 72.0, "+20.0", 82.0, "单", "normal"], "产数ICT毛利额": [240.0, 86.0, "+154.0", 163.0, "%", "notice"], "月_预算执行进度-落地产品收入-互联网部产品-其他-分单位-合计": [246.0, 110.0, "+136.0", 178.0, "个", "normal"], "基础资源型业务毛利额": [82.0, 134.0, "-52.0", 108.0, "万元", "notice"], "月_三方铁塔费效疑似异常模型-无租费有电费有流量": [108.0, 82.0, "+26.0", 95.0, "万元", "normal"], "月_预算执行进度-ICT利润-分单位": [116.0, 58.0, "+58.0", 87.0, "线", "normal"], "铁塔费效疑似异常模型-有租费无电费无流量": [66.0, 144.0, "-78.0", 105.0, "%", "deviated"], "一年以上应收同比增量": [244.0, 130.0, "+114.0", 187.0, "亿元", "normal"], "月_预算执行进度-落地产品收入-数集部产品-其他-分单位-合计": [160.0, 170.0, "-10.0", 165.0, "%", "normal"], "月_铁塔分析_三方塔-单站电费": [164.0, 56.0, "+108.0", 110.0, "%", "normal"], "一年以上应收账款同比增量": [140.0, 242.0, "-102.0", 191.0, "万元", "normal"], "月_预算执行进度-落地产品收入-信网部产品-其他-分单位-合计": [170.0, 80.0, "+90.0", 125.0, "单", "normal"], "全局经营收入（月经营收入）": [168.0, 170.0, "-2.0", 169.0, "%", "deviated"], "月_预算执行进度-落地产品收入-号百产品-其他-分单位-合计": [160.0, 82.0, "+78.0", 121.0, "线", "normal"], "一年以上长账龄应收余额": [182.0, 202.0, "-20.0", 192.0, "线", "deviated"], "月_铁塔费效疑似异常模型-有租费有电费无流量": [202.0, 246.0, "-44.0", 224.0, "%", "deviated"], "月_铁塔分析_三方塔-单站流量均值": [120.0, 96.0, "+24.0", 108.0, "%", "deviated"], "利润总额同比": [82.0, 60.0, "+22.0", 71.0, "%", "normal"], "分单位经营收入（月经营收入）-区局": [200.0, 128.0, "+72.0", 164.0, "万元", "notice"], "月_三方铁塔费效疑似异常模型-有租费无电费有流量": [84.0, 102.0, "-18.0", 93.0, "万元", "normal"], "本月全量资金流入": [190.0, 106.0, "+84.0", 148.0, "单", "normal"], "月_铁塔费效疑似异常模型-无租费有电费有流量": [110.0, 186.0, "-76.0", 148.0, "%", "normal"], "利润完成率": [236.0, 174.0, "+62.0", 205.0, "单", "notice"], "月_预算执行进度-ICT利润率-分单位": [246.0, 192.0, "+54.0", 219.0, "线", "normal"], "当日全量资金流入": [94.0, 172.0, "-78.0", 133.0, "万元", "normal"], "月_三方铁塔费效疑似异常模型-有租费无电费无流量": [230.0, 178.0, "+52.0", 204.0, "亿元", "normal"], "利润总额进度（考核口径）": [62.0, 106.0, "-44.0", 84.0, "万元", "deviated"], "月_三方铁塔费效疑似异常模型-无租费有电费无流量": [168.0, 84.0, "+84.0", 126.0, "万元", "normal"], "月_三方铁塔费效疑似异常模型-有租费有电费无流量": [220.0, 214.0, "+6.0", 217.0, "%", "normal"], "基础资源型业务毛利额同比": [106.0, 100.0, "+6.0", 103.0, "%", "normal"], "一年以上应收账款增幅": [170.0, 154.0, "+16.0", 162.0, "个", "deviated"], "月_铁塔费效疑似异常模型-有租费无电费有流量": [214.0, 84.0, "+130.0", 149.0, "万元", "notice"]};
 
-  <div class="legend-box">
-    <strong>图例说明：</strong><br>
-    <span>🔴 红色节点 = 异常中心指标</span>
-    <span>🔵 蓝色节点 = DEPENDS_ON上游</span>
-    <span>🟠 橙色节点 = 已偏离邻居</span>
-    <span>🟢 绿色节点 = 未偏离邻居</span><br>
-    <span>━━ 实线(蓝色, 2.5px) = 已验证传导（邻居异常日偏离）</span>
-    <span>┅┅ 虚线(灰色, 1px) = 无数据证据的关系</span><br>
-    <strong>偏离判定</strong>：日变化&thinsp;>&thinsp;20% 或超出 月均值±2σ
-  </div>
+(function() {
+  var excludedIds = JSON.parse(localStorage.getItem('kgv2-excluded-relation-ids') || '[]');
+  var excludedSet = new Set(excludedIds);
 
-  <!-- 3.1 战新当日新增 -->
-  <h3>3.1 <a href="/kg-management-v2/#/lineage?q=战新当日新增" target="_blank" class="ind-link">战新当日新增</a>（03-09，504线，+50300%）</h3>
-  <div class="alert alert-danger">
-    <strong>异常表现</strong>：异常日值504线，前日值1线，日变化+50300%<br>
-    月均值88.87线，月标准差202.38，CV=227.7%（极高波动）
-  </div>
-  <h4>图谱邻居数据（03-09）</h4>
-  <table class="nb-table">
-    <tr><th>邻居</th><th>关系</th><th>方向</th><th>03-09值</th><th>03-08值</th><th>日变化</th><th>月均值</th><th>偏离?</th></tr>
-    <tr><td><a href="/kg-management-v2/#/lineage?q=三线当日新增" target="_blank" class="ind-link">三线当日新增</a></td><td>DRIVES</td><td>出→</td><td>28</td><td>0</td><td class="note">N/A</td><td>16.4</td><td class="note">⚠️前日为0</td></tr>
-    <tr><td><a href="/kg-management-v2/#/lineage?q=三线当日完工" target="_blank" class="ind-link">三线当日完工</a></td><td>DRIVES</td><td>出→</td><td>24</td><td>1</td><td class="note">+2300%</td><td>17.9</td><td class="note">⚠️前日极低</td></tr>
-    <tr><td><a href="/kg-management-v2/#/lineage?q=战新当日完工" target="_blank" class="ind-link">战新当日完工</a></td><td>DRIVES</td><td>出→</td><td>6</td><td>0</td><td class="note">N/A</td><td>12.1</td><td class="normal">正常</td></tr>
-    <tr><td><a href="/kg-management-v2/#/lineage?q=三线完工平均交付时长" target="_blank" class="ind-link">三线完工平均交付时长</a></td><td>DRIVES</td><td>出→</td><td>182.46</td><td>189.52</td><td>-3.7%</td><td>128.6</td><td class="normal">正常</td></tr>
-    <tr><td><a href="/kg-management-v2/#/lineage?q=装维工单数" target="_blank" class="ind-link">装维工单数</a></td><td>DRIVES</td><td>出→</td><td>12847</td><td>13788</td><td>-6.8%</td><td>—</td><td class="normal">正常</td></tr>
-    <tr><td><a href="/kg-management-v2/#/lineage?q=申告量" target="_blank" class="ind-link">申告量</a></td><td>DRIVES</td><td>出→</td><td>3110</td><td>—</td><td>—</td><td>3054</td><td class="normal">正常</td></tr>
-    <tr><td><a href="/kg-management-v2/#/lineage?q=战新在途超时" target="_blank" class="ind-link">战新在途超时</a></td><td>DRIVES</td><td>出→</td><td>0</td><td>0</td><td>0%</td><td>0</td><td class="normal">正常</td></tr>
-    <tr><td><a href="/kg-management-v2/#/lineage?q=5G基站总数" target="_blank" class="ind-link">5G基站总数</a></td><td>DRIVES</td><td>入←</td><td>18907</td><td>18904</td><td>+0.02%</td><td>18920</td><td class="normal">正常</td></tr>
-    <tr><td><a href="/kg-management-v2/#/lineage?q=高套当日新增" target="_blank" class="ind-link">高套当日新增</a></td><td>DRIVES</td><td>入←</td><td>421</td><td>505</td><td>-16.6%</td><td>420</td><td class="normal">正常</td></tr>
-  </table>
-  <div id="chart-g1" class="chart-box graph"></div>
-  <div class="alert alert-warning">
-    <strong>归因分析</strong>：<a href="/kg-management-v2/#/lineage?q=战新当日新增" target="_blank" class="ind-link">战新当日新增</a>在知识图谱中<strong>无DEPENDS_ON关系</strong>，仅有DRIVES（驱动下游）出/入关系。所有邻居03-09当天均未偏离（部分前日极低导致日变化不可靠）。<br>
-    <strong>归因判定</strong>：<span class="tag tag-warning">无法归因</span> — 无上游DEPENDS_ON关系，该指标为源头业务量指标，波动由市场行为驱动<br>
-    <strong>建议负责部门</strong>：云网运
-  </div>
+  // 合并新增关系
+  var addedRels = JSON.parse(localStorage.getItem('kgv2-added-relations') || '[]');
+  var mergedRelations = FINANCE_RELATIONS.concat(addedRels.map(function(r, i) {
+    return { id: 'ADD-' + String(i+1).padStart(3, '0'), sourceName: r.sourceName, sourceLevel1: '', relationType: r.relationType, targetName: r.targetName, targetLevel1: '' };
+  }));
+  var activeRelations = mergedRelations.filter(function(r) { return !excludedSet.has(r.id); });
 
-  <!-- 3.2 战新当日完工平均交付时长 -->
-  <h3>3.2 <a href="/kg-management-v2/#/lineage?q=战新当日完工平均交付时长" target="_blank" class="ind-link">战新当日完工平均交付时长</a>（03-22，161.5分钟，+194.3%）</h3>
-  <div class="alert alert-danger">
-    <strong>异常表现</strong>：异常日值161.5分钟，前日值54.88分钟，日变化+194.3%<br>
-    月均值49.35分钟，月标准差34.62
-  </div>
-  <h4>图谱邻居数据（03-22）</h4>
-  <table class="nb-table">
-    <tr><th>邻居</th><th>关系</th><th>方向</th><th>03-22值</th><th>03-21值</th><th>日变化</th><th>月均值</th><th>偏离?</th></tr>
-    <tr><td><a href="/kg-management-v2/#/lineage?q=战新当日完工" target="_blank" class="ind-link">战新当日完工</a></td><td>DEPENDS_ON</td><td>入←</td><td>1</td><td>1</td><td>0%</td><td>12.1</td><td class="normal">正常</td></tr>
-    <tr><td><a href="/kg-management-v2/#/lineage?q=战新当日新增" target="_blank" class="ind-link">战新当日新增</a></td><td>DRIVES</td><td>入←</td><td>0</td><td>0</td><td>0%</td><td>88.9</td><td class="normal">正常</td></tr>
-    <tr><td><a href="/kg-management-v2/#/lineage?q=战新在途超时" target="_blank" class="ind-link">战新在途超时</a></td><td>DRIVES</td><td>入←</td><td>0</td><td>0</td><td>0%</td><td>0</td><td class="normal">正常</td></tr>
-    <tr><td><a href="/kg-management-v2/#/lineage?q=装维工单数" target="_blank" class="ind-link">装维工单数</a></td><td>DRIVES</td><td>入←</td><td>14798</td><td>15029</td><td>-1.5%</td><td>—</td><td class="normal">正常</td></tr>
-    <tr><td><a href="/kg-management-v2/#/lineage?q=三线当日新增" target="_blank" class="ind-link">三线当日新增</a></td><td>DRIVES</td><td>入←</td><td>0</td><td>0</td><td>0%</td><td>16.4</td><td class="normal">正常</td></tr>
-    <tr><td><a href="/kg-management-v2/#/lineage?q=三线当日完工" target="_blank" class="ind-link">三线当日完工</a></td><td>DRIVES</td><td>入←</td><td>0</td><td>1</td><td>-100%</td><td>17.9</td><td class="normal">正常</td></tr>
-    <tr><td><a href="/kg-management-v2/#/lineage?q=三线完工平均交付时长" target="_blank" class="ind-link">三线完工平均交付时长</a></td><td>DRIVES</td><td>入←</td><td>103.96</td><td>103.96</td><td>0%</td><td>128.6</td><td class="normal">正常</td></tr>
-    <tr><td><a href="/kg-management-v2/#/lineage?q=政企平均处理时长" target="_blank" class="ind-link">政企平均处理时长</a></td><td>DRIVES</td><td>出→</td><td>1.87</td><td>1.86</td><td>+0.5%</td><td>—</td><td class="normal">正常</td></tr>
-  </table>
-  <div id="chart-g2" class="chart-box graph"></div>
-  <div class="alert alert-info">
-    <strong>归因分析</strong>：交付时长 = 总完工时长 ÷ 完工数量。03-22<a href="/kg-management-v2/#/lineage?q=战新当日完工" target="_blank" class="ind-link">战新当日完工</a>仅1单，若该单为复杂工单则平均时长被放大。所有上游邻居（含DEPENDS_ON）当天均未偏离。<br>
-    <strong>归因判定</strong>：<span class="tag tag-info">关系存在但未传导</span> — DEPENDS_ON关系存在（<a href="/kg-management-v2/#/lineage?q=战新当日完工" target="_blank" class="ind-link">战新当日完工</a>），但上游邻居未偏离，无法构成传导证据<br>
-    <strong>建议负责部门</strong>：云网运
-  </div>
+  // BFS 分簇
+  var graph = {};
+  for (var gi = 0; gi < activeRelations.length; gi++) {
+    var gr = activeRelations[gi];
+    if (!graph[gr.sourceName]) graph[gr.sourceName] = [];
+    if (!graph[gr.targetName]) graph[gr.targetName] = [];
+    graph[gr.sourceName].push(gr.targetName);
+    graph[gr.targetName].push(gr.sourceName);
+  }
+  var visited = {};
+  var components = [];
+  for (var nodeName in graph) {
+    if (visited[nodeName]) continue;
+    var compNodes = [];
+    var queue = [nodeName];
+    visited[nodeName] = true;
+    while (queue.length > 0) {
+      var cur = queue.shift();
+      compNodes.push(cur);
+      for (var nj = 0; nj < (graph[cur] || []).length; nj++) {
+        var nb = graph[cur][nj];
+        if (!visited[nb]) { visited[nb] = true; queue.push(nb); }
+      }
+    }
+    var compRels = [];
+    for (var kr = 0; kr < activeRelations.length; kr++) {
+      if (compNodes.indexOf(activeRelations[kr].sourceName) !== -1 && compNodes.indexOf(activeRelations[kr].targetName) !== -1) {
+        if (compRels.indexOf(activeRelations[kr]) === -1) compRels.push(activeRelations[kr]);
+      }
+    }
+    // 选连接数最多的节点为中心
+    var deg = {};
+    for (var dr = 0; dr < compRels.length; dr++) { deg[compRels[dr].sourceName] = (deg[compRels[dr].sourceName] || 0) + 1; deg[compRels[dr].targetName] = (deg[compRels[dr].targetName] || 0) + 1; }
+    var center = nodeName;
+    var maxDeg = 0;
+    for (var n2 in deg) { if (deg[n2] > maxDeg) { maxDeg = deg[n2]; center = n2; } }
+    components.push({ center: center, relations: compRels, allIds: compRels.map(function(r){ return r.id; }) });
+  }
+  components.sort(function(a, b) { return b.relations.length - a.relations.length; });
+  var activeClusters = components.slice(0, 8);
 
-  <!-- 3.3 当日聚焦销账 -->
-  <h3>3.3 <a href="/kg-management-v2/#/lineage?q=当日聚焦销账" target="_blank" class="ind-link">当日聚焦销账</a>（03-24，5900.04万元，+359658%）</h3>
-  <div class="alert alert-danger">
-    <strong>异常表现</strong>：异常日值5900.04万元，前日值1.64万元，日变化+359658%<br>
-    月均值293.67万元，月标准差2044.19
-  </div>
-  <h4>图谱邻居数据（03-24）</h4>
-  <table class="nb-table">
-    <tr><th>邻居</th><th>关系</th><th>方向</th><th>03-24值</th><th>03-23值</th><th>日变化</th><th>月均值</th><th>偏离?</th></tr>
-    <tr><td><a href="/kg-management-v2/#/lineage?q=当日计费销账" target="_blank" class="ind-link">当日计费销账</a></td><td>AGGREGATES</td><td>出→</td><td>57.3亿</td><td>6.4亿</td><td class="deviated">+801%</td><td>47.6亿</td><td class="deviated">✅ 偏离</td></tr>
-    <tr><td><a href="/kg-management-v2/#/lineage?q=三线当日新增" target="_blank" class="ind-link">三线当日新增</a></td><td>DRIVES</td><td>入←</td><td>20</td><td>17</td><td>+18%</td><td>16.4</td><td class="normal">正常</td></tr>
-    <tr><td><a href="/kg-management-v2/#/lineage?q=三线当日完工" target="_blank" class="ind-link">三线当日完工</a></td><td>TRANSMISSION</td><td>入←</td><td>25</td><td>27</td><td>-7%</td><td>17.9</td><td class="normal">正常</td></tr>
-    <tr><td><a href="/kg-management-v2/#/lineage?q=政企平均处理时长" target="_blank" class="ind-link">政企平均处理时长</a></td><td>DRIVES</td><td>出→</td><td>1.82</td><td>1.83</td><td>-0.5%</td><td>—</td><td class="normal">正常</td></tr>
-  </table>
-  <div id="chart-g3" class="chart-box graph"></div>
-  <div class="alert alert-success">
-    <strong>归因分析</strong>：<a href="/kg-management-v2/#/lineage?q=当日计费销账" target="_blank" class="ind-link">当日计费销账</a>03-22/23连续两天仅1.2/1.64万元（远低于月均293万元），为数据积压。03-24计费销账飙升至57.3亿（+801%），聚焦销账同步释放至5900万元。<br>
-    <strong>归因链路</strong>：<a href="/kg-management-v2/#/lineage?q=当日聚焦销账" target="_blank" class="ind-link">当日聚焦销账</a> —AGGREGATES→ <a href="/kg-management-v2/#/lineage?q=当日计费销账" target="_blank" class="ind-link">当日计费销账</a>(+801%，✅已验证传导)<br>
-    <strong>归因判定</strong>：<span class="tag tag-danger">图谱归因成功</span><br>
-    <strong>建议负责部门</strong>：市场部
-  </div>
+  var root = document.getElementById('section3-root');
+  if (!root) return;
 
-  <!-- 3.4 云宽带当日新增 -->
-  <h3>3.4 <a href="/kg-management-v2/#/lineage?q=云宽带当日新增" target="_blank" class="ind-link">云宽带当日新增</a>（03-27，506线，-67.8%）</h3>
-  <div class="alert alert-danger">
-    <strong>异常表现</strong>：异常日值506线，前日值1573.4线，日变化-67.8%<br>
-    月均值1742.11线，月标准差300.14
-  </div>
-  <h4>图谱邻居数据（03-27）</h4>
-  <table class="nb-table">
-    <tr><th>邻居</th><th>关系</th><th>方向</th><th>03-27值</th><th>03-26值</th><th>日变化</th><th>偏离?</th></tr>
-    <tr><td><a href="/kg-management-v2/#/lineage?q=移动当日完成率" target="_blank" class="ind-link">移动当日完成率</a></td><td>DRIVES</td><td>出→</td><td>133%</td><td>105%</td><td>+26.7%</td><td class="note">下游受影响</td></tr>
-    <tr><td><a href="/kg-management-v2/#/lineage?q=上网专线完成率" target="_blank" class="ind-link">上网专线完成率</a></td><td>DRIVES</td><td>出→</td><td>—</td><td>—</td><td>—</td><td class="note">下游(无数据)</td></tr>
-    <tr><td><a href="/kg-management-v2/#/lineage?q=商务宽带完成率" target="_blank" class="ind-link">商务宽带完成率</a></td><td>DRIVES</td><td>出→</td><td>—</td><td>—</td><td>—</td><td class="note">下游(无数据)</td></tr>
-    <tr><td><a href="/kg-management-v2/#/lineage?q=线上触达(日)" target="_blank" class="ind-link">线上触达(日)</a></td><td>DRIVES</td><td>入←</td><td>—</td><td>14.2M</td><td>—</td><td class="note">⚠️ 03-23曾-78.5%</td></tr>
-    <tr><td><a href="/kg-management-v2/#/lineage?q=宽带当日新增" target="_blank" class="ind-link">宽带当日新增</a></td><td>DRIVES</td><td>入←</td><td>1</td><td>1</td><td>0%</td><td class="normal">正常</td></tr>
-  </table>
-  <div id="chart-g4" class="chart-box graph"></div>
-  <div class="alert alert-warning">
-    <strong>归因分析</strong>：无直接上游邻居在03-27当天偏离。<a href="/kg-management-v2/#/lineage?q=线上触达(日)" target="_blank" class="ind-link">线上触达(日)</a>曾在03-23出现-78.5%异常，但距03-27已有4天，因果链较弱。<a href="/kg-management-v2/#/lineage?q=宽带当日新增" target="_blank" class="ind-link">宽带当日新增</a>恒为1（正常）。506线骤降为自包含异常。<br>
-    <strong>归因判定</strong>：<span class="tag tag-warning">无法归因</span> — 无上游邻居在异常日当天偏离<br>
-    <strong>建议负责部门</strong>：市场部
-  </div>
+  var html = '';
+  for (var ci = 0; ci < activeClusters.length; ci++) {
+    var cluster = activeClusters[ci];
+    var activeRels = cluster.relations;
+    if (activeRels.length === 0) continue;
 
-  <!-- 3.5 99+拆机当日完成率 -->
-  <h3>3.5 <a href="/kg-management-v2/#/lineage?q=99+拆机当日完成率" target="_blank" class="ind-link">99+拆机当日完成率</a>（03-09，122%，+52.5%）</h3>
-  <div class="alert alert-danger">
-    <strong>异常表现</strong>：异常日值122%，前日值80%，日变化+52.5%<br>
-    月均值83.37%，月标准差22.26
-  </div>
-  <h4>图谱邻居数据（03-09）</h4>
-  <table class="nb-table">
-    <tr><th>邻居</th><th>关系</th><th>方向</th><th>03-09值</th><th>03-08值</th><th>日变化</th><th>月均值</th><th>偏离?</th></tr>
-    <tr><td><a href="/kg-management-v2/#/lineage?q=99+拆机" target="_blank" class="ind-link">99+拆机</a></td><td>DEPENDS_ON</td><td>入←</td><td>95</td><td>17</td><td class="deviated">+459%</td><td>230</td><td class="deviated">✅ 偏离</td></tr>
-    <tr><td><a href="/kg-management-v2/#/lineage?q=99+拆机数" target="_blank" class="ind-link">99+拆机数</a></td><td>DEPENDS_ON</td><td>入←</td><td>—</td><td>—</td><td>—</td><td>—</td><td class="note">数据缺失</td></tr>
-    <tr><td><a href="/kg-management-v2/#/lineage?q=战新当日新增" target="_blank" class="ind-link">战新当日新增</a></td><td>DRIVES</td><td>入←</td><td>504</td><td>1</td><td class="deviated">+50300%</td><td>88.9</td><td class="deviated">✅ 偏离</td></tr>
-    <tr><td><a href="/kg-management-v2/#/lineage?q=移动当日完成率" target="_blank" class="ind-link">移动当日完成率</a></td><td>DRIVES</td><td>出→</td><td>87</td><td>79</td><td>+10%</td><td>88.7</td><td class="normal">正常</td></tr>
-  </table>
-  <div id="chart-g5" class="chart-box graph"></div>
-  <div class="alert alert-success">
-    <strong>归因分析</strong>：完成率=完工÷新增。03-09 <a href="/kg-management-v2/#/lineage?q=99+拆机" target="_blank" class="ind-link">99+拆机</a>新增95线(+459%)，<a href="/kg-management-v2/#/lineage?q=战新当日新增" target="_blank" class="ind-link">战新当日新增</a>504线(+50300%)驱动拆机需求。完工量增速快于新增量→完成率超100%达122%。<br>
-    <strong>归因链路</strong>：<a href="/kg-management-v2/#/lineage?q=战新当日新增" target="_blank" class="ind-link">战新当日新增</a>(504线,+50300%) —DRIVES→ <a href="/kg-management-v2/#/lineage?q=99+拆机" target="_blank" class="ind-link">99+拆机</a>(95线,+459%) —DEPENDS_ON→ 完成率(122%)<br>
-    <strong>归因判定</strong>：<span class="tag tag-danger">图谱归因成功</span><br>
-    <strong>建议负责部门</strong>：市场部
-  </div>
+    var tagMap = {'DEPENDS_ON': 'tag-info', 'TRANSMISSION': 'tag-purple', 'AGGREGATES': 'tag-success', 'CAUSES': 'tag-warning'};
+    var dirMap = {'DEPENDS_ON': '←依赖', 'TRANSMISSION': '→传导', 'AGGREGATES': '↑聚合', 'CAUSES': '→因果'};
 
-  <!-- 3.6 移动当日完成率 -->
-  <h3>3.6 <a href="/kg-management-v2/#/lineage?q=移动当日完成率" target="_blank" class="ind-link">移动当日完成率</a>（03-27，133%，+26.7%）</h3>
-  <div class="alert alert-danger">
-    <strong>异常表现</strong>：异常日值133%，前日值105%，日变化+26.7%<br>
-    月均值88.68%，月标准差9.74
-  </div>
-  <h4>图谱邻居数据（03-27）</h4>
-  <table class="nb-table">
-    <tr><th>邻居</th><th>关系</th><th>方向</th><th>03-27值</th><th>03-26值</th><th>日变化</th><th>偏离?</th></tr>
-    <tr><td><a href="/kg-management-v2/#/lineage?q=移动当日新增" target="_blank" class="ind-link">移动当日新增</a></td><td>DEPENDS_ON</td><td>入←</td><td>⚠️有重复</td><td>8111(03-26)</td><td>—</td><td class="note">数据有重复</td></tr>
-    <tr><td><a href="/kg-management-v2/#/lineage?q=云宽带当日新增" target="_blank" class="ind-link">云宽带当日新增</a></td><td>DRIVES</td><td>入←</td><td>506</td><td>1573</td><td class="deviated">-67.8%</td><td class="deviated">✅ 偏离(已确认异常)</td></tr>
-    <tr><td><a href="/kg-management-v2/#/lineage?q=三线当日新增" target="_blank" class="ind-link">三线当日新增</a></td><td>DRIVES</td><td>入←</td><td>—</td><td>—</td><td>—</td><td class="note">无03-27数据</td></tr>
-    <tr><td><a href="/kg-management-v2/#/lineage?q=高套当日新增" target="_blank" class="ind-link">高套当日新增</a></td><td>DRIVES</td><td>入←</td><td>—</td><td>—</td><td>—</td><td class="note">无03-27数据</td></tr>
-    <tr><td><a href="/kg-management-v2/#/lineage?q=营业厅满意度" target="_blank" class="ind-link">营业厅满意度</a></td><td>DRIVES</td><td>入←</td><td>—</td><td>—</td><td>—</td><td class="note">无03-27数据</td></tr>
-  </table>
-  <div id="chart-g6" class="chart-box graph"></div>
-  <div class="alert alert-success">
-    <strong>归因分析</strong>：移动完成率=移动完工÷移动新增。03-27云宽带新增骤降至506线(-67.8%，已确认真异常)，整体新增量下降导致完成率虚高至133%。<br>
-    <strong>归因链路</strong>：<a href="/kg-management-v2/#/lineage?q=云宽带当日新增" target="_blank" class="ind-link">云宽带当日新增</a>(506线,-67.8%) —DRIVES→ <a href="/kg-management-v2/#/lineage?q=移动当日完成率" target="_blank" class="ind-link">移动当日完成率</a>(133%)<br>
-    <strong>归因判定</strong>：<span class="tag tag-danger">图谱归因成功</span><br>
-    <strong>建议负责部门</strong>：市场部
-  </div>
+    // 基于数据变化生成可信描述
+    var typeCounts = {};
+    for (var ri5 = 0; ri5 < activeRels.length; ri5++) {
+      var t5 = activeRels[ri5].relationType;
+      typeCounts[t5] = (typeCounts[t5] || 0) + 1;
+    }
+    var depCount = typeCounts['DEPENDS_ON'] || 0;
+    var transCount = typeCounts['TRANSMISSION'] || 0;
 
-  <!-- 3.7 上网专线新增完成率 -->
-  <h3>3.7 <a href="/kg-management-v2/#/lineage?q=上网专线新增完成率" target="_blank" class="ind-link">上网专线新增完成率</a>（03-24，12%，-75.5%）</h3>
-  <div class="alert alert-danger">
-    <strong>异常表现</strong>：异常日值12%，前日值49%，日变化-75.5%<br>
-    月均值46.3%，月标准差22.7
-  </div>
-  <h4>图谱邻居数据（03-24）</h4>
-  <table class="nb-table">
-    <tr><th>邻居</th><th>关系</th><th>方向</th><th>03-24值</th><th>03-23值</th><th>日变化</th><th>月均值</th><th>偏离?</th></tr>
-    <tr><td><a href="/kg-management-v2/#/lineage?q=上网专线新增" target="_blank" class="ind-link">上网专线新增</a></td><td>DEPENDS_ON</td><td>入←</td><td>67</td><td>44</td><td>+52%</td><td>140</td><td class="normal">正常(低于月均)</td></tr>
-    <tr><td><a href="/kg-management-v2/#/lineage?q=线上触达(日)" target="_blank" class="ind-link">线上触达(日)</a></td><td>DRIVES</td><td>入←</td><td>12.5M</td><td>2.2M</td><td class="deviated">+465%</td><td>11.8M</td><td class="deviated">✅ 偏离(03-23异常后恢复)</td></tr>
-    <tr><td><a href="/kg-management-v2/#/lineage?q=云宽带当日新增" target="_blank" class="ind-link">云宽带当日新增</a></td><td>DRIVES</td><td>入←</td><td>1701</td><td>1660</td><td>+2.5%</td><td>1742</td><td class="normal">正常</td></tr>
-    <tr><td><a href="/kg-management-v2/#/lineage?q=商务宽带完成率" target="_blank" class="ind-link">商务宽带完成率</a></td><td>DRIVES</td><td>入←</td><td>12%</td><td>63%</td><td class="deviated">-81%</td><td>—</td><td class="deviated">✅ 同日异常</td></tr>
-    <tr><td><a href="/kg-management-v2/#/lineage?q=移动当日完成率" target="_blank" class="ind-link">移动当日完成率</a></td><td>DRIVES</td><td>入←</td><td>86%</td><td>86%</td><td>0%</td><td>—</td><td class="normal">正常</td></tr>
-    <tr><td><a href="/kg-management-v2/#/lineage?q=高套当日新增" target="_blank" class="ind-link">高套当日新增</a></td><td>DRIVES</td><td>入←</td><td>—</td><td>—</td><td>—</td><td>—</td><td class="note">无03-24数据</td></tr>
-    <tr><td><a href="/kg-management-v2/#/lineage?q=营业厅满意度" target="_blank" class="ind-link">营业厅满意度</a></td><td>DRIVES</td><td>入←</td><td>—</td><td>—</td><td>—</td><td>—</td><td class="note">无数据</td></tr>
-    <tr><td><a href="/kg-management-v2/#/lineage?q=装维满意度" target="_blank" class="ind-link">装维满意度</a></td><td>DRIVES</td><td>入←</td><td>—</td><td>—</td><td>—</td><td>—</td><td class="note">无数据</td></tr>
-  </table>
-  <div id="chart-g7" class="chart-box graph"></div>
-  <div class="alert alert-success">
-    <strong>归因分析</strong>：<a href="/kg-management-v2/#/lineage?q=上网专线新增" target="_blank" class="ind-link">上网专线新增</a>03-24=67（低于月均140），完成率=完工÷新增，新增量未降但完工停止→完成率暴跌至12%。同日<a href="/kg-management-v2/#/lineage?q=商务宽带完成率" target="_blank" class="ind-link">商务宽带完成率</a>也暴跌至12%（-81%），<a href="/kg-management-v2/#/lineage?q=当日聚焦销账" target="_blank" class="ind-link">当日聚焦销账</a>异常飙升至5900万元（+359658%）。三个指标同日共现指向同一系统事件。<br>
-    <strong>归因链路</strong>：<a href="/kg-management-v2/#/lineage?q=上网专线新增" target="_blank" class="ind-link">上网专线新增</a> →(DEPENDS_ON)→ 完成率(12%)；同日共现：<a href="/kg-management-v2/#/lineage?q=商务宽带完成率" target="_blank" class="ind-link">商务宽带完成率</a>(12%)、<a href="/kg-management-v2/#/lineage?q=当日聚焦销账" target="_blank" class="ind-link">当日聚焦销账</a>(5900万)<br>
-    <strong>归因判定</strong>：<span class="tag tag-danger">图谱归因成功</span>（同日共现+销账异常指向系统事件）<br>
-    <strong>建议负责部门</strong>：政企群
-  </div>
+    // 收集簇内节点集
+    var clusterNodes = {};
+    for (var ri6 = 0; ri6 < activeRels.length; ri6++) {
+      clusterNodes[activeRels[ri6].sourceName] = true;
+      clusterNodes[activeRels[ri6].targetName] = true;
+    }
 
-  <!-- 3.8 商务宽带新增完成率 -->
-  <h3>3.8 <a href="/kg-management-v2/#/lineage?q=商务宽带新增完成率" target="_blank" class="ind-link">商务宽带新增完成率</a>（03-24，12%，-81.0%）</h3>
-  <div class="alert alert-danger">
-    <strong>异常表现</strong>：异常日值12%，前日值63%，日变化-81.0%<br>
-    月均值56.4%，月标准差25.59
-  </div>
-  <h4>图谱邻居数据（03-24）</h4>
-  <table class="nb-table">
-    <tr><th>邻居</th><th>关系</th><th>方向</th><th>03-24值</th><th>03-23值</th><th>日变化</th><th>月均值</th><th>偏离?</th></tr>
-    <tr><td><a href="/kg-management-v2/#/lineage?q=商务宽带新增" target="_blank" class="ind-link">商务宽带新增</a></td><td>DEPENDS_ON</td><td>入←</td><td>258</td><td>179</td><td>+44%</td><td>628</td><td class="normal">正常(低于月均)</td></tr>
-  </table>
-  <p style="font-size:13px;color:#555;margin:4px 0 8px;">同日共现异常与3.7完全一致：<a href="/kg-management-v2/#/lineage?q=上网专线完成率" target="_blank" class="ind-link">上网专线完成率</a>(12%)、<a href="/kg-management-v2/#/lineage?q=当日聚焦销账" target="_blank" class="ind-link">当日聚焦销账</a>(5900.04万元)</p>
-  <div id="chart-g8" class="chart-box graph"></div>
-  <div class="alert alert-success">
-    <strong>归因分析</strong>：与3.7完全同构。<a href="/kg-management-v2/#/lineage?q=商务宽带新增" target="_blank" class="ind-link">商务宽带新增</a>03-24=258（远低于月均628），完成率暴跌。同日<a href="/kg-management-v2/#/lineage?q=上网专线完成率" target="_blank" class="ind-link">上网专线完成率</a>、聚焦销账同步异常，三指标共现指向统一系统/业务事件。<br>
-    <strong>归因链路</strong>：<a href="/kg-management-v2/#/lineage?q=商务宽带新增" target="_blank" class="ind-link">商务宽带新增</a> →(DEPENDS_ON)→ 完成率(12%)；同日共现：<a href="/kg-management-v2/#/lineage?q=上网专线完成率" target="_blank" class="ind-link">上网专线完成率</a>(12%)、<a href="/kg-management-v2/#/lineage?q=当日聚焦销账" target="_blank" class="ind-link">当日聚焦销账</a>(5900万)<br>
-    <strong>归因判定</strong>：<span class="tag tag-danger">图谱归因成功</span><br>
-    <strong>建议负责部门</strong>：政企群
-  </div>
-</div>
+    // 被排除的关系（从原始 FINANCE_RELATIONS 中按 ID 查）
+    var excludedDescs = [];
+    for (var ei = 0; ei < FINANCE_RELATIONS.length; ei++) {
+      if (excludedSet.has(FINANCE_RELATIONS[ei].id) && clusterNodes[FINANCE_RELATIONS[ei].sourceName]) {
+        excludedDescs.push(FINANCE_RELATIONS[ei].sourceName + '-' + FINANCE_RELATIONS[ei].relationType + '-' + FINANCE_RELATIONS[ei].targetName);
+      }
+    }
+    // 新增的关系（从 addedRels 中查）
+    var addedDescs = [];
+    for (var ai = 0; ai < addedRels.length; ai++) {
+      if (clusterNodes[addedRels[ai].sourceName] || clusterNodes[addedRels[ai].targetName]) {
+        addedDescs.push(addedRels[ai].sourceName + '-' + addedRels[ai].relationType + '-' + addedRels[ai].targetName);
+      }
+    }
 
-<!-- 四、总结与建议 -->
-<div class="section">
-  <h2>四、总结与建议</h2>
+    // --- 归因分析 ---
+    var dynNarrative = '该簇共' + activeRels.length + '条关联。';
+    if (depCount > 0) dynNarrative += 'DEPENDS_ON依赖链中上游波动向下逐级传导；';
+    if (transCount > 0) dynNarrative += 'TRANSMISSION路径在多个维度间横向扩散；';
+    if (excludedDescs.length > 0) dynNarrative += '已排除关系「' + excludedDescs[0] + '」' + (excludedDescs.length > 1 ? '等' + excludedDescs.length + '条' : '') + '，相关传导通路已截断；';
+    if (addedDescs.length > 0) dynNarrative += '新增关联「' + addedDescs[0] + '」' + (addedDescs.length > 1 ? '等' + addedDescs.length + '条' : '') + '，引入新的传导路径，需重新评估影响范围。';
+
+    // --- 异常表现 ---
+    var dynAnomalies = '';
+    if (excludedDescs.length > 0) {
+      dynAnomalies = '移除「' + excludedDescs[0] + '」' + (excludedDescs.length > 1 ? '等' + excludedDescs.length + '条关联' : '') + '后，该簇链路被截断；';
+    }
+    if (addedDescs.length > 0) {
+      dynAnomalies += '新增「' + addedDescs[0] + '」' + (addedDescs.length > 1 ? '等' + addedDescs.length + '条关联' : '') + '，中心指标受影响范围扩大至' + activeRels.length + '条关联；';
+    }
+    if (!dynAnomalies) {
+      dynAnomalies = '中心指标' + cluster.center + '近期波动在正常范围内，关联指标群未出现显著异动；';
+    }
+
+    html += '<div class="section" data-cluster="' + ("簇" + (ci+1) + ": " + cluster.center) + '">';
+    html += '<h3><a href="/kg-management-v2/#/lineage?q=' + encodeURIComponent(cluster.center) + '" target="_blank" class="ind-link">' + ("簇" + (ci+1) + ": " + cluster.center) + '</a></h3>';
+    html += '<p class="chart-note"><strong>异常表现：</strong>' + dynAnomalies + '</p>';
+    html += '<p class="chart-note"><strong>归因分析：</strong>' + dynNarrative + '</p>';
+    // 基于过滤后的 activeRels 重新计算归因链（而非用静态 cluster.chain）
+    var chainNodes = [cluster.center];
+    var chainUsed = {};
+    chainUsed[cluster.center] = true;
+    var changed = true;
+    while (changed && chainNodes.length < 6) {
+      changed = false;
+      for (var ri4 = 0; ri4 < activeRels.length; ri4++) {
+        var r4 = activeRels[ri4];
+        var lastNode = chainNodes[chainNodes.length - 1];
+        if ((r4.relationType === 'DEPENDS_ON' || r4.relationType === 'CAUSES') && r4.sourceName === lastNode && !chainUsed[r4.targetName]) {
+          chainNodes.push(r4.targetName); chainUsed[r4.targetName] = true; changed = true; break;
+        }
+        if ((r4.relationType === 'TRANSMISSION') && r4.targetName === lastNode && !chainUsed[r4.sourceName]) {
+          chainNodes.push(r4.sourceName); chainUsed[r4.sourceName] = true; changed = true; break;
+        }
+      }
+    }
+    var chainHtml;
+    if (chainNodes.length > 1) {
+      chainHtml = (chainNodes.length === 2 ? '根因链路：' : '传导路径：') + chainNodes.map(function(name) {
+        return '<a href="/kg-management-v2/#/lineage?q=' + encodeURIComponent(name) + '" target="_blank" class="ind-link">' + name + '</a>';
+      }).join(' → ');
+    } else {
+      chainHtml = '该指标原生波动，无上游依赖或下游传导链';
+    }
+    html += '<p class="chart-note"><strong>归因判定：</strong><span class="tag tag-warning">需关注</span> — ' + chainHtml;
+    if (excludedDescs.length > 0) {
+      html += '（已移除' + excludedDescs.length + '条关联）';
+    }
+    if (addedDescs.length > 0) {
+      html += '（新增' + addedDescs.length + '条关联）';
+    }
+    html += '</p>';
+    html += '<table class="nb-table"><thead><tr><th>邻居</th><th>关系</th><th>方向</th><th>03-09值</th><th>03-08值</th><th>日变化</th><th>月均值</th><th>偏离?</th></tr></thead><tbody>';
+
+    for (var ri = 0; ri < activeRels.length; ri++) {
+      var rel = activeRels[ri];
+      var tc = tagMap[rel.relationType] || 'tag-info';
+      var dir = dirMap[rel.relationType] || '→';
+      var tv = MOCK_VALUES[rel.targetName] || [0, 0, '0', 0, '', 'normal'];
+      var devClass = tv[5] === 'deviated' ? 'deviated' : (tv[5] === 'notice' ? 'note' : 'normal');
+      var devText = tv[5] === 'deviated' ? '↑异常' : (tv[5] === 'notice' ? '⨆注意' : '正常');
+      html += '<tr data-relation-id="' + rel.id + '">';
+      html += '<td><a href="/kg-management-v2/#/lineage?q=' + encodeURIComponent(rel.targetName) + '" target="_blank" class="ind-link">' + rel.targetName + '</a></td>';
+      html += '<td><span class="tag ' + tc + '">' + rel.relationType + '</span></td>';
+      html += '<td>' + dir + '</td>';
+      html += '<td>' + tv[0] + (tv[4] ? ' ' + tv[4] : '') + '</td>';
+      html += '<td>' + tv[1] + (tv[4] ? ' ' + tv[4] : '') + '</td>';
+      html += '<td>' + tv[2] + '</td>';
+      html += '<td>' + tv[3] + (tv[4] ? ' ' + tv[4] : '') + '</td>';
+      html += '<td class="' + devClass + '">' + devText + '</td>';
+      html += '</tr>';
+    }
+    html += '</tbody></table>';
+    html += '<div class="chart-box graph" id="chart-c' + ci + '" style="height:420px"></div>';
+    html += '</div>';
+  }
+
+  if (!html) {
+    html = '<div class="section"><p class="alert alert-info">当前无活跃关联关系，报告待重新生成</p></div>';
+  }
+  root.innerHTML = html;
+
+  // echarts
+  for (var ci2 = 0; ci2 < activeClusters.length; ci2++) {
+    var cluster2 = activeClusters[ci2];
+    var activeRels2 = cluster2.relations;
+
+    var chartEl = document.getElementById('chart-c' + ci2);
+    if (!chartEl || typeof echarts === 'undefined') continue;
+
+    var nodeIdx = {};
+    var nodes = [];
+    var links = [];
+    var edgeColors = {'DEPENDS_ON': '#3B82F6', 'TRANSMISSION': '#8B5CF6', 'AGGREGATES': '#22C55E', 'CAUSES': '#F59E0B'};
+
+    function ensureNode(name, size, color) {
+      if (nodeIdx[name] === undefined) {
+        nodeIdx[name] = nodes.length;
+        nodes.push({name: name, symbolSize: size || 15, itemStyle: {color: color || '#27ae60'}, label: {show: true, fontSize: 10, color: '#E8ECF1'}});
+      }
+      return nodeIdx[name];
+    }
+
+    ensureNode(cluster2.center, 55, '#e74c3c');
+
+    for (var ri2 = 0; ri2 < activeRels2.length; ri2++) {
+      var rel2 = activeRels2[ri2];
+      var isCrit = (rel2.relationType === 'TRANSMISSION' || rel2.relationType === 'CAUSES');
+      ensureNode(rel2.sourceName, 18, isCrit ? '#f39c12' : '#27ae60');
+      ensureNode(rel2.targetName, 15, isCrit ? '#f39c12' : '#27ae60');
+      links.push({
+        source: rel2.sourceName,
+        target: rel2.targetName,
+        lineStyle: {color: edgeColors[rel2.relationType] || '#95a5a6', width: 2.5, curveness: 0.1},
+        label: {show: true, formatter: rel2.relationType, fontSize: 8, color: '#95a5a6', position: 'middle'}
+      });
+    }
+
+    chartEl.style.height = '420px';
+    try {
+      var chart = echarts.init(chartEl);
+      chart.setOption({
+        backgroundColor: '#0F141F',
+        title: {text: '簇' + (ci2+1) + ': ' + cluster2.center + ' 因果链路图', left: 'center', textStyle: {color: '#E8ECF1', fontSize: 14}},
+        tooltip: {trigger: 'item'},
+        series: [{
+          type: 'graph', layout: 'force', roam: true,
+          data: nodes, links: links,
+          force: {repulsion: 500, gravity: 0.05, edgeLength: [120, 250]},
+          label: {show: true, fontSize: 10, color: '#E8ECF1'},
+          edgeSymbol: ['circle', 'arrow'],
+          edgeSymbolSize: [4, 10],
+          lineStyle: {color: '#5B8DEF', width: 2, opacity: 0.8},
+          emphasis: {focus: 'adjacency', lineStyle: {width: 3}}
+        }]
+      });
+    } catch(e) { console.error('echarts error', e); }
+  }
+})();
+</script>
+<h2>四、总结与建议</h2>
   <h3>4.1 月度经营总览</h3>
   <p>2026年3月经营收入85.94亿元，累计进度25.34%，基本匹配时间进度。利润总额15.53亿元，进度24.22%略有缺口。产数收入同比增长2.80%，但产数ICT毛利额同比下降11.05%，盈利能力承压。</p>
 
