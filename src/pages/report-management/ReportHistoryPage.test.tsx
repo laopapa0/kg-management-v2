@@ -13,15 +13,17 @@ describe('ReportHistoryPage', () => {
     vi.restoreAllMocks()
   })
 
-  it('shows empty state when no generated reports exist', () => {
+  it('shows preloaded mock reports when storage is empty', () => {
     render(
       <MemoryRouter>
         <ReportHistoryPage />
       </MemoryRouter>,
     )
 
-    expect(screen.getByText('暂无历史报告')).toBeInTheDocument()
-    expect(screen.getByText('生成的报告将在此处展示')).toBeInTheDocument()
+    // 预置 6 条历史报告应自动注入（标题含时间戳）
+    expect(screen.getByText((content) => content.includes('核心指标日报') && content.includes('v3'))).toBeInTheDocument()
+    expect(screen.getByText((content) => content.includes('周报汇总') && content.includes('v2'))).toBeInTheDocument()
+    expect(screen.getByText((content) => content.includes('月度经营分析') && content.includes('v1'))).toBeInTheDocument()
   })
 
   it('renders DataTable with plan name, version, template, date and trigger type', () => {

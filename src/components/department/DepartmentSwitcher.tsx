@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ChevronDown, Building2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { mockDepartments } from '@/data/mockAttachmentData';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,16 +20,9 @@ export interface DepartmentSwitcherProps {
   onChange?: (department: Department) => void;
 }
 
-const DEFAULT_DEPARTMENTS: Department[] = [
-  { id: 'dept-finance', name: '财务部' },
-  { id: 'dept-market', name: '市场部' },
-  { id: 'dept-network', name: '网络部' },
-  { id: 'dept-service', name: '客服部' },
-];
-
 export function DepartmentSwitcher({
-  departments = DEFAULT_DEPARTMENTS,
-  defaultDepartmentId = 'dept-finance',
+  departments = mockDepartments,
+  defaultDepartmentId = 'dept-财务部',
   onChange,
 }: DepartmentSwitcherProps) {
   const [selectedId, setSelectedId] = useState(defaultDepartmentId);

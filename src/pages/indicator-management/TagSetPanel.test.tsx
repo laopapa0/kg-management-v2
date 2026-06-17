@@ -72,6 +72,9 @@ describe('TagSetPanel', () => {
 
   it('shows unselected state for tags not referenced by any indicator', () => {
     initializeAttachmentStore()
+    // 清除预置 tagIds，确保标签初始全未选中
+    const stateBefore = useAttachmentStore.getState()
+    stateBefore.setIndicators(stateBefore.indicators.map((i) => ({ ...i, tagIds: [], ruleIds: [] })))
     render(<TagSetPanel />)
 
     const state = useAttachmentStore.getState()
@@ -84,6 +87,9 @@ describe('TagSetPanel', () => {
 
   it('displays tag color when set on the tag node', () => {
     initializeAttachmentStore()
+    // 清除预置 tagIds，确保标签未选中状态
+    const stateBefore = useAttachmentStore.getState()
+    stateBefore.setIndicators(stateBefore.indicators.map((i) => ({ ...i, tagIds: [], ruleIds: [] })))
     render(<TagSetPanel />)
 
     const state = useAttachmentStore.getState()
@@ -133,6 +139,9 @@ describe('TagSetPanel', () => {
     it('selects a child tag when clicked', async () => {
       const user = userEvent.setup()
       initializeAttachmentStore()
+      // 清除预置 tagIds，从干净状态开始
+      const stateBefore = useAttachmentStore.getState()
+      stateBefore.setIndicators(stateBefore.indicators.map((i) => ({ ...i, tagIds: [], ruleIds: [] })))
       render(<TagSetPanel />)
 
       const state = useAttachmentStore.getState()
@@ -149,6 +158,8 @@ describe('TagSetPanel', () => {
     it('marks parent as partial when a child is selected', async () => {
       const user = userEvent.setup()
       initializeAttachmentStore()
+      const stateBefore = useAttachmentStore.getState()
+      stateBefore.setIndicators(stateBefore.indicators.map((i) => ({ ...i, tagIds: [], ruleIds: [] })))
       render(<TagSetPanel />)
 
       const state = useAttachmentStore.getState()
@@ -167,6 +178,8 @@ describe('TagSetPanel', () => {
     it('marks parent as selected when all children are selected', async () => {
       const user = userEvent.setup()
       initializeAttachmentStore()
+      const stateBefore = useAttachmentStore.getState()
+      stateBefore.setIndicators(stateBefore.indicators.map((i) => ({ ...i, tagIds: [], ruleIds: [] })))
       render(<TagSetPanel />)
 
       const state = useAttachmentStore.getState()
@@ -185,6 +198,8 @@ describe('TagSetPanel', () => {
     it('selects all descendants when parent is selected', async () => {
       const user = userEvent.setup()
       initializeAttachmentStore()
+      const stateBefore = useAttachmentStore.getState()
+      stateBefore.setIndicators(stateBefore.indicators.map((i) => ({ ...i, tagIds: [], ruleIds: [] })))
       render(<TagSetPanel />)
 
       const state = useAttachmentStore.getState()
@@ -203,6 +218,8 @@ describe('TagSetPanel', () => {
     it('unselects all descendants when parent is toggled off', async () => {
       const user = userEvent.setup()
       initializeAttachmentStore()
+      const stateBefore = useAttachmentStore.getState()
+      stateBefore.setIndicators(stateBefore.indicators.map((i) => ({ ...i, tagIds: [], ruleIds: [] })))
       render(<TagSetPanel />)
 
       const state = useAttachmentStore.getState()
@@ -236,9 +253,14 @@ describe('TagSetPanel', () => {
       const firstLeaf = state.tagNodes.find((t) => t.parentId)
       expect(firstLeaf).toBeDefined()
 
+      // 清除预置 tagIds，只保留显式设置的一条关联
       act(() => {
         state.setIndicators(
-          state.indicators.map((i, idx) => (idx === 0 ? { ...i, tagIds: [firstLeaf!.id] } : i)),
+          state.indicators.map((i, idx) => ({
+            ...i,
+            tagIds: idx === 0 ? [firstLeaf!.id] : [],
+            ruleIds: [],
+          })),
         )
       })
 
@@ -249,6 +271,9 @@ describe('TagSetPanel', () => {
     it('clears all selections when clear button clicked', async () => {
       const user = userEvent.setup()
       initializeAttachmentStore()
+      // 清除预置 tagIds，从无选中标签开始
+      const stateBefore = useAttachmentStore.getState()
+      stateBefore.setIndicators(stateBefore.indicators.map((i) => ({ ...i, tagIds: [], ruleIds: [] })))
       render(<TagSetPanel />)
 
       const state = useAttachmentStore.getState()
@@ -460,6 +485,9 @@ describe('TagSetPanel', () => {
 
     it('applies 10% tag color background on unselected tag', () => {
       initializeAttachmentStore()
+      // 清除预置 tagIds，确保根标签也处于未选中状态
+      const stateBefore = useAttachmentStore.getState()
+      stateBefore.setIndicators(stateBefore.indicators.map((i) => ({ ...i, tagIds: [], ruleIds: [] })))
       const state = useAttachmentStore.getState()
       const coloredRoot = state.tagNodes.find((t) => t.color && !t.parentId)!
 
@@ -472,6 +500,9 @@ describe('TagSetPanel', () => {
     it('uses unified highlight background on selected tag regardless of color', async () => {
       const user = userEvent.setup()
       initializeAttachmentStore()
+      // 清除预置 tagIds，从无选中标签开始
+      const stateBefore = useAttachmentStore.getState()
+      stateBefore.setIndicators(stateBefore.indicators.map((i) => ({ ...i, tagIds: [], ruleIds: [] })))
       render(<TagSetPanel />)
 
       const state = useAttachmentStore.getState()

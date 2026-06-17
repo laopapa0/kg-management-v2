@@ -119,8 +119,8 @@ describe('ReportPlanDialog — 三步向导', () => {
     await user.click(screen.getByTestId('report-plan-next-button'))
 
     // Shows enabled templates
-    expect(screen.getByText('核心指标日报模板')).toBeInTheDocument()
-    expect(screen.getByText('月度经营分析模板')).toBeInTheDocument()
+    expect(screen.getByText('月报标准模板')).toBeInTheDocument()
+    expect(screen.getByText('周报速览模板')).toBeInTheDocument()
 
     // Can select a template
     await user.click(screen.getByTestId('template-radio-tmpl-001'))

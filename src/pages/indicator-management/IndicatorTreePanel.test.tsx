@@ -140,8 +140,8 @@ describe('IndicatorTreePanel', () => {
 
     const state = useAttachmentStore.getState()
     const child = state.indicators.find((i) => i.name === '子分组节点')
-    // "默认"节点下新增的指标 treeParentId=undefined（候选池+视觉映射回"默认"）
-    expect(child?.treeParentId).toBeUndefined()
+    // "默认"节点下新增的指标 treeParentId 为 pendingNodeId（dept-{dept}-pending）
+    expect(child?.treeParentId).toBe('dept-财务部-pending')
     expect(screen.getByText('子分组节点')).toBeInTheDocument()
   })
 
@@ -154,7 +154,7 @@ describe('IndicatorTreePanel', () => {
     // 跳过"默认"节点，选第一个真实 L1 节点
     const firstRealRow = rows.find((r) => {
       const id = r.getAttribute('data-node-id') ?? ''
-      return !id.startsWith('ui-pending-') && id.includes('-l1-')
+      return !id.startsWith('ui-pending-') && id.startsWith('l2-')
     })
     if (!firstRealRow) throw new Error('no real node found')
 
@@ -178,7 +178,7 @@ describe('IndicatorTreePanel', () => {
     // 跳过"默认"节点，选第一个真实 L1 节点
     const firstRealRow = rows.find((r) => {
       const id = r.getAttribute('data-node-id') ?? ''
-      return !id.startsWith('ui-pending-') && id.includes('-l1-')
+      return !id.startsWith('ui-pending-') && id.startsWith('l2-')
     })
     if (!firstRealRow) throw new Error('no real node found')
     await user.hover(firstRealRow)
@@ -210,6 +210,9 @@ describe('IndicatorTreePanel', () => {
 
   it('deletes a leaf node directly and shows undo toast', async () => {
     initializeAttachmentStore()
+    // 清除预置 tagIds/ruleIds，避免影响删除逻辑（attached descendant 检查）
+    const s = useAttachmentStore.getState()
+    s.setIndicators(s.indicators.map((i) => ({ ...i, tagIds: [], ruleIds: [] })))
     const user = userEvent.setup()
     render(<IndicatorTreePanel />)
 
@@ -231,7 +234,7 @@ describe('IndicatorTreePanel', () => {
     await user.click(deleteButton)
 
     await waitFor(() => {
-      expect(screen.queryByText(leafIndicator.name)).not.toBeInTheDocument()
+      expect(screen.queryAllByText(leafIndicator.name).length).toBe(0)
     })
 
     expect(mockToast).toHaveBeenCalledWith(
@@ -248,6 +251,8 @@ describe('IndicatorTreePanel', () => {
 
   it('restores deleted leaf node via toast undo action', async () => {
     initializeAttachmentStore()
+    const s = useAttachmentStore.getState()
+    s.setIndicators(s.indicators.map((i) => ({ ...i, tagIds: [], ruleIds: [] })))
     const user = userEvent.setup()
     render(<IndicatorTreePanel />)
 

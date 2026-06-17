@@ -50,6 +50,22 @@ describe('RulePanel', () => {
     }
   })
 
+  it('renders exactly 3 root categories and 9 leaf rules', () => {
+    initializeAttachmentStore()
+    render(<RulePanel />)
+
+    const state = useAttachmentStore.getState()
+    const rootRules = state.rules.filter((r) => !r.parentId)
+    const leafRules = state.rules.filter((r) => r.parentId)
+
+    expect(rootRules).toHaveLength(3)
+    expect(leafRules).toHaveLength(9)
+
+    for (const root of rootRules) {
+      expect(screen.getByText(root.name)).toBeInTheDocument()
+    }
+  })
+
   it('displays attached indicator count for each rule', () => {
     initializeAttachmentStore()
     render(<RulePanel />)
@@ -163,7 +179,7 @@ describe('RulePanel', () => {
       const state = useAttachmentStore.getState()
       const targetRule = state.rules.find((r) => r.name.includes('阈值'))
       expect(targetRule).toBeDefined()
-      const otherRule = state.rules.find((r) => r.name === '合规规则')
+      const otherRule = state.rules.find((r) => r.name === '波动幅度检测')
       expect(otherRule).toBeDefined()
 
       render(<RulePanel />)
@@ -228,7 +244,7 @@ describe('RulePanel', () => {
 
       const state = useAttachmentStore.getState()
       const targetRule = state.rules.find((r) => r.name.includes('阈值'))!
-      const otherRule = state.rules.find((r) => r.name === '合规规则')!
+      const otherRule = state.rules.find((r) => r.name === '波动幅度检测')!
 
       render(<RulePanel />)
 
@@ -289,7 +305,7 @@ describe('RulePanel', () => {
 
       const state = useAttachmentStore.getState()
       const targetRule = state.rules.find((r) => r.name.includes('阈值'))!
-      const otherRule = state.rules.find((r) => r.name === '合规规则')!
+      const otherRule = state.rules.find((r) => r.name === '波动幅度检测')!
 
       render(<RulePanel />)
 

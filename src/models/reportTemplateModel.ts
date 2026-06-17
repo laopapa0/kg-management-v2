@@ -45,8 +45,8 @@ export function createReportTemplate(
     id: generateId(),
     createdAt: new Date().toISOString(),
     usageCount: 0,
-    styleGuide: '',
     ...data,
+    styleGuide: data.styleGuide ?? '',
   }
 }
 
@@ -64,13 +64,16 @@ export function createReportSection(
 export const mockReportTemplates: ReportTemplate[] = [
   {
     id: 'tmpl-001',
-    name: '核心指标日报模板',
-    description: '每日核心指标监控报告的标准模板',
+    name: '月报标准模板',
+    description: '月度经营分析报告的标准模板，含概览、异常、趋势、归因、预测和结论',
     styleGuide: '语气专业客观，多用数据说话。每个板块用标题 + 简要分析 + 关键数字摘要的结构。',
     sections: [
       { id: 'sec-001', title: '指标概览', prompt: '汇总关键指标趋势' },
       { id: 'sec-002', title: '异常检测', prompt: '检测异常值并标注' },
-      { id: 'sec-003', title: '同比环比', prompt: '分析指标同比/环比变化' },
+      { id: 'sec-003', title: '趋势分析', prompt: '分析指标同比/环比变化' },
+      { id: 'sec-004', title: '归因分析', prompt: '识别波动原因' },
+      { id: 'sec-005', title: '预测与建议', prompt: '生成结论性摘要' },
+      { id: 'sec-006', title: '结论摘要', prompt: '生成结论性摘要' },
     ],
     usageCount: 42,
     enabled: true,
@@ -78,13 +81,15 @@ export const mockReportTemplates: ReportTemplate[] = [
   },
   {
     id: 'tmpl-002',
-    name: '月度经营分析模板',
-    description: '月度经营分析报告，含部门对比与波动分析',
-    styleGuide: '用图表和数据支撑结论，突出异常和波动。篇幅控制在 2000 字以内。',
+    name: '周报速览模板',
+    description: '周报速览模板，聚焦核心指标、异常和趋势',
+    styleGuide: '用图表和数据支撑结论，突出异常和波动。篇幅控制在 1500 字以内。',
     sections: [
-      { id: 'sec-004', title: '经营概览', prompt: '生成结论性摘要' },
-      { id: 'sec-005', title: '部门对比', prompt: '对比各部门表现' },
-      { id: 'sec-006', title: '波动分析', prompt: '识别波动原因' },
+      { id: 'sec-007', title: '指标概览', prompt: '汇总关键指标趋势' },
+      { id: 'sec-008', title: '异常检测', prompt: '检测异常值并标注' },
+      { id: 'sec-009', title: '趋势分析', prompt: '分析指标同比/环比变化' },
+      { id: 'sec-010', title: '归因分析', prompt: '识别波动原因' },
+      { id: 'sec-011', title: '结论摘要', prompt: '生成结论性摘要' },
     ],
     usageCount: 12,
     enabled: true,

@@ -19,12 +19,12 @@ describe('ReportTemplatesPage', () => {
   it('renders template list with name, section count, usage count and enabled status', () => {
     render(<ReportTemplatesPage />)
 
-    expect(screen.getByText('核心指标日报模板')).toBeInTheDocument()
-    expect(screen.getByText('月度经营分析模板')).toBeInTheDocument()
+    expect(screen.getByText('月报标准模板')).toBeInTheDocument()
+    expect(screen.getByText('周报速览模板')).toBeInTheDocument()
 
-    // section counts (both mock templates have 3 sections)
-    const sectionCounts = screen.getAllByText('3 个板块')
-    expect(sectionCounts).toHaveLength(2)
+    // section counts: 月报标准模板 6 个板块，周报速览模板 5 个板块
+    expect(screen.getByText('6 个板块')).toBeInTheDocument()
+    expect(screen.getByText('5 个板块')).toBeInTheDocument()
 
     // usage counts
     expect(screen.getByText('已使用 42 次')).toBeInTheDocument()

@@ -53,7 +53,7 @@ function convertIndicatorTreeNode(
   depth: number,
   siblingIndex?: number,
 ): MindElixirNodeData {
-  const isPending = node.id.startsWith('ui-pending-');
+  const isPending = node.id.startsWith('ui-pending-') || node.indicator.name === '默认';
   const isVirtualGroup = node.indicator.indicatorType === '虚拟分组';
 
   let style: Record<string, string> | undefined;
@@ -101,7 +101,7 @@ function convertIndicatorTreeNode(
   return {
     id: node.id,
     topic: node.indicator.name,
-    expanded: depth < 3,
+    expanded: node.indicator.name === '默认' || node.indicator.name === '.' ? false : depth < 3,
     style,
     branchColor,
     children: node.children?.map((c, i) => convertIndicatorTreeNode(c, depth + 1, i)),

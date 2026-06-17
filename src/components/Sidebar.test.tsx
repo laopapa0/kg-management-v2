@@ -61,12 +61,11 @@ describe('Sidebar 手风琴三分组', () => {
     expect(reportLink).toBeVisible();
   });
 
-  it('基础维护下包含规则管理、关联关系管理、知识库管理', () => {
+  it('基础维护下包含规则管理、关联关系管理', () => {
     renderWithRouter();
 
     expect(screen.getByText('规则管理').closest('a')).toBeVisible();
     expect(screen.getByText('关联关系管理').closest('a')).toBeVisible();
-    expect(screen.getByText('知识库管理').closest('a')).toBeVisible();
   });
 
   /* ─── 手风琴折叠/展开 ─── */
@@ -104,7 +103,6 @@ describe('Sidebar 手风琴三分组', () => {
     expect(screen.getByText('血缘画布').closest('a')).toHaveAttribute('href', '/lineage');
     expect(screen.getByText('规则管理').closest('a')).toHaveAttribute('href', '/noc/rule');
     expect(screen.getByText('关联关系管理').closest('a')).toHaveAttribute('href', '/link-relation');
-    expect(screen.getByText('知识库管理').closest('a')).toHaveAttribute('href', '/knowledge-upload');
   });
 
   /* ─── 路由高亮 ─── */
@@ -120,5 +118,10 @@ describe('Sidebar 手风琴三分组', () => {
 
     expect(screen.queryByText('报告模板')).not.toBeInTheDocument();
     expect(screen.queryByText('历史报告')).not.toBeInTheDocument();
+  });
+
+  it('知识库管理菜单项已隐藏', () => {
+    renderWithRouter();
+    expect(screen.queryByText('知识库管理')).not.toBeInTheDocument();
   });
 });

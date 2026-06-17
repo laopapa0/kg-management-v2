@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { z } from 'zod';
@@ -20,9 +20,7 @@ import {
   TrendingUp,
   TrendingDown,
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import SearchInput from '@/components/SearchInput';
-import StatusBadge from '@/components/StatusBadge';
+import { forceSimulation, forceLink, forceCollide, forceManyBody, forceCenter } from 'd3-force'
 import {
   Dialog,
   DialogContent,
@@ -43,6 +41,9 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { toast } from 'sonner';
+import { cn } from '@/lib/utils';
+import SearchInput from '@/components/SearchInput';
+import StatusBadge from '@/components/StatusBadge';
 import { getNodeStyle } from './getNodeStyle';
 
 /* ═══════════════════════════════════════════════
@@ -64,7 +65,7 @@ interface Relation {
   lastModifiedBy: string;
 }
 
-type RelationType = 'DEPENDS_ON' | 'CAUSES' | 'AGGREGATES' | 'DERIVED_FROM';
+type RelationType = 'DEPENDS_ON' | 'CAUSES' | 'AGGREGATES' | 'TRANSMISSION' | 'DRIVES';
 
 interface CanvasNode {
   id: string;
@@ -75,81 +76,88 @@ interface CanvasNode {
   y: number;
 }
 
-/* ═══════════════════════════════════════════════
-   Mock 数据 - 增强版血缘图数据
-   ═══════════════════════════════════════════════ */
+import { mockAppliedConnections } from '@/data/aiRecommendations'
+import { indicatorDefinitions } from '@/data/indicatorDefinitions'
 
-const relationListData: Relation[] = [
-  { id: 'REL-001', source: '5G用户渗透率', sourceId: 'n1', sourceLevel1: '发展',
-    target: '移动业务收入', targetId: 'n2', targetLevel1: '经营',
-    type: 'DEPENDS_ON', correlation: 'positive', confidence: 95, description: '5G用户增长直接带动移动业务收入提升', lastModifiedBy: '张三' },
-  { id: 'REL-002', source: '移动业务收入', sourceId: 'n2', sourceLevel1: '经营',
-    target: '总营收', targetId: 'n3', targetLevel1: '经营',
-    type: 'AGGREGATES', correlation: 'positive', confidence: 100, description: '移动业务收入汇总至总营收', lastModifiedBy: '李四' },
-  { id: 'REL-003', source: '5G用户渗透率', sourceId: 'n1', sourceLevel1: '发展',
-    target: '5G流量占比', targetId: 'n4', targetLevel1: '发展',
-    type: 'CAUSES', confidence: 85, description: '5G用户增长推动流量结构变化', lastModifiedBy: '王五' },
-  { id: 'REL-004', source: '5G流量占比', sourceId: 'n4', sourceLevel1: '发展',
-    target: '网络负荷', targetId: 'n5', targetLevel1: '交付',
-    type: 'CAUSES', confidence: 80, description: '5G流量增长导致网络负荷上升', lastModifiedBy: 'AI' },
-  { id: 'REL-005', source: '网络负荷', sourceId: 'n5', sourceLevel1: '交付',
-    target: '扩容需求', targetId: 'n6', targetLevel1: '交付',
-    type: 'DEPENDS_ON', confidence: 90, description: '网络高负荷触发扩容需求', lastModifiedBy: '张三' },
-  { id: 'REL-006', source: '5G用户渗透率', sourceId: 'n1', sourceLevel1: '发展',
-    target: '用户ARPU', targetId: 'n7', targetLevel1: '经营',
-    type: 'DEPENDS_ON', confidence: 88, description: '5G用户渗透率提升带动ARPU增长', lastModifiedBy: '李四' },
-  { id: 'REL-007', source: '用户ARPU', sourceId: 'n7', sourceLevel1: '经营',
-    target: '移动业务收入', targetId: 'n2', targetLevel1: '经营',
-    type: 'DEPENDS_ON', confidence: 92, description: 'ARPU提升带动移动业务收入增长', lastModifiedBy: '王五' },
-  { id: 'REL-008', source: '客户满意度', sourceId: 'n8', sourceLevel1: '服务',
-    target: '5G用户渗透率', targetId: 'n1', targetLevel1: '发展',
-    type: 'CAUSES', confidence: 75, description: '客户满意度影响用户留存与发展', lastModifiedBy: 'AI' },
-  { id: 'REL-009', source: '总营收', sourceId: 'n3', sourceLevel1: '经营',
-    target: '净利润', targetId: 'n9', targetLevel1: '经营',
-    type: 'DEPENDS_ON', confidence: 98, description: '总营收扣除成本后形成净利润', lastModifiedBy: '张三' },
-  { id: 'REL-010', source: '宽带用户数', sourceId: 'n10', sourceLevel1: '发展',
-    target: '家庭业务收入', targetId: 'n11', targetLevel1: '经营',
-    type: 'DEPENDS_ON', confidence: 87, description: '宽带用户增长带动家庭业务收入', lastModifiedBy: '李四' },
-];
+const codeToName = new Map(indicatorDefinitions.map((d) => [d.code, d.name]))
+const codeToLevel1 = new Map(indicatorDefinitions.map((d) => [d.code, d.level1]))
 
-const canvasNodesData: CanvasNode[] = [
-  { id: 'n1', name: '5G用户渗透率', level1: '发展', role: 'root', x: 400, y: 180 },
-  { id: 'n2', name: '移动业务收入', level1: '经营', role: 'affected', x: 600, y: 120 },
-  { id: 'n3', name: '总营收', level1: '经营', role: 'affected', x: 850, y: 120 },
-  { id: 'n4', name: '5G流量占比', level1: '发展', role: 'anomaly', x: 400, y: 360 },
-  { id: 'n5', name: '网络负荷', level1: '交付', role: 'affected', x: 600, y: 300 },
-  { id: 'n6', name: '扩容需求', level1: '交付', role: 'normal', x: 850, y: 300 },
-  { id: 'n7', name: '用户ARPU', level1: '经营', role: 'affected', x: 600, y: 420 },
-  { id: 'n8', name: '客户满意度', level1: '服务', role: 'root', x: 150, y: 180 },
-  { id: 'n9', name: '净利润', level1: '经营', role: 'affected', x: 1100, y: 120 },
-  { id: 'n10', name: '宽带用户数', level1: '发展', role: 'root', x: 150, y: 420 },
-  { id: 'n11', name: '家庭业务收入', level1: '经营', role: 'affected', x: 400, y: 520 },
-];
+const codeToDept = new Map(indicatorDefinitions.map((d) => [d.code, d.department]))
+
+function buildCanvasData(): { nodes: CanvasNode[]; relations: Relation[] } {
+  const uniqueCodes = new Set<string>()
+  const relations: Relation[] = []
+  
+  mockAppliedConnections.forEach((c, i) => {
+    const srcDept = codeToDept.get(c.sourceId)
+    const tgtDept = codeToDept.get(c.targetId)
+    // 仅保留财务部的关联关系
+    if (srcDept !== '财务部' || tgtDept !== '财务部') return
+
+    uniqueCodes.add(c.sourceId)
+    uniqueCodes.add(c.targetId)
+    relations.push({
+      id: `REL-${String(i + 1).padStart(3, '0')}`,
+      source: codeToName.get(c.sourceId) ?? c.sourceId,
+      sourceId: c.sourceId,
+      sourceLevel1: codeToLevel1.get(c.sourceId) ?? '',
+      target: codeToName.get(c.targetId) ?? c.targetId,
+      targetId: c.targetId,
+      targetLevel1: codeToLevel1.get(c.targetId) ?? '',
+      type: c.relationTypeId as RelationType,
+      confidence: 80,
+      description: '',
+      lastModifiedBy: 'AI',
+    })
+  })
+
+  const NODE_RADIUS = 70
+  const EDGE_LENGTH = 220
+
+  // d3-force 力导向布局
+  const simNodes: { id: string; x: number; y: number }[] = []
+  const nodeIndex = new Map<string, number>()
+  Array.from(uniqueCodes).forEach((code, i) => {
+    simNodes.push({ id: code, x: 700 + Math.random() * 200, y: 400 + Math.random() * 200 })
+    nodeIndex.set(code, i)
+  })
+
+  const d3Links: { source: number; target: number }[] = []
+  const es = new Set<string>()
+  relations.forEach((rel) => {
+    const k = [rel.sourceId, rel.targetId].sort().join('-')
+    if (!es.has(k)) { es.add(k); const si = nodeIndex.get(rel.sourceId), ti = nodeIndex.get(rel.targetId); if (si !== undefined && ti !== undefined && si !== ti) d3Links.push({ source: si, target: ti }) }
+  })
+
+  const sim = forceSimulation(simNodes)
+    .force('link', forceLink(d3Links).distance(EDGE_LENGTH + 60))
+    .force('collide', forceCollide(NODE_RADIUS * 2.0))
+    .force('charge', forceManyBody().strength(-600))
+    .force('center', forceCenter(700, 400))
+    .stop()
+
+  for (let i = 0; i < 300; i++) sim.tick()
+
+  const nodes: CanvasNode[] = simNodes.map((n) => ({
+    id: n.id, name: codeToName.get(n.id) ?? n.id,
+    level1: codeToLevel1.get(n.id) ?? '', role: 'normal',
+    x: n.x, y: n.y,
+  }))
+
+  return { nodes, relations }
+}
+
+const { nodes: canvasNodesData, relations: relationListData } = buildCanvasData()
 
 const relationTypeOptions = [
-  { value: 'DEPENDS_ON' as RelationType, label: 'DEPENDS_ON', desc: '依赖：源指标依赖于目标指标', color: '#3478f6' },
-  { value: 'CAUSES' as RelationType, label: 'CAUSES', desc: '因果：源指标影响目标指标', color: '#f59e0b' },
-  { value: 'AGGREGATES' as RelationType, label: 'AGGREGATES', desc: '聚合：源指标由目标指标聚合而来', color: '#10b981' },
-  { value: 'DERIVED_FROM' as RelationType, label: 'DERIVED_FROM', desc: '衍生：源指标由目标指标衍生计算', color: '#7c5cfc' },
-];
+  { value: 'DEPENDS_ON' as RelationType, label: 'DEPENDS_ON', desc: '依赖', color: '#3478f6' },
+  { value: 'CAUSES' as RelationType, label: 'CAUSES', desc: '因果', color: '#f59e0b' },
+  { value: 'AGGREGATES' as RelationType, label: 'AGGREGATES', desc: '聚合', color: '#10b981' },
+  { value: 'TRANSMISSION' as RelationType, label: 'TRANSMISSION', desc: '传导', color: '#06b6d4' },
+  { value: 'DRIVES' as RelationType, label: 'DRIVES', desc: '驱动', color: '#8b5cf6' },
+]
 
-const availableIndicators = [
-  { id: 'n1', name: '5G用户渗透率', level1: '发展', role: 'root' },
-  { id: 'n2', name: '移动业务收入', level1: '经营', role: 'affected' },
-  { id: 'n3', name: '总营收', level1: '经营', role: 'affected' },
-  { id: 'n4', name: '5G流量占比', level1: '发展', role: 'anomaly' },
-  { id: 'n5', name: '网络负荷', level1: '交付', role: 'affected' },
-  { id: 'n6', name: '扩容需求', level1: '交付', role: 'normal' },
-  { id: 'n7', name: '用户ARPU', level1: '经营', role: 'affected' },
-  { id: 'n8', name: '客户满意度', level1: '服务', role: 'root' },
-  { id: 'n9', name: '净利润', level1: '经营', role: 'affected' },
-  { id: 'n10', name: '宽带用户数', level1: '发展', role: 'root' },
-  { id: 'n11', name: '家庭业务收入', level1: '经营', role: 'affected' },
-  { id: 'n12', name: 'FTTR安装量', level1: '发展', role: 'root' },
-  { id: 'n13', name: '千兆用户占比', level1: '发展', role: 'root' },
-  { id: 'n14', name: 'DOU值', level1: '发展', role: 'anomaly' },
-  { id: 'n15', name: '移网用户数', level1: '发展', role: 'root' },
-];
+const availableIndicators = canvasNodesData.map((n) => ({ id: n.id, name: n.name, level1: n.level1, role: n.role }))
 
 /* 节点颜色按 role 映射 */
 const roleLabels: Record<string, string> = {
@@ -163,7 +171,8 @@ const relationTypeColors: Record<RelationType, string> = {
   'DEPENDS_ON': '#3478f6',
   'CAUSES': '#f59e0b',
   'AGGREGATES': '#10b981',
-  'DERIVED_FROM': '#7c5cfc',
+  'TRANSMISSION': '#06b6d4',
+  'DRIVES': '#8b5cf6',
 };
 
 const createRelationSchema = z.object({
@@ -468,10 +477,7 @@ function LineageCanvasSVG({
               style={{ cursor: 'pointer' }}
               filter={isHovered || isSelected ? 'url(#nodeGlow)' : isRelated || isNeighbor ? 'url(#nodeGlow)' : 'url(#nodeShadow)'}
             >
-              <motion.rect
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.4, delay: index * 0.08 }}
+              <rect
                 width={nodeWidth}
                 height={nodeHeight}
                 rx="8"
@@ -490,10 +496,7 @@ function LineageCanvasSVG({
                 fill={borderColor}
                 opacity={0.6}
               />
-              <motion.text
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.4, delay: index * 0.08 + 0.1 }}
+              <text
                 x={nodeWidth / 2}
                 y={nodeHeight / 2 - 6}
                 textAnchor="middle"
@@ -504,11 +507,8 @@ function LineageCanvasSVG({
                 style={{ pointerEvents: 'none' }}
               >
                 {node.name.length > 7 ? node.name.slice(0, 6) + '\u2026' : node.name}
-              </motion.text>
-              <motion.text
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.4, delay: index * 0.08 + 0.15 }}
+              </text>
+              <text
                 x={nodeWidth / 2}
                 y={nodeHeight / 2 + 10}
                 textAnchor="middle"
@@ -518,7 +518,7 @@ function LineageCanvasSVG({
                 style={{ pointerEvents: 'none' }}
               >
                 {node.level1}
-              </motion.text>
+              </text>
             </g>
           );
         })}
@@ -643,6 +643,7 @@ export default function LineageCanvasPage() {
   // 画布状态
   const [zoom, setZoom] = useState(0.85);
   const [pan, setPan] = useState({ x: 50, y: 30 });
+  const canvasRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [relations, setRelations] = useState<Relation[]>(relationListData);
@@ -698,7 +699,9 @@ export default function LineageCanvasPage() {
   // 画布拖拽
   const handleCanvasMouseDown = useCallback(
     (e: React.MouseEvent) => {
-      if (e.target === e.currentTarget || (e.target as HTMLElement).tagName === 'svg') {
+      const el = e.target as HTMLElement
+      // 允许在 SVG 画布任意位置拖拽
+      if (el.tagName !== 'BUTTON' && el.tagName !== 'INPUT') {
         setIsDragging(true);
         setDragStart({ x: e.clientX - pan.x, y: e.clientY - pan.y });
       }
@@ -884,7 +887,7 @@ export default function LineageCanvasPage() {
             />
             <span className="text-[11px] text-dark-text-tertiary">TYPE</span>
             <div className="flex flex-wrap gap-1.5">
-              {['ALL', 'DEPENDS_ON', 'CAUSES', 'AGGREGATES', 'DERIVED_FROM'].map((type) => (
+              {['ALL', 'DEPENDS_ON', 'CAUSES', 'AGGREGATES', 'TRANSMISSION', 'DRIVES'].map((type) => (
                 <button
                   key={type}
                   onClick={() => setFilterType(type)}
@@ -933,7 +936,18 @@ export default function LineageCanvasPage() {
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.2, delay: index * 0.05 }}
-                    onClick={() => setSelectedRelationId(rel.id === selectedRelationId ? null : rel.id)}
+                    onClick={() => {
+                      const isSelected = rel.id === selectedRelationId
+                      setSelectedRelationId(isSelected ? null : rel.id)
+                      setIsDragging(false)
+                      const sNode = nodes.find((n) => n.id === rel.sourceId)
+                      const tNode = nodes.find((n) => n.id === rel.targetId)
+                      if (!sNode || !tNode || !canvasRef.current) return
+                      const mx = (sNode.x + tNode.x) / 2
+                      const my = (sNode.y + tNode.y) / 2
+                      const rect = canvasRef.current.getBoundingClientRect()
+                      setPan({ x: rect.width / 2 - mx * zoom, y: (rect.height - 40) / 2 - my * zoom })
+                    }}
                     className={cn(
                       'bg-dark-elevated rounded-md p-3 cursor-pointer transition-all',
                       'border-l-[3px]',
@@ -1081,6 +1095,7 @@ export default function LineageCanvasPage() {
 
           {/* 画布主体 */}
           <div
+            ref={canvasRef}
             className="absolute inset-0 pt-11"
             onMouseDown={handleCanvasMouseDown}
             onMouseMove={handleCanvasMouseMove}
@@ -1095,8 +1110,23 @@ export default function LineageCanvasPage() {
               selectedNodeId={selectedNodeId}
               onNodeClick={handleNodeClick}
               onRelationClick={(relId) => {
-                setSelectedRelationId(relId);
-                setSelectedNodeId(null);
+                setSelectedRelationId(relId)
+                setSelectedNodeId(null)
+                setIsDragging(false) // 防止拖拽覆盖平移
+                const rel = relations.find((r) => r.id === relId)
+                if (!rel) return
+                const sNode = nodes.find((n) => n.id === rel.sourceId)
+                const tNode = nodes.find((n) => n.id === rel.targetId)
+                if (!sNode || !tNode) return
+                const mx = (sNode.x + tNode.x) / 2
+                const my = (sNode.y + tNode.y) / 2
+                const el = canvasRef.current
+                if (!el) return
+                const rect = el.getBoundingClientRect()
+                setPan({
+                  x: rect.width / 2 - mx * zoom,
+                  y: (rect.height - 40) / 2 - my * zoom,
+                })
               }}
               zoom={zoom}
               pan={pan}

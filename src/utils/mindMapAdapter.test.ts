@@ -129,7 +129,7 @@ describe('mindMapAdapter', () => {
       const pendingChild = data.children!.find((c) => c.id === 'ui-pending-财务部');
       expect(pendingChild).toBeDefined();
       expect(pendingChild!.topic).toBe('默认');
-      expect(pendingChild!.expanded).toBe(true);
+      expect(pendingChild!.expanded).toBe(false);
       expect(pendingChild!.children).toHaveLength(2);
       expect(pendingChild!.children![0].id).toBe('ind-new-1');
       expect(pendingChild!.children![1].id).toBe('ind-new-2');

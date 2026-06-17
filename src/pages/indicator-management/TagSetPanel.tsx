@@ -86,6 +86,20 @@ export default function TagSetPanel({ selectedIndicatorId }: { selectedIndicator
   }, [indicators])
 
   const [selection, setSelection] = useState(() => computeState(tagNodes, initialSelectedIds))
+
+  // 当 selectedIndicatorId 变化时，重置 selection 以只反映当前选中指标的标签关联
+  const selectedIndicator = useMemo(
+    () => (selectedIndicatorId ? indicators.find((i) => i.id === selectedIndicatorId) : null),
+    [indicators, selectedIndicatorId],
+  )
+
+  useEffect(() => {
+    if (selectedIndicator) {
+      setSelection(computeState(tagNodes, new Set(selectedIndicator.tagIds)))
+    } else {
+      setSelection(computeState(tagNodes, initialSelectedIds))
+    }
+  }, [selectedIndicator, tagNodes, initialSelectedIds])
   const [searchTerm, setSearchTerm] = useState('')
   const [debouncedTerm, setDebouncedTerm] = useState('')
   const [searchMode, setSearchMode] = useState<SearchMode>('highlight')
@@ -126,9 +140,22 @@ export default function TagSetPanel({ selectedIndicatorId }: { selectedIndicator
 
   const handleToggle = useCallback(
     (id: string) => {
-      setSelection((prev) => toggle(tagNodes, prev.selected, id))
+      if (selectedIndicator) {
+        // 有选中指标 → 仅修改级联引擎高亮（不写 indicators，避免触发 SVG 连线）
+        const hasTag = selectedIndicator.tagIds.includes(id)
+        const nextSelected = new Set(selection.selected)
+        if (hasTag) {
+          nextSelected.delete(id)
+        } else {
+          nextSelected.add(id)
+        }
+        setSelection(computeState(tagNodes, nextSelected))
+      } else {
+        // 无选中指标 → 级联引擎 toggle（全局标签选中状态）
+        setSelection((prev) => toggle(tagNodes, prev.selected, id))
+      }
     },
-    [tagNodes],
+    [selectedIndicator, tagNodes, selection],
   )
 
   const handleClear = useCallback(() => {
@@ -209,11 +236,6 @@ export default function TagSetPanel({ selectedIndicatorId }: { selectedIndicator
 
   const isFilterEmpty =
     searchMode === 'filter' && debouncedTerm && filteredRootNodes.length === 0
-
-  const selectedIndicator = useMemo(
-    () => (selectedIndicatorId ? indicators.find((i) => i.id === selectedIndicatorId) : null),
-    [indicators, selectedIndicatorId],
-  )
 
   const selectedTagIds = useMemo(
     () => new Set(selectedIndicator?.tagIds ?? []),

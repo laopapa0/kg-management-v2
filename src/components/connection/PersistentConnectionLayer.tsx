@@ -57,8 +57,18 @@ export default function PersistentConnectionLayer({
   }, [])
 
   useEffect(() => {
+    const prevKeys = renderedKeysRef.current
+    const nextKeys = new Set(connections.map((c) => `${c.sourceId}::${c.targetId}`))
+    // 跳过无实际变化的更新，避免不必要的 SVG 重绘触发"奇怪连线"
+    if (prevKeys.size === nextKeys.size && [...prevKeys].every((k) => nextKeys.has(k))) return
+    renderedKeysRef.current = nextKeys
     updateLines()
-  }, [connections, exitingKeys, updateLines])
+  }, [connections, updateLines])
+
+  // exitingKeys 变化时仍需更新（连线退出动画）
+  useEffect(() => {
+    updateLines()
+  }, [exitingKeys, updateLines])
 
   useEffect(() => {
     window.addEventListener('scroll', updateLines, { passive: true })

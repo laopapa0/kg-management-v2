@@ -406,13 +406,11 @@ export function initializeAttachmentStore(): void {
   useAttachmentStore.getState().init()
 }
 
-/** Derived selector: 返回未挂靠到任何树/标签/规则的指标 */
+/** Derived selector: 返回未挂靠到树节点的指标（含挂在"默认"节点下的候补指标），不限制 tagIds/ruleIds */
 export function selectPendingIndicators(state: AttachmentState): IndicatorAttachment[] {
   return state.indicators.filter(
     (indicator) =>
       indicator.indicatorType !== '虚拟分组' &&
-      !indicator.treeParentId &&
-      indicator.tagIds.length === 0 &&
-      indicator.ruleIds.length === 0,
+      (!indicator.treeParentId || indicator.treeParentId?.endsWith('-pending')),
   )
 }

@@ -1,10 +1,16 @@
 import type { GeneratedReport } from '@/models/generatedReportModel'
+import { mockGeneratedReports } from '@/data/mockReportData'
 import { readFromStorage, writeToStorage, __resetMemoryCache } from '@/utils/storageHelper'
 
 const KEY = 'kgv2-generated-reports'
 
 export function getGeneratedReports(): GeneratedReport[] {
-  return readFromStorage<GeneratedReport[]>(KEY, [])
+  const existing = readFromStorage<GeneratedReport[]>(KEY, [])
+  if (existing.length === 0) {
+    writeToStorage(KEY, mockGeneratedReports)
+    return mockGeneratedReports
+  }
+  return existing
 }
 
 export function saveGeneratedReports(data: GeneratedReport[]): void {

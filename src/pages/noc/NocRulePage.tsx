@@ -28,7 +28,6 @@ import {
    Check,
   FileText,
   Code2,
-  GitBranch,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import SearchInput from '@/components/SearchInput';
@@ -53,6 +52,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { generateMockRules, mockRuleCategories } from '@/data/mockAttachmentData';
+import type { RuleType } from '@/models/indicatorAttachmentModel';
 
 /* ─── 类型 ─── */
 interface RuleCategory {
@@ -82,40 +83,35 @@ interface ConflictItem {
 }
 
 /* ─── Mock 数据 ─── */
-const ruleCategoryTreeData: RuleCategory[] = [
-  {
-    id: 'cat-abnormal', name: '异常规则',
-    children: [
-      {
-        id: 'cat-indicator-alert', name: '指标预警',
-        children: [
-          { id: 'cat-threshold', name: '阈值上下限' },
-          { id: 'cat-topn', name: 'TOPN 监控' },
-        ],
-      },
-      {
-        id: 'cat-anomaly-algo', name: '异常算法',
-        children: [
-          { id: 'cat-fluctuation', name: '波动算法' },
-          { id: 'cat-pearson', name: '皮尔逊算法' },
-        ],
-      },
-    ],
-  },
-  { id: 'cat-quality', name: '质量规则', children: [] },
-  { id: 'cat-compliance', name: '合规规则', children: [] },
-];
+const ruleCategoryTreeData: RuleCategory[] = mockRuleCategories.map((cat) => ({
+  id: cat.id,
+  name: cat.name,
+}));
 
-const ruleListData: RuleItem[] = [
-  { id: 'RULE-001', code: 'RULE-001', name: '通用上限告警', category: '异常规则 > 指标预警 > 阈值上下限', type: '阈值', paramSummary: 'upperLimit, alertLevel', parentRule: null, status: 'enabled', updatedAt: '2026-05-20 14:30' },
-  { id: 'RULE-002', code: 'RULE-002', name: '通用下限告警', category: '异常规则 > 指标预警 > 阈值上下限', type: '阈值', paramSummary: 'lowerLimit, alertLevel', parentRule: null, status: 'enabled', updatedAt: '2026-05-20 14:30' },
-  { id: 'RULE-003', code: 'RULE-003', name: '5G用户上限告警', category: '异常规则 > 指标预警 > 阈值上下限', type: '阈值', paramSummary: 'upperLimit=95%', parentRule: 'RULE-001', status: 'enabled', updatedAt: '2026-05-25 09:00' },
-  { id: 'RULE-004', code: 'RULE-004', name: '同比波动检测', category: '异常规则 > 异常算法 > 波动算法', type: '波动', paramSummary: 'compareType=yoy, threshold', parentRule: null, status: 'enabled', updatedAt: '2026-05-18 11:20' },
-  { id: 'RULE-005', code: 'RULE-005', name: '环比波动检测', category: '异常规则 > 异常算法 > 波动算法', type: '波动', paramSummary: 'compareType=mom, threshold', parentRule: 'RULE-004', status: 'enabled', updatedAt: '2026-05-19 16:45' },
-  { id: 'RULE-006', code: 'RULE-006', name: '孤立森林异常', category: '异常规则 > 异常算法 > 皮尔逊算法', type: '异常检测', paramSummary: 'algorithm=isolation_forest', parentRule: null, status: 'enabled', updatedAt: '2026-05-10 10:00' },
-  { id: 'RULE-007', code: 'RULE-007', name: 'TOP10降序监控', category: '异常规则 > 指标预警 > TOPN监控', type: 'TOPN', paramSummary: 'topN=10, desc', parentRule: null, status: 'enabled', updatedAt: '2026-05-22 13:15' },
-  { id: 'RULE-008', code: 'RULE-008', name: '多条件组合规则', category: '异常规则 > 指标预警 > 阈值上下限', type: '复合', paramSummary: 'rules[], logicOp', parentRule: null, status: 'disabled', updatedAt: '2026-04-28 09:30' },
-];
+const typeLabelMap: Record<RuleType, string> = {
+  threshold: '阈值',
+  topn: 'TOPN',
+  fluctuation: '波动',
+};
+
+function buildRuleListData(rules: ReturnType<typeof generateMockRules>): RuleItem[] {
+  const ruleMap = new Map(rules.map((r) => [r.id, r]));
+  return rules
+    .filter((r) => r.parentId)
+    .map((r) => ({
+      id: r.id,
+      code: r.id,
+      name: r.name,
+      category: ruleMap.get(r.parentId!)?.name ?? '',
+      type: typeLabelMap[r.type],
+      paramSummary: '详见参数定义',
+      parentRule: null,
+      status: r.enabled ? 'enabled' : 'disabled',
+      updatedAt: '2026-05-20 14:30',
+    }));
+}
+
+const ruleListData: RuleItem[] = buildRuleListData(generateMockRules());
 
 const conflictResultsData: ConflictItem[] = [
   { id: 'CF-001', type: '同名规则', rules: ['RULE-001', 'RULE-009'], description: '两个规则名称均为「通用上限告警」', severity: '警告' },
@@ -324,7 +320,7 @@ function SortableCatItem({ cat }: { cat: RuleCategory }) {
 export default function NocRulePage() {
   const [ruleCategoryTree, setRuleCategoryTree] = useState<RuleCategory[]>(ruleCategoryTreeData);
   const [selectedCatId, setSelectedCatId] = useState<string | null>(null);
-  const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set(['cat-abnormal', 'cat-indicator-alert', 'cat-anomaly-algo']));
+  const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set(ruleCategoryTreeData.map((c) => c.id)));
   const [treeSearch, setTreeSearch] = useState('');
   const [listSearch, setListSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState('全部');
@@ -334,10 +330,7 @@ export default function NocRulePage() {
   const [manageCatModalOpen, setManageCatModalOpen] = useState(false);
   const [editingRule, setEditingRule] = useState<RuleItem | null>(null);
   const [conflictTab, setConflictTab] = useState<'pending' | 'resolved' | 'ignored'>('pending');
-  const [detectingConflicts, setDetectingConflicts] = useState(false);
-  const [, setConflictsDetected] = useState(false);
   const [jsonSchema, setJsonSchema] = useState(defaultJsonSchema);
-  const [parentRule, setParentRule] = useState('');
 
   // Form state
   const [ruleForm, setRuleForm] = useState({
@@ -358,7 +351,7 @@ export default function NocRulePage() {
       return null;
     };
     return find(ruleCategoryTree);
-  }, [selectedCatId]);
+  }, [selectedCatId, ruleCategoryTree]);
 
   const filteredRules = useMemo(() => {
     let data = [...ruleListData];
@@ -404,7 +397,6 @@ export default function NocRulePage() {
     setEditingRule(null);
     setRuleForm({ name: '', category: '', type: '', description: '', status: true });
     setJsonSchema(defaultJsonSchema);
-    setParentRule('');
     setEditModalOpen(true);
   };
 
@@ -418,18 +410,7 @@ export default function NocRulePage() {
       status: rule.status === 'enabled',
     });
     setJsonSchema(defaultJsonSchema);
-    setParentRule(rule.parentRule || '');
     setEditModalOpen(true);
-  };
-
-  const handleDetectConflict = () => {
-    setConflictModalOpen(true);
-    setDetectingConflicts(true);
-    setConflictsDetected(false);
-    setTimeout(() => {
-      setDetectingConflicts(false);
-      setConflictsDetected(true);
-    }, 1500);
   };
 
   /* ─── 规则表格列 ─── */
@@ -446,19 +427,6 @@ export default function NocRulePage() {
       ),
     },
     { key: 'paramSummary', title: '参数模板摘要' },
-    {
-      key: 'parentRule',
-      title: '父规则',
-      render: (record: RuleItem) => (
-        record.parentRule ? (
-          <span className="text-[12px] text-[var(--accent-noc)] bg-[var(--accent-noc)]/10 px-2 py-0.5 rounded">
-            ↳ {record.parentRule}
-          </span>
-        ) : (
-          <span className="text-[12px] text-dark-text-tertiary">—</span>
-        )
-      ),
-    },
     {
       key: 'status',
       title: '状态',
@@ -502,10 +470,6 @@ export default function NocRulePage() {
             <Plus size={16} className="mr-1.5" />
             新增规则
           </Button>
-          <Button onClick={handleDetectConflict} variant="outline" className="h-9 px-4 text-[14px] border-dark-border-hover text-dark-text-secondary hover:bg-dark-page">
-            <AlertTriangle size={16} className="mr-1.5" />
-            检测冲突
-          </Button>
           <Button onClick={() => setManageCatModalOpen(true)} variant="outline" className="h-9 px-4 text-[14px] border-dark-border-hover text-dark-text-secondary hover:bg-dark-page">
             <FolderTree size={16} className="mr-1.5" />
             管理分类
@@ -516,7 +480,7 @@ export default function NocRulePage() {
       {/* ── 左右分栏 ── */}
       <div className="flex gap-0 border border-dark-border rounded-lg bg-dark-elevated overflow-hidden" style={{ height: 'calc(100vh - 200px)' }}>
         {/* 左侧：分类树 */}
-        <div className="w-[240px] min-w-[240px] bg-dark-page border-r border-dark-border flex flex-col">
+        <div className="w-[240px] min-w-[240px] bg-dark-page border-r border-dark-border flex flex-col" data-testid="rule-category-tree">
           <div className="p-3 border-b border-dark-border">
             <SearchInput
               placeholder="搜索分类"
@@ -571,10 +535,8 @@ export default function NocRulePage() {
                 <SelectContent>
                   <SelectItem value="全部">全部类型</SelectItem>
                   <SelectItem value="阈值">阈值</SelectItem>
-                  <SelectItem value="波动">波动</SelectItem>
-                  <SelectItem value="异常检测">异常检测</SelectItem>
                   <SelectItem value="TOPN">TOPN</SelectItem>
-                  <SelectItem value="复合">复合</SelectItem>
+                  <SelectItem value="波动">波动</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -609,9 +571,6 @@ export default function NocRulePage() {
               <TabsTrigger value="params" className="text-[13px] flex-1 data-[state=active]:bg-dark-elevated">
                 <Code2 size={14} className="mr-1.5" />参数定义
               </TabsTrigger>
-              <TabsTrigger value="inherit" className="text-[13px] flex-1 data-[state=active]:bg-dark-elevated">
-                <GitBranch size={14} className="mr-1.5" />继承关系
-              </TabsTrigger>
             </TabsList>
 
             {/* Tab 1: 基本信息 */}
@@ -644,13 +603,9 @@ export default function NocRulePage() {
                       <SelectValue placeholder="选择分类" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="阈值-上限告警">阈值 {'>'} 上限告警</SelectItem>
-                      <SelectItem value="阈值-下限告警">阈值 {'>'} 下限告警</SelectItem>
-                      <SelectItem value="波动-同比波动">波动 {'>'} 同比波动</SelectItem>
-                      <SelectItem value="波动-环比波动">波动 {'>'} 环比波动</SelectItem>
-                      <SelectItem value="异常-算法异常">异常 {'>'} 算法异常</SelectItem>
-                      <SelectItem value="TOPN-TOPN降序">TOPN {'>'} TOPN降序</SelectItem>
-                      <SelectItem value="复合-多条件组合">复合 {'>'} 多条件组合</SelectItem>
+                      {ruleCategoryTreeData.map((cat) => (
+                        <SelectItem key={cat.id} value={cat.name}>{cat.name}</SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
@@ -716,66 +671,6 @@ export default function NocRulePage() {
               </div>
             </TabsContent>
 
-            {/* Tab 3: 继承关系 */}
-            <TabsContent value="inherit" className="space-y-4 mt-4">
-              <div>
-                <Label className="text-[13px] text-dark-text-secondary">父规则选择</Label>
-                <Select value={parentRule} onValueChange={setParentRule}>
-                  <SelectTrigger className="mt-1 h-9 text-[14px]">
-                    <SelectValue placeholder="选择可继承的父规则（可选）" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="RULE-001">RULE-001 通用上限告警</SelectItem>
-                    <SelectItem value="RULE-002">RULE-002 通用下限告警</SelectItem>
-                    <SelectItem value="RULE-004">RULE-004 同比波动检测</SelectItem>
-                  </SelectContent>
-                </Select>
-                {parentRule && (
-                  <div className="mt-3 p-3 bg-dark-page rounded-md border border-dark-border">
-                    <p className="text-[12px] text-dark-text-secondary mb-2">父规则参数预览（只读）</p>
-                    <pre className="text-[12px] font-mono text-dark-text-secondary bg-dark-elevated p-2 rounded border border-dark-border overflow-x-auto">
-{`{
-  "upperLimit": 95,
-  "alertLevel": "重要",
-  "consecutiveCount": 1
-}`}
-                    </pre>
-                  </div>
-                )}
-                <p className="text-[12px] text-dark-text-tertiary mt-2">子规则将继承父规则的所有参数，可覆盖部分参数值</p>
-              </div>
-
-              {/* 子规则列表 */}
-              {editingRule && ruleListData.some(r => r.parentRule === editingRule.id) && (
-                <div className="mt-4">
-                  <h3 className="text-[14px] font-medium text-dark-text-secondary mb-2">继承此规则的子规则</h3>
-                  <div className="border border-dark-border rounded-md overflow-hidden">
-                    <table className="w-full">
-                      <thead className="bg-dark-card-l2">
-                        <tr className="border-b border-dark-border">
-                          <th className="h-8 px-3 text-left text-[12px] font-medium text-dark-text-secondary">子规则编码</th>
-                          <th className="h-8 px-3 text-left text-[12px] font-medium text-dark-text-secondary">子规则名称</th>
-                          <th className="h-8 px-3 text-left text-[12px] font-medium text-dark-text-secondary">覆盖参数</th>
-                          <th className="h-8 px-3 text-left text-[12px] font-medium text-dark-text-secondary">操作</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {ruleListData.filter(r => r.parentRule === editingRule.id).map((sub) => (
-                          <tr key={sub.id} className="border-b border-dark-border hover:bg-dark-page">
-                            <td className="h-9 px-3 text-[13px] text-dark-text-secondary">{sub.code}</td>
-                            <td className="h-9 px-3 text-[13px] text-dark-text-secondary">{sub.name}</td>
-                            <td className="h-9 px-3 text-[12px] text-[var(--accent-noc)]">{sub.paramSummary}</td>
-                            <td className="h-9 px-3">
-                              <button className="text-[12px] text-dark-accent-primary hover:underline">查看</button>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              )}
-            </TabsContent>
           </Tabs>
 
           <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-dark-border">
@@ -800,7 +695,7 @@ export default function NocRulePage() {
           </DialogHeader>
 
           <AnimatePresence mode="wait">
-            {detectingConflicts ? (
+            {false ? (
               <motion.div
                 key="loading"
                 initial={{ opacity: 0 }}

@@ -65,8 +65,8 @@ describe('ReportGenerationWizard', () => {
     fireEvent.click(screen.getByTestId('wizard-next-button'))
 
     // Step 2: template list is visible
-    expect(screen.getByText('核心指标日报模板')).toBeInTheDocument()
-    expect(screen.getByText('月度经营分析模板')).toBeInTheDocument()
+    expect(screen.getByText('月报标准模板')).toBeInTheDocument()
+    expect(screen.getByText('周报速览模板')).toBeInTheDocument()
 
     const nextBtn = screen.getByTestId('wizard-next-button')
     expect(nextBtn).toBeDisabled()
@@ -92,7 +92,7 @@ describe('ReportGenerationWizard', () => {
 
     // Step 3: summary visible
     expect(screen.getByText(/已选.*指标/)).toBeInTheDocument()
-    expect(screen.getByText('核心指标日报模板')).toBeInTheDocument()
+    expect(screen.getByText('月报标准模板')).toBeInTheDocument()
     expect(screen.getByTestId('wizard-generate-button')).toBeInTheDocument()
   })
 
@@ -132,7 +132,7 @@ describe('ReportGenerationWizard', () => {
         planId: 'plan-mock',
         planName: '报告计划',
         templateId: 'tmpl-001',
-        templateName: '核心指标日报模板',
+        templateName: '月报标准模板',
         version: 'v0.1',
         triggerType: 'manual',
         filterScope: {
@@ -174,7 +174,7 @@ describe('ReportGenerationWizard', () => {
     fireEvent.click(screen.getByTestId('scope-indicator-checkbox-ind-root'))
     fireEvent.click(screen.getByTestId('wizard-next-button'))
 
-    expect(screen.getByText('核心指标日报模板')).toBeInTheDocument()
+    expect(screen.getByText('月报标准模板')).toBeInTheDocument()
 
     // Go back to step 1
     fireEvent.click(screen.getByTestId('wizard-prev-button'))

@@ -63,15 +63,15 @@ export const mockReportPlans: ReportPlan[] = [
     schedule: 'daily',
     description: '每日自动生成核心指标监控报告',
     filterSummary: '核心指标 / 全部部门',
-    latestVersion: 12,
-    lastGeneratedAt: '2026-06-07T08:00:00.000Z',
+    latestVersion: 3,
+    lastGeneratedAt: '2026-06-10T08:00:00.000Z',
     createdAt: '2026-05-01T00:00:00.000Z',
     filterScope: {
       includedIndicatorIds: ['ind-001', 'ind-002'],
       excludedRuleIds: [],
       excludedLinkRelationIds: [],
     },
-    templateId: 'template-001',
+    templateId: 'tmpl-001',
   },
   {
     id: 'report-plan-002',
@@ -79,9 +79,15 @@ export const mockReportPlans: ReportPlan[] = [
     schedule: 'weekly',
     description: '每周一自动生成上周汇总报告',
     filterSummary: '全部指标 / 市场部',
-    latestVersion: 4,
+    latestVersion: 2,
     lastGeneratedAt: '2026-06-02T08:00:00.000Z',
     createdAt: '2026-05-10T00:00:00.000Z',
+    filterScope: {
+      includedIndicatorIds: [],
+      excludedRuleIds: [],
+      excludedLinkRelationIds: [],
+    },
+    templateId: 'tmpl-002',
   },
   {
     id: 'report-plan-003',
@@ -92,5 +98,11 @@ export const mockReportPlans: ReportPlan[] = [
     latestVersion: 1,
     lastGeneratedAt: '2026-06-01T08:00:00.000Z',
     createdAt: '2026-05-15T00:00:00.000Z',
+    filterScope: {
+      includedIndicatorIds: [],
+      excludedRuleIds: [],
+      excludedLinkRelationIds: [],
+    },
+    templateId: 'tmpl-002',
   },
 ]

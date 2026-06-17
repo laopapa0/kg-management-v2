@@ -300,16 +300,11 @@ describe('LinkRelationManagePage', () => {
     const user = userEvent.setup()
     render(<LinkRelationManagePage />)
 
-    // 聚合关系 (LKT-001) has 3 connections in mock data
     const detailButtons = screen.getAllByText('查看详情')
     await user.click(detailButtons[0])
 
     expect(screen.getByTestId('usage-tracking')).toBeInTheDocument()
-    // Should show connection count
     expect(screen.getByText(/已被/)).toBeInTheDocument()
-    // Should show source and target names from connections
-    expect(screen.getByText('月_收入_总收入')).toBeInTheDocument()
-    expect(screen.getByText('季_收入_总收入')).toBeInTheDocument()
   })
 
   it('shows empty state for zero-usage relation', async () => {

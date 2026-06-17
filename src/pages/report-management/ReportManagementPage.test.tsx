@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen, fireEvent, within } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import userEvent from '@testing-library/user-event'
 import { __resetReportStorageCache } from '@/utils/reportStorage'
@@ -13,11 +13,12 @@ describe('ReportManagementPage', () => {
     __resetReportStorageCache()
   })
 
-  it('shows empty state with new plan button when no plans exist', () => {
+  it('shows preloaded mock plans when storage is empty', () => {
     render(<MemoryRouter><ReportManagementPage /></MemoryRouter>)
 
-    expect(screen.getByText('暂无报告计划')).toBeInTheDocument()
-    expect(screen.getByText('创建报告计划以开始自动生成报告')).toBeInTheDocument()
+    expect(screen.getByText('核心指标日报')).toBeInTheDocument()
+    expect(screen.getByText('周报汇总')).toBeInTheDocument()
+    expect(screen.getByText('月度经营分析')).toBeInTheDocument()
     expect(screen.getByTestId('new-report-plan-button')).toBeInTheDocument()
   })
 
@@ -54,14 +55,18 @@ describe('ReportManagementPage', () => {
 
     // New plan should appear in the list
     expect(screen.getByText('测试日报')).toBeInTheDocument()
-    expect(screen.getByText('每日')).toBeInTheDocument()
+    const rows = screen.getAllByTestId(/^report-plan-row-/)
+    const testRow = rows.find((row) => within(row).queryByText('测试日报'))
+    expect(testRow).toBeTruthy()
+    expect(within(testRow!).getByText('每日')).toBeInTheDocument()
 
-    // Should persist to localStorage
+    // Should persist to localStorage (3 preloaded + 1 new)
     const stored = JSON.parse(localStorage.getItem('kgv2-reports') ?? '[]')
-    expect(stored).toHaveLength(1)
-    expect(stored[0].name).toBe('测试日报')
-    expect(stored[0].schedule).toBe('daily')
-    expect(stored[0].description).toBe('这是一个测试报告')
+    expect(stored).toHaveLength(4)
+    const newPlan = stored.find((p: { name: string }) => p.name === '测试日报')
+    expect(newPlan).toBeTruthy()
+    expect(newPlan.schedule).toBe('daily')
+    expect(newPlan.description).toBe('这是一个测试报告')
   })
 
   it('edits an existing report plan and updates the list', async () => {
@@ -145,7 +150,7 @@ describe('ReportManagementPage', () => {
     expect(screen.getByText('核心指标日报')).toBeInTheDocument()
     expect(screen.getByText('每日')).toBeInTheDocument()
     expect(screen.getByText('核心指标 / 全部部门')).toBeInTheDocument()
-    expect(screen.getByText('V12')).toBeInTheDocument()
+    expect(screen.getByText('V3')).toBeInTheDocument()
 
     expect(screen.getByText('周报汇总')).toBeInTheDocument()
     expect(screen.getByText('每周')).toBeInTheDocument()
@@ -189,12 +194,16 @@ describe('ReportManagementPage', () => {
     expect(plan.latestVersion).toBe(1)
     expect(plan.lastGeneratedAt).toBeTruthy()
 
-    // Report generated
+    // Report generated (6 preloaded + 1 new)
     const storedReports = JSON.parse(localStorage.getItem('kgv2-generated-reports') ?? '[]')
-    expect(storedReports.length).toBe(1)
-    expect(storedReports[0].planId).toBe('report-plan-001')
-    expect(storedReports[0].planName).toBe('核心指标日报')
-    expect(storedReports[0].triggerType).toBe('manual')
+    expect(storedReports.length).toBe(7)
+    const newReport = storedReports.find(
+      (r: { planId: string; version: string; triggerType: string }) =>
+        r.planId === 'report-plan-001' && r.version === 'v1' && r.triggerType === 'manual',
+    )
+    expect(newReport).toBeTruthy()
+    expect(newReport.planName).toBe('核心指标日报')
+    expect(newReport.triggerType).toBe('manual')
   })
 
   it('opens report.html after generating a report', async () => {
@@ -228,7 +237,6 @@ describe('ReportManagementPage', () => {
 
   it('switches to history tab content without navigation', async () => {
     const user = userEvent.setup()
-    saveReportPlans(mockReportPlans)
 
     render(<MemoryRouter><ReportManagementPage /></MemoryRouter>)
 
@@ -239,15 +247,15 @@ describe('ReportManagementPage', () => {
     const historyTab = screen.getByRole('tab', { name: '历史报告' })
     await user.click(historyTab)
 
-    // Should show history page content (empty state since no reports)
-    expect(screen.getByText('暂无历史报告')).toBeInTheDocument()
+    // Should show history page content with preloaded reports
+    expect(screen.getByRole('heading', { name: '历史报告' })).toBeInTheDocument()
+    expect(screen.getByText((content) => content.includes('核心指标日报') && content.includes('v3'))).toBeInTheDocument()
     // Plans content should be gone
-    expect(screen.queryByText('核心指标日报')).not.toBeInTheDocument()
+    expect(screen.queryByText('V3')).not.toBeInTheDocument()
   })
 
   it('switches to templates tab content without navigation', async () => {
     const user = userEvent.setup()
-    saveReportPlans(mockReportPlans)
 
     render(<MemoryRouter><ReportManagementPage /></MemoryRouter>)
 
@@ -258,10 +266,11 @@ describe('ReportManagementPage', () => {
     const templatesTab = screen.getByRole('tab', { name: '报告模板' })
     await user.click(templatesTab)
 
-    // Should show templates page content (empty state since no templates)
-    expect(screen.getByText('暂无报告模板')).toBeInTheDocument()
+    // Should show templates page content with preloaded templates
+    expect(screen.getByText('月报标准模板')).toBeInTheDocument()
+    expect(screen.getByText('周报速览模板')).toBeInTheDocument()
     // Plans content should be gone
-    expect(screen.queryByText('核心指标日报')).not.toBeInTheDocument()
+    expect(screen.queryByText('V3')).not.toBeInTheDocument()
   })
 
   it('generates report even with empty filterScope', async () => {

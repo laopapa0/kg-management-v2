@@ -97,9 +97,9 @@ export default function IndicatorCard({
       role="button"
       tabIndex={0}
       animate={controls}
-      className={[
-        'relative flex min-h-[120px] flex-col gap-3 rounded-lg border p-4',
-        'bg-dark-card-l1 text-dark-text-primary',
+        className={[
+          'relative flex w-full min-h-[120px] flex-col gap-3 rounded-lg border p-4',
+          'bg-dark-card-l1 text-dark-text-primary',
         'outline-none transition-all',
         isAttached ? 'opacity-50' : 'opacity-100',
         isHover ? '-translate-y-px shadow-card-hover' : 'shadow-none',

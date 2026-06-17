@@ -350,12 +350,6 @@ export default function IndicatorAttachmentPage() {
       if (ind.treeParentId) {
         result.push({ sourceId: ind.id, targetId: ind.treeParentId })
       }
-      for (const tagId of ind.tagIds) {
-        result.push({ sourceId: ind.id, targetId: tagId })
-      }
-      for (const ruleId of ind.ruleIds) {
-        result.push({ sourceId: ind.id, targetId: ruleId })
-      }
     }
     return result
   }, [allIndicators])
@@ -467,7 +461,7 @@ export default function IndicatorAttachmentPage() {
             data-focus-zone="tree"
             className="flex h-full flex-col rounded-lg border border-dark-border bg-dark-card-l1"
           >
-            <IndicatorTreePanel ref={treePanelRef} onViewModeChange={setViewMode} isConnectionMode={state.isConnecting} />
+            <IndicatorTreePanel ref={treePanelRef} onViewModeChange={setViewMode} isConnectionMode={state.isConnecting} onSelectIndicator={setSelectedIndicatorId} />
           </div>
         </Panel>
 

@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect, useCallback } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import { Scale, Search, Settings } from 'lucide-react'
 import ParameterDrawer from './ParameterDrawer'
 import TreeView, { type TreeNode } from '@/components/tree/TreeView'
@@ -60,6 +60,7 @@ export default function RulePanel({ selectedIndicatorId }: { selectedIndicatorId
   const rules = useAttachmentStore((state) => state.rules)
   const setRules = useAttachmentStore((state) => state.setRules)
   const indicators = useAttachmentStore((state) => state.indicators)
+  const setIndicators = useAttachmentStore((state) => state.setIndicators)
   const ruleParameters = useAttachmentStore((state) => state.ruleParameters)
 
   const tree = useMemo(() => buildRuleTree(rules), [rules])
@@ -136,42 +137,41 @@ export default function RulePanel({ selectedIndicatorId }: { selectedIndicatorId
     return map
   }, [tree])
 
-  function toRuleTreeNode(node: Rule): RuleTreeNode {
-    return {
-      id: node.id,
-      rule: node,
-      children: node.children?.length ? node.children.map(toRuleTreeNode) : undefined,
+  const rootNodes: RuleTreeNode[] = useMemo(() => {
+    function toRuleTreeNode(node: Rule): RuleTreeNode {
+      return {
+        id: node.id,
+        rule: node,
+        children: node.children?.length ? node.children.map(toRuleTreeNode) : undefined,
+      }
     }
-  }
-
-  const rootNodes: RuleTreeNode[] = useMemo(
-    () => tree.map(toRuleTreeNode),
-    [tree],
-  )
-
-  function filterRuleTreeNodes(
-    nodes: RuleTreeNode[],
-    matched: Set<string>,
-    ancestors: Set<string>,
-  ): RuleTreeNode[] {
-    return nodes
-      .map((node) => {
-        const filteredChildren = node.children
-          ? filterRuleTreeNodes(node.children, matched, ancestors)
-          : undefined
-        const isMatch = matched.has(node.id)
-        const isAncestor = ancestors.has(node.id)
-        const hasMatchingChildren = filteredChildren && filteredChildren.length > 0
-        if (isMatch || isAncestor || hasMatchingChildren) {
-          return { ...node, children: filteredChildren }
-        }
-        return null
-      })
-      .filter(Boolean) as RuleTreeNode[]
-  }
+    return tree.map(toRuleTreeNode)
+  }, [tree])
 
   const filteredRootNodes = useMemo(() => {
     if (searchMode !== 'filter' || !debouncedTerm) return rootNodes
+
+    function filterRuleTreeNodes(
+      nodes: RuleTreeNode[],
+      matched: Set<string>,
+      ancestors: Set<string>,
+    ): RuleTreeNode[] {
+      return nodes
+        .map((node) => {
+          const filteredChildren = node.children
+            ? filterRuleTreeNodes(node.children, matched, ancestors)
+            : undefined
+          const isMatch = matched.has(node.id)
+          const isAncestor = ancestors.has(node.id)
+          const hasMatchingChildren = filteredChildren && filteredChildren.length > 0
+          if (isMatch || isAncestor || hasMatchingChildren) {
+            return { ...node, children: filteredChildren }
+          }
+          return null
+        })
+        .filter(Boolean) as RuleTreeNode[]
+    }
+
     return filterRuleTreeNodes(rootNodes, matchedIds, ancestorIds)
   }, [searchMode, debouncedTerm, rootNodes, matchedIds, ancestorIds])
 
@@ -188,22 +188,19 @@ export default function RulePanel({ selectedIndicatorId }: { selectedIndicatorId
     [selectedIndicator],
   )
 
-  const toggleRuleForIndicator = useCallback(
-    (ruleId: string) => {
-      if (!selectedIndicator) return
-      const hasRule = selectedIndicator.ruleIds.includes(ruleId)
-      const nextRuleIds = hasRule
-        ? selectedIndicator.ruleIds.filter((id) => id !== ruleId)
-        : [...selectedIndicator.ruleIds, ruleId]
-      const next = indicators.map((i) =>
+  // 规则记忆：切换选中指标对该规则的启/停（ruleIds）
+  const handleRuleMemoryToggle = (ruleId: string) => {
+    if (!selectedIndicator) return
+    const hasRule = selectedIndicator.ruleIds.includes(ruleId)
+    const nextRuleIds = hasRule
+      ? selectedIndicator.ruleIds.filter((id) => id !== ruleId)
+      : [...selectedIndicator.ruleIds, ruleId]
+    setIndicators(
+      indicators.map((i) =>
         i.id === selectedIndicator.id ? { ...i, ruleIds: nextRuleIds } : i,
-      )
-      setRules(rules) // keep rules unchanged; only indicators change
-      const store = useAttachmentStore.getState()
-      store.setIndicators(next)
-    },
-    [selectedIndicator, indicators, setRules, rules],
-  )
+      ),
+    )
+  }
 
   if (tree.length === 0) {
     return (
@@ -253,6 +250,7 @@ export default function RulePanel({ selectedIndicatorId }: { selectedIndicatorId
               isSearchActive &&
               !matchedIds.has(fullRule.id) &&
               !ancestorIds.has(fullRule.id)
+            const isRuleSelected = Boolean(selectedIndicatorId && selectedRuleIds.has(fullRule.id))
 
             const handleToggleEnabled = () => {
               const next = rules.map((r) =>
@@ -280,11 +278,13 @@ export default function RulePanel({ selectedIndicatorId }: { selectedIndicatorId
                   data-rule-id={fullRule.id}
                   data-dimmed={isDimmed || undefined}
                   data-disabled={isDisabled || undefined}
+                  data-selected={isRuleSelected || undefined}
                   className={[
-                    'flex items-center justify-between gap-2 transition-all duration-200',
+                    'flex items-center justify-between gap-2 rounded-md px-2 py-1 transition-all duration-200',
                     isDimmed ? 'opacity-[0.35] scale-[0.98] pointer-events-none' : '',
                     isDisabled && !isDimmed ? 'opacity-40' : '',
                     !isDimmed && !isDisabled ? 'opacity-100' : '',
+                    isRuleSelected ? 'bg-dark-card-l1 text-dark-accent-primary border border-dark-accent-primary/30 shadow-[0_0_6px_rgba(77,166,255,0.2)]' : '',
                   ].join(' ')}
                 >
                   <div className="flex items-center gap-2">
@@ -292,8 +292,8 @@ export default function RulePanel({ selectedIndicatorId }: { selectedIndicatorId
                       <span />)}
                     <Switch
                       data-testid={`rule-toggle-${fullRule.id}`}
-                      checked={fullRule.enabled ?? true}
-                      onCheckedChange={handleToggleEnabled}
+                      checked={selectedIndicatorId ? selectedRuleIds.has(fullRule.id) : (fullRule.enabled ?? true)}
+                      onCheckedChange={selectedIndicatorId ? () => handleRuleMemoryToggle(fullRule.id) : handleToggleEnabled}
                       onClick={(e) => e.stopPropagation()}
                     />
                     <span className="truncate text-sm text-dark-text-primary">

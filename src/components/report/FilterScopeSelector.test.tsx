@@ -104,14 +104,14 @@ describe('FilterScopeSelector', () => {
 
     render(<FilterScopeSelector value={value} onChange={onChange} />)
 
-    expect(screen.getByText('异常规则')).toBeInTheDocument()
+    expect(screen.getByText('阈值上下限')).toBeInTheDocument()
 
-    const ruleCheckbox = screen.getByTestId('scope-rule-checkbox-rule-abnormal')
+    const ruleCheckbox = screen.getByTestId('scope-rule-checkbox-rule-cat-threshold')
     fireEvent.click(ruleCheckbox)
 
     expect(onChange).toHaveBeenCalled()
     const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1][0] as FilterScopeValue
-    expect(lastCall.excludedRuleIds).toContain('rule-abnormal')
+    expect(lastCall.excludedRuleIds).toContain('rule-cat-threshold')
   })
 
   it('checking a link relation updates excludedLinkRelationIds', () => {

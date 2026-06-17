@@ -6,7 +6,6 @@ import {
   BarChart3,
   Network,
   FileText,
-  BookOpen,
   Database,
   Link,
   Scale,
@@ -50,7 +49,6 @@ const navGroups: NavGroup[] = [
     items: [
       { label: '规则管理', path: '/noc/rule', icon: <Scale size={18} /> },
       { label: '关联关系管理', path: '/link-relation', icon: <Link size={18} /> },
-      { label: '知识库管理', path: '/knowledge-upload', icon: <BookOpen size={18} /> },
     ],
   },
 ];

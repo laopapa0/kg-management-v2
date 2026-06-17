@@ -13,24 +13,16 @@ import ReportHistoryPage from './pages/report-management/ReportHistoryPage'
 import ReportDetailPage from './pages/report-management/ReportDetailPage'
 import NocRulePage from './pages/noc/NocRulePage'
 import LinkRelationManagePage from './pages/link-relation/LinkRelationManagePage'
-import { mockReportPlans } from '@/models/reportModel'
-import { getReportPlans, saveReportPlans } from '@/utils/reportStorage'
-import { mockReportTemplates } from '@/models/reportTemplateModel'
-import { getReportTemplates, saveReportTemplates } from '@/utils/reportTemplateStorage'
 
 export default function App() {
   useEffect(() => {
     const theme = getStoredTheme()
     applyTheme(theme)
 
-    // Initialize report plans with mock data if empty
-    if (getReportPlans().length === 0) {
-      saveReportPlans(mockReportPlans)
-    }
-    // Initialize report templates with mock data if empty
-    if (getReportTemplates().length === 0) {
-      saveReportTemplates(mockReportTemplates)
-    }
+    // 禁用全局右键菜单
+    const disableCtx = (e: MouseEvent) => e.preventDefault()
+    document.addEventListener('contextmenu', disableCtx)
+    return () => document.removeEventListener('contextmenu', disableCtx)
   }, [])
 
   return (

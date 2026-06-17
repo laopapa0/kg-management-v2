@@ -52,6 +52,7 @@ export interface IndicatorTreePanelRef {
 interface IndicatorTreePanelProps {
   onViewModeChange?: (mode: 'tree' | 'mindmap') => void
   isConnectionMode?: boolean
+  onSelectIndicator?: (id: string | null) => void
 }
 
 interface RenderTreeNode extends TreeNode {
@@ -60,7 +61,7 @@ interface RenderTreeNode extends TreeNode {
 }
 
 const IndicatorTreePanel = forwardRef<IndicatorTreePanelRef, IndicatorTreePanelProps>(
-  function IndicatorTreePanel({ onViewModeChange, isConnectionMode = false }, ref) {
+  function IndicatorTreePanel({ onViewModeChange, isConnectionMode = false, onSelectIndicator }, ref) {
   const indicators = useAttachmentStore((state) => state.indicators)
   const addIndicator = useAttachmentStore((state) => state.addIndicator)
   const renameIndicator = useAttachmentStore((state) => state.renameIndicator)
@@ -432,7 +433,10 @@ const IndicatorTreePanel = forwardRef<IndicatorTreePanelRef, IndicatorTreePanelP
                   expanded={expanded}
                   onExpandedChange={setExpanded}
                   selectedId={selectedId}
-                  onSelect={setSelectedId}
+                  onSelect={(id: string | null) => {
+                    setSelectedId(id)
+                    onSelectIndicator?.(id)
+                  }}
                   onEditNode={setEditingId}
                   canEditNode={(node) => node.indicator.indicatorType === '虚拟分组'}
                   onDeleteNode={handleDeleteNode}

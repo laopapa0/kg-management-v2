@@ -15,7 +15,7 @@ if (!Element.prototype.releasePointerCapture) {
 
 describe('ParameterDrawer', () => {
   const defaultProps = {
-    ruleId: 'rule-threshold-p1',
+    ruleId: 'rule-threshold-upper',
     open: true,
     onOpenChange: vi.fn(),
   }
@@ -119,7 +119,7 @@ describe('ParameterDrawer', () => {
 
     it('renders ParameterFields for topn rule', () => {
       initializeAttachmentStore()
-      render(<ParameterDrawer {...defaultProps} ruleId="rule-topn-10" />)
+      render(<ParameterDrawer {...defaultProps} ruleId="rule-topn-desc-10" />)
       expect(screen.getByTestId('input-n')).toBeInTheDocument()
       expect(screen.getByTestId('select-dimension')).toBeInTheDocument()
     })
