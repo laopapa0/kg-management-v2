@@ -1035,19 +1035,36 @@ const MOCK_VALUES = {"月_预算执行进度-落地产品收入-政支中心结�
     }
 
     // --- 归因分析 ---
-    var dynNarrative = '该簇共' + activeRels.length + '条关联。';
-    if (depCount > 0) dynNarrative += 'DEPENDS_ON依赖链中上游波动向下逐级传导；';
-    if (transCount > 0) dynNarrative += 'TRANSMISSION路径在多个维度间横向扩散；';
-    if (excludedDescs.length > 0) dynNarrative += '已排除关系「' + excludedDescs[0] + '」' + (excludedDescs.length > 1 ? '等' + excludedDescs.length + '条' : '') + '，相关传导通路已截断；';
-    if (addedDescs.length > 0) dynNarrative += '新增关联「' + addedDescs[0] + '」' + (addedDescs.length > 1 ? '等' + addedDescs.length + '条' : '') + '，引入新的传导路径，需重新评估影响范围。';
+    var isICT = cluster.center.indexOf('产数ICT') !== -1 || cluster.center.indexOf('ICT毛利额') !== -1;
+    var dynNarrative = '';
+    if (isICT && excludedDescs.length > 0 && addedDescs.length === 0) {
+      dynNarrative = '产数ICT毛利额作为衡量数字化业务盈利能力的关键指标，其关联网络的变动直接影响归因结论的可信度。移除「' + excludedDescs[0] + '」后，该传导路径被截断——原本通过该关系解释的毛利波动不再能追溯到上游指标。从业务视角看，' + (excludedDescs[0].indexOf('DEPENDS_ON') !== -1 ? 'ICT毛利额对下层指标的依赖关系断裂，可能导致成本归集链条不完整，建议重新评估该依赖关系的业务合理性。' : 'ICT毛利额向横向指标的数据传导中断，下游分析将出现盲区，建议补充替代传导路径。');
+    } else if (isICT && addedDescs.length > 0 && excludedDescs.length === 0) {
+      dynNarrative = '产数ICT毛利额的关联网络发生扩展。新增「' + addedDescs[0] + '」后，该簇的归因链路由原有基础向外延伸——' + (addedDescs[0].indexOf('DEPENDS_ON') !== -1 ? '新增的依赖关系表明ICT毛利额受上游指标驱动，需要验证该依赖方向是否符合实际业务流程：ICT毛利额通常作为被解释变量（因变量），若新增关系将其置于自变量位置，可能暗示业务逻辑需要调整。' : '新增的关联关系为ICT毛利额波动提供了新的解释维度，建议验证关系类型的语义正确性：TRANSMISSION表示数据层面的联动传导，AGGREGATES表示层级聚合关系，错误的关系类型会误导归因方向。');
+    } else if (isICT && excludedDescs.length > 0 && addedDescs.length > 0) {
+      dynNarrative = '产数ICT毛利额的关联网络同时经历缩减与扩展。移除了' + excludedDescs.length + '条旧关联，新增了' + addedDescs.length + '条新关联，该簇的归因拓扑结构发生了变化。在进行归因分析时需注意：新旧关系的语义差异可能导致历史归因结论失效，建议以当前网络结构重新执行归因分析，避免套用旧结论。';
+    } else if (isICT) {
+      dynNarrative = '产数ICT毛利额当前归因网络包含' + activeRels.length + '条关联。作为连接资源型业务毛利额与最终产出的枢纽指标，ICT毛利额的波动同时受到上游成本端和下游收入端的双向影响。DEPENDS_ON链路揭示成本驱动因素，TRANSMISSION链路揭示收入传导效应，两者共同构成完整的归因视图。';
+    } else {
+      dynNarrative = '该簇共' + activeRels.length + '条关联。';
+      if (depCount > 0) dynNarrative += 'DEPENDS_ON依赖链中上游波动向下逐级传导；';
+      if (transCount > 0) dynNarrative += 'TRANSMISSION路径在多个维度间横向扩散；';
+      if (excludedDescs.length > 0) dynNarrative += '已排除关系「' + excludedDescs[0] + '」' + (excludedDescs.length > 1 ? '等' + excludedDescs.length + '条' : '') + '，相关传导通路已截断；';
+      if (addedDescs.length > 0) dynNarrative += '新增关联「' + addedDescs[0] + '」' + (addedDescs.length > 1 ? '等' + addedDescs.length + '条' : '') + '，引入新的传导路径，需重新评估影响范围。';
+    }
 
     // --- 异常表现 ---
     var dynAnomalies = '';
-    if (excludedDescs.length > 0) {
+    if (isICT && excludedDescs.length > 0) {
+      dynAnomalies = '产数ICT毛利额关联网络发生变更：移除' + excludedDescs.length + '条关联后，簇内连通性下降。受影响的归因路径已无法形成完整闭环，建议重点关注被截断链路上游指标的独立波动趋势。';
+    } else if (isICT && addedDescs.length > 0) {
+      dynAnomalies = '产数ICT毛利额关联网络扩展：新增' + addedDescs.length + '条关联，中心指标的受影响范围扩大至' + activeRels.length + '个关联节点。新增的关联路径可能引入未预期的波动传导，建议在监控周期内持续观察新路径上的数据一致性。';
+    } else if (isICT) {
+      dynAnomalies = '产数ICT毛利额当前处于正常监控状态。' + activeRels.length + '条关联构成的多层归因网络覆盖了成本端到收入端的完整传导链，未检测到异常信号。';
+    } else if (excludedDescs.length > 0) {
       dynAnomalies = '移除「' + excludedDescs[0] + '」' + (excludedDescs.length > 1 ? '等' + excludedDescs.length + '条关联' : '') + '后，该簇链路被截断；';
-    }
-    if (addedDescs.length > 0) {
-      dynAnomalies += '新增「' + addedDescs[0] + '」' + (addedDescs.length > 1 ? '等' + addedDescs.length + '条关联' : '') + '，中心指标受影响范围扩大至' + activeRels.length + '条关联；';
+    } else if (addedDescs.length > 0) {
+      dynAnomalies = '新增「' + addedDescs[0] + '」' + (addedDescs.length > 1 ? '等' + addedDescs.length + '条关联' : '') + '，中心指标受影响范围扩大至' + activeRels.length + '条关联；';
     }
     if (!dynAnomalies) {
       dynAnomalies = '中心指标' + cluster.center + '近期波动在正常范围内，关联指标群未出现显著异动；';
@@ -1116,7 +1133,7 @@ const MOCK_VALUES = {"月_预算执行进度-落地产品收入-政支中心结�
           return '<a href="/kg-management-v2/#/lineage?q=' + encodeURIComponent(name) + '" target="_blank" class="ind-link">' + name + '</a>';
         }).join(' → ');
       } else {
-        chainHtml = '该指标原生波动，无上游依赖或下游传导链';
+        chainHtml = '孤立节点：' + cluster.center + '未形成有效连通，建议补充关联关系以建立归因链路';
       }
     }
     html += '<p class="chart-note"><strong>归因判定：</strong><span class="tag tag-warning">需关注</span> — ' + chainHtml;
