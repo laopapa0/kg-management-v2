@@ -1058,30 +1058,66 @@ const MOCK_VALUES = {"月_预算执行进度-落地产品收入-政支中心结�
     html += '<p class="chart-note"><strong>异常表现：</strong>' + dynAnomalies + '</p>';
     html += '<p class="chart-note"><strong>归因分析：</strong>' + dynNarrative + '</p>';
     // 基于过滤后的 activeRels 重新计算归因链（而非用静态 cluster.chain）
-    var chainNodes = [cluster.center];
-    var chainUsed = {};
-    chainUsed[cluster.center] = true;
-    var changed = true;
-    while (changed && chainNodes.length < 6) {
-      changed = false;
-      for (var ri4 = 0; ri4 < activeRels.length; ri4++) {
-        var r4 = activeRels[ri4];
-        var lastNode = chainNodes[chainNodes.length - 1];
-        if ((r4.relationType === 'DEPENDS_ON' || r4.relationType === 'CAUSES') && r4.sourceName === lastNode && !chainUsed[r4.targetName]) {
-          chainNodes.push(r4.targetName); chainUsed[r4.targetName] = true; changed = true; break;
-        }
-        if ((r4.relationType === 'TRANSMISSION') && r4.targetName === lastNode && !chainUsed[r4.sourceName]) {
-          chainNodes.push(r4.sourceName); chainUsed[r4.sourceName] = true; changed = true; break;
-        }
+    // 找多条上游根因链（沿 DEPENDS_ON 反向追溯）
+    var rootChains = [];
+    // 收集 DEPENDS_ON 的上游映射: target -> [sources that depend on it]
+    var upstreamMap = {};
+    for (var ri4 = 0; ri4 < activeRels.length; ri4++) {
+      var r4 = activeRels[ri4];
+      if (r4.relationType === 'DEPENDS_ON' || r4.relationType === 'CAUSES') {
+        if (!upstreamMap[r4.sourceName]) upstreamMap[r4.sourceName] = [];
+        upstreamMap[r4.sourceName].push(r4.targetName);
       }
     }
-    var chainHtml;
-    if (chainNodes.length > 1) {
-      chainHtml = (chainNodes.length === 2 ? '根因链路：' : '传导路径：') + chainNodes.map(function(name) {
-        return '<a href="/kg-management-v2/#/lineage?q=' + encodeURIComponent(name) + '" target="_blank" class="ind-link">' + name + '</a>';
-      }).join(' → ');
+    // DFS 找从中心节点出发的所有根因路径
+    function findRootPaths(node, visited, path) {
+      var ups = upstreamMap[node];
+      if (!ups || ups.length === 0) { rootChains.push(path.slice()); return; }
+      for (var ui = 0; ui < ups.length; ui++) {
+        if (visited[ups[ui]]) continue;
+        visited[ups[ui]] = true; path.push(ups[ui]);
+        findRootPaths(ups[ui], visited, path);
+        path.pop(); visited[ups[ui]] = false;
+      }
+    }
+    var initVisited = {}; initVisited[cluster.center] = true;
+    findRootPaths(cluster.center, initVisited, [cluster.center]);
+    // 反转每条链（根因在前，中心在后），取最长的3条
+    for (var ci3 = 0; ci3 < rootChains.length; ci3++) { rootChains[ci3].reverse(); }
+    rootChains.sort(function(a, b) { return b.length - a.length; });
+    var topChains = rootChains.slice(0, 3);
+
+    var chainHtml = '';
+    if (topChains.length > 0 && topChains[0].length > 1) {
+      var labels = topChains.length > 1 ? ['根因链路1', '根因链路2', '根因链路3'] : ['根因链路'];
+      for (var cii = 0; cii < topChains.length; cii++) {
+        if (cii > 0) chainHtml += '；';
+        chainHtml += labels[cii] + '：' + topChains[cii].map(function(name) {
+          return '<a href="/kg-management-v2/#/lineage?q=' + encodeURIComponent(name) + '" target="_blank" class="ind-link">' + name + '</a>';
+        }).join(' → ');
+      }
     } else {
-      chainHtml = '该指标原生波动，无上游依赖或下游传导链';
+      // 无根因链，找传导路径
+      var downChain = [cluster.center];
+      var downUsed = {}; downUsed[cluster.center] = true;
+      var changed2 = true;
+      while (changed2 && downChain.length < 5) {
+        changed2 = false;
+        for (var di = 0; di < activeRels.length; di++) {
+          var dr = activeRels[di];
+          var last = downChain[downChain.length - 1];
+          if ((dr.relationType === 'TRANSMISSION') && dr.sourceName === last && !downUsed[dr.targetName]) {
+            downChain.push(dr.targetName); downUsed[dr.targetName] = true; changed2 = true; break;
+          }
+        }
+      }
+      if (downChain.length > 1) {
+        chainHtml = '传导路径：' + downChain.map(function(name) {
+          return '<a href="/kg-management-v2/#/lineage?q=' + encodeURIComponent(name) + '" target="_blank" class="ind-link">' + name + '</a>';
+        }).join(' → ');
+      } else {
+        chainHtml = '该指标原生波动，无上游依赖或下游传导链';
+      }
     }
     html += '<p class="chart-note"><strong>归因判定：</strong><span class="tag tag-warning">需关注</span> — ' + chainHtml;
     if (excludedDescs.length > 0) {
