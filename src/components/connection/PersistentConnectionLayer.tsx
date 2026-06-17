@@ -71,14 +71,25 @@ export default function PersistentConnectionLayer({
     updateLines()
   }, [exitingKeys, updateLines])
 
-  useEffect(() => {
-    window.addEventListener('scroll', updateLines, { passive: true })
-    window.addEventListener('resize', updateLines)
-    return () => {
-      window.removeEventListener('scroll', updateLines)
-      window.removeEventListener('resize', updateLines)
-    }
+  // 使用 rAF 节流滚动/缩放更新，避免拖拽滚动时频繁重算导致连线闪烁
+  const rafRef = useRef<number | null>(null)
+  const throttledUpdate = useCallback(() => {
+    if (rafRef.current !== null) return
+    rafRef.current = requestAnimationFrame(() => {
+      rafRef.current = null
+      updateLines()
+    })
   }, [updateLines])
+
+  useEffect(() => {
+    window.addEventListener('scroll', throttledUpdate, { passive: true })
+    window.addEventListener('resize', throttledUpdate)
+    return () => {
+      window.removeEventListener('scroll', throttledUpdate)
+      window.removeEventListener('resize', throttledUpdate)
+      if (rafRef.current !== null) cancelAnimationFrame(rafRef.current)
+    }
+  }, [throttledUpdate])
 
   const activeKey = confirmingKey ?? hoveredKey
 
@@ -117,14 +128,11 @@ export default function PersistentConnectionLayer({
       // Notify parent immediately so undo toast shows right away
       onDelete?.(connection)
 
-      // Remove from exiting keys after fade-out animation completes
-      setTimeout(() => {
-        setExitingKeys((prev) => {
-          const next = new Set(prev)
-          next.delete(key)
-          return next
-        })
-      }, 200)
+      setExitingKeys((prev) => {
+        const next = new Set(prev)
+        next.delete(key)
+        return next
+      })
     },
     [onDelete],
   )
