@@ -993,7 +993,12 @@ const MOCK_VALUES = {"月_预算执行进度-落地产品收入-政支中心结�
   // 产数ICT毛利额簇固定为簇1
   var ictIdx = -1;
   for (var ciSort = 0; ciSort < components.length; ciSort++) {
-    if (components[ciSort].center.indexOf('产数ICT') !== -1 || components[ciSort].center.indexOf('ICT毛利额') !== -1) { ictIdx = ciSort; break; }
+    var hasIct = false;
+    for (var cr = 0; cr < components[ciSort].relations.length; cr++) {
+      var r = components[ciSort].relations[cr];
+      if (r.sourceName.indexOf('产数ICT') !== -1 || r.targetName.indexOf('产数ICT') !== -1) { hasIct = true; break; }
+    }
+    if (hasIct) { ictIdx = ciSort; break; }
   }
   if (ictIdx > 0) {
     var ictComp = components.splice(ictIdx, 1)[0];
