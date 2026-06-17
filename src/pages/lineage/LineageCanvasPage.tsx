@@ -78,7 +78,7 @@ interface CanvasNode {
 
 import { mockAppliedConnections } from '@/data/aiRecommendations'
 import { indicatorDefinitions } from '@/data/indicatorDefinitions'
-import { addExcludedRelation, removeExcludedRelation, addCreatedRelation } from '@/utils/lineageExcludedStorage'
+import { addExcludedRelation, removeExcludedRelation, addCreatedRelation, addModifiedRelation } from '@/utils/lineageExcludedStorage'
 
 const codeToName = new Map(indicatorDefinitions.map((d) => [d.code, d.name]))
 const codeToLevel1 = new Map(indicatorDefinitions.map((d) => [d.code, d.level1]))
@@ -771,6 +771,20 @@ export default function LineageCanvasPage() {
     const sourceInd = availableIndicators.find((i) => i.id === createForm.sourceId);
     const targetInd = availableIndicators.find((i) => i.id === createForm.targetId);
     if (!sourceInd || !targetInd) return;
+
+    // 检查是否已存在同 source-target 的关系（编辑场景），先删除旧关系并记录修改
+    const existing = relations.find((r) => r.source === sourceInd.name && r.target === targetInd.name);
+    if (existing) {
+      handleDeleteRelation(existing.id);
+      if (existing.type !== createForm.relationType) {
+        addModifiedRelation({
+          sourceName: sourceInd.name,
+          targetName: targetInd.name,
+          oldType: existing.type,
+          newType: createForm.relationType,
+        });
+      }
+    }
 
     const newRelation: Relation = {
       id: `REL-${String(relations.length + 1).padStart(3, '0')}`,

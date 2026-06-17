@@ -945,6 +945,7 @@ const MOCK_VALUES = {"月_预算执行进度-落地产品收入-政支中心结�
 
   // 合并新增关系
   var addedRels = JSON.parse(localStorage.getItem('kgv2-added-relations') || '[]');
+  var modifiedRels = JSON.parse(localStorage.getItem('kgv2-modified-relations') || '[]');
   var mergedRelations = FINANCE_RELATIONS.concat(addedRels.map(function(r, i) {
     return { id: 'ADD-' + String(i+1).padStart(3, '0'), sourceName: r.sourceName, sourceLevel1: '', relationType: r.relationType, targetName: r.targetName, targetLevel1: '' };
   }));
@@ -1034,10 +1035,28 @@ const MOCK_VALUES = {"月_预算执行进度-落地产品收入-政支中心结�
       }
     }
 
+    // 收集簇内修改的关系
+    var modifiedInCluster = [];
+    for (var mi = 0; mi < modifiedRels.length; mi++) {
+      if (clusterNodes[modifiedRels[mi].sourceName] || clusterNodes[modifiedRels[mi].targetName]) {
+        modifiedInCluster.push(modifiedRels[mi]);
+      }
+    }
+
     // --- 归因分析 ---
     var isICT = cluster.center.indexOf('产数ICT') !== -1 || cluster.center.indexOf('ICT毛利额') !== -1;
     var dynNarrative = '';
-    if (isICT && excludedDescs.length > 0 && addedDescs.length === 0) {
+    if (isICT && modifiedInCluster.length > 0) {
+      var mod = modifiedInCluster[0];
+      dynNarrative = '产数ICT毛利额的关联关系发生语义变更：' + mod.sourceName + '→' + mod.targetName + '原关系类型为「' + mod.oldType + '」，已修改为「' + mod.newType + '」。';
+      if (mod.oldType === 'DEPENDS_ON' && mod.newType === 'TRANSMISSION') {
+        dynNarrative += '该修改将关联语义从依赖转换为传导——原DEPENDS_ON表示ICT毛利额波动直接由上游指标驱动，现改为TRANSMISSION后，关系变为数据层面的横向联动，ICT毛利额波动不再作为该上游指标的直接归因证据。这意味着之前基于依赖关系的归因结论需要重新审视：如果ICT毛利额的波动确实受该指标驱动，则修改为TRANSMISSION可能导致归因链路出现断点。';
+      } else if (mod.oldType === 'TRANSMISSION' && mod.newType === 'DEPENDS_ON') {
+        dynNarrative += '该修改将关联语义从传导转换为依赖——原TRANSMISSION表示数据层面的横向联动，现改为DEPENDS_ON后，该上游指标被确认为ICT毛利额波动的直接驱动因素。修改后的归因链路上游延伸，新增的依赖关系为异常波动的根因追溯提供了更清晰的路径，但需确认依赖方向是否符合业务逻辑。';
+      } else {
+        dynNarrative += '关联语义的变更导致归因拓扑结构发生变化，建议基于新关系类型重新验证归因结论的有效性，避免套用历史分析结果。';
+      }
+    } else if (isICT && excludedDescs.length > 0 && addedDescs.length === 0) {
       dynNarrative = '产数ICT毛利额作为衡量数字化业务盈利能力的关键指标，其关联网络的变动直接影响归因结论的可信度。移除「' + excludedDescs[0] + '」后，该传导路径被截断——原本通过该关系解释的毛利波动不再能追溯到上游指标。从业务视角看，' + (excludedDescs[0].indexOf('DEPENDS_ON') !== -1 ? 'ICT毛利额对下层指标的依赖关系断裂，可能导致成本归集链条不完整，建议重新评估该依赖关系的业务合理性。' : 'ICT毛利额向横向指标的数据传导中断，下游分析将出现盲区，建议补充替代传导路径。');
     } else if (isICT && addedDescs.length > 0 && excludedDescs.length === 0) {
       dynNarrative = '产数ICT毛利额的关联网络发生扩展。新增「' + addedDescs[0] + '」后，该簇的归因链路由原有基础向外延伸——' + (addedDescs[0].indexOf('DEPENDS_ON') !== -1 ? '新增的依赖关系表明ICT毛利额受上游指标驱动，需要验证该依赖方向是否符合实际业务流程：ICT毛利额通常作为被解释变量（因变量），若新增关系将其置于自变量位置，可能暗示业务逻辑需要调整。' : '新增的关联关系为ICT毛利额波动提供了新的解释维度，建议验证关系类型的语义正确性：TRANSMISSION表示数据层面的联动传导，AGGREGATES表示层级聚合关系，错误的关系类型会误导归因方向。');
@@ -1055,7 +1074,17 @@ const MOCK_VALUES = {"月_预算执行进度-落地产品收入-政支中心结�
 
     // --- 异常表现 ---
     var dynAnomalies = '';
-    if (isICT && excludedDescs.length > 0) {
+    if (isICT && modifiedInCluster.length > 0) {
+      var modA = modifiedInCluster[0];
+      dynAnomalies = '产数ICT毛利额关联语义变更：' + modA.sourceName + '→' + modA.targetName + '由「' + modA.oldType + '」修改为「' + modA.newType + '」。该修改改变了ICT毛利额在该关联路径上的归因角色——';
+      if (modA.oldType === 'DEPENDS_ON' && modA.newType === 'TRANSMISSION') {
+        dynAnomalies += '从依赖关系转为传导关系后，ICT毛利额失去了一个上游归因锚点，波动解释能力减弱，建议监控该路径上的异常信号是否会因此出现漏报。';
+      } else if (modA.oldType === 'TRANSMISSION' && modA.newType === 'DEPENDS_ON') {
+        dynAnomalies += '从传导关系转为依赖关系后，ICT毛利额的归因链路上游延伸，新增的驱动因素可能揭示此前未被发现的异常根因，建议回溯近期波动事件验证新的归因关系。';
+      } else {
+        dynAnomalies += '关系语义的变化可能影响归因链路的完整性，建议对比修改前后的异常检测结果差异。';
+      }
+    } else if (isICT && excludedDescs.length > 0) {
       dynAnomalies = '产数ICT毛利额关联网络发生变更：移除' + excludedDescs.length + '条关联后，簇内连通性下降。受影响的归因路径已无法形成完整闭环，建议重点关注被截断链路上游指标的独立波动趋势。';
     } else if (isICT && addedDescs.length > 0) {
       dynAnomalies = '产数ICT毛利额关联网络扩展：新增' + addedDescs.length + '条关联，中心指标的受影响范围扩大至' + activeRels.length + '个关联节点。新增的关联路径可能引入未预期的波动传导，建议在监控周期内持续观察新路径上的数据一致性。';
@@ -1137,12 +1166,9 @@ const MOCK_VALUES = {"月_预算执行进度-落地产品收入-政支中心结�
       }
     }
     html += '<p class="chart-note"><strong>归因判定：</strong><span class="tag tag-warning">需关注</span> — ' + chainHtml;
-    if (excludedDescs.length > 0) {
-      html += '（已移除' + excludedDescs.length + '条关联）';
-    }
-    if (addedDescs.length > 0) {
-      html += '（新增' + addedDescs.length + '条关联）';
-    }
+    if (excludedDescs.length > 0) { html += '（已移除' + excludedDescs.length + '条关联）'; }
+    if (addedDescs.length > 0) { html += '（新增' + addedDescs.length + '条关联）'; }
+    if (modifiedInCluster.length > 0) { html += '（已修改' + modifiedInCluster.length + '条关联）'; }
     html += '</p>';
     html += '<table class="nb-table"><thead><tr><th>邻居</th><th>关系</th><th>方向</th><th>03-09值</th><th>03-08值</th><th>日变化</th><th>月均值</th><th>偏离?</th></tr></thead><tbody>';
 
