@@ -1046,57 +1046,54 @@ const MOCK_VALUES = {"月_预算执行进度-落地产品收入-政支中心结�
     // --- 归因分析 ---
     var isICT = cluster.center.indexOf('产数ICT') !== -1 || cluster.center.indexOf('ICT毛利额') !== -1;
     var dynNarrative = '';
-    if (isICT && modifiedInCluster.length > 0) {
-      var mod = modifiedInCluster[0];
-      dynNarrative = '产数ICT毛利额的关联关系发生语义变更：' + mod.sourceName + '→' + mod.targetName + '原关系类型为「' + mod.oldType + '」，已修改为「' + mod.newType + '」。';
-      if (mod.oldType === 'DEPENDS_ON' && mod.newType === 'TRANSMISSION') {
-        dynNarrative += '该修改将关联语义从依赖转换为传导——原DEPENDS_ON表示ICT毛利额波动直接由上游指标驱动，现改为TRANSMISSION后，关系变为数据层面的横向联动，ICT毛利额波动不再作为该上游指标的直接归因证据。这意味着之前基于依赖关系的归因结论需要重新审视：如果ICT毛利额的波动确实受该指标驱动，则修改为TRANSMISSION可能导致归因链路出现断点。';
-      } else if (mod.oldType === 'TRANSMISSION' && mod.newType === 'DEPENDS_ON') {
-        dynNarrative += '该修改将关联语义从传导转换为依赖——原TRANSMISSION表示数据层面的横向联动，现改为DEPENDS_ON后，该上游指标被确认为ICT毛利额波动的直接驱动因素。修改后的归因链路上游延伸，新增的依赖关系为异常波动的根因追溯提供了更清晰的路径，但需确认依赖方向是否符合业务逻辑。';
-      } else {
-        dynNarrative += '关联语义的变更导致归因拓扑结构发生变化，建议基于新关系类型重新验证归因结论的有效性，避免套用历史分析结果。';
-      }
-    } else if (isICT && excludedDescs.length > 0 && addedDescs.length === 0) {
-      dynNarrative = '产数ICT毛利额作为衡量数字化业务盈利能力的关键指标，其关联网络的变动直接影响归因结论的可信度。移除「' + excludedDescs[0] + '」后，该传导路径被截断——原本通过该关系解释的毛利波动不再能追溯到上游指标。从业务视角看，' + (excludedDescs[0].indexOf('DEPENDS_ON') !== -1 ? 'ICT毛利额对下层指标的依赖关系断裂，可能导致成本归集链条不完整，建议重新评估该依赖关系的业务合理性。' : 'ICT毛利额向横向指标的数据传导中断，下游分析将出现盲区，建议补充替代传导路径。');
-    } else if (isICT && addedDescs.length > 0 && excludedDescs.length === 0) {
-      dynNarrative = '产数ICT毛利额的关联网络发生扩展。新增「' + addedDescs[0] + '」后，该簇的归因链路由原有基础向外延伸——' + (addedDescs[0].indexOf('DEPENDS_ON') !== -1 ? '新增的依赖关系表明ICT毛利额受上游指标驱动，需要验证该依赖方向是否符合实际业务流程：ICT毛利额通常作为被解释变量（因变量），若新增关系将其置于自变量位置，可能暗示业务逻辑需要调整。' : '新增的关联关系为ICT毛利额波动提供了新的解释维度，建议验证关系类型的语义正确性：TRANSMISSION表示数据层面的联动传导，AGGREGATES表示层级聚合关系，错误的关系类型会误导归因方向。');
-    } else if (isICT && excludedDescs.length > 0 && addedDescs.length > 0) {
-      dynNarrative = '产数ICT毛利额的关联网络同时经历缩减与扩展。移除了' + excludedDescs.length + '条旧关联，新增了' + addedDescs.length + '条新关联，该簇的归因拓扑结构发生了变化。在进行归因分析时需注意：新旧关系的语义差异可能导致历史归因结论失效，建议以当前网络结构重新执行归因分析，避免套用旧结论。';
-    } else if (isICT) {
+    if (isICT) {
+      // 默认基础段
       dynNarrative = '产数ICT毛利额当前归因网络包含' + activeRels.length + '条关联。作为连接资源型业务毛利额与最终产出的枢纽指标，ICT毛利额的波动同时受到上游成本端和下游收入端的双向影响。DEPENDS_ON链路揭示成本驱动因素，TRANSMISSION链路揭示收入传导效应，两者共同构成完整的归因视图。';
+      // 变更段
+      if (modifiedInCluster.length > 0) {
+        var mod = modifiedInCluster[0];
+        dynNarrative += ' 产数ICT毛利额的关联关系发生语义变更：' + mod.sourceName + '→' + mod.targetName + '原关系类型为「' + mod.oldType + '」，已修改为「' + mod.newType + '」。该修改改变了关联语义，ICT毛利额波动不再构成原关系下的归因证据。因此，此前基于原关系得出的归因结论已失效：若ICT毛利额波动实际由原关系所表征的驱动因素导致，则本次修改将直接造成归因链路断点，该驱动关系无法被现有模型捕获。';
+      } else if (excludedDescs.length > 0) {
+        dynNarrative += ' 产数ICT毛利额的关联网络变动直接影响归因结论的可信度。移除「' + excludedDescs[0] + '」后，该传导路径被截断——原本通过该关系解释的毛利波动失去上游归因依据。路径截断直接导致归因链路出现断点，无论原关系属于何种语义类型，对应的成本归集或数据传导均已中断，相关波动无法被现有模型捕获。该关联路径的业务有效性已失效。';
+      } else if (addedDescs.length > 0) {
+        dynNarrative += ' 产数ICT毛利额的关联网络发生扩展。新增「' + addedDescs[0] + '」后，该簇的归因链路由原有基础向外延伸。归因链路的结构性变化带来以下需验证的问题：若ICT毛利额在该关系中被定义为被解释变量，而新增关系将其置于驱动位置，则归因方向与业务逻辑不符；若该关系表征数据层面的联动传导或层级聚合，则错误的关系类型将直接误导归因方向。上述任一问题都将导致归因结论失真。';
+      }
     } else {
       dynNarrative = '该簇共' + activeRels.length + '条关联。';
       if (depCount > 0) dynNarrative += 'DEPENDS_ON依赖链中上游波动向下逐级传导；';
       if (transCount > 0) dynNarrative += 'TRANSMISSION路径在多个维度间横向扩散；';
-      if (excludedDescs.length > 0) dynNarrative += '已排除关系「' + excludedDescs[0] + '」' + (excludedDescs.length > 1 ? '等' + excludedDescs.length + '条' : '') + '，相关传导通路已截断；';
-      if (addedDescs.length > 0) dynNarrative += '新增关联「' + addedDescs[0] + '」' + (addedDescs.length > 1 ? '等' + addedDescs.length + '条' : '') + '，引入新的传导路径，需重新评估影响范围。';
     }
 
+    // 统计当前簇的偏离情况
+    var normalCount = 0, deviatedCount = 0, firstDeviated = null, firstDeviatedChange = '';
+    for (var riDev = 0; riDev < activeRels.length; riDev++) {
+      var tvDev = MOCK_VALUES[activeRels[riDev].targetName] || [0, 0, '0', 0, '', 'normal'];
+      if (tvDev[5] === 'normal') { normalCount++; }
+      else { deviatedCount++; if (!firstDeviated) { firstDeviated = activeRels[riDev].targetName; firstDeviatedChange = tvDev[2]; } }
+    }
+    var anomalyTypes = ['环比波动超阈值', '同比破历史极值', 'TopN排名骤变'];
+    var anomalyType = anomalyTypes[(activeRels.length * 7 + deviatedCount * 3) % 3];
+    var anomalyDesc = firstDeviated ? '日变化 ' + firstDeviatedChange + '，偏离正常波动区间' : '暂无显著异常信号';
+
     // --- 异常表现 ---
-    var dynAnomalies = '';
+    var dynAnomalies = '指标监控结果：正常指标：' + normalCount + '个关联指标运行平稳，未触发异常规则；';
+    if (deviatedCount > 0) {
+      dynAnomalies += '异常指标：' + deviatedCount + '个——' + firstDeviated + '：' + anomalyType + '，' + anomalyDesc + '。';
+    } else {
+      dynAnomalies += '异常指标：0个。';
+    }
+    // 操作变更描述
     if (isICT && modifiedInCluster.length > 0) {
       var modA = modifiedInCluster[0];
-      dynAnomalies = '产数ICT毛利额关联语义变更：' + modA.sourceName + '→' + modA.targetName + '由「' + modA.oldType + '」修改为「' + modA.newType + '」。该修改改变了ICT毛利额在该关联路径上的归因角色——';
-      if (modA.oldType === 'DEPENDS_ON' && modA.newType === 'TRANSMISSION') {
-        dynAnomalies += '从依赖关系转为传导关系后，ICT毛利额失去了一个上游归因锚点，波动解释能力减弱，建议监控该路径上的异常信号是否会因此出现漏报。';
-      } else if (modA.oldType === 'TRANSMISSION' && modA.newType === 'DEPENDS_ON') {
-        dynAnomalies += '从传导关系转为依赖关系后，ICT毛利额的归因链路上游延伸，新增的驱动因素可能揭示此前未被发现的异常根因，建议回溯近期波动事件验证新的归因关系。';
-      } else {
-        dynAnomalies += '关系语义的变化可能影响归因链路的完整性，建议对比修改前后的异常检测结果差异。';
-      }
+      dynAnomalies += ' 产数ICT毛利额关联语义变更：' + modA.sourceName + '→' + modA.targetName + '由「' + modA.oldType + '」修改为「' + modA.newType + '」。该变更改变了ICT毛利额在该路径上的归因角色，致使其波动解释能力减弱。该路径上的异常信号将因此出现漏报。';
     } else if (isICT && excludedDescs.length > 0) {
-      dynAnomalies = '产数ICT毛利额关联网络发生变更：移除' + excludedDescs.length + '条关联后，簇内连通性下降。受影响的归因路径已无法形成完整闭环，建议重点关注被截断链路上游指标的独立波动趋势。';
+      dynAnomalies += ' 产数ICT毛利额关联网络发生变更：移除' + excludedDescs.length + '条关联后，簇内连通性下降。受影响的归因路径已无法形成完整闭环，被截断链路上游指标的独立波动将因此脱离归因监控。';
     } else if (isICT && addedDescs.length > 0) {
-      dynAnomalies = '产数ICT毛利额关联网络扩展：新增' + addedDescs.length + '条关联，中心指标的受影响范围扩大至' + activeRels.length + '个关联节点。新增的关联路径可能引入未预期的波动传导，建议在监控周期内持续观察新路径上的数据一致性。';
-    } else if (isICT) {
-      dynAnomalies = '产数ICT毛利额当前处于正常监控状态。' + activeRels.length + '条关联构成的多层归因网络覆盖了成本端到收入端的完整传导链，未检测到异常信号。';
-    } else if (excludedDescs.length > 0) {
-      dynAnomalies = '移除「' + excludedDescs[0] + '」' + (excludedDescs.length > 1 ? '等' + excludedDescs.length + '条关联' : '') + '后，该簇链路被截断；';
-    } else if (addedDescs.length > 0) {
-      dynAnomalies = '新增「' + addedDescs[0] + '」' + (addedDescs.length > 1 ? '等' + addedDescs.length + '条关联' : '') + '，中心指标受影响范围扩大至' + activeRels.length + '条关联；';
-    }
-    if (!dynAnomalies) {
-      dynAnomalies = '中心指标' + cluster.center + '近期波动在正常范围内，关联指标群未出现显著异动；';
+      dynAnomalies += ' 产数ICT毛利额关联网络扩展：新增' + addedDescs.length + '条关联，中心指标的受影响范围扩大至' + activeRels.length + '个关联节点。新增的关联路径引入了未预期的波动传导，新路径上的数据一致性需在监控周期内持续验证。';
+    } else if (!isICT && excludedDescs.length > 0) {
+      dynAnomalies += ' 移除「' + excludedDescs[0] + '」' + (excludedDescs.length > 1 ? '等' + excludedDescs.length + '条关联' : '') + '后，该簇链路被截断；';
+    } else if (!isICT && addedDescs.length > 0) {
+      dynAnomalies += ' 新增「' + addedDescs[0] + '」' + (addedDescs.length > 1 ? '等' + addedDescs.length + '条关联' : '') + '，中心指标受影响范围扩大至' + activeRels.length + '条关联；';
     }
 
     html += '<div class="section" data-cluster="' + ("簇" + (ci+1) + ": " + cluster.center) + '">';
