@@ -29,14 +29,15 @@ describe('NocRulePage', () => {
     cleanup()
   })
 
-  it('左侧分类树应只渲染 3 个分类节点', () => {
+  it('左侧分类树应渲染新的两级结构', () => {
     render(<NocRulePage />)
 
     const tree = screen.getByTestId('rule-category-tree')
-    expect(within(tree).getByText('阈值上下限')).toBeInTheDocument()
-    expect(within(tree).getByText('TOPN 监控')).toBeInTheDocument()
+    expect(within(tree).getByText('异常规则')).toBeInTheDocument()
+    expect(within(tree).getByText('指标预警')).toBeInTheDocument()
     expect(within(tree).getByText('波动算法')).toBeInTheDocument()
-    expect(within(tree).queryByText('异常规则')).not.toBeInTheDocument()
+    expect(within(tree).getByText('阈值上下限')).toBeInTheDocument()
+    expect(within(tree).getByText('TOPN')).toBeInTheDocument()
     expect(within(tree).queryByText('质量规则')).not.toBeInTheDocument()
     expect(within(tree).queryByText('合规规则')).not.toBeInTheDocument()
   })

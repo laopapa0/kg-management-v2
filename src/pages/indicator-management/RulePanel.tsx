@@ -40,18 +40,27 @@ function computeSearchResult(tree: Rule[], term: string): SearchResult {
 
   for (const root of tree) dfs(root)
 
+  // 标记所有匹配节点的祖先节点，用于搜索时自动展开路径。
+  // 通过多轮迭代确保深层祖先也被正确标记。
   const ancestorIds = new Set<string>()
-  function markAncestors(nodes: Rule[]) {
-    for (const node of nodes) {
-      for (const child of node.children ?? []) {
-        if (matchedIds.has(child.id) || ancestorIds.has(child.id)) {
-          ancestorIds.add(node.id)
+  let changed = true
+  while (changed) {
+    changed = false
+    function markAncestors(nodes: Rule[]) {
+      for (const node of nodes) {
+        for (const child of node.children ?? []) {
+          if (matchedIds.has(child.id) || ancestorIds.has(child.id)) {
+            if (!ancestorIds.has(node.id)) {
+              ancestorIds.add(node.id)
+              changed = true
+            }
+          }
+          markAncestors(node.children ?? [])
         }
-        markAncestors(node.children ?? [])
       }
     }
+    markAncestors(tree)
   }
-  markAncestors(tree)
 
   return { matchedIds, ancestorIds }
 }
@@ -78,9 +87,15 @@ export default function RulePanel({ selectedIndicatorId }: { selectedIndicatorId
 
   const [userExpanded, setUserExpanded] = useState<Set<string>>(() => {
     const initial = new Set<string>()
-    for (const node of tree) {
-      if (node.children && node.children.length > 0) initial.add(node.id)
+    function addExpandable(nodes: Rule[]) {
+      for (const node of nodes) {
+        if (node.children && node.children.length > 0) {
+          initial.add(node.id)
+          addExpandable(node.children)
+        }
+      }
     }
+    addExpandable(tree)
     return initial
   })
 
@@ -159,7 +174,7 @@ export default function RulePanel({ selectedIndicatorId }: { selectedIndicatorId
       return nodes
         .map((node) => {
           const filteredChildren = node.children
-            ? filterRuleTreeNodes(node.children, matched, ancestors)
+            ? filterRuleTreeNodes(node.children as RuleTreeNode[], matched, ancestors)
             : undefined
           const isMatch = matched.has(node.id)
           const isAncestor = ancestors.has(node.id)
@@ -187,6 +202,28 @@ export default function RulePanel({ selectedIndicatorId }: { selectedIndicatorId
     () => new Set(selectedIndicator?.ruleIds ?? []),
     [selectedIndicator],
   )
+
+  // 从指定规则移除所有指标挂靠
+  const handleDetachAllFromRule = (ruleId: string) => {
+    setIndicators(
+      indicators.map((i) =>
+        i.ruleIds.includes(ruleId)
+          ? { ...i, ruleIds: i.ruleIds.filter((id) => id !== ruleId) }
+          : i,
+      ),
+    )
+  }
+
+  // 从指定规则移除单个指标挂靠
+  const handleDetachOneFromRule = (ruleId: string, indicatorId: string) => {
+    setIndicators(
+      indicators.map((i) =>
+        i.id === indicatorId && i.ruleIds.includes(ruleId)
+          ? { ...i, ruleIds: i.ruleIds.filter((id) => id !== ruleId) }
+          : i,
+      ),
+    )
+  }
 
   // 规则记忆：切换选中指标对该规则的启/停（ruleIds）
   const handleRuleMemoryToggle = (ruleId: string) => {

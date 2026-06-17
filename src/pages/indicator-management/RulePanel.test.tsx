@@ -50,20 +50,25 @@ describe('RulePanel', () => {
     }
   })
 
-  it('renders exactly 3 root categories and 9 leaf rules', () => {
+  it('renders new two-level rule tree with 2 root categories and 9 leaf rules', () => {
     initializeAttachmentStore()
     render(<RulePanel />)
 
     const state = useAttachmentStore.getState()
     const rootRules = state.rules.filter((r) => !r.parentId)
-    const leafRules = state.rules.filter((r) => r.parentId)
+    const leafRules = state.rules.filter((r) => r.parentId && !state.rules.some((p) => p.parentId === r.id))
 
-    expect(rootRules).toHaveLength(3)
+    expect(rootRules).toHaveLength(2)
     expect(leafRules).toHaveLength(9)
 
     for (const root of rootRules) {
       expect(screen.getByText(root.name)).toBeInTheDocument()
     }
+    expect(screen.getByText('异常规则')).toBeInTheDocument()
+    expect(screen.getByText('指标预警')).toBeInTheDocument()
+    expect(screen.getByText('波动算法')).toBeInTheDocument()
+    expect(screen.getByText('阈值上下限')).toBeInTheDocument()
+    expect(screen.getByText('TOPN')).toBeInTheDocument()
   })
 
   it('displays attached indicator count for each rule', () => {

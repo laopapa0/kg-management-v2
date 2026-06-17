@@ -8,43 +8,51 @@ import {
 import { RuleTypeEnum } from '@/models/indicatorAttachmentModel';
 
 describe('generateMockRules', () => {
-  it('应返回 3 个根分类节点和 9 条叶子规则，共 12 个节点', () => {
+  it('应返回 2 个根分类节点、3 个中间分类和 9 条叶子规则，共 14 个节点', () => {
     const rules = generateMockRules();
     const roots = rules.filter((r) => !r.parentId);
-    const leaves = rules.filter((r) => r.parentId);
+    const ruleIdsWithChildren = new Set(rules.map((r) => r.parentId).filter(Boolean));
+    const leaves = rules.filter((r) => !ruleIdsWithChildren.has(r.id));
+    const midCategories = rules.filter((r) => r.parentId && ruleIdsWithChildren.has(r.id));
 
-    expect(rules).toHaveLength(12);
-    expect(roots).toHaveLength(3);
+    expect(rules).toHaveLength(14);
+    expect(roots).toHaveLength(2);
+    expect(midCategories).toHaveLength(3);
     expect(leaves).toHaveLength(9);
   });
 
-  it('根分类节点应为阈值上下限、TOPN 监控、波动算法', () => {
+  it('根分类节点应为异常规则、指标预警', () => {
     const rules = generateMockRules();
     const rootNames = rules
       .filter((r) => !r.parentId)
       .map((r) => r.name)
       .sort();
 
-    expect(rootNames).toEqual(['TOPN 监控', '波动算法', '阈值上下限']);
+    expect(rootNames).toEqual(['异常规则', '指标预警']);
   });
 
-  it('每个根分类下应恰好有 3 条规则', () => {
+  it('每个根分类下应包含中间分类，每个中间分类下恰好有 3 条叶子规则', () => {
     const rules = generateMockRules();
     const roots = rules.filter((r) => !r.parentId);
 
     for (const root of roots) {
-      const children = rules.filter((r) => r.parentId === root.id);
-      expect(children).toHaveLength(3);
+      const midCategories = rules.filter((r) => r.parentId === root.id);
+      expect(midCategories.length).toBeGreaterThan(0);
+      for (const mid of midCategories) {
+        const leaves = rules.filter((r) => r.parentId === mid.id);
+        expect(leaves).toHaveLength(3);
+      }
     }
   });
 
-  it('不应存在父规则继承链（叶子规则的 parentId 只能是分类节点）', () => {
+  it('叶子规则的 parentId 必须指向存在的规则', () => {
     const rules = generateMockRules();
-    const rootIds = new Set(rules.filter((r) => !r.parentId).map((r) => r.id));
-    const leaves = rules.filter((r) => r.parentId);
+    const ruleIds = new Set(rules.map((r) => r.id));
+    const ruleIdsWithChildren = new Set(rules.map((r) => r.parentId).filter(Boolean));
+    const leaves = rules.filter((r) => !ruleIdsWithChildren.has(r.id));
 
     for (const leaf of leaves) {
-      expect(rootIds.has(leaf.parentId!)).toBe(true);
+      expect(ruleIds.has(leaf.parentId!)).toBe(true);
     }
   });
 
@@ -108,8 +116,10 @@ describe('generateMockIndicators tagIds/ruleIds 预置', () => {
 
   it('每种叶子规则至少被 2 个指标引用', () => {
     const indicators = generateMockIndicators(deptId);
-    const allLeafRules = generateMockRules()
-      .filter((r) => r.parentId)
+    const allRules = generateMockRules();
+    const ruleIdsWithChildren = new Set(allRules.map((r) => r.parentId).filter(Boolean));
+    const allLeafRules = allRules
+      .filter((r) => !ruleIdsWithChildren.has(r.id))
       .map((r) => r.id);
 
     for (const ruleId of allLeafRules) {
@@ -135,9 +145,11 @@ describe('generateMockIndicators tagIds/ruleIds 预置', () => {
 
   it('所有 ruleIds 都在已知叶子规则范围内', () => {
     const indicators = generateMockIndicators(deptId);
+    const allRules = generateMockRules();
+    const ruleIdsWithChildren = new Set(allRules.map((r) => r.parentId).filter(Boolean));
     const validRuleIds = new Set(
-      generateMockRules()
-        .filter((r) => r.parentId)
+      allRules
+        .filter((r) => !ruleIdsWithChildren.has(r.id))
         .map((r) => r.id),
     );
 

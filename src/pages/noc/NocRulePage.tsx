@@ -53,7 +53,7 @@ import {
 } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { generateMockRules, mockRuleCategories } from '@/data/mockAttachmentData';
-import type { RuleType } from '@/models/indicatorAttachmentModel';
+import type { Rule, RuleType } from '@/models/indicatorAttachmentModel';
 
 /* ─── 类型 ─── */
 interface RuleCategory {
@@ -86,6 +86,10 @@ interface ConflictItem {
 const ruleCategoryTreeData: RuleCategory[] = mockRuleCategories.map((cat) => ({
   id: cat.id,
   name: cat.name,
+  children: cat.children?.map((child) => ({
+    id: child.id,
+    name: child.name,
+  })),
 }));
 
 const typeLabelMap: Record<RuleType, string> = {
@@ -96,13 +100,27 @@ const typeLabelMap: Record<RuleType, string> = {
 
 function buildRuleListData(rules: ReturnType<typeof generateMockRules>): RuleItem[] {
   const ruleMap = new Map(rules.map((r) => [r.id, r]));
+  const ruleIdsWithChildren = new Set(rules.map((r) => r.parentId).filter(Boolean));
+
+  function getCategoryPath(rule: Rule): string {
+    const parts: string[] = [];
+    let current: Rule | undefined = rule;
+    while (current?.parentId) {
+      const parent = ruleMap.get(current.parentId);
+      if (!parent) break;
+      parts.unshift(parent.name);
+      current = parent;
+    }
+    return parts.join(' / ');
+  }
+
   return rules
-    .filter((r) => r.parentId)
+    .filter((r) => r.parentId && !ruleIdsWithChildren.has(r.id))
     .map((r) => ({
       id: r.id,
       code: r.id,
       name: r.name,
-      category: ruleMap.get(r.parentId!)?.name ?? '',
+      category: getCategoryPath(r),
       type: typeLabelMap[r.type],
       paramSummary: '详见参数定义',
       parentRule: null,

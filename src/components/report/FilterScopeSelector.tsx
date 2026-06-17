@@ -1,5 +1,6 @@
 import { useState, useMemo, useCallback } from 'react'
 import { X, ListFilter, ArrowLeftRight } from 'lucide-react'
+import { cn } from '@/lib/utils'
 import TreeView from '@/components/tree/TreeView'
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover'
 import { buildIndicatorTree } from '@/utils/attachmentTree'
@@ -70,6 +71,26 @@ export default function FilterScopeSelector({ value, onChange, mode = 'full' }: 
   )
   const allRules = useMemo(() => getRules(), [])
   const ruleTree = useMemo(() => buildRuleTree(allRules), [allRules])
+  const ruleIdsWithChildren = useMemo(() => {
+    const ids = new Set<string>()
+    for (const rule of allRules) {
+      if (rule.parentId) ids.add(rule.parentId)
+    }
+    return ids
+  }, [allRules])
+  const initialExpandedRuleIds = useMemo(() => {
+    const ids: string[] = []
+    function collect(nodes: Rule[]) {
+      for (const node of nodes) {
+        if (node.children && node.children.length > 0) {
+          ids.push(node.id)
+          collect(node.children)
+        }
+      }
+    }
+    collect(ruleTree)
+    return ids
+  }, [ruleTree])
 
   // ── 本地选中状态（与 props.value 同步） ──
   const [checkedIndicatorIds, setCheckedIndicatorIds] = useState<Set<string>>(
@@ -421,19 +442,27 @@ export default function FilterScopeSelector({ value, onChange, mode = 'full' }: 
         <h3 className="mb-2 font-medium text-dark-text-primary">剔除规则</h3>
         <TreeView
           nodes={ruleTree}
-          renderNode={(node) => (
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                data-testid={`scope-rule-checkbox-${node.id}`}
-                checked={checkedRuleIds.has(node.id)}
-                onChange={() => toggleRule(node.id)}
-                onClick={(e) => e.stopPropagation()}
-                className="size-4 cursor-pointer accent-dark-accent-primary"
-              />
-              <span>{node.name}</span>
-            </div>
-          )}
+          initialExpanded={initialExpandedRuleIds}
+          renderNode={(node) => {
+            const isLeafRule = !ruleIdsWithChildren.has(node.id)
+            return (
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  data-testid={`scope-rule-checkbox-${node.id}`}
+                  checked={checkedRuleIds.has(node.id)}
+                  onChange={() => isLeafRule && toggleRule(node.id)}
+                  onClick={(e) => e.stopPropagation()}
+                  disabled={!isLeafRule}
+                  className={cn(
+                    'size-4 accent-dark-accent-primary',
+                    isLeafRule ? 'cursor-pointer' : 'cursor-not-allowed opacity-50',
+                  )}
+                />
+                <span className={isLeafRule ? '' : 'text-dark-text-tertiary'}>{node.name}</span>
+              </div>
+            )
+          }}
         />
       </div>
 

@@ -113,8 +113,10 @@ export function generateMockIndicators(departmentId: string): IndicatorAttachmen
   const leafTags = generateMockTagNodes(departmentId)
     .filter((t) => t.parentId)
     .map((t) => t.id)
-  const leafRules = generateMockRules()
-    .filter((r) => r.parentId)
+  const allRules = generateMockRules()
+  const ruleIdsWithChildren = new Set(allRules.map((r) => r.parentId).filter(Boolean))
+  const leafRules = allRules
+    .filter((r) => !ruleIdsWithChildren.has(r.id))
     .map((r) => r.id)
 
   result.forEach((indicator, index) => {
@@ -161,30 +163,43 @@ export function generateMockTagNodes(_departmentId: string): TagNode[] {
 }
 
 export const mockRuleCategories = [
-  { id: 'rule-cat-threshold', name: '阈值上下限' },
-  { id: 'rule-cat-topn', name: 'TOPN 监控' },
-  { id: 'rule-cat-fluctuation', name: '波动算法' },
+  {
+    id: 'rule-cat-abnormal',
+    name: '异常规则',
+    children: [
+      { id: 'rule-cat-fluctuation', name: '波动算法' },
+    ],
+  },
+  {
+    id: 'rule-cat-early-warning',
+    name: '指标预警',
+    children: [
+      { id: 'rule-cat-threshold', name: '阈值上下限' },
+      { id: 'rule-cat-topn', name: 'TOPN' },
+    ],
+  },
 ] as const
 
 export function generateMockRules(): Rule[] {
   return [
-    // 阈值上下限
-    { id: 'rule-cat-threshold', name: '阈值上下限', type: 'threshold' as const, enabled: true },
+    // 异常规则
+    { id: 'rule-cat-abnormal', name: '异常规则', type: 'threshold' as const, enabled: true },
+    { id: 'rule-cat-fluctuation', name: '波动算法', type: 'fluctuation' as const, parentId: 'rule-cat-abnormal', enabled: true },
+    { id: 'rule-fluctuation-yoy', name: '同比波动检测', type: 'fluctuation' as const, parentId: 'rule-cat-fluctuation', enabled: true },
+    { id: 'rule-fluctuation-mom', name: '环比波动检测', type: 'fluctuation' as const, parentId: 'rule-cat-fluctuation', enabled: true },
+    { id: 'rule-fluctuation-amp', name: '波动幅度检测', type: 'fluctuation' as const, parentId: 'rule-cat-fluctuation', enabled: true },
+
+    // 指标预警
+    { id: 'rule-cat-early-warning', name: '指标预警', type: 'threshold' as const, enabled: true },
+    { id: 'rule-cat-threshold', name: '阈值上下限', type: 'threshold' as const, parentId: 'rule-cat-early-warning', enabled: true },
     { id: 'rule-threshold-upper', name: '通用上限告警', type: 'threshold' as const, parentId: 'rule-cat-threshold', enabled: true },
     { id: 'rule-threshold-lower', name: '通用下限告警', type: 'threshold' as const, parentId: 'rule-cat-threshold', enabled: true },
     { id: 'rule-threshold-5g', name: '5G用户上限告警', type: 'threshold' as const, parentId: 'rule-cat-threshold', enabled: true },
 
-    // TOPN 监控
-    { id: 'rule-cat-topn', name: 'TOPN 监控', type: 'topn' as const, enabled: true },
+    { id: 'rule-cat-topn', name: 'TOPN', type: 'topn' as const, parentId: 'rule-cat-early-warning', enabled: true },
     { id: 'rule-topn-desc-10', name: 'TOP10降序监控', type: 'topn' as const, parentId: 'rule-cat-topn', enabled: true },
     { id: 'rule-topn-asc-5', name: 'TOP5升序监控', type: 'topn' as const, parentId: 'rule-cat-topn', enabled: true },
     { id: 'rule-topn-anomaly-3', name: 'TOP3异常监控', type: 'topn' as const, parentId: 'rule-cat-topn', enabled: true },
-
-    // 波动算法
-    { id: 'rule-cat-fluctuation', name: '波动算法', type: 'fluctuation' as const, enabled: true },
-    { id: 'rule-fluctuation-yoy', name: '同比波动检测', type: 'fluctuation' as const, parentId: 'rule-cat-fluctuation', enabled: true },
-    { id: 'rule-fluctuation-mom', name: '环比波动检测', type: 'fluctuation' as const, parentId: 'rule-cat-fluctuation', enabled: true },
-    { id: 'rule-fluctuation-amp', name: '波动幅度检测', type: 'fluctuation' as const, parentId: 'rule-cat-fluctuation', enabled: true },
   ]
 }
 

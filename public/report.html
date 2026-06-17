@@ -1059,6 +1059,15 @@ const MOCK_VALUES = {"月_预算执行进度-落地产品收入-政支中心结�
 
     // --- 归因分析 ---
     var isICT = cluster.center.indexOf('产数ICT') !== -1 || cluster.center.indexOf('ICT毛利额') !== -1;
+    if (!isICT) {
+      for (var riIct = 0; riIct < activeRels.length; riIct++) {
+        var rIct = activeRels[riIct];
+        if (rIct.sourceName.indexOf('产数ICT') !== -1 || rIct.targetName.indexOf('产数ICT') !== -1) {
+          isICT = true;
+          break;
+        }
+      }
+    }
     var dynNarrative = '';
     if (isICT) {
       // 默认基础段
@@ -1090,11 +1099,23 @@ const MOCK_VALUES = {"月_预算执行进度-落地产品收入-政支中心结�
     var anomalyDesc = firstDeviated ? '日变化 ' + firstDeviatedChange + '，偏离正常波动区间' : '暂无显著异常信号';
 
     // --- 异常表现 ---
-    var dynAnomalies = '指标监控结果：正常指标：' + normalCount + '个关联指标运行平稳，未触发异常规则；';
-    if (deviatedCount > 0) {
-      dynAnomalies += '异常指标：' + deviatedCount + '个——' + firstDeviated + '：' + anomalyType + '，' + anomalyDesc + '。';
+    var dynAnomalies = '';
+    if (isICT) {
+      dynAnomalies = '产数ICT毛利额相关指标监控结果：';
+      dynAnomalies += '<br>- 正常指标：' + normalCount + '个关联指标运行平稳，未触发异常规则。';
+      if (deviatedCount > 0) {
+        dynAnomalies += '<br>- 异常指标：' + deviatedCount + '个指标出现异常——';
+        dynAnomalies += '<br>  · ' + firstDeviated + '：' + anomalyType + '（如环比波动超阈值、同比破历史极值、TopN排名骤变等），具体表现为' + anomalyDesc + '。';
+      } else {
+        dynAnomalies += '<br>- 异常指标：0个。';
+      }
     } else {
-      dynAnomalies += '异常指标：0个。';
+      dynAnomalies = '指标监控结果：正常指标：' + normalCount + '个关联指标运行平稳，未触发异常规则；';
+      if (deviatedCount > 0) {
+        dynAnomalies += '异常指标：' + deviatedCount + '个——' + firstDeviated + '：' + anomalyType + '，' + anomalyDesc + '。';
+      } else {
+        dynAnomalies += '异常指标：0个。';
+      }
     }
     // 操作变更描述
     if (isICT && modifiedInCluster.length > 0) {

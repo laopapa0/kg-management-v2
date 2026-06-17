@@ -94,7 +94,7 @@ describe('FilterScopeSelector', () => {
     expect(lastCall.includedIndicatorIds).toContain('ind-child')
   })
 
-  it('checking a rule updates excludedRuleIds', () => {
+  it('checking a leaf rule updates excludedRuleIds', () => {
     const onChange = vi.fn()
     const value: FilterScopeValue = {
       includedIndicatorIds: [],
@@ -104,14 +104,14 @@ describe('FilterScopeSelector', () => {
 
     render(<FilterScopeSelector value={value} onChange={onChange} />)
 
-    expect(screen.getByText('阈值上下限')).toBeInTheDocument()
+    expect(screen.getByText('通用上限告警')).toBeInTheDocument()
 
-    const ruleCheckbox = screen.getByTestId('scope-rule-checkbox-rule-cat-threshold')
+    const ruleCheckbox = screen.getByTestId('scope-rule-checkbox-rule-threshold-upper')
     fireEvent.click(ruleCheckbox)
 
     expect(onChange).toHaveBeenCalled()
     const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1][0] as FilterScopeValue
-    expect(lastCall.excludedRuleIds).toContain('rule-cat-threshold')
+    expect(lastCall.excludedRuleIds).toContain('rule-threshold-upper')
   })
 
   it('checking a link relation updates excludedLinkRelationIds', () => {

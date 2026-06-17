@@ -347,7 +347,9 @@ export default function IndicatorAttachmentPage() {
   const persistentConnections = useMemo(() => {
     const result: { sourceId: string; targetId: string }[] = []
     for (const ind of allIndicators) {
-      if (ind.treeParentId) {
+      // 过滤掉指向"默认/pending"容器节点的连线：这些指标在视觉上属于候选池，
+      // 画线到"默认"节点会造成"从默认到指标池多个卡片中心多个连线"的混乱。
+      if (ind.treeParentId && !ind.treeParentId.endsWith('-pending')) {
         result.push({ sourceId: ind.id, targetId: ind.treeParentId })
       }
     }
